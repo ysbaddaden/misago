@@ -1,0 +1,14 @@
+#! /usr/bin/php
+<?php
+
+if (!isset($_SERVER['argv'][1]))
+{
+  echo "Usage: misago {$app_name}";
+  exit;
+}
+
+$path_to   = $_SERVER['argv'][1];
+$path_here = dirname(__FILE__);
+`cp -r {$path_here}/../templates/app {$path_to}`;
+
+?>
