@@ -11,9 +11,13 @@ class FakeDriver extends DBO_Base
 {
   function execute($sql)
   {
-    return $sql;
+    return preg_replace('/\s{2,}/', ' ', $sql);
   }
-  function parse_results($results, $scope) { }
+  
+  function parse_results($results, $scope)
+  {
+    return $results;
+  }
 }
 
 class Test_DBO_BaseDriver extends Unit_Test
@@ -147,7 +151,7 @@ class Test_DBO_BaseDriver extends Unit_Test
     
     $data  = array('a' => 'b', 'c' => 'd');
     $sql = $db->update('books', $data);
-    $this->assert_equal("without conditions", $sql, "UPDATE \"books\" SET \"a\" = 'b', \"c\" = 'd'  ;");
+    $this->assert_equal("without conditions", $sql, "UPDATE \"books\" SET \"a\" = 'b', \"c\" = 'd' ;");
     
     $data       = array('a' => 'b', 'c' => 'd');
     $conditions = array('e' => 'f');
@@ -160,21 +164,61 @@ class Test_DBO_BaseDriver extends Unit_Test
     $db  = new FakeDriver(array());
     
     $sql = $db->delete('books');
-    $this->assert_equal("without conditions", $sql, "DELETE FROM \"books\"  ;");
+    $this->assert_equal("without conditions", $sql, "DELETE FROM \"books\" ;");
     
     $conditions = array('e' => 'f');
     $sql = $db->delete('books', $conditions);
     $this->assert_equal("with conditions", $sql, "DELETE FROM \"books\" WHERE \"e\" = 'f' ;");
   }
   
-  function test_select()
+  function test_limit()
   {
+    $db = new FakeDriver(array());
     
+    $test = $db->limit(null);
+    $this->assert_equal("no limit", $test, "");
+    
+    $test = $db->limit(10);
+    $this->assert_equal("limit", $test, "LIMIT 10");
+    
+    $test = $db->limit(10, 15);
+    $this->assert_equal("limit with offset", $test, "LIMIT 10 OFFSET 140");
   }
   
-  function test_query()
+  function test_select()
   {
+    $db  = new FakeDriver(array());
     
+    $sql = $db->select('books');
+    $this->assert_equal("basic", $sql, "SELECT * FROM \"books\" ;");
+    
+    $sql = $db->select('books', "title,description");
+    $this->assert_equal("with fields", $sql, "SELECT \"title\", \"description\" FROM \"books\" ;");
+    
+    $sql = $db->select('books', array(
+      'conditions' => array('name' => 'LIKE %toto%')
+    ));
+    $this->assert_equal("with conditions", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' ;");
+    
+    $sql = $db->select('books', array(
+      'fields'     => 'title,description',
+      'conditions' => array('name' => 'LIKE %toto%')
+    ));
+    $this->assert_equal("with fields and conditions", $sql,
+      "SELECT \"title\", \"description\" FROM \"books\" WHERE \"name\" LIKE '%toto%' ;");
+    
+    $sql = $db->select('books', array(
+      'conditions' => array('name' => 'LIKE %toto%'),
+      'limit'      => 10,
+    ));
+    $this->assert_equal("with limit", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' LIMIT 10 ;");
+    
+    $sql = $db->select('books', array(
+      'conditions' => array('name' => 'LIKE %toto%'),
+      'limit'      => 10,
+      'page'       => 20,
+    ));
+    $this->assert_equal("with pagination", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' LIMIT 10 OFFSET 190 ;");
   }
 }
 

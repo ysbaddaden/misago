@@ -15,10 +15,35 @@ abstract class DBO_Base
     $this->conf =& $conf;
   }
   
-  function query($sql, $scope)
+  function query($sql, $scope=null)
   {
-    $resultset = $this->execute();
-    $this->parse_results($results, $scope);
+    $results = $this->execute($sql);
+    return $this->parse_results($results, $scope);
+  }
+  
+  function select($table, $options=null)
+  {
+    $fields     = '*';
+    $conditions = null;
+    $limit      = null;
+    $page       = null;
+    
+    if (is_string($options)) {
+      $fields = $options;
+    }
+    elseif (is_array($options))
+    {
+      foreach($options as $k => $v) {
+        $$k = $v;
+      }
+    }
+    
+    $table  = $this->field($table);
+    $fields = $this->fields($fields);
+    $where  = $this->conditions($conditions);
+    $limit  = $this->limit($limit, $page);
+    
+    return $this->query("SELECT $fields FROM $table $where $limit ;");
   }
   
   # TODO: Throw an exception if data is empty.
@@ -27,6 +52,7 @@ abstract class DBO_Base
     $table  = $this->field($table);
     $fields = $this->fields(array_keys($data));
     $values = $this->values(array_values($data));
+    
     return $this->execute("INSERT INTO $table ($fields) VALUES ($values) ;");
   }
   
@@ -44,6 +70,7 @@ abstract class DBO_Base
     $table   = $this->field($table);
     $updates = implode(', ', $updates);
     $where   = $this->conditions($conditions);
+    
     return $this->execute("UPDATE $table SET $updates $where ;");
   }
   
@@ -51,7 +78,18 @@ abstract class DBO_Base
   {
     $table = $this->field($table);
     $where = $this->conditions($conditions);
+    
     return $this->execute("DELETE FROM $table $where ;");
+  }
+  
+  function limit($limit, $page=null)
+  {
+    if ($limit)
+    {
+      $offset = ($page > 1) ? " OFFSET ".(($page - 1) * $limit) : '';
+      return ($page > 1) ? "LIMIT $limit$offset" : "LIMIT $limit";
+    }
+    return '';
   }
   
   # Quotes a list of fields.
