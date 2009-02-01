@@ -24,6 +24,7 @@ abstract class DBO_Base
   # TODO: Throw an exception if data is empty.
   function insert($table, array $data)
   {
+    $table  = $this->field($table);
     $fields = $this->fields(array_keys($data));
     $values = $this->values(array_values($data));
     return $this->execute("INSERT INTO $table ($fields) VALUES ($values) ;");
@@ -39,9 +40,18 @@ abstract class DBO_Base
       $v = $this->value($v);
       $updates[] = "$f = $v";
     }
+
+    $table   = $this->field($table);
     $updates = implode(', ', $updates);
     $where   = $this->conditions($conditions);
     return $this->execute("UPDATE $table SET $updates $where ;");
+  }
+  
+  function delete($table, $conditions=null)
+  {
+    $table = $this->field($table);
+    $where = $this->conditions($conditions);
+    return $this->execute("DELETE FROM $table $where ;");
   }
   
   # Quotes a list of fields.

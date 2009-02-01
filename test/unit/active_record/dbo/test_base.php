@@ -132,13 +132,13 @@ class Test_DBO_BaseDriver extends Unit_Test
       'title'       => "Sendmail's reports",
       'description' => "bla bla"
     ));
-    $this->assert_equal("single quote in value", $sql, "INSERT INTO books (\"title\", \"description\") VALUES ('Sendmail\'s reports', 'bla bla') ;");
+    $this->assert_equal("single quote in value", $sql, "INSERT INTO \"books\" (\"title\", \"description\") VALUES ('Sendmail\'s reports', 'bla bla') ;");
     
     $sql = $db->insert('books', array(
       'title'       => "test test",
       'description' => "this is a \"test test\""
     ));
-    $this->assert_equal("quote in value", $sql, "INSERT INTO books (\"title\", \"description\") VALUES ('test test', 'this is a \\\"test test\\\"') ;");
+    $this->assert_equal("quote in value", $sql, "INSERT INTO \"books\" (\"title\", \"description\") VALUES ('test test', 'this is a \\\"test test\\\"') ;");
   }
   
   function test_update()
@@ -147,17 +147,24 @@ class Test_DBO_BaseDriver extends Unit_Test
     
     $data  = array('a' => 'b', 'c' => 'd');
     $sql = $db->update('books', $data);
-    $this->assert_equal("without conditions", $sql, "UPDATE books SET \"a\" = 'b', \"c\" = 'd'  ;");
+    $this->assert_equal("without conditions", $sql, "UPDATE \"books\" SET \"a\" = 'b', \"c\" = 'd'  ;");
     
     $data       = array('a' => 'b', 'c' => 'd');
     $conditions = array('e' => 'f');
     $sql = $db->update('books', $data, $conditions);
-    $this->assert_equal("with conditions", $sql, "UPDATE books SET \"a\" = 'b', \"c\" = 'd' WHERE \"e\" = 'f' ;");
+    $this->assert_equal("with conditions", $sql, "UPDATE \"books\" SET \"a\" = 'b', \"c\" = 'd' WHERE \"e\" = 'f' ;");
   }
   
   function test_delete()
   {
+    $db  = new FakeDriver(array());
     
+    $sql = $db->delete('books');
+    $this->assert_equal("without conditions", $sql, "DELETE FROM \"books\"  ;");
+    
+    $conditions = array('e' => 'f');
+    $sql = $db->delete('books', $conditions);
+    $this->assert_equal("with conditions", $sql, "DELETE FROM \"books\" WHERE \"e\" = 'f' ;");
   }
   
   function test_select()
