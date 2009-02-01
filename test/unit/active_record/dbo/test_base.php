@@ -140,6 +140,35 @@ class Test_DBO_BaseDriver extends Unit_Test
     ));
     $this->assert_equal("quote in value", $sql, "INSERT INTO books (\"title\", \"description\") VALUES ('test test', 'this is a \\\"test test\\\"') ;");
   }
+  
+  function test_update()
+  {
+    $db  = new FakeDriver(array());
+    
+    $data  = array('a' => 'b', 'c' => 'd');
+    $sql = $db->update('books', $data);
+    $this->assert_equal("without conditions", $sql, "UPDATE books SET \"a\" = 'b', \"c\" = 'd'  ;");
+    
+    $data       = array('a' => 'b', 'c' => 'd');
+    $conditions = array('e' => 'f');
+    $sql = $db->update('books', $data, $conditions);
+    $this->assert_equal("with conditions", $sql, "UPDATE books SET \"a\" = 'b', \"c\" = 'd' WHERE \"e\" = 'f' ;");
+  }
+  
+  function test_delete()
+  {
+    
+  }
+  
+  function test_select()
+  {
+    
+  }
+  
+  function test_query()
+  {
+    
+  }
 }
 
 new Test_DBO_BaseDriver();

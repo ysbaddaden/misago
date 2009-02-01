@@ -21,12 +21,27 @@ abstract class DBO_Base
     $this->parse_results($results, $scope);
   }
   
+  # TODO: Throw an exception if data is empty.
   function insert($table, array $data)
   {
     $fields = $this->fields(array_keys($data));
     $values = $this->values(array_values($data));
-    $sql    = "INSERT INTO $table ($fields) VALUES ($values) ;";
-    return $this->execute($sql);
+    return $this->execute("INSERT INTO $table ($fields) VALUES ($values) ;");
+  }
+  
+  # TODO: Throw an exception if data is empty.
+  function update($table, array $data, $conditions=null)
+  {
+    $updates = array();
+    foreach($data as $f => $v)
+    {
+      $f = $this->field($f);
+      $v = $this->value($v);
+      $updates[] = "$f = $v";
+    }
+    $updates = implode(', ', $updates);
+    $where   = $this->conditions($conditions);
+    return $this->execute("UPDATE $table SET $updates $where ;");
   }
   
   # Quotes a list of fields.
