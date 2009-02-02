@@ -138,6 +138,9 @@ class Test_DBO_BaseDriver extends Unit_Test
     $test = $db->order('a');
     $this->assert_equal("simple order", $test, "ORDER BY \"a\"");
     
+    $test = $db->order('a,b');
+    $this->assert_equal("multiple fields", $test, "ORDER BY \"a\", \"b\"");
+    
     $test = $db->order('a DESC');
     $this->assert_equal("order with way", $test, "ORDER BY \"a\" DESC");
     
@@ -154,6 +157,9 @@ class Test_DBO_BaseDriver extends Unit_Test
     
     $test = $db->group('a');
     $this->assert_equal("simple group", $test, "GROUP BY \"a\"");
+    
+    $test = $db->group('a,b');
+    $this->assert_equal("multiple fields", $test, "GROUP BY \"a\", \"b\"");
     
     $test = $db->group('a DESC');
     $this->assert_equal("group with way", $test, "GROUP BY \"a\" DESC");
@@ -252,6 +258,19 @@ class Test_DBO_BaseDriver extends Unit_Test
       'limit' => 10, 'page' => 20,
     ));
     $this->assert_equal("with pagination", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' LIMIT 10 OFFSET 190 ;");
+    
+    $sql = $db->select('books', array(
+      'conditions' => array('name' => 'LIKE %toto%'),
+      'limit' => 10, 'page' => 20,
+      'order' => "created_at DESC",
+    ));
+    $this->assert_equal("with orderby", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' ORDER BY \"created_at\" DESC LIMIT 10 OFFSET 190 ;");
+    
+    $sql = $db->select('books', array(
+      'fields' => "COUNT(*)",
+      'group'  => "created_at ASC",
+    ));
+    $this->assert_equal("with groupby", $sql, "SELECT COUNT(*) FROM \"books\" GROUP BY \"created_at\" ASC ;");
   }
 }
 

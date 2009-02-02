@@ -47,7 +47,7 @@ abstract class DBO_Base
     $group  = $this->group($group);
     $order  = $this->order($order);
     
-    return $this->query("SELECT $fields FROM $table $where $limit ;");
+    return $this->query("SELECT $fields FROM $table $where $group $order $limit ;");
   }
   
   # TODO: Throw an exception if data is empty.
@@ -222,11 +222,12 @@ abstract class DBO_Base
       return "WHERE $conditions";
     }
     
-    # safe modes
+    # uses symbols
     if (count($conditions) == 2 and !is_hash($conditions)) {
       return $this->conditions_with_symbols($conditions[0], $conditions[1]);
     }
     
+    # uses field/value pairs
     $data = array();
     foreach($conditions as $f => $v)
     {
@@ -297,7 +298,8 @@ abstract class DBO_Base
       foreach($fields as $i => $field)
       {
         $parts = explode(' ', trim($field), 2);
-        $fields[$i] = $this->field($parts[0]).(isset($parts[1]) ? ' '.$parts[1] : '');
+        $fields[$i]  = $this->field($parts[0]);
+        $fields[$i] .= isset($parts[1]) ? ' '.$parts[1] : '';
       }
       $fields = implode(', ', $fields);
       return "$type BY $fields";
