@@ -144,6 +144,23 @@ class Test_DBO_BaseDriver extends Unit_Test
     $test = $db->order('a NULLS LAST, b, c ASC');
     $this->assert_equal("by multiple fields", $test, "ORDER BY \"a\" NULLS LAST, \"b\", \"c\" ASC");
   }
+    
+  function test_group()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->group(null);
+    $this->assert_equal("no group", $test, "");
+    
+    $test = $db->group('a');
+    $this->assert_equal("simple group", $test, "GROUP BY \"a\"");
+    
+    $test = $db->group('a DESC');
+    $this->assert_equal("group with way", $test, "GROUP BY \"a\" DESC");
+    
+    $test = $db->group('a NULLS LAST, b, c ASC');
+    $this->assert_equal("by multiple fields", $test, "GROUP BY \"a\" NULLS LAST, \"b\", \"c\" ASC");
+  }
   
   function test_limit()
   {

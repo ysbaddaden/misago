@@ -90,11 +90,11 @@ abstract class DBO_Base
   {
     if ($fields)
     {
-      $fields = explode(', ', $fields);
+      $fields = explode(',', $fields);
       foreach($fields as $i => $field)
       {
-        $parts = explode(' ', $field, 2);
-        $field[$i] = $this->field($parts[0]).' '.$parts[1];
+        $parts = explode(' ', trim($field), 2);
+        $fields[$i] = $this->field($parts[0]).(isset($parts[1]) ? ' '.$parts[1] : '');
       }
       $fields = implode(', ', $fields);
       return "$type BY $fields";
