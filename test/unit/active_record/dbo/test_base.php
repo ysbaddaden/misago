@@ -128,6 +128,37 @@ class Test_DBO_BaseDriver extends Unit_Test
       $test, "WHERE a = 'toto ?' AND b = 'c'");
   }
   
+  function test_order()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->order(null);
+    $this->assert_equal("no order", $test, "");
+    
+    $test = $db->order('a');
+    $this->assert_equal("simple order", $test, "ORDER BY \"a\"");
+    
+    $test = $db->order('a DESC');
+    $this->assert_equal("order with way", $test, "ORDER BY \"a\" DESC");
+    
+    $test = $db->order('a NULLS LAST, b, c ASC');
+    $this->assert_equal("by multiple fields", $test, "ORDER BY \"a\" NULLS LAST, \"b\", \"c\" ASC");
+  }
+  
+  function test_limit()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->limit(null);
+    $this->assert_equal("no limit", $test, "");
+    
+    $test = $db->limit(10);
+    $this->assert_equal("limit", $test, "LIMIT 10");
+    
+    $test = $db->limit(10, 15);
+    $this->assert_equal("limit with offset", $test, "LIMIT 10 OFFSET 140");
+  }
+  
   function test_insert()
   {
     $db  = new FakeDriver(array());
@@ -171,20 +202,6 @@ class Test_DBO_BaseDriver extends Unit_Test
     $this->assert_equal("with conditions", $sql, "DELETE FROM \"books\" WHERE \"e\" = 'f' ;");
   }
   
-  function test_limit()
-  {
-    $db = new FakeDriver(array());
-    
-    $test = $db->limit(null);
-    $this->assert_equal("no limit", $test, "");
-    
-    $test = $db->limit(10);
-    $this->assert_equal("limit", $test, "LIMIT 10");
-    
-    $test = $db->limit(10, 15);
-    $this->assert_equal("limit with offset", $test, "LIMIT 10 OFFSET 140");
-  }
-  
   function test_select()
   {
     $db  = new FakeDriver(array());
@@ -209,14 +226,13 @@ class Test_DBO_BaseDriver extends Unit_Test
     
     $sql = $db->select('books', array(
       'conditions' => array('name' => 'LIKE %toto%'),
-      'limit'      => 10,
+      'limit' => 10,
     ));
     $this->assert_equal("with limit", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' LIMIT 10 ;");
     
     $sql = $db->select('books', array(
       'conditions' => array('name' => 'LIKE %toto%'),
-      'limit'      => 10,
-      'page'       => 20,
+      'limit' => 10, 'page' => 20,
     ));
     $this->assert_equal("with pagination", $sql, "SELECT * FROM \"books\" WHERE \"name\" LIKE '%toto%' LIMIT 10 OFFSET 190 ;");
   }

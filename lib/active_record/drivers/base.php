@@ -27,6 +27,8 @@ abstract class DBO_Base
     $conditions = null;
     $limit      = null;
     $page       = null;
+    $group      = null;
+    $order      = null;
     
     if (is_string($options)) {
       $fields = $options;
@@ -42,6 +44,8 @@ abstract class DBO_Base
     $fields = $this->fields($fields);
     $where  = $this->conditions($conditions);
     $limit  = $this->limit($limit, $page);
+    $group  = $this->group($group);
+    $order  = $this->order($order);
     
     return $this->query("SELECT $fields FROM $table $where $limit ;");
   }
@@ -80,6 +84,27 @@ abstract class DBO_Base
     $where = $this->conditions($conditions);
     
     return $this->execute("DELETE FROM $table $where ;");
+  }
+  
+  function order($fields, $type='ORDER')
+  {
+    if ($fields)
+    {
+      $fields = explode(', ', $fields);
+      foreach($fields as $i => $field)
+      {
+        $parts = explode(' ', $field, 2);
+        $field[$i] = $this->field($parts[0]).' '.$parts[1];
+      }
+      $fields = implode(', ', $fields);
+      return "$type BY $fields";
+    }
+    return '';
+  }
+  
+  function group($fields)
+  {
+    return $this->order($fields, 'GROUP');
   }
   
   function limit($limit, $page=null)
