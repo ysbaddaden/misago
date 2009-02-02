@@ -86,37 +86,6 @@ abstract class DBO_Base
     return $this->execute("DELETE FROM $table $where ;");
   }
   
-  function order($fields, $type='ORDER')
-  {
-    if ($fields)
-    {
-      $fields = explode(',', $fields);
-      foreach($fields as $i => $field)
-      {
-        $parts = explode(' ', trim($field), 2);
-        $fields[$i] = $this->field($parts[0]).(isset($parts[1]) ? ' '.$parts[1] : '');
-      }
-      $fields = implode(', ', $fields);
-      return "$type BY $fields";
-    }
-    return '';
-  }
-  
-  function group($fields)
-  {
-    return $this->order($fields, 'GROUP');
-  }
-  
-  function limit($limit, $page=null)
-  {
-    if ($limit)
-    {
-      $offset = ($page > 1) ? " OFFSET ".(($page - 1) * $limit) : '';
-      return ($page > 1) ? "LIMIT $limit$offset" : "LIMIT $limit";
-    }
-    return '';
-  }
-  
   # Quotes a list of fields.
   # 
   # fields('a, b, c')            translates to "a", "b", "c"
@@ -254,35 +223,8 @@ abstract class DBO_Base
     }
     
     # safe modes
-    if (count($conditions) == 2 and !is_hash($conditions))
-    {
-      $values = $conditions[1];
-      
-      if (is_hash($values))
-      {
-        # uses symbols
-        $symbols = array();
-        foreach($values as $symbol => $value) {
-          $symbols[":$symbol"] = $this->value($value);
-        }
-        $str = strtr($conditions[0], $symbols);
-      }
-      else
-      {
-        # uses question marks
-        $token = strtok($conditions[0], '?');
-        $str   = '';
-        
-        while($token !== false)
-        {
-          $str .= $token;
-          if (!empty($values)) {
-            $str .= $this->value(array_shift($values));
-          }
-          $token = strtok('?');
-        }
-      }
-      return "WHERE $str";
+    if (count($conditions) == 2 and !is_hash($conditions)) {
+      return $this->conditions_with_symbols($conditions[0], $conditions[1]);
     }
     
     $data = array();
@@ -315,6 +257,67 @@ abstract class DBO_Base
       $str[] = "$f $op $v";
     }
     return "WHERE ".implode(" AND ", $str);
+  }
+  
+  function conditions_with_symbols($sql, $values)
+  {
+    if (is_hash($values))
+    {
+      # uses symbols
+      $symbols = array();
+      foreach($values as $symbol => $value) {
+        $symbols[":$symbol"] = $this->value($value);
+      }
+      $str = strtr($sql, $symbols);
+    }
+    else
+    {
+      # uses question marks
+      $token = strtok($sql, '?');
+      $str   = '';
+      
+      while($token !== false)
+      {
+        $str .= $token;
+        if (!empty($values)) {
+          $str .= $this->value(array_shift($values));
+        }
+        $token = strtok('?');
+      }
+    }
+    
+    return "WHERE $str";
+  }
+  
+  function order($fields, $type='ORDER')
+  {
+    if ($fields)
+    {
+      $fields = explode(',', $fields);
+      foreach($fields as $i => $field)
+      {
+        $parts = explode(' ', trim($field), 2);
+        $fields[$i] = $this->field($parts[0]).(isset($parts[1]) ? ' '.$parts[1] : '');
+      }
+      $fields = implode(', ', $fields);
+      return "$type BY $fields";
+    }
+    return '';
+  }
+  
+  function group($fields)
+  {
+    return $this->order($fields, 'GROUP');
+  }
+  
+  function limit($limit, $page=null)
+  {
+    if ($limit)
+    {
+      $offset = ($page > 1) ? " OFFSET ".(($page - 1) * $limit) : '';
+      return ($page > 1) ? "LIMIT $limit$offset" : "LIMIT $limit";
+    }
+    return '';
   }
 }
 
