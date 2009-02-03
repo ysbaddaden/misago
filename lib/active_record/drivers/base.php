@@ -4,15 +4,14 @@ abstract class DBO_Base
 {
   protected $field_quote = '"';
   protected $value_quote = "'";
-  protected $escape_function;
-  protected $conf;
+  protected $config;
   
   abstract function execute($sql);
   abstract function parse_results($results, $scope);
   
-  function __construct(array $conf)
+  function __construct(array $config)
   {
-    $this->conf =& $conf;
+    $this->config =& $config;
   }
   
   function query($sql, $scope=null)
@@ -78,6 +77,7 @@ abstract class DBO_Base
     return $this->execute("UPDATE $table SET $updates $where ;");
   }
   
+  # 
   function delete($table, $conditions=null)
   {
     $table = $this->field($table);
@@ -86,7 +86,7 @@ abstract class DBO_Base
     return $this->execute("DELETE FROM $table $where ;");
   }
   
-  # Quotes a list of fields.
+  # Sanitizes a list of fields.
   # 
   # fields('a, b, c')            translates to "a", "b", "c"
   # fields(array('a', 'b', 'c')) translates to "a", "b", "c"
@@ -100,7 +100,7 @@ abstract class DBO_Base
     return $this->_map($fields, array($this, 'field'));
   }
   
-  # Escapes a list of values.
+  # Sanitizes a list of values.
   # 
   # values('a, b, c')            translates to 'a', 'b', 'c'
   # values(array('a', 'b', 'c')) translates to 'a', 'b', 'c'
@@ -131,7 +131,7 @@ abstract class DBO_Base
     return implode(', ', array_map($callback, $arr));
   }
   
-  # Quotes a single field.
+  # Sanitizes a single field.
   # 
   # field('a')              translates to '"a"'
   # field("COUNT(a)")       translates to 'COUNT("a")'
@@ -184,7 +184,7 @@ abstract class DBO_Base
     return isset($func) ? "$func($field)" : $field;
   }
   
-  # Escapes a single value.
+  # Sanitizes a single value.
   # Must be overriden to use driver's own escape function.
   # 
   # TODO: Do not escape functions (?)
@@ -198,7 +198,7 @@ abstract class DBO_Base
     return $this->value_quote.addslashes($value).$this->value_quote;
   }
   
-  # Quotes and escapes conditions (field/value pairs).
+  # Sanitizes conditions (field/value pairs).
   # 
   # All these calls are equivalent, and will generate the same output:
   #   "toto = 123 AND titi = 456"
@@ -320,6 +320,69 @@ abstract class DBO_Base
       return ($page > 1) ? "LIMIT $limit$offset" : "LIMIT $limit";
     }
     return '';
+  }
+  
+  
+  # Accepts an array of conditions. The array has each value
+  # sanitized and interpolated into the SQL statement.
+  # 
+  # ['name = :name', {name => 'toto'}]
+  # ['name = ? AND group_id = ? ', 'toto', 123]
+  # 
+  # TODO: sanitize_sql_array()
+  function sanitize_sql_array($ary)
+  {
+    
+  }
+  
+  # Accepts an array, hash, or string of SQL conditions and
+  # sanitizes them into a valid SQL fragment for a SET clause.
+  function sanitize_sql_for_assignment($assignments)
+  {
+    if (is_hash($assignments)) {
+      return $this->sanitize_sql_hash_for_assignment($assignments);
+    }
+    elseif (is_array($assignments)) {
+      return $this->sanitize_sql_array($conditions);
+    }
+    return $assignments;
+  }
+  
+  # Accepts an array, hash, or string of SQL conditions and
+  # sanitizes them into a valid SQL fragment for a WHERE clause.
+  function sanitize_sql_for_conditions($conditions)
+  {
+    if (is_hash($conditions)) {
+      return $this->sanitize_sql_hash_for_conditions(&$conditions);
+    }
+    elseif (is_array($conditions)) {
+      return $this->sanitize_sql_array(&$conditions);
+    }
+    return $conditions;
+  }
+  
+  # Sanitizes a hash of attribute/value pairs into SQL conditions
+  # for a WHERE clause.
+  function sanitize_sql_hash_for_conditions(array $conditions)
+  {
+    $conditions = $this->sanitize_sql_hash(&$conditions);
+    return implode(' AND ', $conditions);
+  }
+
+  # Sanitizes a hash of attribute/value pairs into SQL conditions
+  # for a SET clause.
+  function sanitize_sql_hash_for_assignment(array $assignments)
+  {
+    $assignments = $this->sanitize_sql_hash(&$assignments);
+    return implode(', ', $assignments);
+  }
+  
+  # TODO: sanitize_sql_hash()
+  #
+  # ["a" = 'b', "c" = 'd']
+  function & sanitize_sql_hash(array $hash)
+  {
+    return $hash;
   }
 }
 
