@@ -34,41 +34,63 @@ class Test_DBO_BaseDriver extends Unit_Test
     
     $test = $db->sanitize_sql_array(array("a = :a, b = :b", array('a' => ':b', 'b' => ':a')));
     $this->assert_equal("with symbols (no recursion)", $test, "a = ':b', b = ':a'");
-    /*
-    $test = $db->sanitize_sql_for_assignment(array("a = ?, c = ?", 'b', 'd'));
-    $this->assert_equal("with question marks", $test, "a = 'b', c = 'd'");
     
-    $test = $db->sanitize_sql_for_assignment(array("a = ?, c = ?", '?', '?'));
-    $this->assert_equal("with question marks (no recursion)", $test, "a = '?', c = '?'");
-    */
-    $test = $db->sanitize_sql_for_assignment(array("a = %s, c = %d", 'b', 4));
+    $test = $db->sanitize_sql_array(array("a = '%s', c = %d", 'b', 4));
     $this->assert_equal("with printf markers", $test, "a = 'b', c = 4");
+    
+    $test = $db->sanitize_sql_array(array("a = '%s', c = %f", 'b', 3.2));
+    $this->assert_equal("with printf markers (doubles)", $test, "a = 'b', c = 3.200000");
   }
   
-  /*
+  function test_sanitize_sql_hash()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->sanitize_sql_hash(array());
+    $this->assert_equal("empty hash", $test, array());
+    
+    $test = $db->sanitize_sql_hash(array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal("simple hash", $test, array('"a" = \'b\'', '"c" = \'d\''));
+  }
+
+  function test_sanitize_sql_hash_for_conditions()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->sanitize_sql_hash_for_conditions(array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal("simple hash", $test, '"a" = \'b\' AND "c" = \'d\'');
+  }
+
+  function test_sanitize_sql_hash_for_assignment()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->sanitize_sql_hash_for_assignment(array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal("simple hash", $test, '"a" = \'b\', "c" = \'d\'');
+  }
+
   function test_sanitize_sql_for_assignment()
   {
     $db = new FakeDriver(array());
     
-    $test = $db->sanitize_sql_for_assignment();
-    $this->assert_equal("empty string", $test, "");
+    $test = $db->sanitize_sql_for_assignment(array());
+    $this->assert_equal("empty array/hash", $test, "");
     
-    $test = $db->sanitize_sql_for_assignment();
-    $this->assert_equal("empty array/hash", $test, array());
+    $test = $db->sanitize_sql_for_assignment(array('a = b'));
+    $this->assert_equal("array with empty values", $test, 'a = b');
     
-    $test = $db->sanitize_sql_for_assignment();
-    $this->assert_equal("array with empty values", $test, array());
+    $test = $db->sanitize_sql_for_assignment(array("a = :a, c = :c", array('a' => 'b', 'c' => 'd')));
+    $this->assert_equal("array with symbols", $test, "a = 'b', c = 'd'");
     
-    $test = $db->sanitize_sql_for_assignment();
-    $this->assert_equal("array with symbols", $test, array());
+    $test = $db->sanitize_sql_for_assignment(array("a = :a, b = :b", array('a' => ':b', 'b' => ':a')));
+    $this->assert_equal("array with symbols (no recursion)", $test, "a = ':b', b = ':a'");
+
+    $test = $db->sanitize_sql_for_assignment(array("a = '%s', c = %d", 'b', 4));
+    $this->assert_equal("array with printf markers", $test, "a = 'b', c = 4");
     
-    $test = $db->sanitize_sql_for_assignment();
-    $this->assert_equal("array with question marks", $test, array());
-    
-    $test = $db->sanitize_sql_for_assignment();
-    $this->assert_equal("hash", $test, array());
+    $test = $db->sanitize_sql_for_assignment(array("a = '%s', c = %f", 'b', 3.2));
+    $this->assert_equal("array with printf markers (doubles)", $test, "a = 'b', c = 3.200000");
   }
-  */
   
   function test_fields()
   {

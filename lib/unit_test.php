@@ -61,27 +61,30 @@ class Unit_Test
   
   protected function assert_true($comment, $arg)
   {
-    $this->return_assert($comment, $arg === true);
+    $this->return_assert($comment, $arg === true, array('got' => $arg, 'expected' => true));
   }
   
   protected function assert_false($comment, $arg)
   {
-    $this->return_assert($comment, $arg === false);
+    $this->return_assert($comment, $arg === false, array('got' => $arg, 'expected' => false));
   }
   
-  protected function assert_equal($comment, $arg1, $arg2)
+  protected function assert_equal($comment, $test, $expect)
   {
-    $test = is_array($arg1) ? $this->compare_arrays($arg1, $arg2) : ($arg1 === $arg2);
-    $this->return_assert($comment, $test);
+    $success = is_array($test) ? $this->compare_arrays($test, $expect) : ($test === $expect);
+    $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
-  protected function assert_not_equal($comment, $arg1, $arg2)
+  protected function assert_not_equal($test, $return, $expect)
   {
-    $test = is_array($arg1) ? !$this->compare_arrays($arg1, $arg2) : ($arg1 !== $arg2);
-    $this->return_assert($comment, $test);
+    $success = is_array($test) ?
+      !$this->compare_arrays($test, $expect) :
+      ($test !== $expect);
+    
+    $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
-  private function return_assert($comment, $test)
+  private function return_assert($comment, $test, array $vars)
   {
     $this->count_assertions += 1;
     if (!$test)
@@ -89,6 +92,8 @@ class Unit_Test
       # failure
       $this->count_failures += 1;
       printf("\n%s failed: %s\n", $this->running_test, $comment);
+      printf("Expected: %s\n", print_r($vars['expected'], true));
+      printf("Got: %s\n", print_r($vars['got'], true));
     }
   }
   

@@ -189,13 +189,15 @@ abstract class DBO_Base
   # 
   # TODO: Do not escape functions (?)
   #
-  function value($value)
+  function value($value, $quote=true)
   {
     $value = trim($value);
     if (strpos($value, '-! ') === 0) {
       return str_replace("-! ", "", $value);
     }
-    return $this->value_quote.addslashes($value).$this->value_quote;
+#    return $this->value_quote.addslashes($value).$this->value_quote;
+    $value = addslashes($value);
+    return $quote ? $this->value_quote.$value.$this->value_quote : $value;
   }
   
   # Sanitizes conditions (field/value pairs).
@@ -326,8 +328,8 @@ abstract class DBO_Base
   # Accepts an array of conditions. The array has each value
   # sanitized and interpolated into the SQL statement.
   # 
-  # ['name = :name', {name => 'toto'}]
-  # ['name = ? AND group_id = ? ', 'toto', 123]
+  # ["name = :name", {name => 'toto'}]
+  # ["name = '%s' AND group_id = %d", 'toto', 123]
   # 
   # TODO: use sprintf symbols (%s, %d, etc.) instead of question marks (?)
   function sanitize_sql_array($ary)
@@ -346,11 +348,8 @@ abstract class DBO_Base
     }
     else
     {
-      for($i=1, $len = count($ary); $i<$len; $i++)
-      {
-        if (!is_numeric($ary[$i])) {
-          $ary[$i] = $this->value($ary[$i]);
-        }
+      for($i=1, $len = count($ary); $i<$len; $i++) {
+          $ary[$i] = $this->value($ary[$i], false);
       }
       $sql = call_user_func_array('sprintf', $ary);
     }
@@ -399,12 +398,19 @@ abstract class DBO_Base
     return implode(', ', $assignments);
   }
   
-  # TODO: sanitize_sql_hash()
+  # Sanitizes a hash of attribute/value pairs into SQL conditions
   #
-  # ["a" = 'b', "c" = 'd']
+  # ["a" => 'b', "c" => 'd']
   function & sanitize_sql_hash(array $hash)
   {
-    return $hash;
+    $sanitized = array();
+    foreach($hash as $f => $v)
+    {
+      $f = $this->field($f);
+      $v = $this->value($v);
+      $sanitized[] = "$f = $v";
+    }
+    return $sanitized;
   }
 }
 
