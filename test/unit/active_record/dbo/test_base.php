@@ -34,12 +34,15 @@ class Test_DBO_BaseDriver extends Unit_Test
     
     $test = $db->sanitize_sql_array(array("a = :a, b = :b", array('a' => ':b', 'b' => ':a')));
     $this->assert_equal("with symbols (no recursion)", $test, "a = ':b', b = ':a'");
-    
+    /*
     $test = $db->sanitize_sql_for_assignment(array("a = ?, c = ?", 'b', 'd'));
     $this->assert_equal("with question marks", $test, "a = 'b', c = 'd'");
     
     $test = $db->sanitize_sql_for_assignment(array("a = ?, c = ?", '?', '?'));
     $this->assert_equal("with question marks (no recursion)", $test, "a = '?', c = '?'");
+    */
+    $test = $db->sanitize_sql_for_assignment(array("a = %s, c = %d", 'b', 4));
+    $this->assert_equal("with printf markers", $test, "a = 'b', c = 4");
   }
   
   /*

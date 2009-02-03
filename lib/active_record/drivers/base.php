@@ -346,17 +346,13 @@ abstract class DBO_Base
     }
     else
     {
-      $token = strtok(array_shift($ary), '?');
-      $sql   = '';
-      
-      while($token !== false)
+      for($i=1, $len = count($ary); $i<$len; $i++)
       {
-        $sql .= $token;
-        if (!empty($ary)) {
-          $sql .= $this->value(array_shift($ary));
+        if (!is_numeric($ary[$i])) {
+          $ary[$i] = $this->value($ary[$i]);
         }
-        $token = strtok('?');
       }
+      $sql = call_user_func_array('sprintf', $ary);
     }
     return $sql;
   }
