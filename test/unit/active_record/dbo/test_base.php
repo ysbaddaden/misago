@@ -22,6 +22,51 @@ class FakeDriver extends DBO_Base
 
 class Test_DBO_BaseDriver extends Unit_Test
 {
+  function test_sanitize_sql_array()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->sanitize_sql_array(array("a = a, b = b"));
+    $this->assert_equal("empty values", $test, "a = a, b = b");
+    
+    $test = $db->sanitize_sql_array(array("a = :a, c = :c", array('a' => 'b', 'c' => 'd')));
+    $this->assert_equal("with symbols", $test, "a = 'b', c = 'd'");
+    
+    $test = $db->sanitize_sql_array(array("a = :a, b = :b", array('a' => ':b', 'b' => ':a')));
+    $this->assert_equal("with symbols (no recursion)", $test, "a = ':b', b = ':a'");
+    
+    $test = $db->sanitize_sql_for_assignment(array("a = ?, c = ?", 'b', 'd'));
+    $this->assert_equal("with question marks", $test, "a = 'b', c = 'd'");
+    
+    $test = $db->sanitize_sql_for_assignment(array("a = ?, c = ?", '?', '?'));
+    $this->assert_equal("with question marks (no recursion)", $test, "a = '?', c = '?'");
+  }
+  
+  /*
+  function test_sanitize_sql_for_assignment()
+  {
+    $db = new FakeDriver(array());
+    
+    $test = $db->sanitize_sql_for_assignment();
+    $this->assert_equal("empty string", $test, "");
+    
+    $test = $db->sanitize_sql_for_assignment();
+    $this->assert_equal("empty array/hash", $test, array());
+    
+    $test = $db->sanitize_sql_for_assignment();
+    $this->assert_equal("array with empty values", $test, array());
+    
+    $test = $db->sanitize_sql_for_assignment();
+    $this->assert_equal("array with symbols", $test, array());
+    
+    $test = $db->sanitize_sql_for_assignment();
+    $this->assert_equal("array with question marks", $test, array());
+    
+    $test = $db->sanitize_sql_for_assignment();
+    $this->assert_equal("hash", $test, array());
+  }
+  */
+  
   function test_fields()
   {
     $db = new FakeDriver(array());

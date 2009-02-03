@@ -329,10 +329,36 @@ abstract class DBO_Base
   # ['name = :name', {name => 'toto'}]
   # ['name = ? AND group_id = ? ', 'toto', 123]
   # 
-  # TODO: sanitize_sql_array()
+  # TODO: use sprintf symbols (%s, %d, etc.) instead of question marks (?)
   function sanitize_sql_array($ary)
   {
-    
+    if (!isset($ary[1])) {
+      return isset($ary[0]) ? $ary[0] : '';
+    }
+    if (is_hash($ary[1]))
+    {
+      # uses symbols
+      $symbols = array();
+      foreach($ary[1] as $symbol => $value) {
+        $symbols[":$symbol"] = $this->value($value);
+      }
+      $sql = strtr($ary[0], $symbols);
+    }
+    else
+    {
+      $token = strtok(array_shift($ary), '?');
+      $sql   = '';
+      
+      while($token !== false)
+      {
+        $sql .= $token;
+        if (!empty($ary)) {
+          $sql .= $this->value(array_shift($ary));
+        }
+        $token = strtok('?');
+      }
+    }
+    return $sql;
   }
   
   # Accepts an array, hash, or string of SQL conditions and
@@ -343,7 +369,7 @@ abstract class DBO_Base
       return $this->sanitize_sql_hash_for_assignment($assignments);
     }
     elseif (is_array($assignments)) {
-      return $this->sanitize_sql_array($conditions);
+      return $this->sanitize_sql_array($assignments);
     }
     return $assignments;
   }
