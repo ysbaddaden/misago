@@ -331,7 +331,6 @@ abstract class DBO_Base
   # ["name = :name", {name => 'toto'}]
   # ["name = '%s' AND group_id = %d", 'toto', 123]
   # 
-  # TODO: use sprintf symbols (%s, %d, etc.) instead of question marks (?)
   function sanitize_sql_array($ary)
   {
     if (!isset($ary[1])) {

@@ -1,12 +1,12 @@
 <?php
 
+# DEPRECATED: In favor of ActiveRecord_ConnectionAdapters_MysqlAdapter
 class DBO_Mysql extends DBO_Base
 {
   private   $link;
   protected $field_quote = "`";
   protected $value_quote = "'";
 
-  # TODO: DBO::Mysql::start()
   function start()
   {
     if (!$this->link)
@@ -27,7 +27,6 @@ class DBO_Mysql extends DBO_Base
     $this->stop();
   }
 
-  # TODO: DBO::Mysql::execute();
   function execute($sql)
   {
     if (!$this->link) {
@@ -36,7 +35,6 @@ class DBO_Mysql extends DBO_Base
     
   }
   
-  # TODO: DBO::Mysql::parse_resultset();
   function parse_resultset($resultset, $scope=null)
   {
     

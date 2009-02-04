@@ -9,6 +9,9 @@ if (!isset($_SERVER['argv'][1]))
 
 $path_to   = $_SERVER['argv'][1];
 $path_here = dirname(__FILE__);
+
 `cp -r {$path_here}/../templates/app {$path_to}`;
+`rm -f {$path_to}/lib/misago`;
+`ln -sf {$path_here}/.. {$path_to}/lib/misago`;
 
 ?>

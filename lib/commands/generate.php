@@ -3,14 +3,14 @@
 # basic usage
 if (!isset($_SERVER['argv'][1]))
 {
-  $generators = glob(MISAGO.'templates/generators/*.php');
+  $generators = glob(MISAGO.'/lib/commands/generators/*.php');
   foreach($generators as $i => $generator) {
     $generators[$i] = str_replace('.php', '', basename($generator));
   }
   
   echo "Usage: script/generate <generator>\n";
   echo "Available generators: ".implode(', ', $generators)."\n";
-  exit 1;
+  exit;
 }
 
 
@@ -18,25 +18,23 @@ class Generator_Base
 {
   protected function create_directory($path)
   {
-    echo "$path ";
-    
-    if (!file_exists(APP.$path)) {
-      echo mkdir(APP.$path, 0755, true) ? "created" : "error!";
+    if (!file_exists(ROOT.'/'.$path))
+    {
+      echo "      create  $path/\n";
+      mkdir(ROOT.'/'.$path, 0755, true);
     }
     else {
-      echo "exists";
+      echo "      exists  $path/\n";
     }
-    
-    echo "\n";
   }
   
   protected function create_file_from_template($path, $template, array $vars=null)
   {
-    echo "$path ";
-    
-    if (!file_exists(APP.$path))
+    if (!file_exists(ROOT.'/'.$path))
     {
-      $content = file_get_contents(MISAGO.'/templates'.$template);
+      echo "      create  $path\n";
+      
+      $content = file_get_contents(MISAGO.'/templates/'.$template);
       
       if (!empty($vars))
       {
@@ -50,22 +48,21 @@ class Generator_Base
         $content = str_replace($keys, $values, $content);
       }
       
-      file_put_contents(APP.$path, $content);
+      file_put_contents(ROOT.'/'.$path, $content);
     }
     else {
-      echo "exists";
+      echo "      exists  $path\n";
     }
-    
-    echo "\n";
   }
 }
 
 
 # runs generator
-require MISAGO."templates/generators/{$_SERVER['argv'][1]}.php";
+$generator = $_SERVER['argv'][1];
+$class = 'Generator_'.String::camelize($generator);
+$args  = array_slice($_SERVER['argv'], 2);
 
-$class = 'Generator_'.Inflector::camelize($generator);
-$args  = array_slice($_SERVER['argb'], 2);
+require "commands/generators/{$generator}.php";
 new $class($args);
 
 ?>

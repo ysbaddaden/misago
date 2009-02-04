@@ -117,9 +117,6 @@ class Test_ActionView_Base extends Unit_Test
     $html = $view->render(array('partial' => 'ads/ad'));
     $this->assert_equal('shared partial', trim($html), '<ad></ad>');
   }
-  
-  # TODO: Rendering shared partials {:partial => 'advertisement/ad'}.
-
 }
 
 new Test_ActionView_Base();
