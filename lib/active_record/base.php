@@ -32,10 +32,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
 
     if ($arg !== null)
     {
-      if (!is_array($arg))
-      {
-#       $arg = $this->find_by_id(':first', $arg);
-#       $arg = $this->find(':first', array(':conditions' => array('id' => $id)));
+      if (!is_array($arg)) {
+        $arg = $this->find($arg);
       }
       parent::__construct($arg);
     }
