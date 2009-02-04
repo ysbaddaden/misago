@@ -2,13 +2,14 @@
 
 class Generator_Migration extends Generator_Base
 {
-  function __construct($args)
+  function __construct($args, $options=array())
   {
     if (empty($args))
     {
       echo "Syntax error: script/generate migration <title>\n";
       exit;
     }
+    $this->options = $options;
     
     $filename = gmdate('YmdHis').'_'.String::underscore($args[0]);
     $class    = String::camelize($args[0]);

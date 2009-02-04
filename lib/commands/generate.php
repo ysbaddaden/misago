@@ -1,7 +1,23 @@
 <?php
 
+# command line arguments
+$arguments = array();
+$options   = array();
+
+for($i = 1; $i < count($_SERVER['argv']); $i++)
+{
+  $arg = $_SERVER['argv'][$i];
+  if (strpos($arg, '-') === 0) {
+    $options[] = $arg;
+  }
+  else {
+    $arguments[] = $arg;
+  }
+}
+
+
 # basic usage
-if (!isset($_SERVER['argv'][1]))
+if (!isset($arguments[0]))
 {
   $generators = glob(MISAGO.'/lib/commands/generators/*.php');
   foreach($generators as $i => $generator) {
@@ -16,24 +32,38 @@ if (!isset($_SERVER['argv'][1]))
 
 class Generator_Base
 {
-  protected function create_directory($path)
+  protected $options = array();
+  
+  protected function check_path($path, $type='file')
   {
-    if (!file_exists(ROOT.'/'.$path))
+    if (file_exists(ROOT.'/'.$path))
     {
-      echo "      create  $path/\n";
-      mkdir(ROOT.'/'.$path, 0755, true);
+      if ($type == 'file' and in_array('-f', $this->options)) {
+        echo "   overwrite  $path\n";
+      }
+      else
+      {
+        echo "      exists  $path\n";
+        return false;
+      }
     }
     else {
-      echo "      exists  $path/\n";
+      echo "      create  $path\n";
+    }
+    return true;
+  }
+  
+  protected function create_directory($path)
+  {
+    if ($this->check_path("$path/", 'directory')) {
+      mkdir(ROOT.'/'.$path, 0755, true);
     }
   }
   
   protected function create_file_from_template($path, $template, array $vars=null)
   {
-    if (!file_exists(ROOT.'/'.$path))
+    if ($this->check_path($path))
     {
-      echo "      create  $path\n";
-      
       $content = file_get_contents(MISAGO.'/templates/'.$template);
       
       if (!empty($vars))
@@ -50,21 +80,14 @@ class Generator_Base
       
       file_put_contents(ROOT.'/'.$path, $content);
     }
-    else {
-      echo "      exists  $path\n";
-    }
   }
 }
 
-
-# TODO: Parse command line options (eg: -f)
-
 # runs generator
-$generator = $_SERVER['argv'][1];
-$class = 'Generator_'.String::camelize($generator);
-$args  = array_slice($_SERVER['argv'], 2);
+$generator = array_shift($arguments);
+$class     = 'Generator_'.String::camelize($generator);
 
 require "commands/generators/{$generator}.php";
-new $class($args);
+new $class($arguments, $options);
 
 ?>

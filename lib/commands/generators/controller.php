@@ -2,13 +2,14 @@
 
 class Generator_Controller extends Generator_Base
 {
-  function __construct($args)
+  function __construct($args, $options=array())
   {
     if (empty($args))
     {
       echo "Syntax error: script/generate controller <name>\n";
       exit;
     }
+    $this->options = $options;
     
     $filename = String::underscore($args[0]);
     $class    = String::camelize($args[0]);
