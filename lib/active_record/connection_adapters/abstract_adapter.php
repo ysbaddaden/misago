@@ -17,6 +17,12 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function __construct(array $config)
   {
     $this->config = $config;
+    $this->connect();
+  }
+  
+  function config($name)
+  {
+    return $this->config[$name];
   }
   
   function quote_table($table)

@@ -28,7 +28,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     $this->class_name = get_class($this);
     $this->table_name = String::pluralize(String::underscore($this->class_name));
 
-    $this->db = new DBO($_ENV['environment']);
+    $this->db = new ActiveRecord_Connection::create($_ENV['environment']);
 
     if ($arg !== null)
     {

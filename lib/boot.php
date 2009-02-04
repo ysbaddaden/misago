@@ -20,7 +20,11 @@ function __autoload($class)
 {
   $path = str_replace('_', '/', $class);
   $path = String::underscore($path);
-  require "$path.php";
+  if (!include "$path.php")
+  {
+    debug_print_backtrace();
+    exit;
+  }
 }
 
 function sanitize_magic_quotes(&$params)

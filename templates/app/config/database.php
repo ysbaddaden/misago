@@ -1,23 +1,26 @@
 <?php
 
-class DatabaseConfig
+class Database
 {
   static $development = array(
-    'driver'   => 'mysql',
+    'adapter'  => 'mysql',
+    'host'     => 'localhost',
     'username' => 'root',
     'password' => '',
     'database' => 'example_app_development',
   );
 
   static $production = array(
-    'driver'   => 'mysql',
+    'adapter'  => 'mysql',
+    'host'     => 'localhost',
     'username' => 'root',
     'password' => '',
     'database' => 'example_app',
   );
 
   static $test = array(
-    'driver'   => 'mysql',
+    'adapter'  => 'mysql',
+    'host'     => 'localhost',
     'username' => 'root',
     'password' => '',
     'database' => 'example_app_test',

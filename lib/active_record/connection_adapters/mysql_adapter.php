@@ -38,9 +38,6 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
   
   function execute($sql)
   {
-    if (!$this->is_active()) {
-      $this->connect();
-    }
     return mysql_query($sql, $this->link);
   }
   
@@ -129,6 +126,7 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     return mysql_select_db($database, $this->link);
   }
   
+  # 
   # definition:
   #   :column :type, :null, :default, :limit
   #   :timestamps (adds timestamp columns)
