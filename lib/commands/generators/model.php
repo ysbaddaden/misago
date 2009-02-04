@@ -1,12 +1,44 @@
 <?php
 
-#      exists  app/models/
-#      exists  test/unit/
-#      exists  test/fixtures/
-#      create  app/models/tested.rb
-#      create  test/unit/tested_test.rb
-#      create  test/fixtures/testeds.yml
-#      exists  db/migrate
-#      create  db/migrate/002_create_testeds.rb
+# TODO: Generate db/migrate/<timestamp>_create_<table>.php.
+class Generator_Model extends Generator_Base
+{
+  function __construct($args, $options=array())
+  {
+    if (empty($args))
+    {
+      echo "Syntax error: script/generate controller <name>\n";
+      exit;
+    }
+    $this->options = $options;
+    
+    $filename = String::underscore($args[0]);
+    $class    = String::camelize($args[0]);
+    $table    = String::pluralize($filename);
+    
+    $vars = array(
+      'filename' => $filename,
+      'Class'    => $class,
+      'table'    => $table,
+    );
+    
+    $this->create_directory('app/models');
+    $this->create_directory('test/unit');
+#   $this->create_directory('test/fixtures');
+    
+    $this->create_file_from_template("app/models/{$filename}.php",     'model/model.php',   &$vars);
+    $this->create_file_from_template("test/unit/test_{$filename}.php", 'model/test.php',    &$vars);
+#   $this->create_file_from_template("test/fixtures{$table}.yml",      'model/fixture.yml', &$vars);
+    
+    $vars = array(
+      'filename' => gmdate('YmdHis').'_create_'.$table,
+      'Class'    => 'Create'.$class,
+      'Model'    => $class,
+      'table'    => $table,
+    );
+#    $this->create_directory('db/migrate');
+#    $this->create_file_from_template("db/migrate/{$filename}.php", 'model/migration.php', &$vars);
+  }
+}
 
 ?>
