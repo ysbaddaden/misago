@@ -14,7 +14,7 @@ class Generator_Controller extends Generator_Base
     $class    = String::camelize($args[0]);
     $vars = array(
       'filename' => $filename,
-      'Class'    => String::camelize($args[0]),
+      'Class'    => $class,
     );
     
     $this->create_directory('app/controllers');

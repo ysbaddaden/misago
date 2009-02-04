@@ -42,7 +42,7 @@ class Generator_Base
         $values = array();
         foreach($vars as $k => $v)
         {
-          $keys[]   = "#{$k}";
+          $keys[]   = '#{'.$k.'}';
           $values[] = $v;
         }
         $content = str_replace($keys, $values, $content);
@@ -56,6 +56,8 @@ class Generator_Base
   }
 }
 
+
+# TODO: Parse command line options (eg: -f)
 
 # runs generator
 $generator = $_SERVER['argv'][1];
