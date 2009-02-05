@@ -4,9 +4,11 @@ class ActiveRecord_Record extends Object implements Iterator
 {
   protected $__attributes = array();
   
-  function __construct(array $attributes)
+  function __construct(array $attributes=null)
   {
-    $this->__attributes = $attributes; 
+    if (!empty($this->attributes)) {
+      $this->__attributes = $attributes;
+    }
   }
   
   
