@@ -26,6 +26,8 @@ class Test_Unit_Test extends Unit_Test
     $this->assert_equal('single dimension arrays', array('a', 'b', 'c'), array('a', 'b', 'c'));
     $this->assert_equal('multidimensional arrays', array('a', array('b', 'c'), 'd'), array('a', array('b', 'c'), 'd'));
     $this->assert_equal('multidimensional associative arrays', array('az' => array('a', 'b')), array('az' => array('a', 'b')));
+    
+    $this->assert_equal("hash containing null values", array('a' => null), array('a' => null));
   }
   
   function test_assert_not_equal()
