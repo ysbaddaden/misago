@@ -2,7 +2,6 @@
 error_reporting(E_ALL);
 require_once dirname(__FILE__).'/object.php';
 
-# IMPROVE: Add assert_instance_of($comment, $object, $classname)
 class Unit_Test
 {
   private $count_tests    = 0;
@@ -84,6 +83,19 @@ class Unit_Test
     
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
+  
+  protected function assert_instance_of($comment, $object, $classname)
+  {
+    $this->return_assert($comment, get_class($object) === $classname,
+      array('got' => get_class($object), 'expected' => $classname));
+  }
+  
+  protected function assert_type($comment, $var, $type)
+  {
+    $this->return_assert($comment, gettype($var) === $type,
+      array('got' => gettype($var), 'expected' => $type));
+  }
+  
   
   private function return_assert($comment, $test, array $vars)
   {

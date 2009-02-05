@@ -42,8 +42,14 @@ class Test_Unit_Test extends Unit_Test
   
   function test_assert_type()
   {
-    $this->assert_equal('testing integer', gettype(1), 'integer');
-    $this->assert_equal('testing object', gettype(new FakeClass()), 'object');
+    $this->assert_type('testing integer', 1, 'integer');
+    $this->assert_type('testing string', '1', 'string');
+    $this->assert_type('testing object', new FakeClass(), 'object');
+  }
+  
+  function test_assert_instance_of()
+  {
+    $this->assert_instance_of('', new FakeClass(), 'FakeClass');
   }
 }
 
