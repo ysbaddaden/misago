@@ -1,6 +1,6 @@
 <?php
 
-# TODO: Generate db/migrate/<timestamp>_create_<table>.php.
+# TODO: Generate YAML fixtures.
 class Generator_Model extends Generator_Base
 {
   function __construct($args, $options=array())

@@ -72,7 +72,7 @@ class ActionView_Base extends Object
       throw new MisagoException("View template not found: '{$__view_file}'", 404);
     }
     
-    # partial
+    # partial or collection of partials
     elseif (isset($options['partial']))
     {
       if (strpos($options['partial'], '/'))

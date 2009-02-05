@@ -15,7 +15,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   abstract function & columns($sql);
   abstract function is_active();
   abstract function escape_value($value);
-
+  
   function __construct(array $config)
   {
     $this->config = $config;
@@ -53,8 +53,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   #
   # options:
   #   :primary_key => string (name of PK)
-  #   :temporary   => bool   (temporary table)
-  #   :force       => bool   (drop before create)
+  #   :temporary   => bool   (temporary table?)
+  #   :force       => bool   (drop before create?)
   #   :options     => string ("engine=innodb")
   #
   function new_table($table, array $options=null)
@@ -64,7 +64,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   # 
   # definition:
-  #   :column :name, :null, :default, :limit
+  #   :columns => { :name => { :type, :limit, :null, :default, :signed } }
+  #   :primary_key => string (name of PK)
+  #   :temporary   => bool   (temporary table?)
+  #   :force       => bool   (drop before create?)
+  #   :options     => string ("engine=innodb")
   #
   function create_table($table, array $definition)
   {
@@ -80,6 +84,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
         $column = array_merge($this->NATIVE_DATABASE_TYPES[$column['type']], $column);
         
         $def = $column['name'];
+        
         if (isset($column['limit'])) {
           $def .= "({$column['limit']})";
         }
@@ -110,6 +115,13 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     }
     return $this->execute("$sql ;");
   }
+  
+  function drop_table($table)
+  {
+    $table = $this->quote_table($table);
+    return $this->execute("DROP TABLE $table ;");
+  }
+  
 }
 
 ?>

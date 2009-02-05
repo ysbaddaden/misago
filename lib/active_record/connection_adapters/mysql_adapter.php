@@ -1,5 +1,6 @@
 <?php
 
+# TODO: Test ActiveRecord_ConnectionAdapters_Mysql.
 class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '`';
@@ -15,6 +16,12 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     'binary'      => array('name' => 'BLOB'),
   );
   private $link;
+  
+  function escape_value($value)
+  {
+    return mysql_real_escape_string($value, $this->link);
+  }
+  
   
   function is_active()
   {
@@ -47,6 +54,7 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     }
   }
   
+  
   function execute($sql)
   {
     return mysql_query($sql, $this->link);
@@ -67,7 +75,7 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
           $table = mysql_field_table($results, $idx);
           $result[$table][mysql_field_name($results, $idx)] = $value;
         }
-        array_push($data, $result);
+        $data[] = $result;
       }
     }
     
@@ -83,33 +91,39 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     $columns = array();
 		if ($results and mysql_num_rows($results) > 0)
 		{
-      while ($column = mysql_fetch_row($results))
+      while ($row = mysql_fetch_row($results))
       {
-        $name = array_shift($column);
-        $type = strtolower(array_shift($column));
-        
-        $columns[$name] = array(
-          'type' => $type,
-          'null' => (array_shift($column) != 'NO'),
-          'key'  => (array_shift($column) == 'PRI') ? true  : false,
+        $name   = array_shift($row);
+        $column = array(
+          'type'        => strtoupper(array_shift($row)),
+          'null'        => (array_shift($row) != 'NO'),
+          'primary_key' => (array_shift($row) == 'PRI') ? true  : false,
         );
         
-        if ($columns == 'tinytext') {
-          $columns[$name]['length'] = 255;
+        if (preg_match('/(\w+)(\([^\)]+\)/', $column['type'], $match))
+        {
+          $column['type']  = $match[1];
+          $column['limit'] = $match[2];
         }
-        elseif (strpos($type, 'varchar(') === 0) {
-          $columns[$name]['length'] = str_replace(array('varchar(', ')'), '', $type);
+        elseif ($column['type'] == 'TINYTEXT')
+        {
+          $column['type']  = 'string';
+          $column['limit'] = 255;
         }
+        
+        foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
+        {
+          if ($def['type'] == $column['type']) {
+            $column['type'] = $type;
+          }
+        }
+        
+        $columns[] = $column;
       }
     }
     
     mysql_free_result($results);
     return $columns;
-  }
-  
-  function escape_value($value)
-  {
-    return mysql_real_escape_string($value, $this->link);
   }
   
   
@@ -137,15 +151,10 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     return mysql_select_db($database, $this->link);
   }
   
+  
   function rename_table($from, $to)
   {
     
-  }
-  
-  function drop_table($table)
-  {
-    $table = $this->quote_table($table);
-    return $this->execute("DROP TABLE $table ;");
   }
   
   
@@ -165,16 +174,6 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
   }
   
   function remove_column()
-  {
-    
-  }
-  
-  function add_timestamps()
-  {
-    
-  }
-  
-  function remove_timestamps()
   {
     
   }

@@ -327,7 +327,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   {
 
   }
-
+  
   function to_xml()
   {
 

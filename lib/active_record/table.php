@@ -30,13 +30,12 @@ class ActiveRecord_Table
     $definition = array(
       'type' => $type,
     );
-    
     if (!empty($options)) {
       $definition = array_merge($definition, $options);
     }
     
     if (isset($this->columns[$name])) {
-      trigger_error("Column $name already exists.", E_USER_ERROR);
+      trigger_error("Column $name already defined (overwriting it).", E_USER_WARNING);
     }
     
     $this->columns[$name] = $definition;
