@@ -6,6 +6,7 @@ ini_set('include_path',
 	ROOT.'/app/controllers'.PATH_SEPARATOR.
 	ROOT.'/lib'.PATH_SEPARATOR.
 	MISAGO.'/lib'.PATH_SEPARATOR.
+	MISAGO.'/vendor'.PATH_SEPARATOR.
 	ini_get('include_path').PATH_SEPARATOR
 );
 
