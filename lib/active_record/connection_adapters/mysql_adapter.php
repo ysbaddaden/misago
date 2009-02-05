@@ -1,7 +1,6 @@
 <?php
 
-# TODO: Test ActiveRecord_ConnectionAdapters_Mysql.
-class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapters_AbstractAdapter
+class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '`';
   public  $NATIVE_DATABASE_TYPES = array(
@@ -60,6 +59,7 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     return mysql_query($sql, $this->link);
   }
   
+  # TODO: Test select_rows()
   function & select_rows($sql)
   {
     $results = $this->execute($sql);
@@ -83,6 +83,7 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     return $data;
   }
   
+  # TODO: Test columns()
   function & columns($table)
   {
     $table   = $this->quote_table($table);
@@ -146,6 +147,7 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
     return $this->execute("DROP DATABASE $database ;");
   }
   
+  # TODO: Test select_database()
   function select_database($database)
   {
     return mysql_select_db($database, $this->link);

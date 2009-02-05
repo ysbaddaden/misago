@@ -5,7 +5,6 @@ $_ENV['environment'] = 'test';
 
 require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
-#require_once "$location/lib/active_record/connection_adapters/abstract_adapter.php";
 
 class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
@@ -41,7 +40,7 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   }
 }
 
-class Test_DBO_BaseDriver extends Unit_Test
+class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
 {
   function test_quote_table()
   {
@@ -179,6 +178,6 @@ class Test_DBO_BaseDriver extends Unit_Test
 */
 }
 
-new Test_DBO_BaseDriver();
+new Test_ConnectionAdapter_AbstractAdapter();
 
 ?>

@@ -4,17 +4,14 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['environment'] = 'test';
 
 require_once "$location/lib/unit_test.php";
-require_once "$location/lib/misago_exception.php";
-require_once "$location/lib/active_support/array.php";
-require_once "$location/lib/active_record/connection_adapters/abstract_adapter.php";
-require_once "$location/lib/active_record/connection_adapters/mysql_adapter.php";
+require_once "$location/test/test_app/config/boot.php";
 
-class Test_ConnectionAdapter_Mysql extends Unit_Test
+class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
 {
   function test_connect()
   {
   /*
-    $db = new ActiveRecord_ConnectionAdapters_Mysql(array(
+    $db = new ActiveRecord_ConnectionAdapters_MysqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'wrong_user',
       'password' => 'wrong_password',
@@ -29,7 +26,7 @@ class Test_ConnectionAdapter_Mysql extends Unit_Test
     }
     $this->assert_true("Connection failed.", $failed);
   */
-    $db = new ActiveRecord_ConnectionAdapters_Mysql(array(
+    $db = new ActiveRecord_ConnectionAdapters_MysqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'root',
       'password' => '',
@@ -44,14 +41,14 @@ class Test_ConnectionAdapter_Mysql extends Unit_Test
 
   function test_execute()
   {
-    $this->db = new ActiveRecord_ConnectionAdapters_Mysql(array(
+    $this->db = new ActiveRecord_ConnectionAdapters_MysqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'root',
       'password' => '',
     ));
     
     $rs = $this->db->execute("SHOW DATABASES ;");
-    $this->assert_true("", is_resource($rs));
+    $this->assert_true("must return a resource", is_resource($rs));
   }
   
   function test_create_and_drop_database()
@@ -65,6 +62,6 @@ class Test_ConnectionAdapter_Mysql extends Unit_Test
   }
 }
 
-new Test_ConnectionAdapter_Mysql();
+new Test_ConnectionAdapter_MysqlAdapter();
 
 ?>
