@@ -26,7 +26,7 @@ class Test_ActiveRecord_Record extends Unit_Test
     $this->assert_true("attribute set to empty array is empty", empty($record->ary));
   }
   
-  function iterates()
+  function test_iterates()
   {
     $record = new ActiveRecord_Record();
     $record->id = 123;
