@@ -3,7 +3,7 @@
 # Handles database connections.
 # 
 # CHANGED: Dropped config/database.php in favor of config/database.yml
-# OPTIMIZE: Cache decoded YAML database configuration in memory (using APC or memcached).
+# OPTIMIZE: Cache decoded YAML database configuration in memory (using APC for instance).
 #
 class ActiveRecord_Connection
 {

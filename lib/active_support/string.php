@@ -1,10 +1,9 @@
 <?php
 
-#if (defined('ROOT')) {
-  require ROOT.'/config/initializers/inflections.php';
-#}
+require ROOT.'/config/initializers/inflections.php';
 
-/// Manipulates strings: singularizes, pluralizes, CamelCases, etc.
+# Manipulates strings: singularizes, pluralizes, CamelCases, etc.
+# TODO: humanize()
 class String extends Inflections
 {
 	static protected $trans;
