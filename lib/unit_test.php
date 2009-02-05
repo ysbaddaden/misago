@@ -2,6 +2,7 @@
 error_reporting(E_ALL);
 require_once dirname(__FILE__).'/object.php';
 
+# IMPROVE: Add assert_instance_of($comment, $object, $classname)
 class Unit_Test
 {
   private $count_tests    = 0;

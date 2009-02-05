@@ -7,26 +7,32 @@
 #
 class ActiveRecord_Connection
 {
-  private static $configurations;
+  public  static $configurations;
   private static $adapters = array();
   
-  # TODO: Test ActiveRecord_Connection::create().
-  static function create($config_name)
+  static function load_configuration()
   {
-    if (!isset(self::$configurations))
-    {
-      $configurations = file_get_contents(ROOT.'/config/database.yml');
-      self::$configurations = Yaml::decode($configurations);
+    $configurations = file_get_contents(ROOT.'/config/database.yml');
+    self::$configurations = Yaml::decode($configurations);
+  }
+  
+  static function create($environment)
+  {
+    if (!isset(self::$configurations)) {
+      self::load_configurations();
     }
     
-    if (!isset(self::$adapters[$config_name]))
-    {
-      $config = self::$configurations[$config_name];
-      $class  = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
-      self::$adapters[$config_name] = new $class(&$config);
+    $config = self::$configurations[$environment];
+    $class  = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
+    return new $class(&$config);
+  }
+  
+  static function get($environment)
+  {
+    if (!isset(self::$adapters[$environment])) {
+      self::$adapters[$environment] = self::create($environment);
     }
-    
-    return self::$adapters[$config_name];
+    return self::$adapters[$environment];
   }
 }
 
