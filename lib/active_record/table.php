@@ -1,27 +1,27 @@
 <?php
 
+# TODO: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
 class ActiveRecord_Table
 {
   private  $db;
   
   public   $name;
   public   $columns = array();
+  public   $definitions = array(
+    'id'          => true,
+    'primary_key' => 'id',
+  );
   
-  function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $db)
+  function __construct($name, array $definitions=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $db)
   {
     $this->db   = $db;
     $this->name = $name;
     
-    $defaults = array(
-      'id'          => true,
-      'primary_key' => 'id',
-    );
-    $this->options = $options ? array_merge($defaults, $options) : $defaults;
-    
-    if (isset($this->options['id']) and $this->options['id'])
-    {
-      $pk = isset($this->options['primary_key']) ? $this->options['primary_key'] : 'id';
-      $this->add_column('primary_key', $pk);
+    if (!empty($definitions)) {
+      $this->definitions = array_merge($this->definitions, $definitions);
+    }
+    if (isset($this->definitions['id']) and $this->definitions['id']) {
+      $this->add_column('primary_key', $this->definitions['primary_key']);
     }
   }
   
@@ -68,9 +68,8 @@ class ActiveRecord_Table
   
   function create()
   {
-    $this->db->create_table($this->name, array(
-      'columns' => $this->columns,
-    ));
+    $this->definitions['columns'] =& $this->columns;
+    return $this->db->create_table($this->name, $this->definitions);
   }
 }
 

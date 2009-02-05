@@ -64,12 +64,51 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   # 
   # definition:
-  #   :column :type, :null, :default, :limit
+  #   :column :name, :null, :default, :limit
   #
   function create_table($table, array $definition)
   {
-    $columns = $definition['columns'];
+    if (empty($definition['columns'])) {
+      throw new MisagoException("Can't create table: there are no columns.", 500);
+    }
     
+    $columns = array();
+    foreach($definition['columns'] as $name => $column)
+    {
+      if (is_array($this->NATIVE_DATABASE_TYPES[$column['type']]))
+      {
+        $column = array_merge($this->NATIVE_DATABASE_TYPES[$column['type']], $column);
+        
+        $def = $column['name'];
+        if (isset($column['limit'])) {
+          $def .= "({$column['limit']})";
+        }
+        if (isset($column['signed']) and !$column['signed']) {
+          $def .= " UNSIGNED";
+        }
+        if (isset($column['null']) and !$column['null']) {
+          $def .= " NOT NULL";
+        }
+        if (isset($column['default'])) {
+          $def .= " DEFAULT {$column['default']}";
+        }
+      }
+      else {
+        $def = $this->NATIVE_DATABASE_TYPES[$column['type']];
+      }
+      
+      $name = $this->quote_table($name);
+      $columns[] = "$name $def";
+    }
+    
+    $table   = $this->quote_table($table);
+    $columns = implode(', ', $columns);
+    $sql     = "CREATE TABLE $table ( $columns )";
+    
+    if (isset($definition['options'])) {
+      $sql .= ' '.$definition['options'];
+    }
+    return $this->execute("$sql ;");
   }
 }
 

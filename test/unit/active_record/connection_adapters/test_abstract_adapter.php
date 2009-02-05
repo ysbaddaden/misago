@@ -10,10 +10,11 @@ require_once "$location/test/test_app/config/boot.php";
 class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $NATIVE_DATABASE_TYPES = array(
-    'primary_key' => "INTEGER AUTO_INCREMENT PRIMARY KEY",
+    'primary_key' => "SERIAL",
     'string'      => array('name' => 'VARCHAR', 'limit' => 255),
     'text'        => array('name' => 'TEXT'),
     'integer'     => array('name' => 'INT', 'limit' => 4),
+    'float'       => array('name' => 'FLOAT'),
     'date'        => array('name' => 'DATE'),
     'time'        => array('name' => 'TIME'),
     'datetime'    => array('name' => 'DATETIME'),
@@ -90,14 +91,24 @@ class Test_DBO_BaseDriver extends Unit_Test
       'name' => array('type' => 'string'),
     ));
     
-    $t->add_column('string', 'description', array('limit' => 250));
-    $t->add_column('integer', 'price', array('signed' => false));
+    $t = $db->new_table('products', array('options' => 'ENGINE=innodb'));
+    $t->add_column('string', 'name', array('limit' => 100));
+    $t->add_column('text', 'description');
+    $t->add_column('float', 'price', array('signed' => false));
     $this->assert_equal("add column with options", $t->columns, array(
       'id'   => array('type' => 'primary_key'),
-      'name' => array('type' => 'string'),
-      'description' => array('type' => 'string', 'limit' => 250),
-      'price' => array('type' => 'integer', 'signed' => false),
+      'name' => array('type' => 'string', 'limit' => 100),
+      'description' => array('type' => 'text'),
+      'price' => array('type' => 'float', 'signed' => false),
     ));
+    
+    $sql = $t->create();
+    $this->assert_equal("", $sql, preg_replace('/\s+/', ' ', 'CREATE TABLE "products" (
+      "id" SERIAL,
+      "name" VARCHAR(100),
+      "description" TEXT,
+      "price" FLOAT UNSIGNED
+    ) ENGINE=innodb ;'));
   }
   
 /*
