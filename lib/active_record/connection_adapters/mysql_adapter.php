@@ -2,8 +2,19 @@
 
 class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
-  private   $link;
-  protected $column_quote = '`';
+  public  $COLUMN_QUOTE = '`';
+  public  $NATIVE_DATABASE_TYPES = array(
+    'primary_key' => "INTEGER AUTO_INCREMENT PRIMARY KEY",
+    'string'      => array('name' => 'VARCHAR', 'limit' => 255),
+    'text'        => array('name' => 'TEXT'),
+    'integer'     => array('name' => 'INT', 'limit' => 4),
+    'date'        => array('name' => 'DATE'),
+    'time'        => array('name' => 'TIME'),
+    'datetime'    => array('name' => 'DATETIME'),
+    'bool'        => array('name' => 'BOOLEAN'),
+    'binary'      => array('name' => 'BLOB'),
+  );
+  private $link;
   
   function is_active()
   {
@@ -124,23 +135,6 @@ class ActiveRecord_ConnectionAdapters_Mysql extends ActiveRecord_ConnectionAdapt
   function select_database($database)
   {
     return mysql_select_db($database, $this->link);
-  }
-  
-  # 
-  # definition:
-  #   :column :type, :null, :default, :limit
-  #   :timestamps (adds timestamp columns)
-  #
-  # options:
-  #   :id => bool (adds an 'id' column)
-  #   :primary_key (name of PK)
-  #   :temporary => bool (temporary table)
-  #   :force => bool (drop before create)
-  #   :options => string ("engine=innodb")
-  # 
-  function create_table($table, array $definition, array $options=null)
-  {
-    
   }
   
   function rename_table($from, $to)

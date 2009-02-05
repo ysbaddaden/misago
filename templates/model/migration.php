@@ -4,9 +4,12 @@ class #{Class} extends ActiveRecord_Migration
 {
   function up()
   {
-    $this->db->create_table('#{table}', array(
-      
-    ));
+    $t = $this->db->new_table('#{table}');
+    
+    #$t->add_column('string', 'title');
+    
+    $t->add_timestamps();
+    $t->create();
   }
   
   function down()

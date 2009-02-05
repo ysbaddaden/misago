@@ -2,9 +2,11 @@
 
 abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
+  public  $COLUMN_QUOTE = '"';
+  public  $VALUE_QUOTE  = "'";
+  public  $NATIVE_DATABASE_TYPES = array();
+  
   protected $config;
-  protected $column_quote = '"';
-  protected $value_quote  = "'";
   
   abstract function connect();
   abstract function disconnect();
@@ -36,16 +38,38 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     {
       $segments = explode('.', $column);
       foreach($segments as $i => $column) {
-        $segments[$i] = $this->column_quote.$column.$this->column_quote;
+        $segments[$i] = $this->COLUMN_QUOTE.$column.$this->COLUMN_QUOTE;
       }
       return implode('.', $segments);
     }
-    return $this->column_quote.$column.$this->column_quote;
+    return $this->COLUMN_QUOTE.$column.$this->COLUMN_QUOTE;
   }
   
   function quote_value($value)
   {
-    return $this->value_quote.$this->escape_value($value).$this->value_quote;
+    return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
+  }
+  
+  #
+  # options:
+  #   :primary_key => string (name of PK)
+  #   :temporary   => bool   (temporary table)
+  #   :force       => bool   (drop before create)
+  #   :options     => string ("engine=innodb")
+  #
+  function new_table($table, array $options=null)
+  {
+    return new ActiveRecord_Table($table, $options, $this);
+  }
+  
+  # 
+  # definition:
+  #   :column :type, :null, :default, :limit
+  #
+  function create_table($table, array $definition)
+  {
+    $columns = $definition['columns'];
+    
   }
 }
 

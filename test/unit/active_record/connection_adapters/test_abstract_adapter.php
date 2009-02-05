@@ -4,11 +4,23 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['environment'] = 'test';
 
 require_once "$location/lib/unit_test.php";
-require_once "$location/lib/active_support/array.php";
-require_once "$location/lib/active_record/connection_adapters/abstract_adapter.php";
+require_once "$location/test/test_app/config/boot.php";
+#require_once "$location/lib/active_record/connection_adapters/abstract_adapter.php";
 
 class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
+  public  $NATIVE_DATABASE_TYPES = array(
+    'primary_key' => "INTEGER AUTO_INCREMENT PRIMARY KEY",
+    'string'      => array('name' => 'VARCHAR', 'limit' => 255),
+    'text'        => array('name' => 'TEXT'),
+    'integer'     => array('name' => 'INT', 'limit' => 4),
+    'date'        => array('name' => 'DATE'),
+    'time'        => array('name' => 'TIME'),
+    'datetime'    => array('name' => 'DATETIME'),
+    'bool'        => array('name' => 'BOOLEAN'),
+    'binary'      => array('name' => 'BLOB'),
+  );
+  
   function execute($sql)
   {
     return preg_replace('/\s{2,}/', ' ', $sql);
@@ -16,9 +28,16 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   function connect() {}
   function disconnect() {}
-  function select_rows($sql) {}
-  function columns($sql) {}
-  function is_active() {}
+  function & select_rows($sql) {}
+  function & columns($sql) {}
+  
+  function is_active() {
+    return true;
+  }
+  
+  function escape_value($value) {
+    return addslashes($value);
+  }
 }
 
 class Test_DBO_BaseDriver extends Unit_Test
@@ -45,6 +64,42 @@ class Test_DBO_BaseDriver extends Unit_Test
     $this->assert_equal("", $test, '"misago"."orders"');
   }
 
+  function test_new_table()
+  {
+    $db = new FakeAdapter(array());
+    
+    $t = $db->new_table('products');
+    $this->assert_true("new_table", $t instanceof ActiveRecord_Table);
+    
+    $this->assert_equal("must have a primary key", $t->columns, array(
+      'id' => array('type' => 'primary_key'),
+    ));
+    
+    $t = $db->new_table('products', array('primary_key' => "isbn"));
+    $this->assert_equal("personalized primary key", $t->columns, array(
+      'isbn' => array('type' => 'primary_key'),
+    ));
+    
+    $t = $db->new_table('products', array('id' => false));
+    $this->assert_equal("no primary key", $t->columns, array());
+    
+    $t = $db->new_table('products');
+    $t->add_column('string', 'name');
+    $this->assert_equal("add column", $t->columns, array(
+      'id'   => array('type' => 'primary_key'),
+      'name' => array('type' => 'string'),
+    ));
+    
+    $t->add_column('string', 'description', array('limit' => 250));
+    $t->add_column('integer', 'price', array('signed' => false));
+    $this->assert_equal("add column with options", $t->columns, array(
+      'id'   => array('type' => 'primary_key'),
+      'name' => array('type' => 'string'),
+      'description' => array('type' => 'string', 'limit' => 250),
+      'price' => array('type' => 'integer', 'signed' => false),
+    ));
+  }
+  
 /*
   function test_quote_columns()
   {
