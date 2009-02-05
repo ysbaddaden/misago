@@ -56,11 +56,33 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
   {
     $options = array("charset" => 'utf8');
     $rs = $this->db->create_database('misago_test', $options);
-    $this->assert_true("create", $rs ? true : false);
-    
-    $rs = $this->db->drop_database('misago_test');
-    $this->assert_true("drop", $rs ? true : false);
+    $this->assert_true("", $rs ? true : false);
   }
+  
+  function test_create_table()
+  {
+    $options = array('options' => 'ENGINE=innodb');
+    
+    $t = $this->db->new_table("misago_test.products", $options);
+    $t->add_column("string", 'title', array('limit' => 100));
+    $t->add_timestamps();
+    $rs = $t->create();
+    
+    $this->assert_true("", $rs ? true : false);
+  }
+  
+  function test_drop_table()
+  {
+    $rs = $this->db->drop_table('misago_test.products');
+    $this->assert_true("", $rs ? true : false);
+  }
+  
+  function test_drop_database()
+  {
+    $rs = $this->db->drop_database('misago_test');
+    $this->assert_true("", $rs ? true : false);
+  }
+  
 }
 
 new Test_ConnectionAdapter_MysqlAdapter();

@@ -79,9 +79,12 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $columns = array();
     foreach($definition['columns'] as $name => $column)
     {
-      if (is_array($this->NATIVE_DATABASE_TYPES[$column['type']]))
+      $type = strtolower($column['type']);
+      
+      if (isset($this->NATIVE_DATABASE_TYPES[$type])
+        and is_array($this->NATIVE_DATABASE_TYPES[$type]))
       {
-        $column = array_merge($this->NATIVE_DATABASE_TYPES[$column['type']], $column);
+        $column = array_merge($this->NATIVE_DATABASE_TYPES[$type], $column);
         
         $def = $column['name'];
         
