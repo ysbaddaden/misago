@@ -26,4 +26,6 @@ $path_here = dirname(__FILE__);
 `mkdir -p {$path_to}/tmp/cache/lighttpd/compress`;
 `mkdir -p {$path_to}/vendor`;
 
+`sed -i 's/\#{appname}/$path_to/g' {$path_to}/config/database.yml`;
+
 ?>

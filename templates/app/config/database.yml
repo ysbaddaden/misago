@@ -1,0 +1,22 @@
+
+development:
+  adapter: mysql
+  host: localhost
+  database: #{appname}_development
+  username: root
+  password: 
+
+production:
+  adapter: mysql
+  host: localhost
+  database: #{appname}_production
+  username: root
+  password: 
+
+test:
+  adapter: mysql
+  host: localhost
+  database: #{appname}_test
+  username: root
+  password: 
+

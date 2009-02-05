@@ -1,5 +1,6 @@
 <?php
 
+# DEPRECATED
 class Database
 {
   static $development = array(
