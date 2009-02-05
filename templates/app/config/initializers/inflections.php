@@ -1,6 +1,6 @@
 <?php
 
-# TODO: Use a YAML file instead of a PHP class.
+# IMPROVE: Use a YAML file instead of a PHP class.
 class Inflections
 {
   static protected $constants = array('wiki');

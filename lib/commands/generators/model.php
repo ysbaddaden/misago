@@ -1,6 +1,6 @@
 <?php
 
-# TODO: Generate YAML fixtures.
+# IMPROVE: Generate YAML fixtures.
 class Generator_Model extends Generator_Base
 {
   function __construct($args, $options=array())

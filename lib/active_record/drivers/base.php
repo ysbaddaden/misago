@@ -1,6 +1,6 @@
 <?php
 
-# DEPRECATED
+# NOTE: DEPRECATED in favor of ActiveRecord_ConnectionAdapters_AbstractAdapter
 abstract class DBO_Base
 {
   protected $field_quote = '"';
@@ -50,7 +50,6 @@ abstract class DBO_Base
     return $this->query("SELECT $fields FROM $table $where $group $order $limit ;");
   }
   
-  # TODO: Throw an exception if data is empty.
   function insert($table, array $data)
   {
     $table  = $this->field($table);
@@ -60,7 +59,6 @@ abstract class DBO_Base
     return $this->execute("INSERT INTO $table ($fields) VALUES ($values) ;");
   }
   
-  # TODO: Throw an exception if data is empty.
   function update($table, array $data, $conditions=null)
   {
     $updates = array();
@@ -140,7 +138,7 @@ abstract class DBO_Base
   # field("-! PASSWORD(a)") translates to 'PASSWORD(a)' (ie. no quoting)
   # field("DATE_ADD(a, b)") translates to 'DATE_ADD("a", "b")'
   # 
-  # TODO: Do not escape special keywords, like DISTINCT.
+  # IMPROVE: Do not escape special keywords, like DISTINCT.
   # 
   function field($field)
   {
@@ -188,8 +186,6 @@ abstract class DBO_Base
   # Sanitizes a single value.
   # Must be overriden to use driver's own escape function.
   # 
-  # TODO: Do not escape functions (?)
-  #
   function value($value, $quote=true)
   {
     $value = trim($value);

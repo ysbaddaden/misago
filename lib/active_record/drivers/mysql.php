@@ -1,6 +1,6 @@
 <?php
 
-# DEPRECATED: In favor of ActiveRecord_ConnectionAdapters_MysqlAdapter
+# NOTE: DEPRECATED in favor of ActiveRecord_ConnectionAdapters_MysqlAdapter
 class DBO_Mysql extends DBO_Base
 {
   private   $link;

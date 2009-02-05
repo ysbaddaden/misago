@@ -6,6 +6,7 @@ $_ENV['environment'] = 'test';
 require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
 
+# TODO: Test if MysqlAdapter::create_table() actually creates the table.
 class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
 {
   function test_connect()

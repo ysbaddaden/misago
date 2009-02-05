@@ -2,13 +2,15 @@
 
 # Handles database connections.
 # 
-# TODO: Cache decoded YAML database configuration in memory (using APC or memcached).
+# CHANGED: Dropped config/database.php in favor of config/database.yml
+# OPTIMIZE: Cache decoded YAML database configuration in memory (using APC or memcached).
 #
 class ActiveRecord_Connection
 {
   private static $configurations;
   private static $adapters = array();
   
+  # TODO: Test ActiveRecord_Connection::create().
   static function create($config_name)
   {
     if (!isset(self::$configurations))

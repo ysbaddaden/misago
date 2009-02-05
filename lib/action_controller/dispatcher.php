@@ -1,39 +1,5 @@
 <?php
 
-/*
-function & ActionController_analyse_host()
-{
-  $protocol = 'http'.((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 's' : null).'://';
-  
-  $data = array(
-    'protocol' => $protocol,
-    'host'     => isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : null,
-    'port'     => isset($_SERVER['HTTP_PORT']) ? $_SERVER['HTTP_PORT'] : null,
-  );
-  return $data;
-}
-*/
-
-/*
-/// TODO Use the 404 error binding instead. [done]
-/// DEPRECATED
-function ActionController_get_path()
-{
-  if (isset($_GET['misago_path']))
-  {
-	  $path = $_GET['misago_path'];
-	  if (strpos($path, 'favicon.ico') !== false) {
-		  die();
-	  }
-	  unset($_GET['misago_path']);
-  }
-  else {
-	  $path = '';
-  }
-  return $path;
-}
-*/
-
 function ActionController_dispatch($method, $uri)
 {
   # route

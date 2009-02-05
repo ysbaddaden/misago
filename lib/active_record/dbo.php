@@ -4,7 +4,7 @@
 # 
 # $db = DBO::get('development');
 #
-# DEPRECATED
+# NOTE: DEPRECATED in favor of ActiveRecord_Connection
 class DBO
 {
   private static $instances = array();
