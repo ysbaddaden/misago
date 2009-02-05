@@ -1,5 +1,6 @@
 <?php
 
+# DEPRECATED
 abstract class DBO_Base
 {
   protected $field_quote = '"';

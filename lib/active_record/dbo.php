@@ -3,6 +3,8 @@
 # DataBase abstraction layer.
 # 
 # $db = DBO::get('development');
+#
+# DEPRECATED
 class DBO
 {
   private static $instances = array();

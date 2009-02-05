@@ -1,5 +1,12 @@
 <?php
 
+$location = dirname(__FILE__).'/../../..';
+$_ENV['environment'] = 'test';
+
+require "$location/lib/unit_test.php";
+require "$location/test/test_app/config/boot.php";
+
+/*
 class Inflections
 {
   static protected $constants = array('wiki');
@@ -18,11 +25,7 @@ class Inflections
 	  '/$/'  => 's'
   );
 }
-
-$location = dirname(__FILE__).'/../..';
-require "$location/lib/unit_test.php";
-require "$location/lib/active_support/string.php";
-
+*/
 
 class Test_String extends Unit_Test
 {

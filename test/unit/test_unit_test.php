@@ -2,7 +2,12 @@
 
 require_once dirname(__FILE__)."/../../lib/unit_test.php";
 
-class PHPUnit_Test extends PHPUnit
+class FakeClass
+{
+  
+}
+
+class Test_Unit_Test extends Unit_Test
 {
   function test_assert_true()
   {
@@ -40,8 +45,6 @@ class PHPUnit_Test extends PHPUnit
   }
 }
 
-class FakeClass {}
-
-new PHPUnit_Test();
+new Test_Unit_Test();
 
 ?>

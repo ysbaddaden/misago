@@ -75,7 +75,7 @@ class Unit_Test
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
-  protected function assert_not_equal($test, $return, $expect)
+  protected function assert_not_equal($comment, $test, $expect)
   {
     $success = is_array($test) ?
       !$this->compare_arrays($test, $expect) :

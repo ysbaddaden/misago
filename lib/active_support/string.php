@@ -1,8 +1,8 @@
 <?php
 
-if (defined('ROOT')) {
+#if (defined('ROOT')) {
   require ROOT.'/config/initializers/inflections.php';
-}
+#}
 
 /// Manipulates strings: singularizes, pluralizes, CamelCases, etc.
 class String extends Inflections

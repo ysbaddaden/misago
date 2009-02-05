@@ -1,8 +1,10 @@
 <?php
 
 $location = dirname(__FILE__).'/../../..';
+$_ENV['environment'] = 'test';
+
 require_once "$location/lib/unit_test.php";
-require_once "$location/lib/active_support/time.php";
+require_once "$location/test/test_app/config/boot.php";
 
 // TODO Test all is_x() methods
 // TODO Test ago() method
