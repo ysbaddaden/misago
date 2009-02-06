@@ -90,6 +90,12 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     ));
   }
   
+  # TODO: $id = MysqlAdapter::insert($table, $data, $returning_id='id')
+  function test_insert()
+  {
+    
+  }
+  
   function test_drop_table()
   {
     $rs = $this->db->drop_table('misago_test.products');
