@@ -125,6 +125,23 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("DROP TABLE $table ;");
   }
   
+  
+  function insert($table, array $data, $returning=null)
+  {
+    $table  = $this->quote_table($table);
+    $fields = array();
+    $values = array();
+    
+    foreach($data as $field => $value)
+    {
+      $fields[] = $this->quote_column($field);
+      $values[] = $this->quote_value($value);
+    }
+    $fields = implode(', ', $fields);
+    $values = implode(', ', $values);
+    
+    return $this->execute("INSERT INTO $table ( $fields ) VALUES ( $values ) ;");
+  }
 }
 
 ?>

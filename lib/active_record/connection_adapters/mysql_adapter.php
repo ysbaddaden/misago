@@ -200,21 +200,9 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     
   }
   
-  function insert($table, array $data, $returning_id=null)
+  function insert($table, array $data, $returning=null)
   {
-    $table  = $this->quote_table($table);
-    $fields = array();
-    $values = array();
-    
-    foreach($data as $field => $value)
-    {
-      $fields[] = $this->quote_column($field);
-      $values[] = $this->quote_value($value);
-    }
-    $fields = implode(', ', $fields);
-    $values = implode(', ', $values);
-    
-    return $this->execute("INSERT INTO $table ( $fields ) VALUES ( $values ) ;");
+    return parent::insert($table, $data);
   }
 }
 
