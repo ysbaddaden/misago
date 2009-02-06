@@ -89,37 +89,39 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     $table   = $this->quote_table($table);
     $results = $this->execute("DESC $table ;");
     
+    
     $columns = array();
 		if ($results and mysql_num_rows($results) > 0)
 		{
       while ($row = mysql_fetch_row($results))
       {
-        $name   = array_shift($row);
-        $column = array(
-          'type'        => strtoupper(array_shift($row)),
-          'null'        => (array_shift($row) != 'NO'),
-          'primary_key' => (array_shift($row) == 'PRI') ? true  : false,
-        );
+        list($name, $type, $is_null, $key, $default,) = $row;
+        $column = array();
+        $type   = strtoupper($type);
         
-        if (preg_match('/(\w+)(\([^\)]+\)/', $column['type'], $match))
+        if (preg_match('/(\w+)\(([^\)]+)\)/', $type, $match))
         {
           $column['type']  = $match[1];
-          $column['limit'] = $match[2];
+          $column['limit'] = (int)$match[2];
         }
-        elseif ($column['type'] == 'TINYTEXT')
+        elseif ($type == 'TINYTEXT')
         {
           $column['type']  = 'string';
           $column['limit'] = 255;
         }
+        else {
+          $column['type'] = $type;
+        }
         
         foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
         {
-          if ($def['type'] == $column['type']) {
+          if ($def['name'] == $column['type']) {
             $column['type'] = $type;
           }
         }
         
-        $columns[] = $column;
+        $column['null'] = ($is_null == 'NO') ? false : true;
+        $columns[$name] = $column;
       }
     }
     
