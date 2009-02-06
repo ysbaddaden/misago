@@ -56,7 +56,15 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   
   function execute($sql)
   {
-    return mysql_query($sql, $this->link);
+    $rs = mysql_query($sql, $this->link);
+    
+    if (!$rs)
+    {
+      echo "\n[".mysql_errno($this->link)."] ".mysql_error($this->link)."\n";
+      echo "$sql\n\n";
+    }
+    
+    return $rs;
   }
   
   # TODO: Test select_rows()
@@ -83,7 +91,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $data;
   }
   
-  # TODO: Test columns()
   function & columns($table)
   {
     $table   = $this->quote_table($table);
@@ -191,6 +198,23 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   function remove_index()
   {
     
+  }
+  
+  function insert($table, array $data, $returning_id=null)
+  {
+    $table  = $this->quote_table($table);
+    $fields = array();
+    $values = array();
+    
+    foreach($data as $field => $value)
+    {
+      $fields[] = $this->quote_column($field);
+      $values[] = $this->quote_value($value);
+    }
+    $fields = implode(', ', $fields);
+    $values = implode(', ', $values);
+    
+    return $this->execute("INSERT INTO $table ( $fields ) VALUES ( $values ) ;");
   }
 }
 

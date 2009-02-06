@@ -90,10 +90,13 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     ));
   }
   
-  # TODO: $id = MysqlAdapter::insert($table, $data, $returning_id='id')
   function test_insert()
   {
+    $rs = $this->db->insert('products', array('title' => 'azerty'));
+    $this->assert_true("must succeed", $rs);
     
+    $rs = $this->db->insert('products', array('released_at' => date('Y-m-d')));
+    $this->assert_false("must fail", $rs);
   }
   
   function test_drop_table()
