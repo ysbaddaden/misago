@@ -113,7 +113,6 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
   function test_insert()
   {
     $db = new FakeAdapter(array());
-    
     $sql = $db->insert('products', array('title' => 'azerty', 'created_at' => '2009-02-06'));
     $this->assert_equal("", $sql, "INSERT INTO \"products\" ( \"title\", \"created_at\" ) VALUES ( 'azerty', '2009-02-06' ) ;");
   }

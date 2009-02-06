@@ -97,6 +97,28 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     
     $rs = $this->db->insert('products', array('released_at' => date('Y-m-d')));
     $this->assert_false("must fail", $rs);
+    
+    $rs = $this->db->insert('products', array('title' => 'qwerty'));
+    $this->assert_true("must succeed", $rs);
+  }
+  
+  function test_select_rows()
+  {
+    $rs = $this->db->select_rows("SELECT title FROM products WHERE id = 1 ;");
+    $this->assert_equal("", $rs, array(array('products' => array('title' => 'azerty'))));
+    
+    $rs = $this->db->select_rows("SELECT title FROM products ;");
+    $this->assert_equal("", $rs, array(
+      array('products' => array('title' => 'azerty')),
+      array('products' => array('title' => 'qwerty')),
+    ));
+  }
+  
+  # TODO: Write test_insert_returning().
+  function test_insert_returning()
+  {
+#    $id = $this->db->insert('products', array('title' => 'qwerty'), 'id');
+#    $this->assert_equal("", $id, 3);
   }
   
   function test_drop_table()
