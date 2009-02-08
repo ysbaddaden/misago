@@ -105,8 +105,8 @@ class Unit_Test
       # failure
       $this->count_failures += 1;
       printf("\n%s failed: %s\n", $this->running_test, $comment);
-      printf("Expected: %s\n", print_r($vars['expected'], true));
-      printf("Got: %s\n", print_r($vars['got'], true));
+      printf("  expected: %s\n", print_r($vars['expected'], true));
+      printf("       got: %s\n", print_r($vars['got'], true));
     }
   }
   
