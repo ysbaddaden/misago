@@ -1,7 +1,7 @@
 <?php
 
 $location = dirname(__FILE__).'/../../..';
-$_ENV['environment'] = 'test';
+$_ENV['MISAGO_ENV'] = 'test';
 
 require "$location/lib/unit_test.php";
 require "$location/test/test_app/config/boot.php";

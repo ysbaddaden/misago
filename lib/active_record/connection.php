@@ -2,7 +2,6 @@
 
 # Handles database connections.
 # 
-# CHANGED: Dropped config/database.php in favor of config/database.yml
 # OPTIMIZE: Cache decoded YAML database configuration in memory (using APC for instance).
 #
 class ActiveRecord_Connection
@@ -19,7 +18,7 @@ class ActiveRecord_Connection
   static function create($environment)
   {
     if (!isset(self::$configurations)) {
-      self::load_configurations();
+      self::load_configuration();
     }
     
     $config = self::$configurations[$environment];
