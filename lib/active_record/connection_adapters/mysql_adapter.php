@@ -16,17 +16,19 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   );
   private $link;
   
+  # Escapes a value to be used in an SQL query.
   function escape_value($value)
   {
     return mysql_real_escape_string($value, $this->link);
   }
   
-  
+  # Checks wether the connection to the database is active or not.
   function is_active()
   {
     return (bool)$this->link;
   }
   
+  # Connects to the database.
   function connect()
   {
     $callback = (isset($this->config['permanent']) and $this->config['permanent']) ?
@@ -44,6 +46,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
+  # Disconnects from the database.
   function disconnect()
   {
     if ($this->link)
@@ -53,7 +56,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
-  
+  # Executes an SQL query.
   function execute($sql)
   {
     $rs = mysql_query($sql, $this->link);
@@ -110,14 +113,18 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $data;
   }
   
+  # Returns the columns' definitions of a table.
   function & columns($table)
   {
-    $table   = $this->quote_table($table);
-    $results = $this->execute("DESC $table ;");
+    $_table  = $this->quote_table($table);
+    $results = $this->execute("DESC {$_table} ;");
     
+    if (!$results) {
+      throw new ActiveRecord_Exception("No such table: $table", ActiveRecord_Exception::NoSuchTable);
+    }
     
     $columns = array();
-		if ($results and mysql_num_rows($results) > 0)
+		if (mysql_num_rows($results) > 0)
 		{
       while ($row = mysql_fetch_row($results))
       {
@@ -155,7 +162,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $columns;
   }
   
-  
+  # Creates a database.
   function create_database($database, array $options=null)
   {
     $database = $this->quote_table($database);
@@ -169,39 +176,44 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $this->execute("$sql ;");
   }
   
+  # Destroys a database (and everything inside).
   function drop_database($database)
   {
     $database = $this->quote_table($database);
     return $this->execute("DROP DATABASE $database ;");
   }
   
+  # Selects a default database to use.
   function select_database($database)
   {
     return mysql_select_db($database, $this->link);
   }
   
-  
+  # Renames a table.
   function rename_table($from, $to)
   {
     
   }
   
-  
+  # Adds a column to a table.
   function add_column()
   {
     
   }
   
+  # Changes a column's definition in a table.
   function change_column()
   {
     
   }
   
+  # Renames a column in a table.
   function rename_column()
   {
     
   }
   
+  # Destroys a column in a table.
   function remove_column()
   {
     
@@ -218,6 +230,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     
   }
   
+  # Inserts a row into a table.
   function insert($table, array $data, $returning=null)
   {
     $success = parent::insert($table, $data);
