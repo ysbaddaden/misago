@@ -93,21 +93,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $data;
   }
   
-  # Returns a single hash of columns => values.
-  function & select_one($sql)
-  {
-    $rs = $this->select_all($sql);
-    $rs = isset($rs[0]) ? $rs[0] : false;
-    return $rs;
-  }
-  
-  # Returns a single value.
-  function select_value($sql)
-  {
-    $rs = $this->select_one($sql);
-    return (count($rs) > 0) ? array_shift($rs) : null;
-  }
-  
   # Returns an array of values from the first column.
   function & select_values($sql)
   {
@@ -190,7 +175,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $this->execute("DROP DATABASE $database ;");
   }
   
-  # TODO: Test select_database()
   function select_database($database)
   {
     return mysql_select_db($database, $this->link);
