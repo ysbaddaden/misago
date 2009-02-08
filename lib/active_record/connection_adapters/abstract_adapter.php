@@ -58,8 +58,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   #
   # options:
-  #   :primary_key => string (name of PK)
   #   :temporary   => bool   (temporary table?)
+  #   :id          => bool   (automatically add 'id' primary key?)
   #   :force       => bool   (drop before create?)
   #   :options     => string ("engine=innodb")
   #
@@ -70,12 +70,13 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   # 
   # definition:
-  #   :columns => { :name => { :type, :limit, :null, :default, :signed } }
-  #   :primary_key => string (name of PK)
-  #   :temporary   => bool   (temporary table?)
-  #   :force       => bool   (drop before create?)
-  #   :options     => string ("engine=innodb")
-  #
+  #   :columns   => { :name => { :type, :limit, :null, :default, :signed } }
+  #   :temporary => bool   (temporary table?)
+  #   :force     => bool   (drop before create?)
+  #   :options   => string ("engine=innodb")
+  # 
+  # TODO: Add support for :force (true: drop table before create, false: create if not exists).
+  # 
   function create_table($table, array $definition)
   {
     if (empty($definition['columns'])) {
@@ -117,7 +118,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     
     $table   = $this->quote_table($table);
     $columns = implode(', ', $columns);
-    $sql     = "CREATE TABLE $table ( $columns )";
+    
+    $sql = (isset($definition['temporary']) and $definition['temporary']) ?
+      "CREATE TEMPORARY TABLE $table ( $columns )" :
+      "CREATE TABLE $table ( $columns )";
     
     if (isset($definition['options'])) {
       $sql .= ' '.$definition['options'];
@@ -125,10 +129,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("$sql ;");
   }
   
-  function drop_table($table)
+  function drop_table($table, $temporary=false)
   {
     $table = $this->quote_table($table);
-    return $this->execute("DROP TABLE $table ;");
+    return $this->execute("DROP ".($temporary ? "TEMPORARY" : '')." TABLE $table ;");
   }
   
   
@@ -163,6 +167,106 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $values = implode(', ', $values);
     
     return $this->execute("INSERT INTO $table ( $fields ) VALUES ( $values ) ;");
+  }
+  
+  # Updates rows in a table.
+  function update($table, array $data, array $conditions=null)
+  {
+    $table       = $this->quote_table($table);
+    $assignments = $this->sanitize_sql_for_assignment($data);
+    if (!empty($where)) {
+      $where = $this->sanitize_sql_for_conditions($conditions);
+    }
+    return $this->execute("UPDATE $table SET $assignments $where ;");
+  }
+  
+  
+  # Accepts an array, hash, or string of SQL assignments and
+  # sanitizes them into a valid SQL fragment for a SET clause.
+  function sanitize_sql_for_assignment($assignments)
+  {
+    if (is_hash($assignments)) {
+      return $this->sanitize_sql_hash_for_assignment($assignments);
+    }
+    elseif (is_array($assignments)) {
+      return $this->sanitize_sql_array($assignments);
+    }
+    return $assignments;
+  }
+
+  # Accepts an array, hash, or string of SQL conditions and
+  # sanitizes them into a valid SQL fragment for a WHERE clause.
+  function sanitize_sql_for_conditions($conditions)
+  {
+    if (is_hash($conditions)) {
+      return $this->sanitize_sql_hash_for_conditions(&$conditions);
+    }
+    elseif (is_array($conditions)) {
+      return $this->sanitize_sql_array(&$conditions);
+    }
+    return $conditions;
+  }
+  
+  # Accepts an array of conditions. The array has each value
+  # sanitized and interpolated into the SQL statement.
+  # 
+  # ["name = :name", {name => 'toto'}]
+  # ["name = '%s' AND group_id = %d", 'toto', 123]
+  # 
+  function sanitize_sql_array($ary)
+  {
+    if (!isset($ary[1])) {
+      return isset($ary[0]) ? $ary[0] : '';
+    }
+    if (is_hash($ary[1]))
+    {
+      # uses symbols
+      $symbols = array();
+      foreach($ary[1] as $symbol => $value) {
+        $symbols[":$symbol"] = $this->quote_value($value);
+      }
+      $sql = strtr($ary[0], $symbols);
+    }
+    else
+    {
+      for($i=1, $len = count($ary); $i<$len; $i++) {
+          $ary[$i] = $this->escape_value($ary[$i], false);
+      }
+      $sql = call_user_func_array('sprintf', $ary);
+    }
+    return $sql;
+  }
+  
+  # Sanitizes a hash of attribute/value pairs for use in
+  # SQL conditions or assignments.
+  #
+  # ["a" => 'b', "c" => 'd']
+  function & sanitize_sql_hash(array $hash)
+  {
+    $sanitized = array();
+    foreach($hash as $f => $v)
+    {
+      $f = $this->quote_column($f);
+      $v = $this->quote_value($v);
+      $sanitized[] = "$f = $v";
+    }
+    return $sanitized;
+  }
+  
+  # Sanitizes a hash of attribute/value pairs into SQL conditions
+  # for a SET clause.
+  function sanitize_sql_hash_for_assignment(array $assignments)
+  {
+    $assignments = $this->sanitize_sql_hash(&$assignments);
+    return implode(', ', $assignments);
+  }
+  
+  # Sanitizes a hash of attribute/value pairs into SQL conditions
+  # for a WHERE clause.
+  function sanitize_sql_hash_for_conditions(array $conditions)
+  {
+    $conditions = $this->sanitize_sql_hash(&$conditions);
+    return implode(' AND ', $conditions);
   }
 }
 

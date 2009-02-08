@@ -1,7 +1,7 @@
 <?php
 
 $location = dirname(__FILE__).'/../../../..';
-$_ENV['environment'] = 'test';
+$_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
@@ -116,79 +116,82 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     ) ENGINE=innodb ;'));
   }
   
+  function test_sanitize_sql_array()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->sanitize_sql_array(array("a = a, b = b"));
+    $this->assert_equal("empty values", $test, "a = a, b = b");
+    
+    $test = $db->sanitize_sql_array(array("a = :a, c = :c", array('a' => 'b', 'c' => 'd')));
+    $this->assert_equal("with symbols", $test, "a = 'b', c = 'd'");
+    
+    $test = $db->sanitize_sql_array(array("a = :a, b = :b", array('a' => ':b', 'b' => ':a')));
+    $this->assert_equal("with symbols (no recursion)", $test, "a = ':b', b = ':a'");
+    
+    $test = $db->sanitize_sql_array(array("a = '%s', c = %d", 'b', 4));
+    $this->assert_equal("with printf markers", $test, "a = 'b', c = 4");
+    
+    $test = $db->sanitize_sql_array(array("a = '%s', c = %f", 'b', 3.2));
+    $this->assert_equal("with printf markers (doubles)", $test, "a = 'b', c = 3.200000");
+  }
+  
+  function test_sanitize_sql_hash()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->sanitize_sql_hash(array());
+    $this->assert_equal("empty hash", $test, array());
+    
+    $test = $db->sanitize_sql_hash(array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal("simple hash", $test, array('"a" = \'b\'', '"c" = \'d\''));
+  }
+
+  function test_sanitize_sql_hash_for_conditions()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->sanitize_sql_hash_for_conditions(array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal("simple hash", $test, '"a" = \'b\' AND "c" = \'d\'');
+  }
+
+  function test_sanitize_sql_hash_for_assignment()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->sanitize_sql_hash_for_assignment(array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal("simple hash", $test, '"a" = \'b\', "c" = \'d\'');
+  }
+
+  function test_sanitize_sql_for_assignment()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->sanitize_sql_for_assignment(array());
+    $this->assert_equal("empty array/hash", $test, "");
+    
+    $test = $db->sanitize_sql_for_assignment(array('a = b'));
+    $this->assert_equal("array with empty values", $test, 'a = b');
+    
+    $test = $db->sanitize_sql_for_assignment(array("a = :a, c = :c", array('a' => 'b', 'c' => 'd')));
+    $this->assert_equal("array with symbols", $test, "a = 'b', c = 'd'");
+    
+    $test = $db->sanitize_sql_for_assignment(array("a = :a, b = :b", array('a' => ':b', 'b' => ':a')));
+    $this->assert_equal("array with symbols (no recursion)", $test, "a = ':b', b = ':a'");
+
+    $test = $db->sanitize_sql_for_assignment(array("a = '%s', c = %d", 'b', 4));
+    $this->assert_equal("array with printf markers", $test, "a = 'b', c = 4");
+    
+    $test = $db->sanitize_sql_for_assignment(array("a = '%s', c = %f", 'b', 3.2));
+    $this->assert_equal("array with printf markers (doubles)", $test, "a = 'b', c = 3.200000");
+  }
+  
   function test_insert()
   {
     $db = new FakeAdapter(array());
     $sql = $db->insert('products', array('title' => 'azerty', 'created_at' => '2009-02-06'));
     $this->assert_equal("", $sql, "INSERT INTO \"products\" ( \"title\", \"created_at\" ) VALUES ( 'azerty', '2009-02-06' ) ;");
   }
-  
-  /*
-  function test_quote_columns()
-  {
-    $db = new FakeDriver(array());
-    
-    $fields = $db->fields("a, b, c");
-    $this->assert_equal("simple list", $fields, '"a", "b", "c"');
-
-    $fields = $db->fields("a.b, c.d");
-    $this->assert_equal("list of table.field", $fields, '"a"."b", "c"."d"');
-    
-    $fields = $db->fields("a.b.c, d.e.f");
-    $this->assert_equal("list of schema.table.field", $fields, '"a"."b"."c", "d"."e"."f"');
-    
-    $fields = $db->fields("*, a.*");
-    $this->assert_equal("do not escape widlcards", $fields, '*, "a".*');
-
-    $fields = $db->fields("-! a, b, c");
-    $this->assert_equal("no param shall be parsed", $fields, 'a, b, c');
-
-    $fields = $db->fields("a, -! b, c");
-    $this->assert_equal("one param shall not be parsed", $fields, '"a", b, "c"');
-
-    $fields = $db->fields(" -! a, b, c");
-    $this->assert_equal("edge case, first param musn't be parsed", $fields, 'a, "b", "c"');
-
-    $field = $db->field("COUNT(b)");
-    $this->assert_equal("do not parse function", $field, 'COUNT("b")');
-
-    $field = $db->field("COUNT(*)");
-    $this->assert_equal("do not parse function + wildcard", $field, 'COUNT(*)');
-    
-    $test = $db->field("DATE_ADD(a, b)");
-    $this->assert_equal("correctly handle multiple fields in function", $test, 'DATE_ADD("a", "b")');
-    
-#    $test = $db->field("DATE_ADD(a, DATE_SUB(b, c))");
-#    $this->assert_equal("recursive parsing of functions", $test, 'DATE_ADD("a", DATE_SUB("b", "c"))');
-  }
-*/
-/*
-  function test_values()
-  {
-    $db = new FakeDriver(array());
-    
-    $value = $db->value("sendmail's report");
-    $this->assert_equal("simple string escape", $value, "'sendmail\\'s report'");
-    
-    $value = $db->value("-! 'sendmail\\'s report'");
-    $this->assert_equal("do not escape string", $value, "'sendmail\\'s report'");
-
-    $values = $db->values(array('a', 'b', 'c'));
-    $this->assert_equal("escape a list of values from array", $values, "'a', 'b', 'c'");
-
-    $values = $db->values('a, b, c');
-    $this->assert_equal("escape a list of values from string", $values, "'a', 'b', 'c'");
-
-    $values = $db->values(array('a', '-! b', 'c'));
-    $this->assert_equal("escape a list of values but one", $values, "'a', b, 'c'");
-
-    $values = $db->values('a, b, -! c');
-    $this->assert_equal("escape a list of values but one from string", $values, "'a', 'b', c");
-
-    $values = $db->values(' -! a, b, c');
-    $this->assert_equal("escape a list of values but the first", $values, "a, 'b', 'c'");
-  }
-*/
 }
 
 new Test_ConnectionAdapter_AbstractAdapter();
