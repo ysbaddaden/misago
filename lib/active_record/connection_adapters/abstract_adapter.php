@@ -151,7 +151,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return (count($rs) > 0) ? array_shift($rs) : null;
   }
   
-  
+  # Inserts a row in a table.
   function insert($table, array $data, $returning=null)
   {
     $table  = $this->quote_table($table);
@@ -174,9 +174,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   {
     $table       = $this->quote_table($table);
     $assignments = $this->sanitize_sql_for_assignment($data);
-    if (!empty($where)) {
-      $where = $this->sanitize_sql_for_conditions($conditions);
-    }
+    $where = empty($conditions) ? '' :
+      'WHERE '.$this->sanitize_sql_for_conditions($conditions);
     return $this->execute("UPDATE $table SET $assignments $where ;");
   }
   

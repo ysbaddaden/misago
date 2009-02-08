@@ -192,6 +192,17 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $sql = $db->insert('products', array('title' => 'azerty', 'created_at' => '2009-02-06'));
     $this->assert_equal("", $sql, "INSERT INTO \"products\" ( \"title\", \"created_at\" ) VALUES ( 'azerty', '2009-02-06' ) ;");
   }
+  
+  function test_update()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->update('products', array('title' => 'qwerty', 'updated_at' => '2009-02-08'));
+    $this->assert_equal("", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' ;");
+    
+    $sql = $db->update('products', array('title' => 'qwerty', 'updated_at' => '2009-02-08'), array('id' => 123));
+    $this->assert_equal("", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' WHERE \"id\" = '123' ;");
+  }
 }
 
 new Test_ConnectionAdapter_AbstractAdapter();
