@@ -170,7 +170,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   }
   
   # Updates rows in a table.
-  function update($table, array $data, array $conditions=null)
+  function update($table, $data, $conditions=null)
   {
     $table       = $this->quote_table($table);
     $assignments = $this->sanitize_sql_for_assignment($data);
@@ -179,6 +179,13 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("UPDATE $table SET $assignments $where ;");
   }
   
+  function delete($table, $conditions=null)
+  {
+    $table = $this->quote_table($table);
+    $where = empty($conditions) ? '' :
+      'WHERE '.$this->sanitize_sql_for_conditions($conditions);
+    return $this->execute("DELETE FROM $table $where ;");
+  }
   
   # Accepts an array, hash, or string of SQL assignments and
   # sanitizes them into a valid SQL fragment for a SET clause.

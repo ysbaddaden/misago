@@ -198,10 +198,30 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $db = new FakeAdapter(array());
     
     $sql = $db->update('products', array('title' => 'qwerty', 'updated_at' => '2009-02-08'));
-    $this->assert_equal("", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' ;");
+    $this->assert_equal("no condition", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' ;");
     
     $sql = $db->update('products', array('title' => 'qwerty', 'updated_at' => '2009-02-08'), array('id' => 123));
-    $this->assert_equal("", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' WHERE \"id\" = '123' ;");
+    $this->assert_equal("hash conditions", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' WHERE \"id\" = '123' ;");
+    
+    $sql = $db->update('products', array('title' => 'qwerty', 'updated_at' => '2009-02-08'), 'id = 456');
+    $this->assert_equal("string conditions", $sql, "UPDATE \"products\" SET \"title\" = 'qwerty', \"updated_at\" = '2009-02-08' WHERE id = 456 ;");
+    
+    $sql = $db->update('products', array('title = :title, updated_at = :updated_at', array('title' => 'qwerty', 'updated_at' => '2009-02-08')), 'id = 456');
+    $this->assert_equal("symbols assignments", $sql, "UPDATE \"products\" SET title = 'qwerty', updated_at = '2009-02-08' WHERE id = 456 ;");
+  }
+  
+  function test_delete()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->delete('products');
+    $this->assert_equal("no condition", $sql, "DELETE FROM \"products\" ;");
+    
+    $sql = $db->delete('products', array('id' => 123));
+    $this->assert_equal("hash condition", $sql, "DELETE FROM \"products\" WHERE \"id\" = '123' ;");
+    
+    $sql = $db->delete('products', 'id = 123');
+    $this->assert_equal("string condition", $sql, "DELETE FROM \"products\" WHERE id = 123 ;");
   }
 }
 
