@@ -67,12 +67,12 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $rs;
   }
   
-  # TODO: Test select_rows()
-  function & select_rows($sql)
+  # Returns a hash of columns => values.
+  function & select_all($sql)
   {
     $results = $this->execute($sql);
+    $data    = array();
     
-    $data = array();
 		if ($results and mysql_num_rows($results) > 0)
 		{
       while ($row = mysql_fetch_row($results))
@@ -80,10 +80,44 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
         $result = array();
         foreach ($row as $idx => $value)
         {
-          $table = mysql_field_table($results, $idx);
-          $result[$table][mysql_field_name($results, $idx)] = $value;
+#          $table  = mysql_field_table($results, $idx);
+          $column = mysql_field_name($results, $idx);
+#          $result[$table][$column] = $value;
+          $result[$column] = $value;
         }
         $data[] = $result;
+      }
+    }
+    
+    mysql_free_result($results);
+    return $data;
+  }
+  
+  # Returns a single hash of columns => values.
+  function & select_one($sql)
+  {
+    $rs = $this->select_all($sql);
+    $rs = isset($rs[0]) ? $rs[0] : false;
+    return $rs;
+  }
+  
+  # Returns a single value.
+  function select_value($sql)
+  {
+    $rs = $this->select_one($sql);
+    return (count($rs) > 0) ? array_shift($rs) : null;
+  }
+  
+  # Returns an array of values from the first column.
+  function & select_values($sql)
+  {
+    $results = $this->execute($sql);
+    $data    = array();
+    
+		if ($results and mysql_num_rows($results) > 0)
+		{
+      while ($row = mysql_fetch_row($results)) {
+        $data[] = $row[0];
       }
     }
     
@@ -213,8 +247,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       {
         $returning = $this->quote_column($returning);
         $table     = $this->quote_table($table);
-        $ret = $this->select_rows("SELECT MAX($returning) AS key FROM $table LIMIT 1 ;");
-        return isset($ret[0]['key']) ? $ret[0]['key'] : false;
+        return $this->select_value("SELECT MAX($returning) FROM $table LIMIT 1 ;");
       }
     }
     return $success;

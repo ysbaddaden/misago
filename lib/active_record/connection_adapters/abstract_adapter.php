@@ -10,8 +10,14 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   abstract function connect();
   abstract function disconnect();
+  
   abstract function execute($sql);
-  abstract function & select_rows($sql);
+#  abstract function & select_rows($sql);
+  abstract function & select_all($sql);
+#  abstract function & select_one($sql);
+#  abstract function select_value($sql);
+  abstract function & select_values($sql);
+
   abstract function & columns($sql);
   abstract function is_active();
   abstract function escape_value($value);
@@ -123,6 +129,22 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   {
     $table = $this->quote_table($table);
     return $this->execute("DROP TABLE $table ;");
+  }
+  
+  
+  # Returns a single hash of columns => values.
+  function & select_one($sql)
+  {
+    $rs = $this->select_all($sql);
+    $rs = isset($rs[0]) ? $rs[0] : false;
+    return $rs;
+  }
+  
+  # Returns a single value.
+  function select_value($sql)
+  {
+    $rs = $this->select_one($sql);
+    return (count($rs) > 0) ? array_shift($rs) : null;
   }
   
   

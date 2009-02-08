@@ -28,7 +28,13 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   function connect() {}
   function disconnect() {}
-  function & select_rows($sql) {}
+  
+#  function & select_rows($sql) {}
+  function & select_all($sql) {}
+  function & select_one($sql) {}
+  function & select_value($sql) {}
+  function & select_values($sql) {}
+  
   function & columns($sql) {}
   
   function is_active() {

@@ -104,21 +104,46 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
   
   function test_select_rows()
   {
-    $rs = $this->db->select_rows("SELECT title FROM products WHERE id = 1 ;");
-    $this->assert_equal("", $rs, array(array('products' => array('title' => 'azerty'))));
     
-    $rs = $this->db->select_rows("SELECT title FROM products ;");
+  }
+  
+  function test_select_all()
+  {
+    $rs = $this->db->select_all("SELECT title FROM products WHERE id = 1 ;");
+    $this->assert_equal("", $rs, array(array('title' => 'azerty')));
+    
+    $rs = $this->db->select_all("SELECT title FROM products ;");
     $this->assert_equal("", $rs, array(
-      array('products' => array('title' => 'azerty')),
-      array('products' => array('title' => 'qwerty')),
+      array('title' => 'azerty'),
+      array('title' => 'qwerty'),
     ));
   }
   
-  # TODO: Write test_insert_returning().
+  function test_select_one()
+  {
+    $rs = $this->db->select_one("SELECT title FROM products WHERE id = 1 ;");
+    $this->assert_equal("", $rs, array('title' => 'azerty'));
+    
+    $rs = $this->db->select_one("SELECT title FROM products LIMIT 1 OFFSET 1 ;");
+    $this->assert_equal("", $rs, array('title' => 'qwerty'));
+  }
+  
+  function test_select_value()
+  {
+    $rs = $this->db->select_value("SELECT title FROM products WHERE id = 1 ;");
+    $this->assert_equal("", $rs, 'azerty');
+  }
+  
+  function test_select_values()
+  {
+    $rs = $this->db->select_values("SELECT title FROM products ;");
+    $this->assert_equal("", $rs, array('azerty', 'qwerty'));
+  }
+  
   function test_insert_returning()
   {
-#    $id = $this->db->insert('products', array('title' => 'qwerty'), 'id');
-#    $this->assert_equal("", $id, 3);
+    $id = $this->db->insert('products', array('title' => 'qwerty'), 'id');
+    $this->assert_equal("", $id, '3');
   }
   
   function test_drop_table()
