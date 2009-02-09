@@ -1,10 +1,9 @@
 <?php
-
-class ActiveRecord_IrreversibleMigration extends Exception
-{
-  
-}
-
+/**
+ * Handles database migrations.
+ * 
+ * @package ActiveRecord
+ */
 class ActiveRecord_Migration
 {
   protected $db;
@@ -12,27 +11,36 @@ class ActiveRecord_Migration
   
   function __construct($version, $environment)
   {
-    $this->db = ActiveRecord_Connection::create($environment);
+    $this->db = ActiveRecord_Connection::get($environment);
     $this->version = $version;
   }
   
-  private function information_schema_exists()
+  /**
+   * Checks wether the information_schema table exists in the current database.
+   * It's used to store the latest migration timestamps.
+   */
+  static private function information_schema_exists()
   {
     static $exists = null;
     
     if ($exists === null)
     {
-      $columns = $this->db->columns('information_schema_exists');
+      $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+      $columns = $db->columns('information_schema_exists');
       $exists = !empty($columns);
     }
     return $exists;
   }
   
-  function get_version()
+  /**
+   * Returns the timestamp of the last migration runned.
+   */
+  static function get_version()
   {
-    if ($this->information_schema_exists())
+    if (self::information_schema_exists())
     {
-      return $this->db->select_value("SELECT version
+      $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+      return $db->select_value("SELECT version
         FROM misago_information_schema
         ORDER BY version DESC
         LIMIT 1 ;");
@@ -40,21 +48,29 @@ class ActiveRecord_Migration
     return 0;
   }
   
-  function save_version($version)
+  /**
+   * Saves a timestamp as last runned migration.
+   */
+  static function save_version($version)
   {
-    if ($this->information_schema_exists()) {
-      $this->db->update('information_schema_exists', array('version' => $version));
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    
+    if (self::information_schema_exists()) {
+      $db->update('information_schema_exists', array('version' => $version));
     }
     else
     {
-      $this->db->create_table('misago_information_schema', array(
+      $db->create_table('misago_information_schema', array(
         'columns' => array('version' => array('type' => 'string', 'limit' => 14)),
         'id'      => false,
       ));
-      $this->db->insert('information_schema_exists', array('version' => $version));
+      $db->insert('information_schema_exists', array('version' => $version));
     }
   }
   
+  /**
+   * Migrate database in the given direction (either up or down).
+   */
   function migrate($direction)
   {
     $time   = microtime(true);
@@ -81,6 +97,9 @@ class ActiveRecord_Migration
     return $result;
   }
   
+  /**
+   * Displays a message to the end-user.
+   */
   function announce($message)
   {
     $class = get_class($this);
