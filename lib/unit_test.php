@@ -110,7 +110,6 @@ class Unit_Test
     }
   }
   
-  # CHANGED: Using isset($arr2[$k]) caused problem when value was 'null'. Using array_key_exists fixed it.
   private function compare_arrays($arr1, $arr2)
   {
     if (!is_array($arr1)

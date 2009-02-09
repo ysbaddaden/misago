@@ -1,6 +1,14 @@
 <?php
+/**
+ * Extensions for arrays.
+ * 
+ * @package ActiveSupport
+ * @subpackage Array
+ */
 
-# Checks wether an array is a hash of key/value pairs or just a list of values. 
+/**
+ * Checks wether an array is a hash of key/value pairs or just a list of values.
+ */
 function is_hash($arr)
 {
   if (!is_array($arr)) {

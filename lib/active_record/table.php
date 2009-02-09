@@ -1,6 +1,14 @@
 <?php
 
-# IMPROVE: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
+/**
+ * Helper to create new tables. Generally used in migrations,
+ * but permits to create temporary tables too.
+ * 
+ * @package ActiveRecord
+ * 
+ * IMPROVE: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
+ * TODO: Add support for indexes.
+ */
 class ActiveRecord_Table
 {
   private  $db;
@@ -25,6 +33,9 @@ class ActiveRecord_Table
     }
   }
   
+  /**
+   * Adds a columns to table's definition.
+   */
   function add_column($type, $name, array $options=null)
   {
     $definition = array(
@@ -41,6 +52,14 @@ class ActiveRecord_Table
     $this->columns[$name] = $definition;
   }
   
+  /**
+   * Adds timestamp columns to table's definition.
+   * 
+   * $type can be:
+   *   - date, which will create created_on & updated_on.
+   *   - time, which will create created_at & updated_at.
+   *   - datetime, which will create created_at & updated_at.
+   */
   function add_timestamps($type='datetime')
   {
     switch($type)
@@ -65,6 +84,9 @@ class ActiveRecord_Table
     }
   }
   
+  /**
+   * Actually creates the table in database.
+   */
   function create()
   {
     $this->definitions['columns'] =& $this->columns;

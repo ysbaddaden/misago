@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * 
+ * @package ActiveS<>upport
+ * @subpackage Time
+ */
 class Time extends Object
 {
   protected $_time;
@@ -105,16 +109,21 @@ class Time extends Object
       case 'datetime': return strftime($this->is_this_year() ? '%b %e, %I:%M%P' : '%b %e %Y, %I:%M%P', $this->_time);
       case 'date':     return strftime($this->is_this_year() ? '%b %e' : '%b %e %Y', $this->_time);
       case 'time':     return strftime('%I:%M%P', $this->_time);
+      case 'db':       return $this->to_query();
     }
   }
   
-  /// RSS
+  /**
+   * RSS date format (RFC2822)
+   */
   function to_rfc2822()
   {
     return date('r', $this->_time);
   }
   
-  /// ATOM
+  /**
+   * ATOM date format (ISO8601)
+   */
   function to_iso8601()
   {
     return date('c', $this->_time);

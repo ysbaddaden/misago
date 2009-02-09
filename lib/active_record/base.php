@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * 
+ * @package ActiveRecord
+ */
 class ActiveRecord_Base extends ActiveRecord_Record
 {
   # TODO: Post()

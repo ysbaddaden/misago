@@ -1,5 +1,10 @@
 <?php
-
+/**
+ * Mysql adapter.
+ * 
+ * @package ActiveRecord
+ * @subpackage ConnectionAdapters
+ */
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '`';
@@ -16,19 +21,16 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   );
   private $link;
   
-  # Escapes a value to be used in an SQL query.
   function escape_value($value)
   {
     return mysql_real_escape_string($value, $this->link);
   }
   
-  # Checks wether the connection to the database is active or not.
   function is_active()
   {
     return (bool)$this->link;
   }
   
-  # Connects to the database.
   function connect()
   {
     $callback = (isset($this->config['permanent']) and $this->config['permanent']) ?
@@ -46,7 +48,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
-  # Disconnects from the database.
   function disconnect()
   {
     if ($this->link)
@@ -56,7 +57,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
-  # Executes an SQL query.
   function execute($sql)
   {
     $rs = mysql_query($sql, $this->link);
@@ -70,7 +70,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $rs;
   }
   
-  # Returns a hash of columns => values.
   function & select_all($sql)
   {
     $results = $this->execute($sql);
@@ -96,7 +95,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $data;
   }
   
-  # Returns an array of values from the first column.
   function & select_values($sql)
   {
     $results = $this->execute($sql);
@@ -113,7 +111,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $data;
   }
   
-  # Returns the columns' definitions of a table.
   function & columns($table)
   {
     $_table  = $this->quote_table($table);
@@ -162,7 +159,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $columns;
   }
   
-  # Creates a database.
   function create_database($database, array $options=null)
   {
     $database = $this->quote_table($database);
@@ -176,14 +172,12 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $this->execute("$sql ;");
   }
   
-  # Destroys a database (and everything inside).
   function drop_database($database)
   {
     $database = $this->quote_table($database);
     return $this->execute("DROP DATABASE $database ;");
   }
   
-  # Selects a default database to use.
   function select_database($database)
   {
     return mysql_select_db($database, $this->link);
@@ -230,24 +224,30 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     
   }
   
-  # Inserts a row into a table.
   function insert($table, array $data, $returning=null)
   {
     $success = parent::insert($table, $data);
     
-    if ($success)
+    if ($success and $returning !== null)
     {
-      if ($returning === null) {
-        return $success;
-      }
-      else
-      {
-        $returning = $this->quote_column($returning);
-        $table     = $this->quote_table($table);
-        return $this->select_value("SELECT MAX($returning) FROM $table LIMIT 1 ;");
-      }
+      $returning = $this->quote_column($returning);
+      $table     = $this->quote_table($table);
+      return $this->select_value("SELECT MAX($returning) FROM $table LIMIT 1 ;");
     }
+    
     return $success;
+  }
+  
+  function update($table, $data, $conditions=null)
+  {
+    $success = parent::update($table, $data, $conditions);
+    return $success ? mysql_affected_rows($this->link) : $success;
+  }
+  
+  function delete($table, $conditions=null)
+  {
+    $success = parent::delete($table, $conditions);
+    return $success ? mysql_affected_rows($this->link) : $success;
   }
 }
 

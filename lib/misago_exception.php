@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * Generic exception handler for the framework.
+ */
 class MisagoException extends Exception
 {
-  /// TODO Log error data & display a standard error page in production environment.
+  # TODO Log error data & display a standard error page in production environment. 
   function render()
   {
     HTTP::status($this->getCode());

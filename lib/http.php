@@ -48,12 +48,18 @@ class HTTP
     505 => 'HTTP Version Not Supported',
   );
   
+  /**
+   * Sets status in output HTTP header.
+   */
   static function status($code=200)
   {
     $status = self::$codes[$code];
     header("Status: $code {$status}");
   }
   
+  /**
+   * Redirects current request.
+   */
   static function redirect($url, $code=303)
   {
     if (!DEBUG)

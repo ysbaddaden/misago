@@ -1,33 +1,46 @@
 <?php
-
 require ROOT.'/config/initializers/inflections.php';
 
-# Manipulates strings: singularizes, pluralizes, CamelCases, etc.
-# TODO: humanize()
+/**
+ * Extensions for strings.
+ * 
+ * @package ActiveSupport
+ * @subpackage Array
+ * 
+ * TODO: String::humanize()
+ */
 class String extends Inflections
 {
 	static protected $trans;
 	
-	/// Transforms to CamelText (eg: BlogComment).
+	/**
+	 * Transforms to CamelText (eg: BlogComment).
+	 */
 	static function camelize($str)
 	{
 		return str_replace(' ', '', ucwords(str_replace('_', ' ', $str)));
 	}
 	
-	/// Transforms to underscore_text (eg: blog_comment).
+	/**
+	 * Transforms to underscore_text (eg: blog_comment).
+	 */
 	static function underscore($str)
 	{
 		return str_replace(' ', '_', strtolower(preg_replace('/(?<=\w)([A-Z])/', ' \1', $str)));
 	}
 	
-	/// Transforms to camelBacked style (eg: blogComment).
+	/**
+	 * Transforms to camelBacked style (eg: blogComment).
+	 */
 	static function variablize($str)
 	{
 		$str = self::camelize($str);
 		return strtolower(substr($str, 0, 1)).substr($str, 1);
 	}
 	
-	/// Singularizes a word.
+	/**
+	 * Singularizes a word.
+	 */
 	static function singularize($str)
 	{
 		if (in_array(strtolower($str), self::$constants)) {
@@ -43,7 +56,9 @@ class String extends Inflections
 		return $str;
 	}
 	
-	/// Pluralizes a word.
+	/**
+	 *Pluralizes a word.
+	 */
 	static function pluralize($str)
 	{
 		if (in_array(strtolower($str), self::$constants)) {
@@ -65,7 +80,9 @@ class String extends Inflections
 	 * Changes spaces and non ascii chars to a dash,
 	 * but should preserve accented characters).
 	 * 
-	 * "This is a title" -> "this-is-a-title"
+	 * <code>
+	 * "This is a title" => "this-is-a-title"
+	 * </code>
 	 */
 	static function slug($str, $strtolower=true)
 	{

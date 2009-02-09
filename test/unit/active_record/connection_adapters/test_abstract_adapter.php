@@ -44,6 +44,10 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   function escape_value($value) {
     return addslashes($value);
   }
+  
+  function create_database($database, array $options=null) {}
+  function drop_database($database) {}
+  function select_database($database) {}
 }
 
 class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test

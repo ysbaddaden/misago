@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * 
+ * @package ActiveRecord
+ */
 class ActiveRecord_Record extends Object implements Iterator
 {
   protected $__attributes = array();

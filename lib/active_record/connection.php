@@ -1,20 +1,29 @@
 <?php
-
-# Handles database connections.
-# 
-# OPTIMIZE: Cache decoded YAML database configuration in memory (using APC for instance).
-#
+/**
+ * Handles database connections.
+ * 
+ * @package ActiveRecord
+ * @subpackage Connection
+ */
 class ActiveRecord_Connection
 {
   public  static $configurations;
   private static $adapters = array();
   
+  /**
+   * Loads configurations from config/database.yml.
+   * 
+   * OPTIMIZE: Cache decoded YAML database configuration in memory (using APC for instance).
+   */
   static function load_configuration()
   {
     $configurations = file_get_contents(ROOT.'/config/database.yml');
     self::$configurations = Yaml::decode($configurations);
   }
   
+  /**
+   * Creates a singleton (one single connection object per configuration entry).
+   */
   static function create($environment)
   {
     if (!isset(self::$configurations)) {
@@ -26,6 +35,10 @@ class ActiveRecord_Connection
     return new $class(&$config);
   }
   
+  /**
+   * Returns the connection object for the given configuration.
+   * Will create it automatically, if it doesn't exists already.
+   */
   static function get($environment)
   {
     if (!isset(self::$adapters[$environment])) {
