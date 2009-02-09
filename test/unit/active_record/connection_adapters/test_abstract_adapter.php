@@ -47,7 +47,7 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   function create_database($database, array $options=null) {}
   function drop_database($database) {}
-  function select_database($database) {}
+  function select_database($database=null) {}
 }
 
 class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test

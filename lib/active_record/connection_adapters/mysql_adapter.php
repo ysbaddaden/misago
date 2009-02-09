@@ -43,9 +43,15 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       true
     );
     
-    if ($this->link === false) {
-      throw new MisagoException("Unable to connect to MySQL database.", 500);
+    if ($this->link === false)
+    {
+      throw new ActiveRecord_Exception("Unable to connect to MySQL database.",
+        ExceptionActiveRecord_CantConnect);
     }
+    
+#    if (!empty($this->config['database'])) {
+#      $this->select_database($this->config['database']);
+#    }
   }
   
   function disconnect()
@@ -116,8 +122,10 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     $_table  = $this->quote_table($table);
     $results = $this->execute("DESC {$_table} ;");
     
-    if (!$results) {
-      throw new ActiveRecord_Exception("No such table: $table", ActiveRecord_Exception::NoSuchTable);
+    if (!$results)
+    {
+      throw new ActiveRecord_Exception("No such table: $table",
+        ActiveRecord_Exception::NoSuchTable);
     }
     
     $columns = array();
@@ -178,10 +186,20 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $this->execute("DROP DATABASE $database ;");
   }
   
-  function select_database($database)
+  function select_database($database=null)
   {
-    return mysql_select_db($database, $this->link);
+    if (empty($database)) {
+      $database = $this->config('database');
+    }
+    $success = mysql_select_db($database, $this->link);
+    if (!$success)
+    {
+      throw new ActiveRecord_Exception("Can't select database $database.",
+        ActiveRecord_Exception::CantSelectDatabase);
+    }
+    return $success;
   }
+  
   
   # Renames a table.
   function rename_table($from, $to)

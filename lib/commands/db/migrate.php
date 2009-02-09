@@ -2,10 +2,12 @@
 # IMPROVE: Add possibility to run a specific migration (version = XXX).
 
 $direction = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 'up';
-#$from_version = ActiveRecord_Migration::get_version();
+$from_version = ActiveRecord_Migration::get_version();
 
 
 $migration_files = glob(ROOT.'/db/migrate/*.php');
+sort($migration_files);
+
 $runned_migrations = 0;
 
 foreach($migration_files as $file)
@@ -14,8 +16,8 @@ foreach($migration_files as $file)
   preg_match("/^([\d]+)_([\w_]+)\.php$/", $file, $match);
   
   $ts = $match[1];
-#  if ($ts > $from_version)
-#  {
+  if ($ts > $from_version)
+  {
     $runned_migrations += 1;
     
     require ROOT.'/db/migrate/'.$file;
@@ -24,12 +26,12 @@ foreach($migration_files as $file)
     $result = $migration->migrate($direction);
     
     if ($result) {
-      # ActiveRecord_Migration::save_version($ts);
+       ActiveRecord_Migration::save_version($ts);
     }
     else {
       die();
     }
-#  }
+  }
 }
 
 if ($runned_migrations === 0) {

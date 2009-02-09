@@ -12,6 +12,8 @@ class ActiveRecord_Migration
   function __construct($version, $environment)
   {
     $this->db = ActiveRecord_Connection::get($environment);
+    $this->db->select_database();
+    
     $this->version = $version;
   }
   
@@ -80,13 +82,13 @@ class ActiveRecord_Migration
     {
       case 'up':
         $this->announce('migrating');
-#        $result = $this->up();
+        $result = $this->up();
         $this->announce(sprintf('migrated (%.04fs)', microtime(true) - $time));
       break;
       
       case 'down':
         $this->announce('reverting');
-#        $result = $this->down();
+        $result = $this->down();
         $this->announce(sprintf('reverted (%.04fs)', microtime(true) - $time));
       break;
       

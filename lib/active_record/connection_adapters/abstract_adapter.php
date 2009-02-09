@@ -78,7 +78,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   /**
    * Selects a default database to use.
    */
-  abstract function select_database($database);
+  abstract function select_database($database=null);
   
   
   /**

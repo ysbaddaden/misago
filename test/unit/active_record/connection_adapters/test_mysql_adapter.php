@@ -72,7 +72,17 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
   
   function test_select_database()
   {
-    $rs = $this->db->select_database('misago_fake_test');
+    try {
+      $rs = $this->db->select_database('misago_fake_test');
+      $rs = true;
+    }
+    catch(ActiveRecord_Exception $e)
+    {
+      if ($e->getCode() != ActiveRecord_Exception::CantSelectDatabase) {
+        throw $e;
+      }
+      $rs = false;
+    }
     $this->assert_false("database doesn't exists", $rs);
     
     $rs = $this->db->select_database('misago_test');

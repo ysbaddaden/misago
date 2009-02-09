@@ -1,6 +1,10 @@
 <?php
 
 $db = ActiveRecord_Connection::create($_ENV['MISAGO_ENV']);
-$db->drop_database($db->config('database'));
+
+$database = $db->config('database');
+if ($db->drop_database($database)) {
+  echo "Destroyed database $database.\n";
+}
 
 ?>

@@ -6,8 +6,11 @@
  */
 class ActiveRecord_Exception extends MisagoException
 {
-  const NoSuchTable = 1;
-  const IrreversibleMigration = 2;
+  const CantConnect        = 1;
+  const CantSelectDatabase = 2;
+  const NoSuchTable        = 3;
+  
+  const IrreversibleMigration = 10;
 }
 
 ?>
