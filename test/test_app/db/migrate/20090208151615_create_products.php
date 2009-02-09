@@ -10,12 +10,12 @@ class CreateProduct extends ActiveRecord_Migration
     $t->add_column('float',  'price', array('null' => false, 'signed' => false));
     
     $t->add_timestamps();
-    $t->create();
+    return $t->create();
   }
   
   function down()
   {
-    $this->db->drop_table('products');
+    return $this->db->drop_table('products');
   }
 }
 

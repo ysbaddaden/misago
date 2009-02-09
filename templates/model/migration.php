@@ -9,12 +9,12 @@ class #{Class} extends ActiveRecord_Migration
     #$t->add_column('string', 'title');
     
     $t->add_timestamps();
-    $t->create();
+    return $t->create();
   }
   
   function down()
   {
-    $this->db->drop_table('#{table}');
+    return $this->db->drop_table('#{table}');
   }
 }
 

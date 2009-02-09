@@ -23,15 +23,17 @@ class ActiveRecord_Migration
    */
   static private function information_schema_exists()
   {
-    static $exists = null;
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db->select_database();
     
-    if ($exists === null)
+    try
     {
-      $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
-      $columns = $db->columns('information_schema_exists');
-      $exists = !empty($columns);
+      $db->columns('misago_information_schema');
+      return true;
     }
-    return $exists;
+    catch(ActiveRecord_Exception $e) {
+      return false;
+    }
   }
   
   /**
@@ -42,6 +44,8 @@ class ActiveRecord_Migration
     if (self::information_schema_exists())
     {
       $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+      $db->select_database();
+      
       return $db->select_value("SELECT version
         FROM misago_information_schema
         ORDER BY version DESC
@@ -56,17 +60,20 @@ class ActiveRecord_Migration
   static function save_version($version)
   {
     $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db->select_database();
     
     if (self::information_schema_exists()) {
-      $db->update('information_schema_exists', array('version' => $version));
+      $db->update('misago_information_schema', array('version' => $version));
     }
     else
     {
       $db->create_table('misago_information_schema', array(
-        'columns' => array('version' => array('type' => 'string', 'limit' => 14)),
-        'id'      => false,
+        'id' => false,
+        'columns' => array(
+          'version' => array('type' => 'string', 'limit' => 14)
+         )
       ));
-      $db->insert('information_schema_exists', array('version' => $version));
+      $db->insert('misago_information_schema', array('version' => $version));
     }
   }
   
