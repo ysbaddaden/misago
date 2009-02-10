@@ -86,7 +86,7 @@ class Unit_Test
   
   protected function assert_instance_of($comment, $object, $classname)
   {
-    $this->return_assert($comment, get_class($object) === $classname,
+    $this->return_assert($comment, $object instanceof $classname,
       array('got' => get_class($object), 'expected' => $classname));
   }
   
