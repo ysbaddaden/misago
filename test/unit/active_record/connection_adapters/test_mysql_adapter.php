@@ -5,6 +5,7 @@ $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
+require_once 'active_record/exception.php';
 
 class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
 {
@@ -21,7 +22,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
       $db->connect();
       $failed = false;
     }
-    catch(MisagoException $e) {
+    catch(ActiveRecord_ConnectionNotEstablished $e) {
       $failed = true;
     }
     $this->assert_true("Connection failed.", $failed);
@@ -76,11 +77,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
       $rs = $this->db->select_database('misago_fake_test');
       $rs = true;
     }
-    catch(ActiveRecord_Exception $e)
-    {
-      if ($e->getCode() != ActiveRecord_Exception::CantSelectDatabase) {
-        throw $e;
-      }
+    catch(ActiveRecord_StatementInvalid $e) {
       $rs = false;
     }
     $this->assert_false("database doesn't exists", $rs);
@@ -89,6 +86,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $this->assert_true("database exists", $rs);
   }
   
+  # TODO: Test missing table case.
   function test_columns()
   {
     $columns = $this->db->columns('products');
@@ -100,6 +98,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     ));
   }
   
+  # TODO: Test missing table case.
   function test_insert()
   {
     $rs = $this->db->insert('products', array('title' => 'azerty'));

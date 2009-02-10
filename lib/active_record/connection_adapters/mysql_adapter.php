@@ -44,10 +44,8 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       true
     );
     
-    if ($this->link === false)
-    {
-      throw new ActiveRecord_Exception("Unable to connect to MySQL database.",
-        ExceptionActiveRecord_CantConnect);
+    if ($this->link === false) {
+      throw new ActiveRecord_ConnectionNotEstablished("Unable to connect to MySQL database.");
     }
     
 #    if (!empty($this->config['database'])) {
@@ -64,16 +62,15 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
+  # IMPROVE: Add some error logging (in 'production' environment).
   function execute($sql)
   {
     $rs = mysql_query($sql, $this->link);
-    
     if (!$rs)
     {
-      echo "\n[".mysql_errno($this->link)."] ".mysql_error($this->link)."\n";
-      echo "$sql\n\n";
+      $message = "MySQL error [".mysql_errno($this->link)."] ".mysql_error($this->link)."\n$sql";
+      echo "\n$message\n\n";
     }
-    
     return $rs;
   }
   
@@ -123,10 +120,8 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     $_table  = $this->quote_table($table);
     $results = $this->execute("DESC {$_table} ;");
     
-    if (!$results)
-    {
-      throw new ActiveRecord_Exception("No such table: $table",
-        ActiveRecord_Exception::NoSuchTable);
+    if (!$results) {
+      throw new ActiveRecord_StatementInvalid("No such table: $table");
     }
     
     $columns = array();
@@ -193,10 +188,8 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       $database = $this->config('database');
     }
     $success = mysql_select_db($database, $this->link);
-    if (!$success)
-    {
-      throw new ActiveRecord_Exception("Can't select database $database.",
-        ActiveRecord_Exception::CantSelectDatabase);
+    if (!$success) {
+      throw new ActiveRecord_StatementInvalid("Can't select database $database.");
     }
     return $success;
   }

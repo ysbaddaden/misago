@@ -5,6 +5,7 @@ $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
+require_once 'active_record/exception.php';
 
 class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {

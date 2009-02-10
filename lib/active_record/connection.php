@@ -30,7 +30,21 @@ class ActiveRecord_Connection
       self::load_configuration();
     }
     
+    if (!isset(self::$configurations[$environment];)) {
+      throw new ActiveRecord_ConfigurationError("No such configuration: $environment.");
+    }
+    
     $config = self::$configurations[$environment];
+    
+    if (empty($config['adapter'])) {
+      throw new ActiveRecord_AdapterNotSpecified("Adapter not specified in configuration: $environment.");
+    }
+    
+    # FIXME: file_exists must search in INC path.
+#    if (!file_exists('active_record/connection_adapters/'.String::underscore().'_adapter.php', true) {
+#      throw new ActiveRecord_AdapterNotFound("Adapter {$config['adapter']} can't be found.");
+#    }
+    
     $class  = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
     return new $class(&$config);
   }
