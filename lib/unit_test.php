@@ -54,8 +54,8 @@ class Unit_Test
     $this->time = microtime(true) - $this->time;
     
     printf("\nFinished in %f seconds.\n\n", $this->time);
-    printf("%d tests, %d assertions, %d failures, %d errors\n",
-      $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors);
+    printf("%d tests, %d assertions, %d failures, %d errors ; %s\n",
+      $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors, get_class($this));
   }
   
   

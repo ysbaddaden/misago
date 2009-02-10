@@ -1,4 +1,6 @@
 <?php
+require_once 'active_record/exception.php';
+
 /**
  * Handles database connections.
  * 
@@ -30,7 +32,7 @@ class ActiveRecord_Connection
       self::load_configuration();
     }
     
-    if (!isset(self::$configurations[$environment];)) {
+    if (!isset(self::$configurations[$environment])) {
       throw new ActiveRecord_ConfigurationError("No such configuration: $environment.");
     }
     
@@ -40,8 +42,8 @@ class ActiveRecord_Connection
       throw new ActiveRecord_AdapterNotSpecified("Adapter not specified in configuration: $environment.");
     }
     
-    # FIXME: file_exists must search in INC path.
-#    if (!file_exists('active_record/connection_adapters/'.String::underscore().'_adapter.php', true) {
+    # FIXME: file_exists must search in INC path. Is it possible?
+#    if (!file_exists('active_record/connection_adapters/'.String::underscore($config['adapter']).'_adapter.php')) {
 #      throw new ActiveRecord_AdapterNotFound("Adapter {$config['adapter']} can't be found.");
 #    }
     
