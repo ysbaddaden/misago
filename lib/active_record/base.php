@@ -65,10 +65,13 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * 
    * OPTIMIZE: if $scope is :first add {limit => 1} to options.
    */
-  function & find($scope=':all')
+  function & find($scope=':all', $options=null)
   {
     $table = $this->db->quote_table($this->table_name);
-    $sql   = "SELECT * FROM {$table} ;";
+    $limit = isset($options['limit']) ?
+      $this->db->sanitize_limit($options['limit']) : null;
+    
+    $sql = "SELECT * FROM {$table} $limit ;";
     
     $class = get_class($this);
     switch($scope)

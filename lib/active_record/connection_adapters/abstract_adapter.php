@@ -118,7 +118,25 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
   }
   
-
+  /**
+   * Creates a LIMIt+OFFSET statement.
+   */
+  function sanitize_limit($limit=null, $page=null)
+  {
+    if($limit)
+    {
+      $limit = (int)$limit;
+      $str   = "LIMIT $limit";
+      if ($page)
+      {
+        $offset = ((int)$page - 1) * $limit;
+        $str .= " OFFSET $offset";
+      }
+      return $str;
+    }
+    return '';
+  }
+  
   /**
    * Accepts an array, hash, or string of SQL assignments and
    * sanitizes them into a valid SQL fragment for a SET clause.

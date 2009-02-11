@@ -121,6 +121,17 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     ) ENGINE=innodb ;'));
   }
   
+  function test_sanitize_limit()
+  {
+    $db = new FakeAdapter(array());
+    
+    $limit = $db->sanitize_limit(10);
+    $this->assert_equal("", $limit, "LIMIT 10");
+    
+    $limit = $db->sanitize_limit(10, 2);
+    $this->assert_equal("", $limit, "LIMIT 10 OFFSET 10");
+  }
+  
   function test_sanitize_sql_array()
   {
     $db = new FakeAdapter(array());
