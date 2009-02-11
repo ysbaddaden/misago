@@ -13,7 +13,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     'string'      => array('name' => 'VARCHAR', 'limit' => 255),
     'text'        => array('name' => 'TEXT'),
     'integer'     => array('name' => 'INT',   'limit' => 4),
-    'float'       => array('name' => 'FLOAT', 'limit' => 4),
+    'double'      => array('name' => 'FLOAT', 'limit' => 4),
     'date'        => array('name' => 'DATE'),
     'time'        => array('name' => 'TIME'),
     'datetime'    => array('name' => 'DATETIME'),
