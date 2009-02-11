@@ -49,23 +49,33 @@ class ActiveRecord_Base extends ActiveRecord_Record
   }
   
   /**
-   * TODO: find(:all)
    * TODO: find(:all, $options)
    * TODO: find($options)
+   * TODO: find(:first, $options)
+   * 
+   * OPTIMIZE: if $scope is :first add {limit => 1} to options.
    */
-  function find()
+  function & find($scope=':all')
   {
-    # query
     $table   = $this->db->quote_table($this->table_name);
     $results = $this->db->select_all("SELECT * FROM {$table} ;");
     
-    # builds records
-    $records = array();
     $class   = get_class($this);
-    foreach($results as $result) {
-      $records[] = new $class($result);
+    switch($scope)
+    {
+      case ':all':
+        $records = array();
+        foreach($results as $result) {
+          $records[] = new $class($result);
+        }
+        return $records;
+      break;
+      
+      case ':first':
+        $record = isset($results[0]) ? new $class($results[0]) : null;
+        return $record;
+      break;
     }
-    return $records;
   }
   
   /**
