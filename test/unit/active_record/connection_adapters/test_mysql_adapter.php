@@ -65,6 +65,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     
     $t = $this->db->new_table("misago_test.products", $options);
     $t->add_column("string", 'title', array('limit' => 100, 'null' => false));
+    $t->add_column("float",  'price', array('signed' => false));
     $t->add_timestamps();
     $rs = $t->create();
     
@@ -93,6 +94,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $this->assert_equal("", $columns, array(
       'id'         => array('type' => 'integer', 'limit' => 11,  'null' => false),
       'title'      => array('type' => 'string',  'limit' => 100, 'null' => false),
+      'price'      => array('type' => 'float',    'null' => true, 'signed' => false),
       'created_at' => array('type' => 'datetime', 'null' => true),
       'updated_at' => array('type' => 'datetime', 'null' => true),
     ));

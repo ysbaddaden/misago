@@ -133,6 +133,12 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
         $column = array();
         $type   = strtoupper($type);
         
+        if (stripos($type, 'UNSIGNED') !== false)
+        {
+          $signed = false;
+          $type = trim(str_ireplace('UNSIGNED', '', $type));
+        }
+        
         if (preg_match('/(\w+)\(([^\)]+)\)/', $type, $match))
         {
           $column['type']  = $match[1];
@@ -155,6 +161,11 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
         }
         
         $column['null'] = ($is_null == 'NO') ? false : true;
+        if (isset($signed))
+        {
+          $column['signed'] = $signed;
+          unset($signed);
+        }
         $columns[$name] = $column;
       }
     }
