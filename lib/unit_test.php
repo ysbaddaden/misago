@@ -71,16 +71,29 @@ class Unit_Test
   
   protected function assert_equal($comment, $test, $expect)
   {
-    $success = is_array($test) ? $this->compare_arrays($test, $expect) : ($test === $expect);
+    if (is_array($test)) {
+      $success = $this->compare_arrays($test, $expect);
+    }
+    elseif (is_object($test)) {
+      $success = $this->compare_objects($test, $expect);
+    }
+    else {
+      $success = ($test === $expect);
+    }
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
   protected function assert_not_equal($comment, $test, $expect)
   {
-    $success = is_array($test) ?
-      !$this->compare_arrays($test, $expect) :
-      ($test !== $expect);
-    
+    if (is_array($test)) {
+      $success = !$this->compare_arrays($test, $expect);
+    }
+    elseif (is_object($test)) {
+      $success = !$this->compare_objects($test, $expect);
+    }
+    else {
+      $success = ($test !== $expect);
+    }
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
@@ -129,12 +142,50 @@ class Unit_Test
       {
         return false;
       }
+      elseif (is_object($v)
+        and (!is_object($arr2[$k]) or $this->compare_objects($v, $arr2[$k]) === false))
+      {
+        return false;
+      }
       elseif ($arr2[$k] !== $v) {
         return false;
       }
     }
     return true;
   }
+
+  private function compare_objects($a, $b)
+  {
+    if (!is_object($a)
+      or !is_object($b)
+      or (get_class($a) != get_class($b))
+      or (count($a) != count($b)))
+    {
+      return false;
+    }
+    
+    foreach($a as $k => $v)
+    {
+      if (!isset($b->$k)) {
+        return false;
+      }
+      elseif (is_object($v)
+        and (!is_object($b->$k) or $this->compare_objects($v, $b->$k) === false))
+      {
+        return false;
+      }
+      elseif (is_array($v)
+        and (!is_array($b->$k) or $this->compare_arrays($v, $b->$k) === false))
+      {
+        return false;
+      }
+      elseif ($b->$k !== $v) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 }
 
 ?>

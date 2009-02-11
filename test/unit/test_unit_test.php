@@ -6,6 +6,10 @@ class FakeClass
 {
   
 }
+class FakeClass2
+{
+  
+}
 
 class Test_Unit_Test extends Unit_Test
 {
@@ -28,6 +32,11 @@ class Test_Unit_Test extends Unit_Test
     $this->assert_equal('multidimensional associative arrays', array('az' => array('a', 'b')), array('az' => array('a', 'b')));
     
     $this->assert_equal("hash containing null values", array('a' => null), array('a' => null));
+    
+    $a = new FakeClass(); $a->id = 1; $a->price = 9.95; $a->name = 'azerty';
+    $b = new FakeClass(); $b->id = 1; $b->price = 9.95; $b->name = 'azerty';
+    $this->assert_equal("objects", $a, $b);
+    $this->assert_equal("array of objects", array($a, $b), array($a, $b));
   }
   
   function test_assert_not_equal()
@@ -38,6 +47,23 @@ class Test_Unit_Test extends Unit_Test
     $this->assert_not_equal('multidimensional arrays', array('a', array('b', 'c'), 'd'), array('a', array('c', 'b'), 'e'));
     $this->assert_not_equal('multidimensional associative arrays (keys)', array('az' => array('a', 'b')), array('bz' => array('a', 'b')));
     $this->assert_not_equal('multidimensional associative arrays (values)', array('az' => array('a', 'b')), array('az' => array('d', 'e')));
+    
+    $a = new FakeClass(); $a->id = 1; $a->price = 9.95; $a->name = 'azerty';
+    $b = new FakeClass(); $b->id = 1; $b->price = 10.95; $b->name = 'azerty';
+    $this->assert_not_equal("objects with different values", $a, $b);
+    
+    $a = new FakeClass(); $a->id = 1; $a->price = 9.95; $a->name = 'azerty';
+    $b = new FakeClass(); $b->id = 1; $b->retail_price = 10.95; $b->name = 'azerty';
+    $this->assert_not_equal("objects with different keys", $a, $b);
+    
+    $a = new FakeClass();
+    $b = new FakeClass2();
+    $this->assert_not_equal("different classes", $a, $b);
+    
+    $a = new FakeClass(); $a->id = 1; $a->price = 9.95; $a->name = 'azerty';
+    $b = new FakeClass(); $b->id = 1; $b->price = 9.95; $b->name = 'azerty';
+    $c = new FakeClass2();
+    $this->assert_not_equal("array of objects", array($a, $b), array($a, $c));
   }
   
   function test_assert_type()
