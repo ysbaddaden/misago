@@ -22,12 +22,15 @@ class ActiveRecord_Base extends ActiveRecord_Record
   }
   
   # TODO: Post(:id)
+  # OPTIMIZE: Cache columns' defintion (eg: in memory throught APC).
   function __construct($arg=null)
   {
-    # database connection & relation
+    # database connection
     $this->table_name = String::underscore(String::pluralize(get_class($this)));
     $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
     $this->db->select_database();
+    
+    # columns' definition
     $this->columns = $this->db->columns($this->table_name);
     
     # args
@@ -39,8 +42,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   function set_attributes(array $arg)
   {
-    foreach($arg as $attribute => $value)
-    {
+    foreach($arg as $attribute => $value) {
       $this->$attribute = $value;
     }
   }
@@ -68,8 +70,12 @@ class ActiveRecord_Base extends ActiveRecord_Record
   function & find($scope=':all', $options=null)
   {
     $table = $this->db->quote_table($this->table_name);
-    $limit = isset($options['limit']) ?
-      $this->db->sanitize_limit($options['limit']) : null;
+    $limit = '';
+    if (isset($options['limit']))
+    {
+      $page  = isset($options['page']) ? $options['page'] : null;
+      $limit = $this->db->sanitize_limit($options['limit'], $page);
+    }
     
     $sql = "SELECT * FROM {$table} $limit ;";
     

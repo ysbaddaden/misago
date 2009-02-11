@@ -100,11 +100,14 @@ class Test_ActiveRecord_Base extends Unit_Test
   {
     $product = new Product();
     
-    $options = array('limit' => 2);
+    $options  = array('limit' => 2);
     $products = $product->find(':all', $options);
-    
     $this->assert_instance_of("instances of Product", $products[0], 'Product');
     $this->assert_equal("must return 2 products only", count($products), 2);
+    
+    $options  = array('limit' => 2, 'page' => 2);
+    $products = $product->find(':all', $options);
+    $this->assert_equal("must return 2 products only", count($products), 1);
   }
   
   /*
