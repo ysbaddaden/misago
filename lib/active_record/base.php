@@ -11,6 +11,15 @@ class ActiveRecord_Base extends ActiveRecord_Record
   protected $primary_key = 'id';
   protected $columns     = array();
   
+  function column_names()
+  {
+    return array_keys($this->columns);
+  }
+  
+  function columns()
+  {
+    return $this->columns;
+  }
   
   # TODO: Post(:id)
   function __construct($arg=null)
@@ -22,30 +31,31 @@ class ActiveRecord_Base extends ActiveRecord_Record
     $this->columns = $this->db->columns($this->table_name);
     
     # args
-    if (is_array($arg)) {
+    if (is_array($arg))
+    {
       $this->set_attributes($arg);
     }
   }
   
   function set_attributes(array $arg)
   {
-    foreach($arg as $attribute => $value) {
+    foreach($arg as $attribute => $value)
+    {
       $this->$attribute = $value;
     }
   }
   
-  function __set($attr, $value)
+  function __set($attribute, $value)
   {
-    if (isset($this->columns[$attr]))
+    if (isset($this->columns[$attribute]))
     {
-      if ($this->columns[$attr]['type'] == 'integer') {
-        $value = (int)$value;
-      }
-      elseif ($this->columns[$attr]['type'] == 'float') {
-        $value = (float)$value;
+      switch($this->columns[$attribute]['type'])
+      {
+        case 'integer': $value = (int)$value;    break;
+        case 'double':  $value = (double)$value; break;
       }
     }
-    return parent::__set($attr, $value);
+    return parent::__set($attribute, $value);
   }
   
   /**
@@ -57,13 +67,15 @@ class ActiveRecord_Base extends ActiveRecord_Record
    */
   function & find($scope=':all')
   {
-    $table   = $this->db->quote_table($this->table_name);
-    $results = $this->db->select_all("SELECT * FROM {$table} ;");
+    $table = $this->db->quote_table($this->table_name);
+    $sql   = "SELECT * FROM {$table} ;";
     
-    $class   = get_class($this);
+    $class = get_class($this);
     switch($scope)
     {
       case ':all':
+        $results = $this->db->select_all($sql);
+        
         $records = array();
         foreach($results as $result) {
           $records[] = new $class($result);
@@ -72,7 +84,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
       break;
       
       case ':first':
-        $record = isset($results[0]) ? new $class($results[0]) : null;
+        $result = $this->db->select_one($sql);
+        $record = $result ? new $class($result) : null;
         return $record;
       break;
     }
