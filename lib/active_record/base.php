@@ -49,6 +49,26 @@ class ActiveRecord_Base extends ActiveRecord_Record
   }
   
   /**
+   * TODO: find(:all)
+   * TODO: find(:all, $options)
+   * TODO: find($options)
+   */
+  function find()
+  {
+    # query
+    $table   = $this->db->quote_table($this->table_name);
+    $results = $this->db->select_all("SELECT * FROM {$table} ;");
+    
+    # builds records
+    $records = array();
+    $class   = get_class($this);
+    foreach($results as $result) {
+      $records[] = new $class($result);
+    }
+    return $records;
+  }
+  
+  /**
    * Creates a new record (saved in database).
    * 
    * <code>

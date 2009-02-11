@@ -70,9 +70,31 @@ class Test_ActiveRecord_Base extends Unit_Test
     $this->assert_equal("", $products[0]->price, 5.98);
   }
   
-  function test_find()
+  function test_find_all()
   {
+    $product = new Product();
     
+    $products = $product->find();
+    $this->assert_equal("must find 3 products", count($products), 3);
+    $this->assert_instance_of("array of products", $products[0], 'Product');
+    
+    $products_more = $product->find(':all');
+    $this->assert_equal("must find 3 products", count($products), 3);
+    $this->assert_equal("result must be equivalent to previous one", $products_more[0]->id, $products[0]->id);
+  }
+  
+  function test_find_one()
+  {
+  /*
+    $product = new Product();
+    
+    $options = array('conditions' => array('id' => 1))
+    $product = $product->find($options);
+    
+    $this->assert_instance_of("instance of product", $product, 'Product');
+    $this->assert_equal("product's name",  $product->name, 'azerty');
+    $this->assert_equal("product's price", $product->price, 9.95);
+  */
   }
   
   /*
