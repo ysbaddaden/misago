@@ -85,16 +85,14 @@ class Test_ActiveRecord_Base extends Unit_Test
   
   function test_find_one()
   {
-  /*
     $product = new Product();
     
     $options = array('conditions' => array('id' => 1))
-    $product = $product->find($options);
+    $product = $product->find(':first');
     
     $this->assert_instance_of("instance of product", $product, 'Product');
     $this->assert_equal("product's name",  $product->name, 'azerty');
     $this->assert_equal("product's price", $product->price, 9.95);
-  */
   }
   
   /*
