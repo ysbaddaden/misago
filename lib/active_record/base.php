@@ -12,15 +12,25 @@ class ActiveRecord_Base extends ActiveRecord_Record
   protected $columns     = array();
   
   # TODO: Post(:id)
-  # TODO: Post({:id => 1, :title => ''})
-  function __construct()
+  function __construct($arg=null)
   {
+    # database connection & relation
     $this->table_name = String::underscore(String::pluralize(get_class($this)));
-    
     $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
     $this->db->select_database();
-    
     $this->columns = $this->db->columns($this->table_name);
+    
+    # args
+    if (is_array($arg)) {
+      $this->set_attributes($arg);
+    }
+  }
+  
+  function set_attributes(array $arg)
+  {
+    foreach($arg as $attribute => $value) {
+      $this->$attribute = $value;
+    }
   }
   
   function __set($attr, $value)
@@ -29,6 +39,9 @@ class ActiveRecord_Base extends ActiveRecord_Record
     {
       if ($this->columns[$attr]['type'] == 'integer') {
         $value = (int)$value;
+      }
+      elseif ($this->columns[$attr]['type'] == 'float') {
+        $value = (float)$value;
       }
     }
     return parent::__set($attr, $value);

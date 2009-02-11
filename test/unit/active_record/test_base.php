@@ -40,6 +40,10 @@ class Test_ActiveRecord_Base extends Unit_Test
     $this->assert_equal('Product must be an instance of Product', get_class($product), 'Product');
     $this->assert_instance_of('Product must be an instance of ActiveRecord_Base',   $product, 'ActiveRecord_Base');
     $this->assert_instance_of('Product must be an instance of ActiveRecord_Record', $product, 'ActiveRecord_Record');
+    
+    $product = new Product(array('name' => 'azerty', 'price' => 18.99));
+    $this->assert_equal("", $product->name, 'azerty');
+    $this->assert_equal("", $product->price, 18.99);
   }
   
   function test_create()
