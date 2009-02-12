@@ -21,8 +21,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     return $this->columns;
   }
   
-  # TODO: Post(:id)
-  # OPTIMIZE: Cache columns' defintion (eg: in memory throught APC).
+  # OPTIMIZE: Cache columns' definition (eg: in memory throught APC).
   function __construct($arg=null)
   {
     # database connection
