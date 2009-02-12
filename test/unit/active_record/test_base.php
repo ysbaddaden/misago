@@ -130,10 +130,14 @@ class Test_ActiveRecord_Base extends Unit_Test
   function test_find_id()
   {
     $product = new Product();
-    $product = $product->find(3);
     
+    $product = $product->find(3);
     $this->assert_equal("", $product->id, 3);
     $this->assert_equal("", $product->name, 'bepo');
+    
+    $product = new Product(2);
+    $this->assert_equal("", $product->id, 2);
+    $this->assert_equal("", $product->name, 'qwerty');
   }
   
   /*

@@ -34,13 +34,16 @@ class ActiveRecord_Base extends ActiveRecord_Record
     $this->columns = $this->db->columns($this->table_name);
     
     # args
-    if (is_array($arg))
+    if ($arg !== null)
     {
+      if (!is_array($arg)) {
+        $arg = $this->find($arg);
+      }
       $this->set_attributes($arg);
     }
   }
   
-  function set_attributes(array $arg)
+  function set_attributes($arg)
   {
     foreach($arg as $attribute => $value) {
       $this->$attribute = $value;
@@ -61,14 +64,11 @@ class ActiveRecord_Base extends ActiveRecord_Record
   }
   
   /**
-   * TODO: find(:all, $options)
-   * TODO: find($options)
-   * TODO: find(:first, $options)
-   * 
-   * OPTIMIZE: if $scope is :first add {limit => 1} to options.
+   * TODO: Add some options: select, group, joins, from.
    */
   function & find($scope=':all', $options=null)
   {
+    # params
     if (!is_symbol($scope))
     {
       if (is_array($scope) and !is_array($options))
@@ -85,10 +85,12 @@ class ActiveRecord_Base extends ActiveRecord_Record
       }
     }
     
+    # otimization(s)
     if ($scope == ':first' and !isset($options['limit'])) {
       $options['limit'] = 1;
     }
     
+    # buils SQL
     $table = $this->db->quote_table($this->table_name);
     $where = '';
     $order = '';
@@ -97,9 +99,11 @@ class ActiveRecord_Base extends ActiveRecord_Record
     if (!empty($options['conditions'])) {
       $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
     }
+    
     if (!empty($options['order'])) {
       $where = 'ORDER BY '.$this->db->sanitize_order($options['order']);
     }
+    
     if (isset($options['limit']))
     {
       $page  = isset($options['page']) ? $options['page'] : null;
@@ -108,6 +112,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     
     $sql = "SELECT * FROM $table $where $order $limit ;";
     
+    # queries then creates objects
     $class = get_class($this);
     switch($scope)
     {
