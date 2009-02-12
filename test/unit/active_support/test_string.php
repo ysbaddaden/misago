@@ -29,6 +29,14 @@ class Inflections
 
 class Test_String extends Unit_Test
 {
+  function test_is_symbol()
+  {
+    $this->assert_true('', is_symbol(":first"));
+    $this->assert_true('', is_symbol(":all"));
+    $this->assert_false('', is_symbol("all"));
+    $this->assert_false('', is_symbol(" :all"));
+  }
+  
   function test_camelize()
   {
     $this->assert_equal('from underscore',  String::camelize('application_controller'), 'ApplicationController');

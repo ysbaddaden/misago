@@ -1,6 +1,11 @@
 <?php
 require ROOT.'/config/initializers/inflections.php';
 
+function is_symbol($str)
+{
+  return (strpos($str, ':') === 0);
+}
+
 /**
  * Extensions for strings.
  * 
