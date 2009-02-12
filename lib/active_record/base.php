@@ -70,11 +70,15 @@ class ActiveRecord_Base extends ActiveRecord_Record
   function & find($scope=':all', $options=null)
   {
     $table = $this->db->quote_table($this->table_name);
-    $limit = '';
     $where = '';
+    $order = '';
+    $limit = '';
     
     if (!empty($options['conditions'])) {
       $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
+    }
+    if (!empty($options['order'])) {
+      $where = 'ORDER BY '.$this->db->sanitize_order($options['order']);
     }
     if (isset($options['limit']))
     {
@@ -82,7 +86,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-    $sql = "SELECT * FROM $table $where $limit ;";
+    $sql = "SELECT * FROM $table $where $order $limit ;";
     
     $class = get_class($this);
     switch($scope)

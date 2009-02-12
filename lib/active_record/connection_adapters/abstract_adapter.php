@@ -118,6 +118,32 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
   }
   
+  function sanitize_order($columns)
+  {
+#    if (strpos($columns, '-! ') === 0) {
+#      return substr($columns, 3);
+#    }
+#    elseif (strpos($columns, 'RAND()') === false)
+#    {
+#      $columns = preg_replace_callback('/([\w.]+)\s*(ASC|DESC|NULLS FIRST|NULLS LAST)[\s,]*/',
+#        array($this, 'preg_order'), $columns);
+#    }
+    if (!is_array($columns)) {
+      $columns = explode(',', $columns);
+    }
+    foreach($columns as $i => $column)
+    {
+      if (strpos($column, ' ')) {
+        list($column, $options) = explode(' ', $column, 1);
+      }
+      else {
+        $options = '';
+      }
+      $columns[$i] = $this->quote_column($column)." $options";
+    }
+    return implode(', ', $columns);
+  }
+  
   /**
    * Creates a LIMIt+OFFSET statement.
    */
