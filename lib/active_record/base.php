@@ -80,10 +80,13 @@ class ActiveRecord_Base extends ActiveRecord_Record
       {
         $options = array(
           'conditions' => array($this->primary_key => $scope),
-          'limit' => 1
         );
         $scope = ':first';
       }
+    }
+    
+    if ($scope == ':first' and !isset($options['limit'])) {
+      $options['limit'] = 1;
     }
     
     $table = $this->db->quote_table($this->table_name);
