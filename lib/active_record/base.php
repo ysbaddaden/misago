@@ -84,8 +84,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     
     $sql = "SELECT * FROM $table $where $limit ;";
     
-    echo "\n$sql";
-    
     $class = get_class($this);
     switch($scope)
     {
