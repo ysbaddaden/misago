@@ -121,6 +121,26 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     ) ENGINE=innodb ;'));
   }
   
+  function test_sanitize_order()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->sanitize_order('toto');
+    $this->assert_equal('', trim($test), '"toto"');
+    
+    $test = $db->sanitize_order('toto asc');
+    $this->assert_equal('', trim($test), '"toto" asc');
+    
+    $test = $db->sanitize_order('toto.titi DESC');
+    $this->assert_equal('', trim($test), '"toto"."titi" DESC');
+    
+    $test = $db->sanitize_order('toto.titi DESC, tata asc');
+    $this->assert_equal('', trim($test), '"toto"."titi" DESC, "tata" asc');
+    
+    $test = $db->sanitize_order('toto.titi, tata asc');
+    $this->assert_equal('', trim($test), '"toto"."titi", "tata" asc');
+  }
+  
   function test_sanitize_limit()
   {
     $db = new FakeAdapter(array());

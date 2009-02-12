@@ -120,26 +120,21 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   function sanitize_order($columns)
   {
-#    if (strpos($columns, '-! ') === 0) {
-#      return substr($columns, 3);
-#    }
-#    elseif (strpos($columns, 'RAND()') === false)
-#    {
-#      $columns = preg_replace_callback('/([\w.]+)\s*(ASC|DESC|NULLS FIRST|NULLS LAST)[\s,]*/',
-#        array($this, 'preg_order'), $columns);
-#    }
     if (!is_array($columns)) {
       $columns = explode(',', $columns);
     }
     foreach($columns as $i => $column)
     {
-      if (strpos($column, ' ')) {
-        list($column, $options) = explode(' ', $column, 1);
+      $column = trim($column);
+      if (strpos($column, ' ') !== false)
+      {
+        list($column, $options) = explode(' ', $column, 2);
+        $options = " $options";
       }
       else {
         $options = '';
       }
-      $columns[$i] = $this->quote_column($column)." $options";
+      $columns[$i] = $this->quote_column($column).$options;
     }
     return implode(', ', $columns);
   }
@@ -149,18 +144,18 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   function sanitize_limit($limit=null, $page=null)
   {
-    if($limit)
-    {
-      $limit = (int)$limit;
-      $str   = "LIMIT $limit";
-      if ($page)
-      {
-        $offset = ((int)$page - 1) * $limit;
-        $str .= " OFFSET $offset";
-      }
-      return $str;
+    if(!$limit) {
+      return '';
     }
-    return '';
+    
+    $limit = (int)$limit;
+    $str   = "LIMIT $limit";
+    if ($page)
+    {
+      $offset = ((int)$page - 1) * $limit;
+      $str .= " OFFSET $offset";
+    }
+    return $str;
   }
   
   /**
