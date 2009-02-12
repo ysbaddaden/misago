@@ -78,7 +78,10 @@ class ActiveRecord_Base extends ActiveRecord_Record
       }
       else
       {
-        $options = array('conditions' => array($this->primary_key => $scope));
+        $options = array(
+          'conditions' => array($this->primary_key => $scope),
+          'limit' => 1
+        );
         $scope = ':first';
       }
     }
