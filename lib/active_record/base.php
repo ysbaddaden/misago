@@ -71,13 +71,20 @@ class ActiveRecord_Base extends ActiveRecord_Record
   {
     $table = $this->db->quote_table($this->table_name);
     $limit = '';
+    $where = '';
+    
+    if (!empty($options['conditions'])) {
+      $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
+    }
     if (isset($options['limit']))
     {
       $page  = isset($options['page']) ? $options['page'] : null;
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-    $sql = "SELECT * FROM {$table} $limit ;";
+    $sql = "SELECT * FROM $table $where $limit ;";
+    
+    echo "\n$sql";
     
     $class = get_class($this);
     switch($scope)
