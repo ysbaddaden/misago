@@ -110,6 +110,14 @@ class Test_ActiveRecord_Base extends Unit_Test
     $this->assert_equal("must return 2 products only", count($products), 1);
   }
   
+  function test_find_with_order()
+  {
+    $product = new Product();
+    $options = array('order' => 'name desc');
+    $products = $product->find(':all', $options);
+    $this->assert_equal("", $products->name, 'bepo');
+  }
+  
   /*
   function test_update()
   {
