@@ -69,6 +69,20 @@ class ActiveRecord_Base extends ActiveRecord_Record
    */
   function & find($scope=':all', $options=null)
   {
+    if (!is_symbol($scope))
+    {
+      if (is_array($scope) and !is_array($options))
+      {
+        $options =& $scope;
+        $scope = ':all';
+      }
+      else
+      {
+        $options = array('conditions' => array($this->primary_key => $scope));
+        $scope = ':first';
+      }
+    }
+    
     $table = $this->db->quote_table($this->table_name);
     $where = '';
     $order = '';
@@ -93,7 +107,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     {
       case ':all':
         $results = $this->db->select_all($sql);
-        
         $records = array();
         foreach($results as $result) {
           $records[] = new $class($result);

@@ -113,9 +113,27 @@ class Test_ActiveRecord_Base extends Unit_Test
   function test_find_with_order()
   {
     $product = new Product();
+    
     $options = array('order' => 'name desc');
     $products = $product->find(':all', $options);
     $this->assert_equal("", $products[1]->name, 'bepo');
+    
+    $options = array('order' => 'products.name desc');
+    $products = $product->find(':all', $options);
+    $this->assert_equal("", $products[1]->name, 'bepo');
+    
+    $options = array('order' => 'name desc');
+    $product = $product->find(':first', $options);
+    $this->assert_equal("", $product->name, 'qwerty');
+  }
+  
+  function test_find_id()
+  {
+    $product = new Product();
+    $product = $product->find(3);
+    
+    $this->assert_equal("", $product->id, 3);
+    $this->assert_equal("", $product->name, 'bepo');
   }
   
   /*
