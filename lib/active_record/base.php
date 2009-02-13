@@ -11,14 +11,17 @@ class ActiveRecord_Base extends ActiveRecord_Record
   protected $primary_key = 'id';
   protected $columns     = array();
   
-  function column_names()
-  {
-    return array_keys($this->columns);
-  }
-  
+  # Returns the definition of columns for the table associated with this class.
   function columns()
   {
     return $this->columns;
+  }
+  
+  # Returns the list of column names for the table associated with this class.
+  function & column_names()
+  {
+    $column_names = array_keys($this->table_columns);
+    return $column_names;
   }
   
   # OPTIMIZE: Cache columns' definition (eg: in memory throught APC).
@@ -76,7 +79,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
    *   - limit (integer)
    *   - page (integer)
    * 
-   * TODO: Add some options: select, group, joins, from.
+   * TODO: Add some options: group, joins, from.
+   * TODO: Add scope :last (how is that doable?).
    */
   function & find($scope=':all', $options=null)
   {
@@ -144,11 +148,17 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
   }
   
+  /**
+   * Shortcut for find(:all).
+   */
   function all($options=null)
   {
     return $this->find(':all', $options);
   }
   
+  /**
+   * Shortcut for find(:first).
+   */
   function first($options=null)
   {
     return $this->find(':first', $options);
@@ -228,6 +238,24 @@ class ActiveRecord_Base extends ActiveRecord_Record
       return $this->{$this->primary_key} = $id;
     }
     return false;
+  }
+  
+  # TODO: Write ActiveRecord::Base::update_all().
+  function update_all($conditions=null)
+  {
+    
+  }
+  
+  # TODO: Write ActiveRecord::Base::delete().
+  function delete($id=null)
+  {
+    
+  }
+  
+  # TODO: Write ActiveRecord::Base::delete_all().
+  function delete_all($conditions=null)
+  {
+    
   }
 }
 

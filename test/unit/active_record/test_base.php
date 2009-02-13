@@ -157,6 +157,7 @@ class Test_ActiveRecord_Base extends Unit_Test
     $this->assert_equal("Product::all()", count($products), 3);
     
     $product = $product->first();
+
     $this->assert_instance_of("Product::first()", $product, 'Product');
   }
   
