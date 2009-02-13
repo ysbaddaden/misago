@@ -70,8 +70,9 @@ class ActiveRecord_Base extends ActiveRecord_Record
    *   - :first
    * 
    * Options:
+   *   - select (collection)
    *   - conditions (string, array or hash)
-   *   - order (string or array)
+   *   - order (collection)
    *   - limit (integer)
    *   - page (integer)
    * 
@@ -102,28 +103,25 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
     
     # buils SQL
-    $table = $this->db->quote_table($this->table_name);
-    $select = empty($options['select']) ? '*' :
-      $this->db->parse_columns($options['select']);
-    $where = '';
-    $order = '';
-    $limit = '';
+    $table  = $this->db->quote_table($this->table_name);
+    $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
+    $where  = '';
+    $order  = '';
+    $limit  = '';
     
     if (!empty($options['conditions'])) {
       $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
     }
-    
     if (!empty($options['order'])) {
       $where = 'ORDER BY '.$this->db->sanitize_order($options['order']);
     }
-    
     if (isset($options['limit']))
     {
       $page  = isset($options['page']) ? $options['page'] : null;
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-    $sql = "SELECT * FROM $table $where $order $limit ;";
+    $sql = "SELECT $select FROM $table $where $order $limit ;";
     
     # queries then creates objects
     $class = get_class($this);
@@ -144,6 +142,16 @@ class ActiveRecord_Base extends ActiveRecord_Record
         return $record;
       break;
     }
+  }
+  
+  function all($options=null)
+  {
+    return $this->find(':all', $options);
+  }
+  
+  function first($options=null)
+  {
+    return $this->find(':first', $options);
   }
   
   /**
