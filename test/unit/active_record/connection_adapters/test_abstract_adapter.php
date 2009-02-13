@@ -75,6 +75,17 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $this->assert_equal("", $test, '"misago"."orders"');
   }
 
+  function test_quote_columns()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->quote_columns('id, name');
+    $this->assert_equal("", $test, '"id", "name"');
+
+    $test = $db->quote_columns('misago.orders, products, tags');
+    $this->assert_equal("", $test, '"misago"."orders", "products", "tags"');
+  }
+
   function test_new_table()
   {
     $db = new FakeAdapter(array());

@@ -63,11 +63,23 @@ class ActiveRecord_Base extends ActiveRecord_Record
   }
   
   /**
+   * Finds records in database.
+   * 
+   * Scopes:
+   *   - :last,
+   *   - :first
+   * 
+   * Options:
+   *   - conditions (string, array or hash)
+   *   - order (string or array)
+   *   - limit (integer)
+   *   - page (integer)
+   * 
    * TODO: Add some options: select, group, joins, from.
    */
   function & find($scope=':all', $options=null)
   {
-    # params
+    # arguments
     if (!is_symbol($scope))
     {
       if (is_array($scope) and !is_array($options))
@@ -84,13 +96,15 @@ class ActiveRecord_Base extends ActiveRecord_Record
       }
     }
     
-    # otimization(s)
+    # optimization(s)
     if ($scope == ':first' and !isset($options['limit'])) {
       $options['limit'] = 1;
     }
     
     # buils SQL
     $table = $this->db->quote_table($this->table_name);
+    $select = empty($options['select']) ? '*' :
+      $this->db->parse_columns($options['select']);
     $where = '';
     $order = '';
     $limit = '';

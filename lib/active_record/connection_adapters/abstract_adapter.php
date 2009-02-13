@@ -99,6 +99,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   function quote_column($column)
   {
+    $column = trim($column);
     if (strpos($column, '.'))
     {
       $segments = explode('.', $column);
@@ -108,6 +109,18 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       return implode('.', $segments);
     }
     return $this->COLUMN_QUOTE.$column.$this->COLUMN_QUOTE;
+  }
+  
+  /**
+   * Quotes a series of columns for use in a SQL query.
+   */
+  function quote_columns($columns)
+  {
+    if (!is_array($columns)) {
+      $columns = explode(',', $columns);
+    }
+    $columns = array_map(array($this, 'quote_column'), $columns);
+    return implode(', ', $columns);
   }
   
   /**
