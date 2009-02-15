@@ -19,6 +19,10 @@ require 'active_support/time.php';
 
 require 'http.php';
 
+if (!function_exists('apc_store')) {
+  require 'fake_apc.php';
+}
+
 function __autoload($class)
 {
   $path = str_replace('_', '/', $class);

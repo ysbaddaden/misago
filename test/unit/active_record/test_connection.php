@@ -11,6 +11,7 @@ class Test_ActiveRecord_Connection extends Unit_Test
   function test_load_configuration()
   {
     ActiveRecord_Connection::load_configuration();
+    
     $this->assert_equal("", ActiveRecord_Connection::$configurations, array (
       'development' => array(
         'adapter'  => 'mysql',
@@ -49,6 +50,15 @@ class Test_ActiveRecord_Connection extends Unit_Test
   }
 }
 
+
+passthru("cd $location/test/test_app; MISAGO_ENV=test script/db/drop");
+passthru("cd $location/test/test_app; MISAGO_ENV=test script/db/create");
+passthru("cd $location/test/test_app; MISAGO_ENV=production script/db/drop");
+passthru("cd $location/test/test_app; MISAGO_ENV=production script/db/create");
+/*
 new Test_ActiveRecord_Connection();
 
+`cd $location/test/test_app; MISAGO_ENV=test script/db/drop`;
+`cd $location/test/test_app; MISAGO_ENV=production script/db/drop`;
+*/
 ?>

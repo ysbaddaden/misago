@@ -11,29 +11,21 @@ class ActiveRecord_Base extends ActiveRecord_Record
   protected $primary_key = 'id';
   protected $columns     = array();
   
-  # Returns the definition of columns for the table associated with this class.
-  function columns()
-  {
-    return $this->columns;
-  }
-  
-  # Returns the list of column names for the table associated with this class.
-  function & column_names()
-  {
-    $column_names = array_keys($this->table_columns);
-    return $column_names;
-  }
-  
-  # OPTIMIZE: Cache columns' definition (eg: in memory throught APC).
   function __construct($arg=null)
   {
     # database connection
     $this->table_name = String::underscore(String::pluralize(get_class($this)));
     $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
-    $this->db->select_database();
     
     # columns' definition
-    $this->columns = $this->db->columns($this->table_name);
+    $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
+    $this->columns = apc_fetch($apc_key, $success);
+    
+    if ($success === false)
+    {
+      $this->columns = $this->db->columns($this->table_name);
+      apc_store($apc_key, $this->columns);
+    }
     
     # args
     if ($arg !== null)
@@ -63,6 +55,19 @@ class ActiveRecord_Base extends ActiveRecord_Record
       }
     }
     return parent::__set($attribute, $value);
+  }
+  
+  # Returns the definition of columns for the table associated with this class.
+  function columns()
+  {
+    return $this->columns;
+  }
+  
+  # Returns the list of column names for the table associated with this class.
+  function & column_names()
+  {
+    $column_names = array_keys($this->table_columns);
+    return $column_names;
   }
   
   /**

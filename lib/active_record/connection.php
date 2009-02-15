@@ -25,6 +25,9 @@ class ActiveRecord_Connection
   
   /**
    * Creates a singleton (one single connection object per configuration entry).
+   * 
+   * Shouldn't be called directly, except on a few circumstances.
+   * Use ActiveRecord_Connection::get() instead.
    */
   static function create($environment)
   {
@@ -47,7 +50,7 @@ class ActiveRecord_Connection
 #      throw new ActiveRecord_AdapterNotFound("Adapter {$config['adapter']} can't be found.");
 #    }
     
-    $class  = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
+    $class = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
     return new $class(&$config);
   }
   
@@ -57,8 +60,10 @@ class ActiveRecord_Connection
    */
   static function get($environment)
   {
-    if (!isset(self::$adapters[$environment])) {
+    if (!isset(self::$adapters[$environment]))
+    {
       self::$adapters[$environment] = self::create($environment);
+      self::$adapters[$environment]->select_database();
     }
     return self::$adapters[$environment];
   }
