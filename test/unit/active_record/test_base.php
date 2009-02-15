@@ -3,23 +3,9 @@
 $location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
 
-# cleanup
-`cd $location/test/test_app; MISAGO_ENV=test script/db/drop`;
-`cd $location/test/test_app; MISAGO_ENV=test script/db/create`;
-`cd $location/test/test_app; MISAGO_ENV=test script/db/migrate`;
-
-# fake objects
-class Post extends ActiveRecord_Base {}
-
-class Product extends ActiveRecord_Base
-{
-  
-}
-
-class Test_ActiveRecord_Base extends Unit_Test
+class Test_ActiveRecord_Base extends Unit_TestCase
 {
   function test_no_such_table()
   {

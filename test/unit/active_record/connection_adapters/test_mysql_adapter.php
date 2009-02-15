@@ -3,7 +3,6 @@
 $location = dirname(__FILE__).'/../../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
 require_once 'active_record/exception.php';
 
@@ -168,6 +167,8 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $rs = $this->db->drop_database('misago_test');
     $this->assert_true("", $rs ? true : false);
   }
+
+  
 }
 
 new Test_ConnectionAdapter_MysqlAdapter();

@@ -3,29 +3,8 @@
 $location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require "$location/lib/unit_test.php";
+require "$location/lib/unit/test.php";
 require "$location/test/test_app/config/boot.php";
-
-/*
-class Inflections
-{
-  static protected $constants = array('wiki');
-  
-  static protected $singularize_rules = array(
-	  '/ses$/' => 's', 
-	  '/ies$/' => 'y',
-	  '/xes$/' => 'x', 
-	  '/s$/'   => ''
-  );
-  
-  static protected $pluralize_rules   = array(
-	  '/s$/' => 'ses',
-	  '/y$/' => 'ies',
-	  '/x$/' => 'xes',
-	  '/$/'  => 's'
-  );
-}
-*/
 
 class Test_String extends Unit_Test
 {

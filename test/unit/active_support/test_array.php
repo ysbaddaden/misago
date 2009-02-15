@@ -3,7 +3,7 @@
 $location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require_once "$location/lib/unit_test.php";
+require_once "$location/lib/unit/test.php";
 require_once "$location/lib/active_support/array.php";
 
 class Test_ActiveSupport_Array extends Unit_Test

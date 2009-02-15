@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__)."/../../lib/unit_test.php";
+require_once dirname(__FILE__)."/../../lib/unit/test.php";
 
 class FakeClass
 {

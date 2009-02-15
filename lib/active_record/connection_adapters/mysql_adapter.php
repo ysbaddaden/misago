@@ -179,8 +179,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     $database = $this->quote_table($database);
     $sql = "CREATE DATABASE $database";
     
-    echo "$sql\n";
-    
     if (isset($options['charset']))
     {
       $charset = $this->quote_value($options['charset']);

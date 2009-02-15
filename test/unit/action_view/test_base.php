@@ -3,7 +3,6 @@
 $location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
 require_once ROOT."/app/controllers/application.php";
 

@@ -3,7 +3,6 @@
 $location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require_once "$location/lib/unit_test.php";
 require_once "$location/test/test_app/config/boot.php";
 
 class Test_ActiveRecord_Connection extends Unit_Test
@@ -51,14 +50,13 @@ class Test_ActiveRecord_Connection extends Unit_Test
 }
 
 
-passthru("cd $location/test/test_app; MISAGO_ENV=test script/db/drop");
-passthru("cd $location/test/test_app; MISAGO_ENV=test script/db/create");
-passthru("cd $location/test/test_app; MISAGO_ENV=production script/db/drop");
-passthru("cd $location/test/test_app; MISAGO_ENV=production script/db/create");
-/*
+system("MISAGO_ENV=test $location/test/test_app/script/db/drop");
+system("MISAGO_ENV=test $location/test/test_app/script/db/create");
+system("MISAGO_ENV=production $location/test/test_app/script/db/drop");
+system("MISAGO_ENV=production $location/test/test_app/script/db/create");
+
 new Test_ActiveRecord_Connection();
 
-`cd $location/test/test_app; MISAGO_ENV=test script/db/drop`;
-`cd $location/test/test_app; MISAGO_ENV=production script/db/drop`;
-*/
+system("MISAGO_ENV=test $location/test/test_app/script/db/drop");
+system("MISAGO_ENV=production $location/test/test_app/script/db/drop");
 ?>

@@ -2,7 +2,7 @@
 
 $location = dirname(__FILE__).'/../../..';
 require_once "$location/lib/misago_exception.php";
-require_once "$location/lib/unit_test.php";
+require_once "$location/lib/unit/test.php";
 require_once "$location/lib/action_controller/routing.php";
 
 class Test_ActionController_Routing extends Unit_Test
