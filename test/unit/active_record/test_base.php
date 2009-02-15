@@ -168,6 +168,43 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   }
   */
   
+  function test_update_all()
+  {
+    $product = new Product();
+    
+    $updates = array('updated_at' => '2008-12-21 00:01:00');
+    $product->update_all($updates);
+    $products = $product->all();
+    $this->assert_equal("update_all",
+      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
+      array('2008-12-21 00:01:00', '2008-12-21 00:01:00', '2008-12-21 00:01:00')
+    );
+    
+    $updates = array('updated_at' => '2008-12-21 00:02:00');
+    $product->update_all($updates, 'id = 1');
+    $products = $product->all();
+    $this->assert_equal("update_all with conditions",
+      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
+      array('2008-12-21 00:02:00', '2008-12-21 00:01:00', '2008-12-21 00:01:00')
+    );
+    
+    $updates = array('updated_at' => '2008-12-21 00:03:00');
+    $product->update_all($updates, null, array('limit' => 2));
+    $products = $product->all();
+    $this->assert_equal("update_all with limit",
+      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
+      array('2008-12-21 00:03:00', '2008-12-21 00:03:00', '2008-12-21 00:01:00')
+    );
+    
+    $updates = array('updated_at' => '2008-12-21 00:04:00');
+    $product->update_all($updates, null, array('limit' => 2, 'order' => 'id desc'));
+    $products = $product->all();
+    $this->assert_equal("update_all with limit+order",
+      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
+      array('2008-12-21 00:03:00', '2008-12-21 00:04:00', '2008-12-21 00:04:00')
+    );
+    
+  }
 }
 
 new Test_ActiveRecord_Base();

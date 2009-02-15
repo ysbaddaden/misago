@@ -1,7 +1,5 @@
 <?php
 
-# TODO: Load an APC-like interface to cache data on disk.
-
 ini_set('include_path',
 	ROOT.'/app/models'.PATH_SEPARATOR.
 	ROOT.'/app/helpers'.PATH_SEPARATOR.

@@ -245,10 +245,16 @@ class ActiveRecord_Base extends ActiveRecord_Record
     return false;
   }
   
-  # TODO: Write ActiveRecord::Base::update_all().
-  function update_all($conditions=null)
+  /**
+   * Updates many records at once.
+   */
+  function update_all($updates, $conditions=null, $options=null)
   {
-    
+    $sets  = $this->db->sanitize_sql_for_assignment($updates);
+    $where = empty($conditions) ? '' : 'WHERE '.$this->db->sanitize_sql_for_conditions($conditions);
+    $limit = empty($options['limit']) ? '' : $this->db->sanitize_limit($options['limit']);
+    $order = empty($options['order']) ? '' : "ORDER BY ".$this->db->sanitize_order($options['order']);
+    return $this->db->execute("UPDATE {$this->table_name} SET $sets $where $order $limit ;");
   }
   
   # TODO: Write ActiveRecord::Base::delete().

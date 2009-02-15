@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 
-# TODO: Fusionate compare_arrays and compare_objects as compare_iterables.
+# IMPROVE: Fusionate compare_arrays and compare_objects as compare_iterables.
 class Unit_Test
 {
   private $count_tests    = 0;
@@ -56,7 +56,6 @@ class Unit_Test
     printf("\nFinished in %f seconds.\n%d tests, %d assertions, %d failures, %d errors\n",
       $this->time, $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors);
   }
-  
   
   protected function assert_true($comment, $arg)
   {
