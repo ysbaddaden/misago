@@ -203,6 +203,16 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     );
   }
   
+  function test_update_attributes()
+  {
+    $product = new Product(1);
+    $product->update_attribute('name', 'poiuyt');
+    $this->assert_equal('name must have changed', $product->name, 'poiuyt');
+    
+    $product = new Product(1);
+    $this->assert_equal('change must have been recorded', $product->name, 'poiuyt');
+  }
+  
   function test_delete_all()
   {
     $data1   = array('name' => "qwerty", 'price' =>  5.98);

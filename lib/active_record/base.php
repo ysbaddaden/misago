@@ -213,7 +213,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * $users = $user->update(array_keys($people), array_values($people));
    * </code>
    * 
-   * FIXME: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
+   * IMPROVE: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
    */
   function update($id, $attributes)
   {
@@ -252,6 +252,67 @@ class ActiveRecord_Base extends ActiveRecord_Record
       return $this->{$this->primary_key} = $id;
     }
     return false;
+  }
+  
+  /**
+   * Updates one attribute of record.
+   *
+   * <code>
+   * $post = new Post(1);
+   * $post->name = 'my first post [update]';
+   * $post->update_attribute('name');
+   * 
+   * $post->update_attribute('name', 'my first post [update 2]');
+   * </code>
+   * 
+   * TODO: Test update_attribute().
+   * TODO: Test update_attribute() with a NULL value.
+   */
+  function update_attribute($attribute, $value=null)
+  {
+    $value   = (func_num_args() > 1) ? $value : $this->$attribute;
+    $updates = array($attribute => $value);
+    return $this->update_attributes(&$updates);
+  }
+  
+  /**
+   * Updates some attributes of record.
+   * 
+   * <code>
+   * $post = new Post(1);
+   * $post->title    = 'my first post [update]';
+   * $post->category = 2;
+   * $post->update_attributes(array('title', 'category'));
+   * $post->update_attributes('title, category');
+   * 
+   * $post->update_attributes(array(
+   *   'title'    => 'my first post [update 2]',
+   *   'category' => 3
+   * ));
+   * </code>
+   * 
+   * TODO: Test update_attributes().
+   * TODO: Test update_attributes() with a NULL value.
+   */
+  function update_attributes($updates)
+  {
+    if (is_hash($udpates))
+    {
+      foreach($updates as $attribute => $value) {
+        $this->$attribute = $value;
+      }
+      return $this->db->update($this->table_name, $updates);
+    }
+    
+    if (is_string($updates)) {
+      $updates = explode(',', str_replace(' ', '', $updates));
+    }
+    
+    $_updates = array();
+    foreach($updates as $attribute) {
+      $_updates[$attribute] = $this->$attribute;
+    }
+    return $this->db->update($this->table_name, $_updates);
   }
   
   /**
