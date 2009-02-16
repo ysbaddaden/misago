@@ -50,13 +50,13 @@ class Test_ActiveRecord_Connection extends Unit_Test
 }
 
 
-system("MISAGO_ENV=test $location/test/test_app/script/db/drop");
-system("MISAGO_ENV=test $location/test/test_app/script/db/create");
-system("MISAGO_ENV=production $location/test/test_app/script/db/drop");
-system("MISAGO_ENV=production $location/test/test_app/script/db/create");
+exec("MISAGO_ENV=test $location/test/test_app/script/db/drop");
+exec("MISAGO_ENV=test $location/test/test_app/script/db/create");
+exec("MISAGO_ENV=production $location/test/test_app/script/db/drop");
+exec("MISAGO_ENV=production $location/test/test_app/script/db/create");
 
 new Test_ActiveRecord_Connection();
 
-system("MISAGO_ENV=test $location/test/test_app/script/db/drop");
-system("MISAGO_ENV=production $location/test/test_app/script/db/drop");
+exec("MISAGO_ENV=test $location/test/test_app/script/db/drop");
+exec("MISAGO_ENV=production $location/test/test_app/script/db/drop");
 ?>

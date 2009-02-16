@@ -213,26 +213,35 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * $users = $user->update(array_keys($people), array_values($people));
    * </code>
    * 
-   * FIXME: Must return ActiveRecord objects!
-   * FIXME: Record must be loaded before it is updated, and only changed attributes must be recorded.
+   * FIXME: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
    */
   function update($id, $attributes)
   {
-    if (is_array($id))
+    if (!is_array($id))
+    {
+      $conditions = array($this->primary_key => $id);
+      if ($this->db->update($this->table_name, $attributes, $conditions) !== false)
+      {
+        $class = get_class($this);
+        return new $class($id);
+      }
+      return false;
+    }
+    else
     {
       $records = array();
       $i = 0;
       foreach($id as $_id)
       {
-        $records[$i] = $this->update($_id, $attributes[$i]);
+        $rs = $this->update($_id, $attributes[$i]);
+        
+        if ($rs === false) {
+          return false;
+        }
+        $records[] = $rs;
         $i++;
       }
       return $records;
-    }
-    else
-    {
-      $conditions = array($this->primary_key => $id);
-      return $this->db->update($this->table_name, $attributes, $conditions);
     }
   }
   
@@ -255,12 +264,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
   function update_all($updates, $conditions=null, $options=null)
   {
     return $this->db->update($this->table_name, $updates, $conditions, $options);
-    
-#    $sets  = $this->db->sanitize_sql_for_assignment($updates);
-#    $where = empty($conditions) ? '' : 'WHERE '.$this->db->sanitize_sql_for_conditions($conditions);
-#    $limit = empty($options['limit']) ? '' : $this->db->sanitize_limit($options['limit']);
-#    $order = empty($options['order']) ? '' : "ORDER BY ".$this->db->sanitize_order($options['order']);
-#    return $this->db->execute("UPDATE {$this->table_name} SET $sets $where $order $limit ;");
   }
   
   /**
@@ -277,9 +280,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
    */
   function delete($id=null)
   {
-    $table = $this->db->quote_table($this->table_name);
-    $conditions = array($this->primary_key => isset($id) ? $id : $this->id);
-    return $this->db->delete($table, $conditions);
+    $conditions = array($this->primary_key => isset($id) ? $id : $this->{$this->primary_key});
+    return $this->db->delete($this->table_name, $conditions);
   }
   
   /**
@@ -292,14 +294,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   function delete_all($conditions=null, $options=null)
   {
     return $this->db->delete($this->table_name, $conditions, $options);
-#    
-#    $where = empty($conditions) ? '' : 'WHERE '.$this->db->sanitize_sql_for_conditions($conditions);
-#    $limit = empty($options['limit']) ? '' : $this->db->sanitize_limit($options['limit']);
-#    $order = empty($options['order']) ? '' : "ORDER BY ".$this->db->sanitize_order($options['order']);
-#    $table = $this->db->quote_table($this->table_name);
-#    return $this->db->execute("DELETE FROM $table $where $order $limit ;");
   }
-  
 }
 
 ?>

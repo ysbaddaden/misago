@@ -147,7 +147,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_instance_of("Product::first()", $product, 'Product');
   }
   
-  /*
   function test_update()
   {
     $product = new Product();
@@ -166,7 +165,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal("", $products[1]->name, 'bepo');
     $this->assert_equal("", $products[0]->name, 'swerty');
   }
-  */
   
   function test_update_all()
   {
