@@ -65,6 +65,8 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   # IMPROVE: Add some error logging (in 'production' environment).
   function execute($sql)
   {
+#    echo "$sql\n";
+    
     $rs = mysql_query($sql, $this->link);
     if (!$rs)
     {
@@ -261,15 +263,15 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $success;
   }
   
-  function update($table, $data, $conditions=null)
+  function update($table, $data, $conditions=null, $options=null)
   {
-    $success = parent::update($table, $data, $conditions);
+    $success = parent::update($table, $data, $conditions, $options);
     return $success ? mysql_affected_rows($this->link) : $success;
   }
   
-  function delete($table, $conditions=null)
+  function delete($table, $conditions=null, $options=null)
   {
-    $success = parent::delete($table, $conditions);
+    $success = parent::delete($table, $conditions, $options);
     return $success ? mysql_affected_rows($this->link) : $success;
   }
 }

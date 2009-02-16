@@ -203,7 +203,44 @@ class Test_ActiveRecord_Base extends Unit_TestCase
       array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
       array('2008-12-21 00:03:00', '2008-12-21 00:04:00', '2008-12-21 00:04:00')
     );
+  }
+  
+  function test_delete_all()
+  {
+    $data1   = array('name' => "qwerty", 'price' =>  5.98);
+    $data2   = array('name' => "bepo",   'price' => 10.55);
+    $product = new Product();
     
+    
+    $product->delete_all();
+    $products = $product->all();
+    $this->assert_equal("delete_all", count($products), 0);
+    
+    
+    $product->create($data1, $data2);
+    
+    $product->delete_all('id = 4');
+    $product = $product->first();
+    $this->assert_equal("delete_all with conditions", $product->name, 'bepo');
+    
+    
+    $product->delete_all();
+    $product->create($data1, $data2);
+    
+    $product->delete_all(null, array('limit' => 1));
+    $products = $product->all();
+    
+    $this->assert_equal("delete_all with limit", count($products), 1);
+    $this->assert_equal("delete_all with limit", $products[0]->name, 'bepo');
+    
+    
+    $product->delete_all();
+    $product->create($data1, $data2);
+    
+    $product->delete_all(null, array('limit' => 1, 'order' => 'id desc'));
+    $product = $product->first();
+    $this->assert_equal("delete_all with limit+order", count($products), 1);
+    $this->assert_equal("delete_all with limit+order", $product->name, 'qwerty');
   }
 }
 

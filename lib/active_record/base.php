@@ -247,27 +247,59 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   /**
    * Updates many records at once.
+   * 
+   * Available options:
+   *   - limit
+   *   - order
    */
   function update_all($updates, $conditions=null, $options=null)
   {
-    $sets  = $this->db->sanitize_sql_for_assignment($updates);
-    $where = empty($conditions) ? '' : 'WHERE '.$this->db->sanitize_sql_for_conditions($conditions);
-    $limit = empty($options['limit']) ? '' : $this->db->sanitize_limit($options['limit']);
-    $order = empty($options['order']) ? '' : "ORDER BY ".$this->db->sanitize_order($options['order']);
-    return $this->db->execute("UPDATE {$this->table_name} SET $sets $where $order $limit ;");
+    return $this->db->update($this->table_name, $updates, $conditions, $options);
+    
+#    $sets  = $this->db->sanitize_sql_for_assignment($updates);
+#    $where = empty($conditions) ? '' : 'WHERE '.$this->db->sanitize_sql_for_conditions($conditions);
+#    $limit = empty($options['limit']) ? '' : $this->db->sanitize_limit($options['limit']);
+#    $order = empty($options['order']) ? '' : "ORDER BY ".$this->db->sanitize_order($options['order']);
+#    return $this->db->execute("UPDATE {$this->table_name} SET $sets $where $order $limit ;");
   }
   
-  # TODO: Write ActiveRecord::Base::delete().
+  /**
+   * Deletes a record.
+   * 
+   * <code>
+   * # deletes a given record
+   * $post->delete(123);
+   * 
+   * # deletes current record
+   * $post = new Post(456);
+   * $post->delete();
+   * </code>
+   */
   function delete($id=null)
   {
-    
+    $table = $this->db->quote_table($this->table_name);
+    $conditions = array($this->primary_key => isset($id) ? $id : $this->id);
+    return $this->db->delete($table, $conditions);
   }
   
-  # TODO: Write ActiveRecord::Base::delete_all().
-  function delete_all($conditions=null)
+  /**
+   * Deletes many records at once.
+   * 
+   * Available options:
+   *   - limit
+   *   - order
+   */
+  function delete_all($conditions=null, $options=null)
   {
-    
+    return $this->db->delete($this->table_name, $conditions, $options);
+#    
+#    $where = empty($conditions) ? '' : 'WHERE '.$this->db->sanitize_sql_for_conditions($conditions);
+#    $limit = empty($options['limit']) ? '' : $this->db->sanitize_limit($options['limit']);
+#    $order = empty($options['order']) ? '' : "ORDER BY ".$this->db->sanitize_order($options['order']);
+#    $table = $this->db->quote_table($this->table_name);
+#    return $this->db->execute("DELETE FROM $table $where $order $limit ;");
   }
+  
 }
 
 ?>

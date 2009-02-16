@@ -7,7 +7,7 @@ class Unit_TestCase extends Unit_Test
     $location = ROOT;
     
     # db cleanup (just in case)
-#    exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/drop");
+    exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/drop");
     
     # db ignition
     exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/create");

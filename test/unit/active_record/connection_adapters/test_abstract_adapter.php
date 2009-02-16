@@ -254,6 +254,20 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     
     $sql = $db->update('products', array('title = :title, updated_at = :updated_at', array('title' => 'qwerty', 'updated_at' => '2009-02-08')), 'id = 456');
     $this->assert_equal("symbols assignments", $sql, "UPDATE \"products\" SET title = 'qwerty', updated_at = '2009-02-08' WHERE id = 456 ;");
+    
+    $data = array('title = :title', array('title' => 'qwerty'));
+    
+    $sql = $db->update('products', $data, 'category = 1', array('limit' => 10));
+    $this->assert_equal("symbols assignments", $sql, "UPDATE \"products\" SET title = 'qwerty' WHERE category = 1 LIMIT 10 ;");
+    
+    $sql = $db->update('products', $data, 'category = 1', array('order' => 'id DESC'));
+    $this->assert_equal("symbols assignments", $sql, "UPDATE \"products\" SET title = 'qwerty' WHERE category = 1 ORDER BY \"id\" DESC ;");
+    
+    $sql = $db->update('products', $data, 'category = 1', array('limit' => 5, 'order' => 'id ASC'));
+    $this->assert_equal("symbols assignments", $sql, "UPDATE \"products\" SET title = 'qwerty' WHERE category = 1 ORDER BY \"id\" ASC LIMIT 5 ;");
+    
+    $sql = $db->update('products', $data, null, array('limit' => 5, 'order' => 'id ASC'));
+    $this->assert_equal("symbols assignments", $sql, "UPDATE \"products\" SET title = 'qwerty' ORDER BY \"id\" ASC LIMIT 5 ;");
   }
   
   function test_delete()
@@ -268,6 +282,18 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     
     $sql = $db->delete('products', 'id = 123');
     $this->assert_equal("string condition", $sql, "DELETE FROM \"products\" WHERE id = 123 ;");
+    
+    $sql = $db->delete('products', 'category = 1', array('limit' => 10));
+    $this->assert_equal("string condition+limit", $sql, "DELETE FROM \"products\" WHERE category = 1 LIMIT 10 ;");
+    
+    $sql = $db->delete('products', 'category = 1', array('order' => 'id DESC'));
+    $this->assert_equal("string condition+order", $sql, "DELETE FROM \"products\" WHERE category = 1 ORDER BY \"id\" DESC ;");
+    
+    $sql = $db->delete('products', 'category = 1', array('limit' => 10, 'order' => 'id DESC'));
+    $this->assert_equal("string condition+limit+order", $sql, "DELETE FROM \"products\" WHERE category = 1 ORDER BY \"id\" DESC LIMIT 10 ;");
+    
+    $sql = $db->delete('products', null, array('limit' => 10, 'order' => 'id ASC'));
+    $this->assert_equal("string order", $sql, "DELETE FROM \"products\" ORDER BY \"id\" ASC LIMIT 10 ;");
   }
 }
 

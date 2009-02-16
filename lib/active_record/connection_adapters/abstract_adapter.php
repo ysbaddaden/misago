@@ -408,24 +408,26 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   /**
    * Updates rows in a table.
    */
-  function update($table, $data, $conditions=null)
+  function update($table, $data, $conditions=null, $options=null)
   {
-    $table       = $this->quote_table($table);
-    $assignments = $this->sanitize_sql_for_assignment($data);
-    $where = empty($conditions) ? '' :
-      'WHERE '.$this->sanitize_sql_for_conditions($conditions);
-    return $this->execute("UPDATE $table SET $assignments $where ;");
+    $table = $this->quote_table($table);
+    $sets  = $this->sanitize_sql_for_assignment($data);
+    $where = empty($conditions)       ? '' : 'WHERE '.$this->sanitize_sql_for_conditions($conditions);
+    $order = empty($options['order']) ? '' : "ORDER BY ".$this->sanitize_order($options['order']);
+    $limit = empty($options['limit']) ? '' : $this->sanitize_limit($options['limit']);
+    return $this->execute("UPDATE $table SET $sets $where $order $limit ;");
   }
   
   /**
    * Deletes rows from a table.
    */
-  function delete($table, $conditions=null)
+  function delete($table, $conditions=null, $options=null)
   {
     $table = $this->quote_table($table);
-    $where = empty($conditions) ? '' :
-      'WHERE '.$this->sanitize_sql_for_conditions($conditions);
-    return $this->execute("DELETE FROM $table $where ;");
+    $where = empty($conditions)       ? '' : 'WHERE '.$this->sanitize_sql_for_conditions($conditions);
+    $order = empty($options['order']) ? '' : "ORDER BY ".$this->sanitize_order($options['order']);
+    $limit = empty($options['limit']) ? '' : $this->sanitize_limit($options['limit']);
+    return $this->execute("DELETE FROM $table $where $order $limit ;");
   }
 }
 
