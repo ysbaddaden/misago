@@ -20,8 +20,8 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     'bool'        => array('name' => 'BOOLEAN'),
     'binary'      => array('name' => 'BLOB'),
   );
-  public  $VALUE_TRUE = '0';
-  public  $VALUE_TRUE = '1';
+  public  $VALUE_FALSE = '0';
+  public  $VALUE_TRUE  = '1';
   private $link;
   
   function escape_value($value)

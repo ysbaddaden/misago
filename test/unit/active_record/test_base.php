@@ -269,7 +269,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_type("set a field to null", $product->updated_at, 'NULL');
     
     $product = new Product(1);
-    $this->assert_type("change must have been recorded", $product->updated_at, 'NULL');
+    $this->assert_type("null field must have been recorded", $product->updated_at, 'NULL');
     
     $product->price = 10.99;
     $product->name  = 'bepo';
@@ -297,7 +297,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_type("set a field to null", $product->updated_at, 'NULL');
     
     $product = new Product(1);
-    $this->assert_equal("set a field to null (recorded?)", $product->updated_at, null);
     $this->assert_type("set a field to null (recorded?)", $product->updated_at, 'NULL');
   }
 }

@@ -148,6 +148,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     if (!is_array($columns)) {
       $columns = explode(',', $columns);
     }
+    
     foreach($columns as $i => $column)
     {
       $column = trim($column);
@@ -161,6 +162,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       }
       $columns[$i] = $this->quote_column($column).$options;
     }
+    
     return implode(', ', $columns);
   }
   
