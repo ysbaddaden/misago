@@ -9,6 +9,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '"';
   public  $VALUE_QUOTE  = "'";
+  public  $VALUE_FALSE  = 'f';
+  public  $VALUE_TRUE   = 't';
+  public  $VALUE_NULL   = 'NULL';
   public  $NATIVE_DATABASE_TYPES = array();
   
   protected $config;
@@ -128,6 +131,15 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   function quote_value($value)
   {
+    if ($value === true) {
+      return $this->VALUE_TRUE;
+    }
+    elseif($value === false) {
+      return $this->VALUE_FALSE;
+    }
+    elseif($value === null) {
+      return $this->VALUE_NULL;
+    }
     return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
   }
   

@@ -84,6 +84,29 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $test = $db->quote_columns('misago.orders, products, tags');
     $this->assert_equal("", $test, '"misago"."orders", "products", "tags"');
   }
+  
+  function test_quote_value()
+  {
+    $db = new FakeAdapter(array());
+    
+    $test = $db->quote_value('azerty');
+    $this->assert_equal("string", $test, "'azerty'");
+    
+    $test = $db->quote_value('1.0');
+    $this->assert_equal("float", $test, "'1.0'");
+    
+    $test = $db->quote_value('1');
+    $this->assert_equal("integer", $test, "'1'");
+    
+    $test = $db->quote_value(true);
+    $this->assert_equal("boolean true", $test, 't');
+    
+    $test = $db->quote_value(false);
+    $this->assert_equal("boolean false", $test, 'f');
+    
+    $test = $db->quote_value(null);
+    $this->assert_equal("boolean false", $test, 'NULL');
+  }
 
   function test_new_table()
   {
