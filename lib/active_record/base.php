@@ -296,7 +296,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
    */
   function update_attributes($updates)
   {
-    if (is_hash($udpates))
+    # hash of fields => values
+    if (is_hash($updates))
     {
       foreach($updates as $attribute => $value) {
         $this->$attribute = $value;
@@ -304,12 +305,14 @@ class ActiveRecord_Base extends ActiveRecord_Record
       return $this->db->update($this->table_name, $updates);
     }
     
+    # list of fields
     if (is_string($updates)) {
       $updates = explode(',', str_replace(' ', '', $updates));
     }
     
     $_updates = array();
-    foreach($updates as $attribute) {
+    foreach($updates as $attribute)
+    {
       $_updates[$attribute] = $this->$attribute;
     }
     return $this->db->update($this->table_name, $_updates);

@@ -203,6 +203,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     );
   }
   
+  /*
   function test_update_attributes()
   {
     $product = new Product(1);
@@ -212,6 +213,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product(1);
     $this->assert_equal('change must have been recorded', $product->name, 'poiuyt');
   }
+  */
   
   function test_delete_all()
   {
@@ -249,6 +251,54 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = $product->first();
     $this->assert_equal("delete_all with limit+order", count($products), 1);
     $this->assert_equal("delete_all with limit+order", $product->name, 'qwerty');
+  }
+  
+  function test_update_attributes()
+  {
+    $product = new Product();
+    $product->delete_all();
+    $product = $product->create(array('id' => 1, 'name' => 'bepo', 'price' => 9.99));
+    
+    $product->update_attributes(array('price' => 10.95, 'name' => 'Bepo'));
+    $this->assert_equal("object must have been updated", array($product->name, $product->price), array('Bepo', 10.95));
+    
+    $product = new Product(1);
+    $this->assert_equal("changes must have been recorded", array($product->name, $product->price), array('Bepo', 10.95));
+    
+    $product->update_attributes(array('created_at' => null));
+    $this->assert_type("set a field to null", $product->updated_at, 'NULL');
+    
+    $product = new Product(1);
+    $this->assert_type("change must have been recorded", $product->updated_at, 'NULL');
+    
+    $product->price = 10.99;
+    $product->name  = 'bepo';
+    $product->update_attributes('name, price');
+    $product = new Product(1);
+    $this->assert_equal("update a list of fields (as string)", array($product->name, $product->price), array('bepo', 10.99));
+    
+    $product->price = 8.95;
+    $product->name  = 'Bepo';
+    $product->update_attributes(array('name', 'price'));
+    $product = new Product(1);
+    $this->assert_equal("update a list of fields (as array)", array($product->name, $product->price), array('Bepo', 8.95));
+  }
+  
+  function test_update_attribute()
+  {
+    $product = new Product(1);
+    $product->update_attribute('updated_at', '2008-12-31 00:00:01');
+    $this->assert_equal("basic update", $product->updated_at, '2008-12-31 00:00:01');
+    
+    $product = new Product(1);
+    $this->assert_equal("basic update (recorded?)", $product->updated_at, '2008-12-31 00:00:01');
+    
+    $product->update_attribute('updated_at', null);
+    $this->assert_type("set a field to null", $product->updated_at, 'NULL');
+    
+    $product = new Product(1);
+    $this->assert_equal("set a field to null (recorded?)", $product->updated_at, null);
+    $this->assert_type("set a field to null (recorded?)", $product->updated_at, 'NULL');
   }
 }
 
