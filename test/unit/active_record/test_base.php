@@ -210,6 +210,9 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product = new Product(1);
     $this->assert_false("new Product(id)", $product->new_record);
+    
+    $products = $product->all();
+    $this->assert_false("new Product(id)", $products[0]->new_record);
   }
   
   function test_save()
