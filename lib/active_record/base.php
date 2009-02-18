@@ -55,9 +55,11 @@ class ActiveRecord_Base extends ActiveRecord_Record
     foreach($arg as $attribute => $value) {
       $this->$attribute = $value;
     }
+    /*
     if ($new_record === true or $new_record === false) {
       $this->new_record = $new_record;
     }
+    */
   }
   
   function __set($attribute, $value)
@@ -208,12 +210,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
    */
   function save()
   {
-    if ($this->new_record) {
-      $this->_create();
-    }
-    else {
-      $this->_update();
-    }
+    $method = $this->new_record ? '_create' : '_update';
+    return (bool)$this->$method();
   }
   
   protected function _create()

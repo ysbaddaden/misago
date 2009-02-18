@@ -203,20 +203,36 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     );
   }
   
-  /*
-  function test_update_attributes()
+  function test_new_record()
   {
-    $product = new Product(1);
-    $product->update_attribute('name', 'poiuyt');
-    $this->assert_equal('name must have changed', $product->name, 'poiuyt');
+    $product = new Product(array('name' => 'mwerty', 'price' => 6));
+    $this->assert_true("new Product(attributes)", $product->new_record);
     
     $product = new Product(1);
-    $this->assert_equal('change must have been recorded', $product->name, 'poiuyt');
+    $this->assert_false("new Product(id)", $product->new_record);
   }
-  */
+  
+  function test_save()
+  {
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db->execute('TRUNCATE products ;');
+    
+    # save: create
+    $product = new Product(array('name' => 'mwerty', 'price' => 6));
+    $this->assert_true("before creation: is a new record", $product->new_record);
+    $this->assert_true("creates record", $product->save());
+    $this->assert_false("after creation: isn't a new record", $product->new_record);
+    
+    # save: update
+    $product->name = 'pwerty';
+    $this->assert_true("updates record", $product->save());
+  }
   
   function test_delete_all()
   {
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db->execute('TRUNCATE products ;');
+    
     $data1   = array('name' => "qwerty", 'price' =>  5.98);
     $data2   = array('name' => "bepo",   'price' => 10.55);
     $product = new Product();
@@ -229,7 +245,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product->create($data1, $data2);
     
-    $product->delete_all('id = 4');
+    $product->delete_all('id = 1');
     $product = $product->first();
     $this->assert_equal("delete_all with conditions", $product->name, 'bepo');
     
