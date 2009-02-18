@@ -65,6 +65,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   }
   
   # IMPROVE: Add some error logging (in 'production' environment).
+  # IMPROVE: SQL requests direct log in HTML (currently only for command line).
   function execute($sql)
   {
     if (isset($_ENV['MISAGO_DEBUG']) and $_ENV['MISAGO_DEBUG'] == 2) {
