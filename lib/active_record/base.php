@@ -205,8 +205,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   /**
    * Creates or updates the record.
-   * 
-   * TODO: Test ActiveRecord::Base::save();
    */
   function save()
   {
@@ -225,7 +223,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     return false;
   }
   
-  # TODO: Test ActiveRecord::Base::_update();
   protected function _update()
   {
     $conditions = array($this->primary_key => $this->{$this->primary_key});
@@ -257,7 +254,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
       $class  = get_class($this);
       $record = new $class($attributes);
       
-      # FIXME: How can it work? _create() is a protected method (and it's not Ruby)!
+      # NOTE: Amazing! You can call a protected method outside an object, but within the same class?
       if ($record->_create()) {
         return $record;
       }
