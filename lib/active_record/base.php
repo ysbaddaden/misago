@@ -2,6 +2,8 @@
 /**
  * 
  * @package ActiveRecord
+ *
+ * TODO: Test new_record.
  */
 class ActiveRecord_Base extends ActiveRecord_Record
 {
@@ -10,6 +12,12 @@ class ActiveRecord_Base extends ActiveRecord_Record
   protected $table_name;
   protected $primary_key = 'id';
   protected $columns     = array();
+  
+  /**
+   * Must be treated as protected.
+   */
+  public $new_record  = true;
+  
   
   function __construct($arg=null)
   {
@@ -20,7 +28,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     # columns' definition
     $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
     $this->columns = apc_fetch($apc_key, $success);
-    
     if ($success === false)
     {
       $this->columns = $this->db->columns($this->table_name);
@@ -30,17 +37,26 @@ class ActiveRecord_Base extends ActiveRecord_Record
     # args
     if ($arg !== null)
     {
-      if (!is_array($arg)) {
+      if (!is_array($arg))
+      {
         $arg = $this->find($arg);
+        $this->new_record = false;
       }
       $this->set_attributes($arg);
     }
   }
   
-  function set_attributes($arg)
+  /**
+   * Sets the record's attributes.
+   * Warning: should be treated as a protected method.
+   */
+  function set_attributes($arg/*, $new_record=null*/)
   {
     foreach($arg as $attribute => $value) {
       $this->$attribute = $value;
+    }
+    if ($new_record === true or $new_record === false) {
+      $this->new_record = $new_record;
     }
   }
   
@@ -52,18 +68,23 @@ class ActiveRecord_Base extends ActiveRecord_Record
       {
         case 'integer': $value = (int)$value;    break;
         case 'double':  $value = (double)$value; break;
+#        case 'boolean': $value = (boolean)$value; break;
       }
     }
     return parent::__set($attribute, $value);
   }
   
-  # Returns the definition of columns for the table associated with this class.
+  /**
+   * Returns the definition of columns for the table associated with this class.
+   */
   function columns()
   {
     return $this->columns;
   }
   
-  # Returns the list of column names for the table associated with this class.
+  /**
+   * Returns the list of column names for the table associated with this class.
+   */
   function & column_names()
   {
     $column_names = array_keys($this->table_columns);
@@ -85,7 +106,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
    *   - page (integer)
    * 
    * TODO: Add some options: group, joins, from.
-   * TODO: Add scope :last (how is that doable?).
+   * IMPROVE: Add scope :last (how is that doable?).
    */
   function & find($scope=':all', $options=null)
   {
@@ -139,15 +160,25 @@ class ActiveRecord_Base extends ActiveRecord_Record
       case ':all':
         $results = $this->db->select_all($sql);
         $records = array();
-        foreach($results as $result) {
-          $records[] = new $class($result);
+        foreach($results as $result)
+        {
+          $record = new $class($result);
+          $record->new_record = false;
+          $records[] = $record;
         }
         return $records;
       break;
       
       case ':first':
         $result = $this->db->select_one($sql);
-        $record = $result ? new $class($result) : null;
+        if ($result)
+        {
+          $record = new $class($result);
+          $record->new_record = false;
+        }
+        else {
+          $record = null;
+        }
         return $record;
       break;
     }
@@ -169,8 +200,42 @@ class ActiveRecord_Base extends ActiveRecord_Record
     return $this->find(':first', $options);
   }
   
+  
   /**
-   * Creates a new record (saved in database).
+   * Creates or updates the record.
+   * 
+   * TODO: Test ActiveRecord::Base::save();
+   */
+  function save()
+  {
+    if ($this->new_record) {
+      $this->_create();
+    }
+    else {
+      $this->_update();
+    }
+  }
+  
+  protected function _create()
+  {
+    $id = $this->db->insert($this->table_name, $this->__attributes, $this->primary_key);
+    if ($id)
+    {
+      $this->new_record = false;
+      return $this->{$this->primary_key} = $id;
+    }
+    return false;
+  }
+  
+  # TODO: Test ActiveRecord::Base::_update();
+  protected function _update()
+  {
+    $conditions = array($this->primary_key => $this->{$this->primary_key});
+    return $this->db->update($this->table_name, $this->__attributes, $conditions);
+  }
+  
+  /**
+   * Creates a new record.
    * 
    * <code>
    * $user  = $user->create(array('name' => 'John'));
@@ -194,6 +259,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
       $class  = get_class($this);
       $record = new $class($attributes);
       
+      # FIXME: How can it work? _create() is a protected method (and it's not Ruby)!
       if ($record->_create()) {
         return $record;
       }
@@ -245,15 +311,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
   }
   
-  private function _create()
-  {
-    $id = $this->db->insert($this->table_name, $this->__attributes, $this->primary_key);
-    if ($id) {
-      return $this->{$this->primary_key} = $id;
-    }
-    return false;
-  }
-  
   /**
    * Updates one attribute of record.
    *
@@ -264,9 +321,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * 
    * $post->update_attribute('name', 'my first post [update 2]');
    * </code>
-   * 
-   * TODO: Test update_attribute().
-   * TODO: Test update_attribute() with a NULL value.
    */
   function update_attribute($attribute, $value=null)
   {
@@ -290,9 +344,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
    *   'category' => 3
    * ));
    * </code>
-   * 
-   * TODO: Test update_attributes().
-   * TODO: Test update_attributes() with a NULL value.
    */
   function update_attributes($updates)
   {
