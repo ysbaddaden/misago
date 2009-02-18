@@ -67,7 +67,9 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   # IMPROVE: Add some error logging (in 'production' environment).
   function execute($sql)
   {
-#    echo "\n$sql";
+    if (isset($_ENV['MISAGO_DEBUG']) and $_ENV['MISAGO_DEBUG'] == 2) {
+      echo "\n$sql";
+    }
     
     $rs = mysql_query($sql, $this->link);
     if (!$rs)

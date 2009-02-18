@@ -10,6 +10,10 @@ ini_set('include_path',
 	ini_get('include_path').PATH_SEPARATOR
 );
 
+#if (isset($_ENV['MISAGO_DEBUG'])) {
+#  define('DEBUG', $_ENV['MISAGO_DEBUG']);
+#}
+
 #require 'object.php';
 require 'active_support/string.php';
 require 'active_support/array.php';
