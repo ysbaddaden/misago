@@ -121,9 +121,28 @@ class ActionController_Routing extends Object
     return $mapping;
   }
   
-  # TODO: There is a lot thing of things to do in Routing::reverse().
+  # FIXME: Fix default route with missing parameters.
   function reverse(array $mapping)
   {
+    foreach($this->routes as $route)
+    {
+      if ((isset($route['mapping'][':controller']) and $mapping[':controller'] == $route['mapping'][':controller'])
+        or strpos($route['path'], ':controller') !== false)
+      {
+        if ((isset($route['mapping'][':action']) and $mapping[':action'] == $route['mapping'][':action'])
+          or strpos($route['path'], ':action') !== false)
+        {
+          $path = strtr($route['path'], $mapping);
+          
+          
+          return "/$path";
+        }
+      }
+    }
+    
+    throw new MisagoException("No route for: ".print_r($mapping, true), 500);
+    
+  /*
     $mapping = array_merge(array(
       ':controller' => '',
       ':action'     => '',
@@ -157,6 +176,7 @@ class ActionController_Routing extends Object
     }
     
     return "/$path";
+  */
   }
 }
 
