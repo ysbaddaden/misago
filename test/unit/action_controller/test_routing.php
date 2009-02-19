@@ -277,6 +277,12 @@ class Test_ActionController_Routing extends Unit_Test
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
     $this->assert_equal("build route", $map->reverse($mapping), '/page/toto.json');
   }
+  
+  function test_path_for()
+  {
+    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
+    $this->assert_equal("build route", path_for($mapping), '/page/toto.json');
+  }
 }
 
 new Test_ActionController_Routing();

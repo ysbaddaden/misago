@@ -203,4 +203,21 @@ class ActionController_Routing extends Object
   }
 }
 
+/**
+ * Returns the path for a given mapping.
+ * 
+ * <code>
+ * $path = path_for(array(':controller' => 'products'));
+ * $path = path_for('product_index');
+ * </code>
+ */
+function path_for($mapping, array $keys=null)
+{
+  $map = ActionController_Routing::draw();
+  if (is_array($mapping)) {
+    return $map->reverse($mapping);
+  }
+  return $map->named_reverse($name, $keys);
+}
+
 ?>
