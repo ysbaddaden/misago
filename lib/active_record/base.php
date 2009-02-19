@@ -2,8 +2,6 @@
 /**
  * 
  * @package ActiveRecord
- *
- * TODO: Test new_record.
  */
 class ActiveRecord_Base extends ActiveRecord_Record
 {
@@ -16,8 +14,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   /**
    * Must be treated as protected.
    */
-  public $new_record  = true;
-  
+  protected $new_record  = true;
   
   function __construct($arg=null)
   {

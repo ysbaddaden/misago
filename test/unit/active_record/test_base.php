@@ -206,13 +206,13 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   function test_new_record()
   {
     $product = new Product(array('name' => 'mwerty', 'price' => 6));
-    $this->assert_true("new Product(attributes)", $product->new_record);
+    $this->assert_true("new Product(attributes)", $product->new_record());
     
     $product = new Product(1);
-    $this->assert_false("new Product(id)", $product->new_record);
+    $this->assert_false("new Product(id)", $product->new_record());
     
     $products = $product->all();
-    $this->assert_false("new Product(id)", $products[0]->new_record);
+    $this->assert_false("new Product(id)", $products[0]->new_record());
   }
   
   function test_save()
@@ -222,9 +222,9 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     # save: create
     $product = new Product(array('name' => 'mwerty', 'price' => 6));
-    $this->assert_true("before creation: is a new record", $product->new_record);
+    $this->assert_true("before creation: is a new record", $product->new_record());
     $this->assert_true("creates record", $product->save());
-    $this->assert_false("after creation: isn't a new record", $product->new_record);
+    $this->assert_false("after creation: isn't a new record", $product->new_record());
     
     # save: update
     $product->name = 'pwerty';
