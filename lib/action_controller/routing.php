@@ -1,8 +1,7 @@
 <?php
 
-/// TODO: Reverse Routing: Mapping => URL
-/// TODO: Polymorphic URL Generation
-/// TODO: Named routes
+# TODO: Polymorphic URL Generation
+# TODO: Named routes
 class ActionController_Routing extends Object
 {
   private $routes          = array();
@@ -16,7 +15,9 @@ class ActionController_Routing extends Object
   );
   private static $map;
   
-  /// Singleton
+  /**
+   * Singleton
+   */
   static function draw()
   {
     if (self::$map === null) {
@@ -25,11 +26,17 @@ class ActionController_Routing extends Object
     return self::$map;
   }
   
+  /**
+   * Empties the routes.
+   */
   function reset()
   {
     $this->routes = array();
   }
   
+  /**
+   * Connects a path to a mapping.
+   */
   function connect($path, $mapping=array())
   {
     $regexp = $path;
@@ -50,14 +57,29 @@ class ActionController_Routing extends Object
     );
     $regexp = preg_replace(array_keys($rules), array_values($rules), $regexp);
     
+    $keys = array();
+    foreach(preg_split('/[\.\/\?]/', $path, -1, PREG_SPLIT_NO_EMPTY) as $key)
+    {
+      if ($key[0] == ':'
+        and $key != ':controller'
+        and $key != ':action'
+        and $key != ':format')
+      {
+        $keys[] = $key;
+      }
+    }
+    
     $this->routes[] = array(
       'path'     => $path,
       'regexp'   => "#^$regexp$#u",
       'mapping'  => &$mapping,
+      'keys'     => &$keys,
     );
   }
   
-  /// Connects the homepage
+  /**
+   * Connects the homepage
+   */
   function root(array $mapping)
   {
     foreach($this->routes as $i => $route)
@@ -69,7 +91,9 @@ class ActionController_Routing extends Object
     $this->connect('', &$mapping);
   }
   
-  /// Builds RESTful connections
+  /**
+   * Builds RESTful connections
+   */
   function resource($name)
   {
     $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'index',   'conditions' => array('method' => 'GET')));
@@ -80,6 +104,9 @@ class ActionController_Routing extends Object
     $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'destroy', 'conditions' => array('method' => 'DELETE')));
   }
   
+  /**
+   * Returns a mapping for a given method+path.
+   */
   function & route($method, $uri)
   {
     $uri = trim($uri, '/');
@@ -121,62 +148,58 @@ class ActionController_Routing extends Object
     return $mapping;
   }
   
-  # FIXME: Fix default route with missing parameters.
+  /**
+   * Returns a path for a given mapping.
+   * 
+   * FIXME: Handle special requirements for keys.
+   */
   function reverse(array $mapping)
   {
+    $_mapping = array_merge(array(
+      ':controller' => '',
+      ':action'     => 'index',
+    ), $mapping);
+    
     foreach($this->routes as $route)
     {
-      if ((isset($route['mapping'][':controller']) and $mapping[':controller'] == $route['mapping'][':controller'])
+      # has controller?
+      if ((isset($route['mapping'][':controller']) and $_mapping[':controller'] == $route['mapping'][':controller'])
         or strpos($route['path'], ':controller') !== false)
       {
-        if ((isset($route['mapping'][':action']) and $mapping[':action'] == $route['mapping'][':action'])
+        # has action?
+        if ((isset($route['mapping'][':action']) and $_mapping[':action'] == $route['mapping'][':action'])
           or strpos($route['path'], ':action') !== false)
         {
-          $path = strtr($route['path'], $mapping);
+          # has keys?
+          if ($this->has_keys(&$route, &$_mapping))
+          {
+            $path = strtr($route['path'], $_mapping);
+            $path = str_replace(array('/:format', '.:format', '?:format'), '', $path);
+            return "/$path";
+          }
           
-          
-          return "/$path";
+          # default
+          $path = ($_mapping[':action'] == 'index') ?
+            "/{$_mapping[':controller']}" :
+            "/{$_mapping[':controller']}/{$_mapping[':action']}";
+          return isset($_mapping[':format']) ? "$path.{$_mapping[':format']}" : $path;
         }
       }
     }
-    
     throw new MisagoException("No route for: ".print_r($mapping, true), 500);
-    
-  /*
-    $mapping = array_merge(array(
-      ':controller' => '',
-      ':action'     => '',
-      ':format'     => '',
-    ), $mapping);
-    $path = "";
-    
-    # FIXME: Find the good route and break the loop.
-    foreach($this->routes as $route)
+  }
+  
+  private function has_keys($route, $mapping)
+  {
+    foreach($route['keys'] as $key)
     {
-      $path = $route['path'];
-      
-      $replace = array();
-      if (empty($mapping[':format'])) {
-        $replace[] = ':format';
-      }
-      if (empty($mapping[':id'])) {
-        $replace[] = ':id';
-      }
-      if (empty($mapping[':action'])) {
-        $replace[] = ':action';
-      }
-      if (!empty($replace)) {
-        $path = preg_replace('/[\/\.\?](?:'.implode('|', $replace).')/', '', $path);
-      }
-      
-      $path = strtr($path, $mapping);
-      if (strpos($path, ':') === false) {
+      if (!isset($mapping[$key]))
+      {
+        return false;
         break;
       }
     }
-    
-    return "/$path";
-  */
+    return true;
   }
 }
 
