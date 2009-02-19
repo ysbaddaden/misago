@@ -230,8 +230,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     {
       $class  = get_class($this);
       $record = new $class($attributes);
-      
-      # NOTE: Amazing! You can call a protected method outside an object, but within the same class?
       if ($record->_create()) {
         return $record;
       }

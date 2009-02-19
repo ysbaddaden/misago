@@ -4,9 +4,6 @@ $_ENV['MISAGO_ENV'] = 'test';
 $location = dirname(__FILE__).'/../../..';
 
 require_once "$location/test/test_app/config/boot.php";
-#require_once "$location/lib/misago_exception.php";
-#require_once "$location/lib/unit/test.php";
-#require_once "$location/lib/action_controller/routing.php";
 
 class Test_ActionController_Routing extends Unit_Test
 {
@@ -247,6 +244,17 @@ class Test_ActionController_Routing extends Unit_Test
     catch(Exception $e) {
       $this->assert_true('/page/test456', true);
     }
+  }
+  
+  function test_reverse()
+  {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->connect(':controller/:action/:id.:format');
+    
+    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 456);
+    $path = $map->reverse($mapping);
+    $this->assert_equal("", $path, '/pages/show/456');
   }
 }
 

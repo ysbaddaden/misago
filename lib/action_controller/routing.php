@@ -51,9 +51,9 @@ class ActionController_Routing extends Object
     $regexp = preg_replace(array_keys($rules), array_values($rules), $regexp);
     
     $this->routes[] = array(
-      'path'    => $path,
-      'regexp'  => "#^$regexp$#u",
-      'mapping' => &$mapping,
+      'path'     => $path,
+      'regexp'   => "#^$regexp$#u",
+      'mapping'  => &$mapping,
     );
   }
   
@@ -119,6 +119,30 @@ class ActionController_Routing extends Object
     
     $mapping[':method'] = $method;
     return $mapping;
+  }
+  
+  function reverse(array $mapping)
+  {
+    $mapping = array_merge(array(
+      ':controller' => '',
+      ':action'     => '',
+      ':format'     => '',
+    ), $mapping);
+    
+    print_r($mapping);
+    
+    foreach($this->routes as $route)
+    {
+      print_r($route);
+    /*
+      if ($route[':controller'] == $mapping[':controller']
+        and $route[':action'] == $mapping[':action'])
+      {
+        return $route['path'];
+      }
+     */
+    }
+    return '/';
   }
 }
 
