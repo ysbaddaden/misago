@@ -121,6 +121,7 @@ class ActionController_Routing extends Object
     return $mapping;
   }
   
+  # TODO: There is a lot thing of things to do in Routing::reverse().
   function reverse(array $mapping)
   {
     $mapping = array_merge(array(
@@ -128,21 +129,26 @@ class ActionController_Routing extends Object
       ':action'     => '',
       ':format'     => '',
     ), $mapping);
+    $path = "";
     
-    print_r($mapping);
-    
+    # FIXME: Find the good route and break the loop.
+    # OPTIMIZE: Factorize all preg_replace into a single one.
     foreach($this->routes as $route)
     {
-      print_r($route);
-    /*
-      if ($route[':controller'] == $mapping[':controller']
-        and $route[':action'] == $mapping[':action'])
-      {
-        return $route['path'];
+      $path = $route['path'];
+      if (empty($mapping[':format'])) {
+        $path = preg_replace('/[\.\/]:format/', '', $path);
       }
-     */
+      if (empty($mapping[':id'])) {
+        $path = preg_replace('/[\.\/]:id/', '', $path);
+      }
+      if (empty($mapping[':action'])) {
+        $path = preg_replace('/[\.\/]:action/', '', $path);
+      }
+      $path = strtr($path, $mapping);
     }
-    return '/';
+    
+    return "/$path";
   }
 }
 

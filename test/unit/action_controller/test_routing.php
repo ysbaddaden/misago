@@ -252,9 +252,17 @@ class Test_ActionController_Routing extends Unit_Test
     $map->reset();
     $map->connect(':controller/:action/:id.:format');
     
+    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 456, ':format' => 'html');
+    $this->assert_equal("", $map->reverse($mapping), '/pages/show/456.html');
+    
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 456);
-    $path = $map->reverse($mapping);
-    $this->assert_equal("", $path, '/pages/show/456');
+    $this->assert_equal("", $map->reverse($mapping), '/pages/show/456');
+    
+    $mapping = array(':controller' => 'pages', ':action' => 'create');
+    $this->assert_equal("", $map->reverse($mapping), '/pages/create');
+    
+    $mapping = array(':controller' => 'pages');
+    $this->assert_equal("", $map->reverse($mapping), '/pages');
   }
 }
 
