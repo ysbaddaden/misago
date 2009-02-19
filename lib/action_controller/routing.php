@@ -132,20 +132,28 @@ class ActionController_Routing extends Object
     $path = "";
     
     # FIXME: Find the good route and break the loop.
-    # OPTIMIZE: Factorize all preg_replace into a single one.
     foreach($this->routes as $route)
     {
       $path = $route['path'];
+      
+      $replace = array();
       if (empty($mapping[':format'])) {
-        $path = preg_replace('/[\.\/]:format/', '', $path);
+        $replace[] = ':format';
       }
       if (empty($mapping[':id'])) {
-        $path = preg_replace('/[\.\/]:id/', '', $path);
+        $replace[] = ':id';
       }
       if (empty($mapping[':action'])) {
-        $path = preg_replace('/[\.\/]:action/', '', $path);
+        $replace[] = ':action';
       }
+      if (!empty($replace)) {
+        $path = preg_replace('/[\/\.\?](?:'.implode('|', $replace).')/', '', $path);
+      }
+      
       $path = strtr($path, $mapping);
+      if (strpos($path, ':') === false) {
+        break;
+      }
     }
     
     return "/$path";

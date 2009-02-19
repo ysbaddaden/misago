@@ -253,16 +253,33 @@ class Test_ActionController_Routing extends Unit_Test
     $map->connect(':controller/:action/:id.:format');
     
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 456, ':format' => 'html');
-    $this->assert_equal("", $map->reverse($mapping), '/pages/show/456.html');
+    $this->assert_equal("default: full", $map->reverse($mapping), '/pages/show/456.html');
     
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 456);
-    $this->assert_equal("", $map->reverse($mapping), '/pages/show/456');
+    $this->assert_equal("default: controller/action/id", $map->reverse($mapping), '/pages/show/456');
     
     $mapping = array(':controller' => 'pages', ':action' => 'create');
-    $this->assert_equal("", $map->reverse($mapping), '/pages/create');
+    $this->assert_equal("default: controller/action", $map->reverse($mapping), '/pages/create');
     
     $mapping = array(':controller' => 'pages');
-    $this->assert_equal("", $map->reverse($mapping), '/pages');
+    $this->assert_equal("default: controller", $map->reverse($mapping), '/pages');
+    
+    
+    $map->reset();
+    $map->connect('page/:id', array(':controller' => 'pages', ':action' => 'show'));
+    $map->connect(':controller/:action/:id.:format');
+    
+    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto');
+    $this->assert_equal("choose the appropriate route", $map->reverse($mapping), '/page/toto');
+    
+    /*
+    $map->reset();
+    $map->connect('page/:id', array(':controller' => 'pages', ':action' => 'show'));
+    $map->connect(':controller/:action/:id.:format');
+    
+    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto');
+    $this->assert_equal("choose the appropriate route", $map->reverse($mapping), '/page/toto');
+    */
   }
 }
 
