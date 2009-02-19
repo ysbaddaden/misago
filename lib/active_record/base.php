@@ -6,15 +6,12 @@
 class ActiveRecord_Base extends ActiveRecord_Record
 {
   protected $db;
-  
   protected $table_name;
   protected $primary_key = 'id';
   protected $columns     = array();
   
-  /**
-   * Must be treated as protected.
-   */
   protected $new_record  = true;
+  
   
   function __construct($arg=null)
   {
@@ -45,18 +42,12 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   /**
    * Sets the record's attributes.
-   * Warning: should be treated as a protected method.
    */
-  function set_attributes($arg/*, $new_record=null*/)
+  protected function set_attributes($arg)
   {
     foreach($arg as $attribute => $value) {
       $this->$attribute = $value;
     }
-    /*
-    if ($new_record === true or $new_record === false) {
-      $this->new_record = $new_record;
-    }
-    */
   }
   
   function __set($attribute, $value)
@@ -67,27 +58,10 @@ class ActiveRecord_Base extends ActiveRecord_Record
       {
         case 'integer': $value = (int)$value;    break;
         case 'double':  $value = (double)$value; break;
-#        case 'boolean': $value = (boolean)$value; break;
+        case 'boolean': $value = (bool)$value;   break;
       }
     }
     return parent::__set($attribute, $value);
-  }
-  
-  /**
-   * Returns the definition of columns for the table associated with this class.
-   */
-  function columns()
-  {
-    return $this->columns;
-  }
-  
-  /**
-   * Returns the list of column names for the table associated with this class.
-   */
-  function & column_names()
-  {
-    $column_names = array_keys($this->table_columns);
-    return $column_names;
   }
   
   /**
@@ -100,11 +74,13 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * Options:
    *   - select (collection)
    *   - conditions (string, array or hash)
+   *   - group (collection)
    *   - order (collection)
    *   - limit (integer)
    *   - page (integer)
    * 
-   * TODO: Add some options: group, joins, from.
+   * TODO: Add some options: joins, from.
+   * TODO: Test option 'group'.
    * IMPROVE: Add scope :last (how is that doable?).
    */
   function & find($scope=':all', $options=null)
@@ -135,14 +111,18 @@ class ActiveRecord_Base extends ActiveRecord_Record
     $table  = $this->db->quote_table($this->table_name);
     $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
     $where  = '';
+    $group  = '';
     $order  = '';
     $limit  = '';
     
     if (!empty($options['conditions'])) {
       $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
     }
+    if (!empty($options['group'])) {
+      $group = 'GROUP BY '.$this->db->sanitize_order($options['group']);
+    }
     if (!empty($options['order'])) {
-      $where = 'ORDER BY '.$this->db->sanitize_order($options['order']);
+      $order = 'ORDER BY '.$this->db->sanitize_order($options['order']);
     }
     if (isset($options['limit']))
     {
@@ -150,7 +130,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-    $sql = "SELECT $select FROM $table $where $order $limit ;";
+    $sql = "SELECT $select FROM $table $where $group $order $limit ;";
     
     # queries then creates objects
     $class = get_class($this);

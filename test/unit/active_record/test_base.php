@@ -113,6 +113,20 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal("", $product->name, 'qwerty');
   }
   
+  function test_with_all_options()
+  {
+    $product = new Product();
+    
+    $options = array('conditions' => 'id > 1', 'order' => 'name desc');
+    $products = $product->find(':all', $options);
+    $this->assert_equal("results count", count($products), 2);
+    
+    $options = array('conditions' => 'id > 1', 'order' => 'id asc', 'limit' => 1);
+    $products = $product->find(':all', $options);
+    $this->assert_equal("only one result", count($products), 1);
+    $this->assert_equal("must have skip first", $products[0]->id, 2);
+  }
+  
   function test_find_id()
   {
     $product = new Product();
