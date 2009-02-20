@@ -203,23 +203,41 @@ class ActionController_Routing extends Object
     return true;
   }
   
+  /**
+   * Creates helper functions like 'edit_product_url()' for easy path and url generations.
+   */
   function build_path_and_url_helpers()
   {
+    $functions = '';
+    
     foreach($this->routes as $route)
     {
-      if (isset($route['mapping'][':controller']))
+      if (strpos($route['mapping'][':controller'], ':controller'))
       {
-        $controller = $route['mapping'][':controller'];
-        $model      = String::singularize($controller);
-        
-        if (isset($route['mapping'][':action'])) {
+        # implicit controllers: let's get them
+        $controllers = $this->get_list_of_controllers();
+      }
+      elseif (isset($route['mapping'][':controller']))
+      {
+        # explicit controller
+        $controllers = array($route['mapping'][':controller']);
+      }
+      
+      foreach($controllers as $controller)
+      {
+        if (isset($route['mapping'][':action']))
+        {
+          # explicit action
           $actions = array($route['mapping'][':action']);
         }
-        elseif (strpos($route['path'], ':action')) {
+        elseif (strpos($route['path'], ':action'))
+        {
+          # implicit actions: let's get them
           $actions = $this->extract_actions_from_controller($controller);
         }
         
-        $functions = '';
+        $model = String::singularize($controller);
+        
         foreach($actions as $action)
         {
           $func_base_name = ($action == 'index') ? $controller : "{$action}_{$model}";
@@ -231,41 +249,30 @@ class ActionController_Routing extends Object
             "return FULL_BASE_URL.{$func_base_name}_path(\$keys);\n".
             "}";
         }
-        eval($functions);
       }
     }
-    /*
-    $routes      = array();
-    $controllers = array();
-    
-    foreach($this->routes as $route)
-    {
-      if (isset($route['mapping'][':controller']))
-      {
-        $controller = $route['mapping'][':controller'];
-        if (isset($route['mapping'][':action'])) {
-          $action = $route['mapping'][':action'];
-        }
-        $routes[] = array($controller, $action);
-      }
-      else
-      {
-        $dh = opendir(ROOT.'/app/controllers/');
-        while(($file = readdir($dh)) !== false)
-        {
-          if (is_file(ROOT.'/app/controllers/'.$file)
-          {
-            $controllers[] = str_replace('.php', '', $controller);
-          }
-        }
-        $controllers = array();
-      }
-      print_r($controllers);
-    }
-    */
+    eval($functions);
   }
   
-  function & extract_actions_from_controller($controller)
+  private function & get_list_of_controllers()
+  {
+    $controllers = array();
+    
+    $dh = opendir(ROOT.'/app/controllers/');
+    if ($dh)
+    {
+      while(($file = readdir($dh)) !== false)
+      {
+        if (is_file(ROOT.'/app/controllers/'.$file) {
+          $controllers[] = str_replace('.php', '', $controller);
+        }
+      }
+      closedir($dh);
+    }
+    return $controllers;
+  }
+  
+  private function & extract_actions_from_controller($controller)
   {
     require_once "controllers/$controller.php";
     $actions = get_class_methods(String::camelize($controller));
