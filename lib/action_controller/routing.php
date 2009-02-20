@@ -248,7 +248,6 @@ class ActionController_Routing extends Object
           # implicit action
           $actions = $this->extract_actions_from_controller($controller);
         }
-        
         if (empty($actions)) {
           continue;
         }
@@ -262,37 +261,8 @@ class ActionController_Routing extends Object
           if (isset($functions["{$func_base_name}_path"])) {
             continue;
           }
-          
-          # path
-          $func = "function {$func_base_name}_path(\$keys=array())\n{\n";
-          
-          if (strpos($route['path'], ':controller') !== false) {
-            $func .= "  \$keys[':controller'] = '$controller';\n";
-          }
-          if (strpos($route['path'], ':action') !== false) {
-            $func .= "  \$keys[':action'] = '$action';\n";
-          }
-          
-          $func .= "  \$path = strtr('{$route['path']}', \$keys);\n";
-          
-          if ($route['default']) {
-            $func .= "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n";
-          }
-          else {
-            $func .= "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
-          }
-          
-          $func .= "  return \$path;\n";
-          $func .= "}";
-          
-          $functions["{$func_base_name}_path"] = $func;
-          
-          # url
-          $func  = "function {$func_base_name}_url(\$keys=array()) {\n";
-          $func .= "  return '/'.{$func_base_name}_path(\$keys);\n";
-          $func .= "}";
-          
-          $functions["{$func_base_name}_url"] = $func;
+          $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action);
+          $functions["{$func_base_name}_url"]  = $this->build_url_function($func_base_name);
         }
       }
     }
@@ -304,6 +274,36 @@ class ActionController_Routing extends Object
     }
     
     eval($functions);
+  }
+  
+  private function build_path_function($func_base_name, $route, $controller, $action)
+  {
+    $func = "function {$func_base_name}_path(\$keys=array())\n{\n";
+    
+    if (strpos($route['path'], ':controller') !== false) {
+      $func .= "  \$keys[':controller'] = '$controller';\n";
+    }
+    if (strpos($route['path'], ':action') !== false) {
+      $func .= "  \$keys[':action'] = '$action';\n";
+    }
+    $func .= "  \$path = strtr('{$route['path']}', \$keys);\n";
+    
+    $func .= $route['default'] ?
+      "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n" :
+      "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
+    
+    $func .= "  return \$path;\n";
+    $func .= "}";
+    
+    return $func;
+  }
+  
+  private function build_url_function($func_base_name)
+  {
+    $func  = "function {$func_base_name}_url(\$keys=array()) {\n";
+    $func .= "  return '/'.{$func_base_name}_path(\$keys);\n";
+    $func .= "}";
+    return $func;
   }
   
   private function & get_list_of_controllers()
