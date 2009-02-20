@@ -36,6 +36,8 @@ class ActionController_Routing extends Object
   
   /**
    * Connects a path to a mapping.
+   * 
+   * TODO: Recognize a default route (ie. mapping is empty, thus it's a default route).
    */
   function connect($path, $mapping=array())
   {
@@ -204,7 +206,15 @@ class ActionController_Routing extends Object
   }
   
   /**
-   * Creates helper functions like 'edit_product_url()' for easy path and url generations.
+   * Creates helper functions to build paths and URL from routing definition (aka reverse routing).
+   * 
+   * For instance the route 'product/:id' => {:controller => 'products', :action => 'show'}
+   * will make the 'show_product_path()' and 'show_product_url()' functions available.
+   * 
+   * IMPROVE: Generate named route URL builders.
+   * IMPROVE: Recognize keys' special requirements (?)
+   * OPTIMIZE: Cache generated code (into a PHP file on disk, or in memory with APC).
+   * FIXME: Cleanup missing keys on default routes.
    */
   function build_path_and_url_helpers()
   {
@@ -212,7 +222,7 @@ class ActionController_Routing extends Object
     
     foreach($this->routes as $route)
     {
-      if (strpos($route['mapping'][':controller'], ':controller'))
+      if (strpos($route['path'], ':controller') !== false)
       {
         # implicit controllers: let's get them
         $controllers = $this->get_list_of_controllers();
@@ -230,10 +240,14 @@ class ActionController_Routing extends Object
           # explicit action
           $actions = array($route['mapping'][':action']);
         }
-        elseif (strpos($route['path'], ':action'))
+        elseif (strpos($route['path'], ':action') !== false)
         {
           # implicit actions: let's get them
           $actions = $this->extract_actions_from_controller($controller);
+        }
+        
+        if (empty($actions)) {
+          continue;
         }
         
         $model = String::singularize($controller);
@@ -242,15 +256,34 @@ class ActionController_Routing extends Object
         {
           $func_base_name = ($action == 'index') ? $controller : "{$action}_{$model}";
           
-          $functions .= "\nfunction {$func_base_name}_path(\$keys=null) {\n".
-            "return strtr('{$route['path']}', \$keys);\n".
-            "}";
-          $functions .= "\nfunction {$func_base_name}_url(\$keys=null) { \n".
-            "return FULL_BASE_URL.{$func_base_name}_path(\$keys);\n".
-            "}";
+          if (isset($functions["{$func_base_name}_path"])) {
+            continue;
+          }
+          
+          # path
+          $func = "function {$func_base_name}_path(\$keys=array())\n{\n";
+          if (strpos($route['path'], ':controller') !== false) {
+            $func .= "  \$keys[':controller'] = '$controller';\n";
+          }
+          if (strpos($route['path'], ':action') !== false) {
+            $func .= "  \$keys[':action'] = '$action';\n";
+          }
+          $func .= "  return strtr('{$route['path']}', \$keys);\n";
+          $func .= "}";
+          
+          $functions["{$func_base_name}_path"] = $func;
+          
+          # url
+          $func  = "function {$func_base_name}_url(\$keys=array()) {\n";
+          $func .= "  return '/'.{$func_base_name}_path(\$keys);\n";
+          $func .= "}";
+          
+          $functions["{$func_base_name}_url"] = $func;
         }
       }
     }
+    
+    $functions = implode("\n\n", $functions);
     eval($functions);
   }
   
@@ -258,13 +291,16 @@ class ActionController_Routing extends Object
   {
     $controllers = array();
     
-    $dh = opendir(ROOT.'/app/controllers/');
+    $dh = opendir(APP.'/controllers/');
     if ($dh)
     {
       while(($file = readdir($dh)) !== false)
       {
-        if (is_file(ROOT.'/app/controllers/'.$file) {
-          $controllers[] = str_replace('.php', '', $controller);
+        if (is_file(APP.'/controllers/'.$file) and strpos($file, '_controller.php'))
+        
+        {
+          $controller = str_replace('_controller.php', '', $file);
+          $controllers[] = $controller;
         }
       }
       closedir($dh);
@@ -274,14 +310,21 @@ class ActionController_Routing extends Object
   
   private function & extract_actions_from_controller($controller)
   {
-    require_once "controllers/$controller.php";
-    $actions = get_class_methods(String::camelize($controller));
-    return $actions;
+    $methods = get_class_methods(String::camelize($controller.'_controller'));
+    if (!empty($methods))
+    {
+      $inherited_methods = get_class_methods(get_parent_class(String::camelize($controller.'_controller')));
+      $actions = array_diff($methods, $inherited_methods);
+      return $actions;
+    }
+    return $methods;
   }
 }
 
 /**
  * Returns the path for a given mapping.
+ * 
+ * DEPRECATED: Is the 'path_for()' function necessary, or even useful?
  * 
  * <code>
  * $path = path_for(array(':controller' => 'products'));
