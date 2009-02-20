@@ -1,7 +1,11 @@
 <?php
-
-# TODO: Polymorphic URL Generation
-# TODO: Named routes
+/**
+ * 
+ * @package ActionController
+ * 
+ * TODO: Polymorphic URL Generation
+ * TODO: Named routes
+ */
 class ActionController_Routing extends Object
 {
   private $routes          = array();
@@ -36,8 +40,6 @@ class ActionController_Routing extends Object
   
   /**
    * Connects a path to a mapping.
-   * 
-   * TODO: Recognize a default route (ie. mapping is empty, thus it's a default route).
    */
   function connect($path, $mapping=array())
   {
@@ -53,9 +55,9 @@ class ActionController_Routing extends Object
     }
     
     $rules = array(
-      '#(?<![\/\.\?]):([\w_-]+)#u' => '(?<$1>[^\/\.\?]*)?',           # :param
-      '#([\/\.\?]):([\w_-]+)#u'    => '(?:\\\$1(?<$2>[^\/\.\?]*))?',  # [/.?]:param
-      '#([\/\.\?])\*([\w_-]+)#u'   => '(?:\\\$1(?<$2>.*?))?',         # [/.?]*path
+      '#(?<![\/\.\?]):([\w_-]+)#u' => '(?<$1>[^\/\.\?]*)?',          # :param
+      '#([\/\.\?]):([\w_-]+)#u'    => '(?:\\\$1(?<$2>[^\/\.\?]*))?', # [/.?]:param
+      '#([\/\.\?])\*([\w_-]+)#u'   => '(?:\\\$1(?<$2>.*?))?',        # [/.?]*path
     );
     $regexp = preg_replace(array_keys($rules), array_values($rules), $regexp);
     
@@ -212,12 +214,10 @@ class ActionController_Routing extends Object
    * For instance the route 'product/:id' => {:controller => 'products', :action => 'show'}
    * will make the 'show_product_path()' and 'show_product_url()' functions available.
    * 
-   * IMPROVE: Generate named route URL builders.
    * IMPROVE: Recognize keys' special requirements (?)
-   * IMPROVE: Modularize a little, in order to cleanup code (?)
    * OPTIMIZE: Cache generated code (into a PHP file on disk, or in memory with APC).
    * 
-   * TODO: Handle :format is defined in route path or in mapping.
+   * TODO: Handle :format if defined in route path or in mapping.
    */
   function build_path_and_url_helpers()
   {

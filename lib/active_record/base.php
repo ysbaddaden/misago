@@ -2,6 +2,13 @@
 /**
  * 
  * @package ActiveRecord
+ * 
+ * TODO: Implement has_one association.
+ * TODO: Implement belongs_to association.
+ * TODO: Implement has_many association.
+ * TODO: Implement has_and_belongs_to_many association.
+ * 
+ * TODO: Implement calculations.
  */
 class ActiveRecord_Base extends ActiveRecord_Record
 {

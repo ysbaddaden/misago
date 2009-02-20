@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * 
+ * @package ActionController
+ */
 abstract class ActionController_Base extends Object
 {
   public    $name;
