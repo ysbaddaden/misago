@@ -296,6 +296,12 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_true('show_product_url()', function_exists('show_product_url'));
     
     $this->assert_true('products_path()', function_exists('products_path'));
+    
+    $this->assert_equal('/products', products_path(), 'products/index');
+    $this->assert_equal('/product/123', show_product_path(array(':id' => 123)), 'product/123');
+    $this->assert_equal('/product/123', show_product_path(array(':id' => 123, ':format' => 'html')), 'product/123.html');
+    
+    $this->assert_equal('/say/hello_who/Julien', hello_who_say_url(array(':id' => 'Julien')), '/say/hello_who/Julien');
   }
 }
 

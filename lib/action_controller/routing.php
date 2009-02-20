@@ -72,10 +72,11 @@ class ActionController_Routing extends Object
     }
     
     $this->routes[] = array(
-      'path'     => $path,
-      'regexp'   => "#^$regexp$#u",
-      'mapping'  => &$mapping,
-      'keys'     => &$keys,
+      'path'    => $path,
+      'regexp'  => "#^$regexp$#u",
+      'mapping' => &$mapping,
+      'keys'    => &$keys,
+      'default' => empty($mapping),
     );
   }
   
@@ -213,8 +214,10 @@ class ActionController_Routing extends Object
    * 
    * IMPROVE: Generate named route URL builders.
    * IMPROVE: Recognize keys' special requirements (?)
+   * IMPROVE: Modularize a little, in order to cleanup code (?)
    * OPTIMIZE: Cache generated code (into a PHP file on disk, or in memory with APC).
-   * FIXME: Cleanup missing keys on default routes.
+   * 
+   * TODO: Handle :format is defined in route path or in mapping.
    */
   function build_path_and_url_helpers()
   {
@@ -222,15 +225,15 @@ class ActionController_Routing extends Object
     
     foreach($this->routes as $route)
     {
-      if (strpos($route['path'], ':controller') !== false)
-      {
-        # implicit controllers: let's get them
-        $controllers = $this->get_list_of_controllers();
-      }
-      elseif (isset($route['mapping'][':controller']))
+      if (isset($route['mapping'][':controller']))
       {
         # explicit controller
         $controllers = array($route['mapping'][':controller']);
+      }
+      elseif (strpos($route['path'], ':controller') !== false)
+      {
+        # implicit controller
+        $controllers = $this->get_list_of_controllers();
       }
       
       foreach($controllers as $controller)
@@ -242,7 +245,7 @@ class ActionController_Routing extends Object
         }
         elseif (strpos($route['path'], ':action') !== false)
         {
-          # implicit actions: let's get them
+          # implicit action
           $actions = $this->extract_actions_from_controller($controller);
         }
         
@@ -262,13 +265,24 @@ class ActionController_Routing extends Object
           
           # path
           $func = "function {$func_base_name}_path(\$keys=array())\n{\n";
+          
           if (strpos($route['path'], ':controller') !== false) {
             $func .= "  \$keys[':controller'] = '$controller';\n";
           }
           if (strpos($route['path'], ':action') !== false) {
             $func .= "  \$keys[':action'] = '$action';\n";
           }
-          $func .= "  return strtr('{$route['path']}', \$keys);\n";
+          
+          $func .= "  \$path = strtr('{$route['path']}', \$keys);\n";
+          
+          if ($route['default']) {
+            $func .= "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n";
+          }
+          else {
+            $func .= "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
+          }
+          
+          $func .= "  return \$path;\n";
           $func .= "}";
           
           $functions["{$func_base_name}_path"] = $func;
@@ -284,6 +298,11 @@ class ActionController_Routing extends Object
     }
     
     $functions = implode("\n\n", $functions);
+    
+    if ($_ENV['MISAGO_DEBUG'] == 3) {
+      echo "\n\n$functions";
+    }
+    
     eval($functions);
   }
   
