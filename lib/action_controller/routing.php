@@ -152,6 +152,7 @@ class ActionController_Routing extends Object
    * Returns a path for a given mapping.
    * 
    * FIXME: Handle special requirements for keys.
+   * TODO: What about HTTP method calls?
    */
   function reverse(array $mapping)
   {
@@ -200,6 +201,75 @@ class ActionController_Routing extends Object
       }
     }
     return true;
+  }
+  
+  function build_path_and_url_helpers()
+  {
+    foreach($this->routes as $route)
+    {
+      if (isset($route['mapping'][':controller']))
+      {
+        $controller = $route['mapping'][':controller'];
+        $model      = String::singularize($controller);
+        
+        if (isset($route['mapping'][':action'])) {
+          $actions = array($route['mapping'][':action']);
+        }
+        elseif (strpos($route['path'], ':action')) {
+          $actions = $this->extract_actions_from_controller($controller);
+        }
+        
+        $functions = '';
+        foreach($actions as $action)
+        {
+          $func_base_name = ($action == 'index') ? $controller : "{$action}_{$model}";
+          
+          $functions .= "\nfunction {$func_base_name}_path(\$keys=null) {\n".
+            "return strtr('{$route['path']}', \$keys);\n".
+            "}";
+          $functions .= "\nfunction {$func_base_name}_url(\$keys=null) { \n".
+            "return FULL_BASE_URL.{$func_base_name}_path(\$keys);\n".
+            "}";
+        }
+        eval($functions);
+      }
+    }
+    /*
+    $routes      = array();
+    $controllers = array();
+    
+    foreach($this->routes as $route)
+    {
+      if (isset($route['mapping'][':controller']))
+      {
+        $controller = $route['mapping'][':controller'];
+        if (isset($route['mapping'][':action'])) {
+          $action = $route['mapping'][':action'];
+        }
+        $routes[] = array($controller, $action);
+      }
+      else
+      {
+        $dh = opendir(ROOT.'/app/controllers/');
+        while(($file = readdir($dh)) !== false)
+        {
+          if (is_file(ROOT.'/app/controllers/'.$file)
+          {
+            $controllers[] = str_replace('.php', '', $controller);
+          }
+        }
+        $controllers = array();
+      }
+      print_r($controllers);
+    }
+    */
+  }
+  
+  function & extract_actions_from_controller($controller)
+  {
+    require_once "controllers/$controller.php";
+    $actions = get_class_methods(String::camelize($controller));
+    return $actions;
   }
 }
 

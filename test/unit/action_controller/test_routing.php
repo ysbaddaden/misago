@@ -283,6 +283,20 @@ class Test_ActionController_Routing extends Unit_Test
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
     $this->assert_equal("build route", path_for($mapping), '/page/toto.json');
   }
+  
+  function test_build_url_and_path_helpers()
+  {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->connect('product/:id.:format', array(':controller' => 'products', ':action' => 'show'));
+    $map->connect(':controller/:action/:id.:format');
+    $map->build_path_and_url_helpers();
+    
+    $this->assert_true('show_product_path()', function_exists('show_product_path'));
+    $this->assert_true('show_product_url()', function_exists('show_product_url'));
+    
+    $this->assert_true('products_path()', function_exists('products_path'));
+  }
 }
 
 new Test_ActionController_Routing();
