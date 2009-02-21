@@ -19,6 +19,10 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   protected $new_record  = true;
   
+  protected $belongs_to = array();
+  protected $has_one    = array();
+  protected $has_many   = array();
+  
   
   function __construct($arg=null)
   {
@@ -70,6 +74,43 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
     return parent::__set($attribute, $value);
   }
+  
+  /*
+  function __get($attribute)
+  {
+    if (in_array($attribute, array_keys($this->columns)))
+    {
+      # field
+      return parent::__get($attribute);
+    }
+    elseif (in_array($attribute, $this->belongs_to))
+    {
+      # association: belongs to
+      $foreign_key = "{$attribute}_id";
+      $conditions  = array('id' => $this->{$foreign_key});
+      $class       = String::camelize($attribute);
+      
+      $record = new $class();
+      return $this->$attribute = $record->find(':first', array('conditions' => &$conditions));
+    }
+    elseif (in_array($attribute, $this->has_one))
+    {
+      # association: has one
+      $foreign_key = "{$attribute}_id";
+      $conditions  = array($foreign_key => $this->{$this->primary_key});
+      $class       = String::camelize($attribute);
+      
+      $record = new $class();
+      return $this->$attribute = $record->find(':first', array('conditions' => &$conditions));
+    }
+#    elseif (in_array($attribute, $this->has_many))
+#    {
+#      # association: has many
+#      $class = String::camelize(String::singularize($attribute));
+#      $this->$attribute = new $class();
+#    }
+  }
+  */
   
   /**
    * Finds records in database.
@@ -198,6 +239,19 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   protected function _create()
   {
+    # timestamps
+    if (empty($this->created_at) and array_key_exists('created_at', $this->columns))
+    {
+      $time = new Time(null, 'datetime');
+      $this->created_at = $time->to_query();
+    }
+    if (empty($this->created_on) and array_key_exists('created_on', $this->columns))
+    {
+      $time = new Time(null, 'date');
+      $this->created_on = $time->to_query();
+    }
+    
+    # create
     $id = $this->db->insert($this->table_name, $this->__attributes, $this->primary_key);
     if ($id)
     {
@@ -207,10 +261,33 @@ class ActiveRecord_Base extends ActiveRecord_Record
     return false;
   }
   
-  protected function _update()
+  protected function _update($attributes=null)
   {
+    if ($attributes === null) {
+      $attributes =& $this->__attributes;
+    }
+    else
+    {
+      foreach($attributes as $field => $value) {
+        $this->$field = $value;
+      }
+    }
+    
+    # timestamps
+    if (empty($this->updated_at) and array_key_exists('updated_at', $this->columns))
+    {
+      $time = new Time(null, 'datetime');
+      $this->updated_at = $time->to_query();
+    }
+    if (empty($this->updated_on) and array_key_exists('updated_on', $this->columns))
+    {
+      $time = new Time(null, 'date');
+      $this->updated_on = $time->to_query();
+    }
+    
+    # update
     $conditions = array($this->primary_key => $this->{$this->primary_key});
-    return $this->db->update($this->table_name, $this->__attributes, $conditions);
+    return $this->db->update($this->table_name, $attributes, $conditions);
   }
   
   /**
@@ -257,11 +334,23 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * </code>
    * 
    * IMPROVE: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
+   * FIXME: Use ActiveRecord::Base::_update() for actual saving.
    */
   function update($id, $attributes)
   {
     if (!is_array($id))
     {
+      if (empty($attributes['updated_at']) and array_key_exists('updated_at', $this->columns))
+      {
+        $time = new Time(null, 'datetime');
+        $attributes['updated_at'] = $time->to_query();
+      }
+      if (empty($attributes['updated_on']) and array_key_exists('updated_on', $this->columns))
+      {
+        $time = new Time(null, 'date');
+        $attributes['updated_on'] = $time->to_query();
+      }
+      
       $conditions = array($this->primary_key => $id);
       if ($this->db->update($this->table_name, $attributes, $conditions) !== false)
       {
@@ -327,10 +416,10 @@ class ActiveRecord_Base extends ActiveRecord_Record
     # hash of fields => values
     if (is_hash($updates))
     {
-      foreach($updates as $attribute => $value) {
-        $this->$attribute = $value;
-      }
-      return $this->db->update($this->table_name, $updates);
+#      foreach($updates as $attribute => $value) {
+#        $this->$attribute = $value;
+#      }
+      return $this->_update($updates);
     }
     
     # list of fields
@@ -339,11 +428,10 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
     
     $_updates = array();
-    foreach($updates as $attribute)
-    {
+    foreach($updates as $attribute) {
       $_updates[$attribute] = $this->$attribute;
     }
-    return $this->db->update($this->table_name, $_updates);
+    return $this->_update(&$_updates);
   }
   
   /**
