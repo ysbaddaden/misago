@@ -240,12 +240,12 @@ class ActiveRecord_Base extends ActiveRecord_Record
   protected function _create()
   {
     # timestamps
-    if (empty($this->created_at) and array_key_exists('created_at', $this->columns))
+    if (array_key_exists('created_at', $this->columns))
     {
       $time = new Time(null, 'datetime');
       $this->created_at = $time->to_query();
     }
-    if (empty($this->created_on) and array_key_exists('created_on', $this->columns))
+    if (array_key_exists('created_on', $this->columns))
     {
       $time = new Time(null, 'date');
       $this->created_on = $time->to_query();
@@ -271,7 +271,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
     
     # timestamps
-    if (empty($this->updated_at) and array_key_exists('updated_at', $this->columns))
+    if (array_key_exists('updated_at', $this->columns))
     {
       $time = new Time(null, 'datetime');
       $this->updated_at = $time->to_query();
@@ -279,7 +279,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
         $attributes['updated_at'] = $this->updated_at;
       }
     }
-    if (empty($this->updated_on) and array_key_exists('updated_on', $this->columns))
+    if (array_key_exists('updated_on', $this->columns))
     {
       $time = new Time(null, 'date');
       $this->updated_on = $time->to_query();
@@ -344,12 +344,12 @@ class ActiveRecord_Base extends ActiveRecord_Record
   {
     if (!is_array($id))
     {
-      if (empty($attributes['updated_at']) and array_key_exists('updated_at', $this->columns))
+      if (array_key_exists('updated_at', $this->columns))
       {
         $time = new Time(null, 'datetime');
         $attributes['updated_at'] = $time->to_query();
       }
-      if (empty($attributes['updated_on']) and array_key_exists('updated_on', $this->columns))
+      if (array_key_exists('updated_on', $this->columns))
       {
         $time = new Time(null, 'date');
         $attributes['updated_on'] = $time->to_query();
