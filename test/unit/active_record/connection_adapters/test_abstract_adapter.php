@@ -154,6 +154,27 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     ) ENGINE=innodb ;'));
   }
   
+  function test_add_column()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->add_column('products', 'bool', 'in_stock');
+    $this->assert_equal("no particular option", $sql, preg_replace('/\s+/', ' ',
+      'ALTER TABLE "products" ADD "in_stock" BOOLEAN ;'));
+    
+    $sql = $db->add_column('products', 'bool', 'in_stock', array('null' => false, 'default' => true));
+    $this->assert_equal("with all options", $sql, preg_replace('/\s+/', ' ',
+      'ALTER TABLE "products" ADD "in_stock" BOOLEAN NOT NULL DEFAULT t ;'));
+  }
+  
+  function test_drop_column()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->drop_column('products', 'in_stock');
+    $this->assert_equal("", $sql, preg_replace('/\s+/', ' ', 'ALTER TABLE "products" DROP "in_stock" ;'));
+  }
+  
   function test_sanitize_order()
   {
     $db = new FakeAdapter(array());

@@ -322,36 +322,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     }
     
     $columns = array();
-    foreach($definition['columns'] as $name => $column)
-    {
-      $type = strtolower($column['type']);
-      
-      if (isset($this->NATIVE_DATABASE_TYPES[$type])
-        and is_array($this->NATIVE_DATABASE_TYPES[$type]))
-      {
-        $column = array_merge($this->NATIVE_DATABASE_TYPES[$type], $column);
-        
-        $def = $column['name'];
-        
-        if (isset($column['limit'])) {
-          $def .= "({$column['limit']})";
-        }
-        if (isset($column['signed']) and !$column['signed']) {
-          $def .= " UNSIGNED";
-        }
-        if (isset($column['null']) and !$column['null']) {
-          $def .= " NOT NULL";
-        }
-        if (isset($column['default'])) {
-          $def .= " DEFAULT {$column['default']}";
-        }
-      }
-      else {
-        $def = $this->NATIVE_DATABASE_TYPES[$column['type']];
-      }
-      
-      $name = $this->quote_table($name);
-      $columns[] = "$name $def";
+    foreach($definition['columns'] as $name => $column) {
+      $columns[] = $this->build_column_definition($name, $column);
     }
     
     $table   = $this->quote_table($table);
@@ -365,6 +337,65 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       $sql .= ' '.$definition['options'];
     }
     return $this->execute("$sql ;");
+  }
+  
+  private function build_column_definition($name, array $column=null)
+  {
+    $type = strtolower($column['type']);
+    
+    if (isset($this->NATIVE_DATABASE_TYPES[$type])
+      and is_array($this->NATIVE_DATABASE_TYPES[$type]))
+    {
+      $column = array_merge($this->NATIVE_DATABASE_TYPES[$type], $column);
+      
+      $def = $column['name'];
+      
+      if (isset($column['limit'])) {
+        $def .= "({$column['limit']})";
+      }
+      if (isset($column['signed']) and !$column['signed']) {
+        $def .= " UNSIGNED";
+      }
+      if (isset($column['null']) and !$column['null']) {
+        $def .= " NOT NULL";
+      }
+      if (isset($column['default'])) {
+        $def .= " DEFAULT ".$this->quote_value($column['default']);
+      }
+    }
+    else {
+      $def = $this->NATIVE_DATABASE_TYPES[$column['type']];
+    }
+    
+    $name = $this->quote_column($name);
+    return "$name $def";
+  }
+  
+  /**
+   * TODO: Test AbstractAdapter::add_column();
+   */
+  function add_column($table, $type, $name, array $options=null)
+  {
+    $definition = array(
+      'type' => $type,
+    );
+    if (!empty($options)) {
+      $definition = array_merge($definition, $options);
+    }
+    
+    $table  = $this->quote_table($table);
+    $column = $this->build_column_definition($name, $definition);
+    return $this->execute("ALTER TABLE $table ADD $column ;");
+  }
+  
+  /**
+   * TODO: Test AbstractAdapter::drop_column();
+   */
+  function drop_column($table, $name)
+  {
+    $table = $this->quote_table($table);
+    $name  = $this->quote_column($name);
+    return $this->execute("ALTER TABLE $table DROP $name ;");
   }
   
   /**

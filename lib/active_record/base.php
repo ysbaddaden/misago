@@ -69,7 +69,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
       {
         case 'integer': $value = (int)$value;    break;
         case 'double':  $value = (double)$value; break;
-        case 'boolean': $value = (bool)$value;   break;
+        case 'bool':    $value = (bool)$value;   break;
       }
     }
     return parent::__set($attribute, $value);
@@ -263,10 +263,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   protected function _update($attributes=null)
   {
-    if ($attributes === null) {
-      $attributes =& $this->__attributes;
-    }
-    else
+    if ($attributes !== null)
     {
       foreach($attributes as $field => $value) {
         $this->$field = $value;
@@ -278,16 +275,23 @@ class ActiveRecord_Base extends ActiveRecord_Record
     {
       $time = new Time(null, 'datetime');
       $this->updated_at = $time->to_query();
+      if ($attributes !== null) {
+        $attributes['updated_at'] = $this->updated_at;
+      }
     }
     if (empty($this->updated_on) and array_key_exists('updated_on', $this->columns))
     {
       $time = new Time(null, 'date');
       $this->updated_on = $time->to_query();
+      if ($attributes !== null) {
+        $attributes['updated_on'] = $this->updated_on;
+      }
     }
     
     # update
     $conditions = array($this->primary_key => $this->{$this->primary_key});
-    return $this->db->update($this->table_name, $attributes, $conditions);
+    $updates    = ($attributes === null) ? $this->__attributes : $attributes;
+    return $this->db->update($this->table_name, $updates, $conditions);
   }
   
   /**
@@ -414,11 +418,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   function update_attributes($updates)
   {
     # hash of fields => values
-    if (is_hash($updates))
-    {
-#      foreach($updates as $attribute => $value) {
-#        $this->$attribute = $value;
-#      }
+    if (is_hash($updates)) {
       return $this->_update($updates);
     }
     
@@ -426,7 +426,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     if (is_string($updates)) {
       $updates = explode(',', str_replace(' ', '', $updates));
     }
-    
     $_updates = array();
     foreach($updates as $attribute) {
       $_updates[$attribute] = $this->$attribute;
