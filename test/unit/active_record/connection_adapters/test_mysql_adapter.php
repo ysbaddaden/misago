@@ -99,6 +99,21 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     ));
   }
   
+  function test_add_column()
+  {
+    $this->db->add_column('products', 'bool', 'in_stock');
+    
+    $columns = $this->db->columns('products');
+    $this->assert_equal("", $columns, array(
+      'id'         => array('type' => 'integer', 'limit' => 11,  'null' => false),
+      'title'      => array('type' => 'string',  'limit' => 100, 'null' => false),
+      'price'      => array('type' => 'double',   'null' => true, 'signed' => false),
+      'created_at' => array('type' => 'datetime', 'null' => true),
+      'updated_at' => array('type' => 'datetime', 'null' => true),
+      'in_stock'   => array('type' => 'bool',     'null' => true),
+    ));
+  }
+  
   # TODO: Test missing table case.
   function test_insert()
   {

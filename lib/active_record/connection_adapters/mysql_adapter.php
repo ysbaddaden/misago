@@ -160,10 +160,22 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
           $column['type'] = $type;
         }
         
-        foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
+        if ($column['type'] == 'TINYINT'
+          and isset($column['limit'])
+          and $column['limit'] == 1)
         {
-          if ($def['name'] == $column['type']) {
-            $column['type'] = $type;
+          $column['type'] = 'bool';
+          unset($column['limit']);
+        }
+        else
+        {
+          foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
+          {
+            if ($def['name'] == $column['type'])
+            {
+              $column['type'] = $type;
+              break;
+            }
           }
         }
         
@@ -212,7 +224,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $success;
   }
   
-  
+  /*
   # Renames a table.
   function rename_table($from, $to)
   {
@@ -242,7 +254,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   {
     
   }
-  
+  */
   
   function create_index()
   {
