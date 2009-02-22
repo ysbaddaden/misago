@@ -12,7 +12,7 @@ class Generator_Migration extends Generator_Base
     $this->options = $options;
     
     $filename = gmdate('YmdHis').'_'.String::underscore($args[0]);
-    $class    = String::camelize($args[0]);
+    $class    = String::camelize(String::singularize($args[0]));
     $vars = array(
       'filename' => $filename,
       'Class'    => $class,
