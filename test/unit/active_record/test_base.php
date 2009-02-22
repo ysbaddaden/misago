@@ -298,11 +298,11 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product(1);
     $this->assert_equal("changes must have been recorded", array($product->name, $product->price), array('Bepo', 10.95));
     
-    $product->update_attributes(array('created_at' => null));
-    $this->assert_type("set a field to null", $product->updated_at, 'NULL');
+    $product->update_attributes(array('in_stock' => null));
+    $this->assert_type("set a field to null", $product->in_stock, 'NULL');
     
     $product = new Product(1);
-    $this->assert_type("null field must have been recorded", $product->updated_at, 'NULL');
+    $this->assert_type("null field must have been recorded", $product->in_stock, 'NULL');
     
     $product->price = 10.99;
     $product->name  = 'bepo';
@@ -320,17 +320,17 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   function test_update_attribute()
   {
     $product = new Product(1);
-    $product->update_attribute('updated_at', '2008-12-31 00:00:01');
-    $this->assert_equal("basic update", $product->updated_at, '2008-12-31 00:00:01');
+    $product->update_attribute('in_stock', true);
+    $this->assert_equal("basic update", $product->in_stock, true);
     
     $product = new Product(1);
-    $this->assert_equal("basic update (recorded?)", $product->updated_at, '2008-12-31 00:00:01');
+    $this->assert_equal("basic update (recorded?)", $product->in_stock, true);
     
-    $product->update_attribute('updated_at', null);
-    $this->assert_type("set a field to null", $product->updated_at, 'NULL');
+    $product->update_attribute('in_stock', null);
+    $this->assert_type("set a field to null", $product->in_stock, 'NULL');
     
     $product = new Product(1);
-    $this->assert_type("set a field to null (recorded?)", $product->updated_at, 'NULL');
+    $this->assert_type("set a field to null (recorded?)", $product->in_stock, 'NULL');
   }
 }
 

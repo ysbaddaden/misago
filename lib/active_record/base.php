@@ -63,7 +63,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   function __set($attribute, $value)
   {
-    if (isset($this->columns[$attribute]))
+    if ($value !== null and isset($this->columns[$attribute]))
     {
       switch($this->columns[$attribute]['type'])
       {
