@@ -1,0 +1,16 @@
+-
+  id: 1
+  name: bepo
+  price: 9.99
+  in_stock: null
+-
+  id: 2
+  name: qwerty
+  price: 4.98
+  in_stock: false
+-
+  id: 3
+  name: azerty
+  price: 6.95
+  in_stock: true
+
