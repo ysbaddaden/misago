@@ -15,6 +15,14 @@ class Test_ActiveSupport_Array extends Unit_Test
     $this->assert_true("full hash", is_hash(array('a' => 'b', 'c' => 'd')));
     $this->assert_true("a mixup is a hash", is_hash(array(1, 'b' => 2, 3)));
   }
+  
+  function test_array_collection()
+  {
+    $this->assert_equal("string collection", array_collection("a, b, cde"), array('a', 'b', 'cde'));
+    $this->assert_equal("string collection with empty values", array_collection("a, b, ,cde"), array('a', 'b', 'cde'));
+    $this->assert_equal("array", array_collection(array('a', 'b', 'cde')), array('a', 'b', 'cde'));
+    $this->assert_equal("array with empty values", array_collection(array('a', 'b', ' ', ' cde')), array('a', 'b', 'cde'));
+  }
 }
 
 new Test_ActiveSupport_Array();

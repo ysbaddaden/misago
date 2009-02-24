@@ -24,4 +24,20 @@ function is_hash($arr)
   return false;
 }
 
+function & array_collection($collection)
+{
+  if (!is_array($collection)) {
+    $collection = explode(',', $collection);
+  }
+  $_collection = array();
+  foreach($collection as $item)
+  {
+    $item = trim($item);
+    if (!empty($item)) {
+      $_collection[] = $item;
+    }
+  }
+  return $_collection;
+}
+
 ?>
