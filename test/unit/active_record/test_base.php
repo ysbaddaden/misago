@@ -332,6 +332,12 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product(1);
     $this->assert_type("set a field to null (recorded?)", $product->in_stock, 'NULL');
   }
+
+  # FIXME: Test ActiveRecord's Base belongs_to relationship.
+  function test_belongs_to_relationship()
+  {
+    $invoice = new Invoice();
+  }
 }
 
 new Test_ActiveRecord_Base();

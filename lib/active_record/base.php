@@ -75,7 +75,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     return parent::__set($attribute, $value);
   }
   
-  /*
   function __get($attribute)
   {
     if (in_array($attribute, array_keys($this->columns)))
@@ -103,14 +102,17 @@ class ActiveRecord_Base extends ActiveRecord_Record
       $record = new $class();
       return $this->$attribute = $record->find(':first', array('conditions' => &$conditions));
     }
-#    elseif (in_array($attribute, $this->has_many))
-#    {
-#      # association: has many
-#      $class = String::camelize(String::singularize($attribute));
-#      $this->$attribute = new $class();
-#    }
+    elseif (in_array($attribute, $this->has_many))
+    {
+      # association: has many
+      $foreign_key = "{$attribute}_id";
+      $conditions  = array($foreign_key => $this->{$this->primary_key});
+      $class       = String::camelize(String::singularize($attribute));
+      
+      $record = new $class();
+      return $this->$attribute = $record->find(':all', array('conditions' => &$conditions));
+    }
   }
-  */
   
   /**
    * Finds records in database.
