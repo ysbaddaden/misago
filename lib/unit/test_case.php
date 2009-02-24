@@ -20,7 +20,6 @@ class Unit_TestCase extends Unit_Test
     exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/drop");
   }
   
-  # FIXME: Finish Unit_TestCase::fixtures().
   function fixtures($fixtures)
   {
     $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);

@@ -63,16 +63,22 @@ class ActiveRecord_Base extends ActiveRecord_Record
   
   function __set($attribute, $value)
   {
-    if ($value !== null and isset($this->columns[$attribute]))
+    if (isset($this->columns[$attribute]))
     {
-      switch($this->columns[$attribute]['type'])
+      if ($value !== null)
       {
-        case 'integer': $value = (int)$value;    break;
-        case 'double':  $value = (double)$value; break;
-        case 'bool':    $value = (bool)$value;   break;
+        switch($this->columns[$attribute]['type'])
+        {
+          case 'integer': $value = (int)$value;    break;
+          case 'double':  $value = (double)$value; break;
+          case 'bool':    $value = (bool)$value;   break;
+        }
       }
+      return parent::__set($attribute, $value);
     }
-    return parent::__set($attribute, $value);
+    else {
+      return $this->$attribute = $value;
+    }
   }
   
   function __get($attribute)
@@ -95,7 +101,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     elseif (in_array($attribute, $this->has_one))
     {
       # association: has one
-      $foreign_key = "{$attribute}_id";
+      $foreign_key = String::underscore(get_class($this))."_id";
       $conditions  = array($foreign_key => $this->{$this->primary_key});
       $class       = String::camelize($attribute);
       
@@ -105,7 +111,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     elseif (in_array($attribute, $this->has_many))
     {
       # association: has many
-      $foreign_key = "{$attribute}_id";
+      $foreign_key = String::underscore(get_class($this))."_id";;
       $conditions  = array($foreign_key => $this->{$this->primary_key});
       $class       = String::camelize(String::singularize($attribute));
       

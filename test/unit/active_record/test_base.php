@@ -333,10 +333,29 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_type("set a field to null (recorded?)", $product->in_stock, 'NULL');
   }
 
-  # FIXME: Test ActiveRecord's Base belongs_to relationship.
   function test_belongs_to_relationship()
   {
-    $invoice = new Invoice();
+    $product = new Product();
+    $product->delete_all();
+    $this->fixtures("products, orders, baskets, invoices");
+    
+    $invoice = new Invoice(1);
+    $this->assert_instance_of('invoice->order', $invoice->order, 'Order');
+    $this->assert_equal('invoice->order->id', $invoice->order->id, 1);
+  }
+  
+  function test_has_one_relationship()
+  {
+    $order = new Order(2);
+    $this->assert_instance_of('order->invoice', $order->invoice, 'Invoice');
+    $this->assert_equal('order->invoice->id', $order->invoice->id, 2);
+  }
+  
+  function test_has_many_relationship()
+  {
+    $order = new Order(1);
+    $this->assert_type('order->baskets', $order->baskets, 'array');
+    $this->assert_equal('count', count($order->baskets), 3);
   }
 }
 
