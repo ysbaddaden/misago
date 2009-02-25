@@ -357,6 +357,29 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_type('order->baskets', $order->baskets, 'array');
     $this->assert_equal('count', count($order->baskets), 3);
   }
+  
+  function test_find_with_joins()
+  {
+    $product = new product();
+    $products = $product->find(':all', array(
+      'select'     => 'products.id',
+      'conditions' => 'baskets.order_id = 1',
+      'joins'      => 'INNER JOIN baskets ON baskets.product_id = products.id',
+    ));
+    $this->assert_equal('simple join', count($products), 3);
+    $this->assert_equal('simple join', array($products[0]->id, $products[1]->id, $products[2]->id), array(1, 2, 3));
+    
+    $products = $product->find(':all', array(
+      'select'     => 'products.id',
+      'conditions' => array('orders.id' => 1),
+      'joins'      => array(
+        'INNER JOIN baskets ON baskets.product_id = products.id',
+        'INNER JOIN orders  ON orders.id = baskets.order_id'
+      ),
+    ));
+    $this->assert_equal('multiple joins', count($products), 3);
+    $this->assert_equal('multiple joins', array($products[0]->id, $products[1]->id, $products[2]->id), array(1, 2, 3));
+  }
 }
 
 new Test_ActiveRecord_Base();

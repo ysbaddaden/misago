@@ -170,7 +170,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * Finds records in database.
    * 
    * Scopes:
-   *   - :last,
+   *   - :all
    *   - :first
    * 
    * Options:
@@ -181,7 +181,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
    *   - limit (integer)
    *   - page (integer)
    * 
-   * TODO: Add some options: joins, from.
    * TODO: Test option 'group'.
    * IMPROVE: Add scope :last (how is that doable?).
    */
@@ -216,7 +215,11 @@ class ActiveRecord_Base extends ActiveRecord_Record
     $group  = '';
     $order  = '';
     $limit  = '';
+    $joins  = '';
     
+    if (!empty($options['joins'])) {
+      $joins = is_array($options['joins']) ? implode(' ', $options['joins']) : $options['joins'];
+    }
     if (!empty($options['conditions'])) {
       $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
     }
@@ -232,7 +235,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-    $sql = "SELECT $select FROM $table $where $group $order $limit ;";
+    $sql = "SELECT $select FROM $table $joins $where $group $order $limit ;";
     
     # queries then creates objects
     $class = get_class($this);
