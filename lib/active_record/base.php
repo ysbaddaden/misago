@@ -3,9 +3,8 @@
  * 
  * @package ActiveRecord
  * 
- * TODO: Implement has_one association.
- * TODO: Implement belongs_to association.
- * TODO: Implement has_many association.
+ * TODO: Implement eager loading of associations (:include => 'assoc').
+ * TODO: Implement :throught associations.
  * TODO: Implement has_and_belongs_to_many association.
  * 
  * TODO: Implement calculations.
@@ -45,7 +44,6 @@ class ActiveRecord_Base extends ActiveRecord_Record
     }
     
     # relationships
-    # OPTIMIZE: Cache relationships configuration in APC (?)
     $this->configure_associations('belongs_to');
     $this->configure_associations('has_one');
     $this->configure_associations('has_many');
