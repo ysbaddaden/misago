@@ -72,6 +72,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
 
     $test = $db->quote_column('misago.orders');
     $this->assert_equal("", $test, '"misago"."orders"');
+
+    $test = $db->quote_column('products.*');
+    $this->assert_equal("", $test, '"products".*');
   }
 
   function test_quote_columns()

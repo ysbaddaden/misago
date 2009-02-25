@@ -106,8 +106,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     if (strpos($column, '.'))
     {
       $segments = explode('.', $column);
-      foreach($segments as $i => $column) {
-        $segments[$i] = $this->COLUMN_QUOTE.$column.$this->COLUMN_QUOTE;
+      foreach($segments as $i => $column)
+      {
+        if ($segments[$i] != '*') {
+          $segments[$i] = $this->COLUMN_QUOTE.$column.$this->COLUMN_QUOTE;
+        }
       }
       return implode('.', $segments);
     }
