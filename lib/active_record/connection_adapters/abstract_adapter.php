@@ -300,8 +300,6 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    *   - temporary (bool), true to create a temporary table
    *   - id        (bool), true to automatically add an auto incrementing id column
    *   - options   (string), eg: "engine = innodb"
-   * 
-   * TODO: Add support for 'force' (bool)
    */
   function new_table($table, array $options=null)
   {
@@ -313,10 +311,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * 
    * Definition:
    *   - temporary (bool), true to create a temporary table
-   *   - columns   (array), eg: { :name => { :type, :limit, :null, :default, :signed } }
+   *   - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed}}
    *   - options   (string), eg: "engine = innodb"
    * 
-   * TODO: Add support for 'force' (true: drop table before create, false: create if not exists).
+   * TODO: Add option 'force' (true: drop table before create, false: create if not exists).
    */
   function create_table($table, array $definition)
   {
@@ -399,6 +397,42 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $table = $this->quote_table($table);
     $name  = $this->quote_column($name);
     return $this->execute("ALTER TABLE $table DROP $name ;");
+  }
+  
+  /**
+   * Adds an index to a table column.
+   * By default the index is named "$table_$column_idx" or "$table_$column_uniq".
+   * 
+   * Available options:
+   *   - type: null or unique
+   *   - name: manual naming of the index
+   *   - size: specified size of the index, in case of a blob/text. 
+   * 
+   * IMPROVE: Handle multiple column index.
+   */
+  function add_index($table, $column, $options=null)
+  {
+    $type = isset($options['type']) ? $options['type'] : '';
+    $name = isset($options['name']) ? $options['name'] :
+      "{$table}_{$column}_".((strtolower($type) == 'unique') ? 'uniq' : 'idx');
+    $size = isset($options['size']) ? "({$options['size']})" : '';
+    
+    $name   = $this->quote_column($name);
+    $table  = $this->quote_table($table);
+    $column = $this->quote_column($column);
+    
+    return $this->execute("CREATE $type INDEX $name ON $table($column$size) ;");
+  }
+  
+  /**
+   * Drops an index from a table.
+   * TODO: Test drop_index().
+   */
+  function drop_index($table, $name)
+  {
+    $table = $this->quote_table($table);
+    $name  = $this->quote_column($name);
+    return $this->execute("DROP INDEX $name ON $table ;");
   }
   
   /**

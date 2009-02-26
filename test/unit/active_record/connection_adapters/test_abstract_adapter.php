@@ -149,7 +149,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     ));
     
     $sql = $t->create();
-    $this->assert_equal("", $sql, preg_replace('/\s+/', ' ', 'CREATE TABLE "products" (
+    $this->assert_equal("", $sql, preg_replace('/\s{2,}/', ' ', 'CREATE TABLE "products" (
       "id" SERIAL,
       "name" VARCHAR(100),
       "description" TEXT,
@@ -162,12 +162,12 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $db = new FakeAdapter(array());
     
     $sql = $db->add_column('products', 'bool', 'in_stock');
-    $this->assert_equal("no particular option", $sql, preg_replace('/\s+/', ' ',
-      'ALTER TABLE "products" ADD "in_stock" BOOLEAN ;'));
+    $this->assert_equal("no particular option", $sql,
+      'ALTER TABLE "products" ADD "in_stock" BOOLEAN ;');
     
     $sql = $db->add_column('products', 'bool', 'in_stock', array('null' => false, 'default' => true));
-    $this->assert_equal("with all options", $sql, preg_replace('/\s+/', ' ',
-      'ALTER TABLE "products" ADD "in_stock" BOOLEAN NOT NULL DEFAULT t ;'));
+    $this->assert_equal("with all options", $sql,
+      'ALTER TABLE "products" ADD "in_stock" BOOLEAN NOT NULL DEFAULT t ;');
   }
   
   function test_drop_column()
@@ -175,7 +175,27 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $db = new FakeAdapter(array());
     
     $sql = $db->drop_column('products', 'in_stock');
-    $this->assert_equal("", $sql, preg_replace('/\s+/', ' ', 'ALTER TABLE "products" DROP "in_stock" ;'));
+    $this->assert_equal("", $sql, 'ALTER TABLE "products" DROP "in_stock" ;');
+  }
+  
+  function test_add_index()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->add_index('products', 'in_stock');
+    $this->assert_equal("", $sql, 'CREATE INDEX "products_in_stock_idx" ON "products"("in_stock") ;');
+    
+    $sql = $db->add_index('products', 'name', array('type' => 'unique'));
+    $this->assert_equal("", $sql, 'CREATE unique INDEX "products_name_uniq" ON "products"("name") ;');
+    
+    $sql = $db->add_index('products', 'name', array('size' => '10'));
+    $this->assert_equal("", $sql, 'CREATE INDEX "products_name_idx" ON "products"("name"(10)) ;');
+    
+    $sql = $db->add_index('products', 'name', array('type' => 'unique', 'size' => 5));
+    $this->assert_equal("", $sql, 'CREATE unique INDEX "products_name_uniq" ON "products"("name"(5)) ;');
+    
+    $sql = $db->add_index('products', 'name', array('name' => 'product_uniq_idx', 'type' => 'unique', 'size' => 5));
+    $this->assert_equal("", $sql, 'CREATE unique INDEX "product_uniq_idx" ON "products"("name"(5)) ;');
   }
   
   function test_sanitize_order()

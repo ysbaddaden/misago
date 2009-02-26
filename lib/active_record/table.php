@@ -6,8 +6,7 @@
  * 
  * @package ActiveRecord
  * 
- * IMPROVE: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
- * TODO: Add support for indexes.
+ * TODO: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
  */
 class ActiveRecord_Table
 {
