@@ -313,8 +313,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    *   - temporary (bool), true to create a temporary table
    *   - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed}}
    *   - options   (string), eg: "engine = innodb"
-   * 
-   * TODO: Add option 'force' (true: drop table before create, false: create if not exists).
+   *   - force     (null, bool), true: drop table before create, false: create if not exists.
    */
   function create_table($table, array $definition)
   {
@@ -327,12 +326,22 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       $columns[] = $this->build_column_definition($name, $column);
     }
     
-    $table   = $this->quote_table($table);
-    $columns = implode(', ', $columns);
+    $table     = $this->quote_table($table);
+    $columns   = implode(', ', $columns);
+    $temporary = (isset($definition['temporary']) and $definition['temporary']) ? 'TEMPORARY' : '';
+    $if_not_exists = '';
     
-    $sql = (isset($definition['temporary']) and $definition['temporary']) ?
-      "CREATE TEMPORARY TABLE $table ( $columns )" :
-      "CREATE TABLE $table ( $columns )";
+    if (isset($definition['force']))
+    {
+      if ($definition['force']) {
+        $this->execute("DROP $temporary TABLE IF EXISTS $table ;");
+      }
+      else {
+        $if_not_exists = 'IF NOT EXISTS';
+      }
+    }
+    
+    $sql = "CREATE $temporary TABLE {$if_not_exists} $table ( $columns )";
     
     if (isset($definition['options'])) {
       $sql .= ' '.$definition['options'];

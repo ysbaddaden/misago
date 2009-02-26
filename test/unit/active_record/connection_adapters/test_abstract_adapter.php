@@ -23,6 +23,9 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   function execute($sql)
   {
+    if (isset($_ENV['MISAGO_DEBUG']) and $_ENV['MISAGO_DEBUG'] >= 2) {
+      echo "\n$sql";
+    }
     return preg_replace('/\s{2,}/', ' ', $sql);
   }
   
@@ -110,7 +113,37 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $test = $db->quote_value(null);
     $this->assert_equal("boolean false", $test, 'NULL');
   }
-
+  
+  function test_create_table()
+  {
+    $db = new FakeAdapter(array());
+    
+    $columns = array(
+      'id'   => array('type' => 'integer', 'signed' => false),
+      'name' => array('type' => 'string'),
+    );
+    
+    $definition = array('columns' => $columns);
+    $sql = $db->create_table('products', $definition);
+    $this->assert_equal('', $sql, "CREATE TABLE \"products\" ( \"id\" INT(4) UNSIGNED, \"name\" VARCHAR(255) ) ;");
+    
+    $definition = array('columns' => $columns, 'temporary' => true);
+    $sql = $db->create_table('products', $definition);
+    $this->assert_equal('', $sql, "CREATE TEMPORARY TABLE \"products\" ( \"id\" INT(4) UNSIGNED, \"name\" VARCHAR(255) ) ;");
+    
+    $definition = array('columns' => $columns, 'temporary' => true, 'force' => false);
+    $sql = $db->create_table('products', $definition);
+    $this->assert_equal('', $sql, "CREATE TEMPORARY TABLE IF NOT EXISTS \"products\" ( \"id\" INT(4) UNSIGNED, \"name\" VARCHAR(255) ) ;");
+    
+    $definition = array('columns' => $columns, 'temporary' => true, 'force' => true);
+    $sql = $db->create_table('products', $definition);
+    $this->assert_equal('', $sql, "CREATE TEMPORARY TABLE \"products\" ( \"id\" INT(4) UNSIGNED, \"name\" VARCHAR(255) ) ;");
+    
+    $definition = array('columns' => $columns, 'force' => true);
+    $sql = $db->create_table('products', $definition);
+    $this->assert_equal('', $sql, "CREATE TABLE \"products\" ( \"id\" INT(4) UNSIGNED, \"name\" VARCHAR(255) ) ;");
+  }
+  
   function test_new_table()
   {
     $db = new FakeAdapter(array());
@@ -155,6 +188,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
       "description" TEXT,
       "price" FLOAT UNSIGNED
     ) ENGINE=innodb ;'));
+    
   }
   
   function test_add_column()
