@@ -340,6 +340,19 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("$sql ;");
   }
   
+  /**
+   * Drops a table.
+   * 
+   * Options:
+   *   - temporary (bool), true if table to drop is a temporary table.
+   */
+  function drop_table($table, array $options=null)
+  {
+    $table = $this->quote_table($table);
+    $tmp   = (isset($options['temporary']) and $options['temporary']);
+    return $this->execute("DROP ".($tmp ? "TEMPORARY" : '')." TABLE $table ;");
+  }
+  
   private function build_column_definition($name, array $column=null)
   {
     $type = strtolower($column['type']);
@@ -426,26 +439,12 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   /**
    * Drops an index from a table.
-   * TODO: Test drop_index().
    */
   function drop_index($table, $name)
   {
     $table = $this->quote_table($table);
     $name  = $this->quote_column($name);
     return $this->execute("DROP INDEX $name ON $table ;");
-  }
-  
-  /**
-   * Drops a table.
-   * 
-   * Options:
-   *   - temporary (bool), true if table to drop is a temporary table.
-   */
-  function drop_table($table, array $options=null)
-  {
-    $table = $this->quote_table($table);
-    $tmp   = (isset($options['temporary']) and $options['temporary']);
-    return $this->execute("DROP ".($tmp ? "TEMPORARY" : '')." TABLE $table ;");
   }
   
   /**

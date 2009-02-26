@@ -198,6 +198,17 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $this->assert_equal("", $sql, 'CREATE unique INDEX "product_uniq_idx" ON "products"("name"(5)) ;');
   }
   
+  function test_drop_index()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->drop_index('products', 'product_uniq_idx');
+    $this->assert_equal("", $sql, 'DROP INDEX "product_uniq_idx" ON "products" ;');
+    
+    $sql = $db->drop_index('products', 'product_name_uniq');
+    $this->assert_equal("", $sql, 'DROP INDEX "product_name_uniq" ON "products" ;');
+  }
+  
   function test_sanitize_order()
   {
     $db = new FakeAdapter(array());
