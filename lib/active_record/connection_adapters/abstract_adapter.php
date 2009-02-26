@@ -395,7 +395,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   }
   
   /**
-   * TODO: Test AbstractAdapter::add_column();
+   * Adds a column to a table.
    */
   function add_column($table, $type, $name, array $options=null)
   {
@@ -412,7 +412,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   }
   
   /**
-   * TODO: Test AbstractAdapter::drop_column();
+   * Removes a column from a table.
    */
   function drop_column($table, $name)
   {
@@ -518,6 +518,25 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $order = empty($options['order']) ? '' : "ORDER BY ".$this->sanitize_order($options['order']);
     $limit = empty($options['limit']) ? '' : $this->sanitize_limit($options['limit']);
     return $this->execute("DELETE FROM $table $where $order $limit ;");
+  }
+  
+  /**
+   * Handles database transactions.
+   * 
+   * Available actions:
+   *   - begin: starts a transaction
+   *   - commit: ends a transaction and commits statements to the database.
+   *   - rollback: ends a transaction and drops statements (nothing is recorded in the database).
+   */
+  function transaction($action)
+  {
+    switch(strtolower($action))
+    {
+      case 'begin':    return $this->execute("BEGIN ;");
+      case 'commit':   return $this->execute("COMMIT ;");
+      case 'rollback': return $this->execute("ROLLBACK ;");
+      default: trigger_error("Unknown transaction : $action.", E_USER_WARNING);
+    }
   }
 }
 

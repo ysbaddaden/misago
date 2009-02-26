@@ -4,6 +4,8 @@
  * 
  * @package ActiveRecord
  * @subpackage ConnectionAdapters
+ * 
+ * TODO: Add support for transactions.
  */
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {

@@ -358,6 +358,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * $user  = $user->create(array('name' => 'John'));
    * $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
    * </code>
+   * 
+   * IMPROVE: Use transactions when creating multiple records.
    */
   function create(array $attributes)
   {
@@ -394,8 +396,9 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * $users = $user->update(array_keys($people), array_values($people));
    * </code>
    * 
-   * IMPROVE: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
    * FIXME: Use ActiveRecord::Base::_update() for actual saving.
+   * IMPROVE: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
+   * IMPROVE: Use transactions when updating multiple records.
    */
   function update($id, $attributes)
   {
