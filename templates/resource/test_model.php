@@ -4,9 +4,9 @@ if (!isset($_ENV['MISAGO_ENV'])) {
   $_ENV['MISAGO_ENV'] = 'test';
 }
 $location = dirname(__FILE__).'/../..';
-require_once "$location/app/controllers/#{filename}_controller.php";
+require_once "$location/config/boot.php";
 
-class Test_#{Class}Controller extends Unit_TestCase
+class Test_#{Model} extends Unit_Test
 {
   function test_true()
   {
@@ -14,6 +14,6 @@ class Test_#{Class}Controller extends Unit_TestCase
   }
 }
 
-new Test_#{Class}Controller();
+new Test_#{Model}();
 
 ?>

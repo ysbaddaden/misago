@@ -1,7 +1,9 @@
 <?php
 
+if (!isset($_ENV['MISAGO_ENV'])) {
+  $_ENV['MISAGO_ENV'] = 'test';
+}
 $location = dirname(__FILE__).'/../..';
-require_once "$location/lib/misago/lib/unit_test.php";
 require_once "$location/config/boot.php";
 
 class Test_#{Class} extends Unit_Test
