@@ -407,6 +407,26 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $sql = $db->delete('products', null, array('limit' => 10, 'order' => 'id ASC'));
     $this->assert_equal("string order", $sql, "DELETE FROM \"products\" ORDER BY \"id\" ASC LIMIT 10 ;");
   }
+  
+  function test_transactions()
+  {
+    $db = new FakeAdapter(array());
+    
+    $sql = $db->transaction('begin');
+    $this->assert_equal("", $sql, "BEGIN ;");
+    
+    $sql = $db->transaction('BeGin');
+    $this->assert_equal("", $sql, "BEGIN ;");
+    
+    $sql = $db->transaction('COMMIT');
+    $this->assert_equal("", $sql, "COMMIT ;");
+    
+    $sql = $db->transaction('commit');
+    $this->assert_equal("", $sql, "COMMIT ;");
+    
+    $sql = $db->transaction('rollback');
+    $this->assert_equal("", $sql, "ROLLBACK ;");
+  }
 }
 
 new Test_ConnectionAdapter_AbstractAdapter();
