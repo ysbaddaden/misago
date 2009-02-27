@@ -516,6 +516,8 @@ class ActiveRecord_Base extends ActiveRecord_Record
    * $post = new Post(456);
    * $post->delete();
    * </code>
+   * 
+   * FIXME: Check for record's existence before deleting!
    */
   function delete($id=null)
   {

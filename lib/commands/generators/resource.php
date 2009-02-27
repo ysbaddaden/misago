@@ -1,5 +1,6 @@
 <?php
 
+# TODO: Generate routes.
 # IMPROVE: Generate YAML fixtures.
 class Generator_Resource extends Generator_Base
 {
