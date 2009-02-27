@@ -3,6 +3,8 @@
  * 
  * @package ActiveRecord
  * 
+ * TODO: Implement validations.
+ * 
  * TODO: Implement eager loading of associations (:include => 'assoc').
  * TODO: Implement :throught associations.
  * TODO: Implement has_and_belongs_to_many association.

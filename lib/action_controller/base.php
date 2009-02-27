@@ -54,7 +54,7 @@ abstract class ActionController_Base extends Object
     $options['action'] = ($action === null) ? $this->action : $action;
     
     if (!isset($options['format'])) {
-      $options['format'] = $this->mapping[':format'];
+      $options['format'] = empty($this->mapping[':format']) ? 'html' : $this->mapping[':format'];
     }
     
     $view = new ActionView_Base($this);

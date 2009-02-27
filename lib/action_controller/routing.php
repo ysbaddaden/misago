@@ -5,6 +5,8 @@
  * 
  * TODO: Polymorphic URL Generation
  * TODO: Named routes
+ * 
+ * FIXME: Do NOT set params[:format] when format isn't explicitly defined in URL.
  */
 class ActionController_Routing extends Object
 {
