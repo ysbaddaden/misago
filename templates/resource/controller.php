@@ -1,7 +1,7 @@
 <?php
 
 # TODO: Set HTTP status codes.
-#class #{Class}Controller extends ApplicationController
+# TODO: Add respond_to() to handle specific :format requests.
 class #{Class}Controller extends ApplicationController
 {
   # GET /#{class_plural}
@@ -21,10 +21,14 @@ class #{Class}Controller extends ApplicationController
   # POST /#{class_plural}
   function create()
   {
-    if (!empty($this->params['#{class}']))
+    if (!isset($this->params['#{class}']))
     {
       $#{class} = new #{Class}();
       $this->#{class} = $#{class}->create($this->params['#{class}']);
+      
+      if ($this->#{class} !== null) {
+        $this->redirect(show_#{class}_path($this->params[':id']));
+      }
     }
     else {
       $this->#{class} = new #{Class}();
@@ -34,17 +38,11 @@ class #{Class}Controller extends ApplicationController
   # PUT /#{class_plural}/:id
   function update()
   {
-    if (!empty($this->params['#{class}']))
-    {
-      $#{class} = new #{Class}();
-      $this->#{class} = $#{class}->update($this->params[':id'], $this->params['#{class}']);
-      
-      if ($this->#{class} !== null) {
-        $this->redirect(show_#{class}_path($this->params[':id']));
-      }
-    }
-    else {
-      $this->#{class} = new #{Class}();
+    $#{class} = new #{Class}();
+    $this->#{class} = $#{class}->update($this->params[':id'], $this->params['#{class}']);
+    
+    if ($this->#{class} !== null) {
+      $this->redirect(show_#{class}_path($this->params[':id']));
     }
   }
   
