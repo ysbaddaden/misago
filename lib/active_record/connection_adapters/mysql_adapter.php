@@ -4,8 +4,6 @@
  * 
  * @package ActiveRecord
  * @subpackage ConnectionAdapters
- * 
- * TODO: Add support for transactions.
  */
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
@@ -51,10 +49,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     if ($this->link === false) {
       throw new ActiveRecord_ConnectionNotEstablished("Unable to connect to MySQL database.");
     }
-    
-#    if (!empty($this->config['database'])) {
-#      $this->select_database($this->config['database']);
-#    }
   }
   
   function disconnect()
@@ -224,48 +218,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       throw new ActiveRecord_StatementInvalid("Can't select database $database.");
     }
     return $success;
-  }
-  
-  /*
-  # Renames a table.
-  function rename_table($from, $to)
-  {
-    
-  }
-  
-  # Adds a column to a table.
-  function add_column()
-  {
-    
-  }
-  
-  # Changes a column's definition in a table.
-  function change_column()
-  {
-    
-  }
-  
-  # Renames a column in a table.
-  function rename_column()
-  {
-    
-  }
-  
-  # Destroys a column in a table.
-  function remove_column()
-  {
-    
-  }
-  */
-  
-  function create_index()
-  {
-    
-  }
-  
-  function remove_index()
-  {
-    
   }
   
   function insert($table, array $data, $returning=null)

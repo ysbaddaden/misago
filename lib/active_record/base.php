@@ -3,15 +3,14 @@
  * 
  * @package ActiveRecord
  * 
- * TODO: Implement validations.
- * 
+ * TODO: Extract Associations into ActiveRecord::Associations.
  * TODO: Implement eager loading of associations (:include => 'assoc').
  * TODO: Implement :throught associations.
  * TODO: Implement has_and_belongs_to_many association.
  * 
  * TODO: Implement calculations.
  */
-class ActiveRecord_Base extends ActiveRecord_Record
+class ActiveRecord_Base extends ActiveRecord_Validations
 {
   protected $db;
   protected $table_name;
@@ -37,6 +36,7 @@ class ActiveRecord_Base extends ActiveRecord_Record
     $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
     
     # columns' definition
+    # IMPROVE: Check if columns do not conflict with class attributes.
     $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
     $this->columns = apc_fetch($apc_key, $success);
     if ($success === false)
