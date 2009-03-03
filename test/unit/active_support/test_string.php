@@ -3,7 +3,7 @@
 $location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
-require "$location/lib/unit/test.php";
+#require "$location/lib/unit/test.php";
 require "$location/test/test_app/config/boot.php";
 
 class Test_String extends Unit_Test
@@ -54,6 +54,15 @@ class Test_String extends Unit_Test
     $this->assert_equal('simple', String::slug('This is a Test'), 'this-is-a-test');
     $this->assert_equal('with some non alphanumerical characts', String::slug('This is a f*** test!'), 'this-is-a-f-test');
     $this->assert_equal('with accented characters', String::slug("J'ai été à la maison."), "j-ai-été-à-la-maison");
+  }
+  
+  function test_humanize()
+  {
+    $this->assert_equal('', String::humanize('test'), 'Test');
+    $this->assert_equal('', String::humanize('test_field'), 'Test field');
+    $this->assert_equal('', String::humanize('UserAgreement'), 'User agreement');
+    $this->assert_equal('', String::humanize('User Agreement'), 'User agreement');
+    $this->assert_equal('', String::humanize('User test'), 'User test');
   }
 }
 

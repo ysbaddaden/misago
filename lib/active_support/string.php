@@ -11,8 +11,6 @@ function is_symbol($str)
  * 
  * @package ActiveSupport
  * @subpackage Array
- * 
- * TODO: String::humanize()
  */
 class String extends Inflections
 {
@@ -107,6 +105,11 @@ class String extends Inflections
 		
     # trims dashes, etc.
 		return trim($str, '-.&;');
+	}
+	
+	static function humanize($str)
+	{
+	  return ucfirst(str_replace('_', ' ', String::underscore($str)));
 	}
 }
 
