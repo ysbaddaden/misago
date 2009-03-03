@@ -5,13 +5,17 @@
  * @package ActiveRecord
  * @subpackage Validations
  * 
- * TODO: Write tests for ActiveRecord::Errors.
- * TODO: Transform symbols to full text error messages.
+ * IMPROVE: Extract ActiveRecord::Errors::$symbol_messages into a configurable/translatable YAML file.
  */
-class ActiveRecord_Errors /*implements Iterator*/
+class ActiveRecord_Errors
 {
-  private $base_messages = array();
-  private $messages      = array();
+  private $base_messages   = array();
+  private $messages        = array();
+  private $symbol_messages = array(
+    ':invalid' => "{{attribute}} is invalid",
+    ':blank'   => "{{attribute}} can't be blank",
+    ':empty'   => "{{attribute}} can't be empty",
+  );
   
   function __get($attribute)
   {
@@ -59,13 +63,12 @@ class ActiveRecord_Errors /*implements Iterator*/
     return $count;
   }
   
-  # FIXME: ActiveRecord_Errors::full_messages() -> how to concatenate arrays in PHP?
+  # FIXME: ActiveRecord_Errors::full_messages() -> how do we concatenate arrays in PHP?
   function full_messages()
   {
     $messages = $this->base_messages;
-    foreach($this->messages as $_messages)
-    {
-      $messages .= $_messages;
+    foreach($this->messages as $_messages) {
+      $messages += $_messages;
     }
     return $messages;
   }
@@ -85,6 +88,14 @@ class ActiveRecord_Errors /*implements Iterator*/
   {
     if (!empty($this->messages[$attribute]))
     {
+      foreach($this->messages[$attribute] as $i => $msg)
+      { 
+        if (is_symbol($msg)) {
+          $msg = $this->symbol_messages[$msg];
+        }
+        $this->messages[$attribute][$i] = str_replace("{attribute}", String::humanize($attribute), $msg);
+      }
+      
       return (count($this->messages[$attribute]) > 1) ?
         $this->messages[$attribute] : $this->messages[$attribute][0];
     }
@@ -100,62 +111,6 @@ class ActiveRecord_Errors /*implements Iterator*/
     }
     return null;
   }
-  
-  /*
-  function to_xml()
-  {
-    $xml = '<?xml version="1.0" encoding="UTF-8"?><errors>';
-    foreach($this->base_messages as $msg) {
-      $xml .= "<error>$msg</error>";
-    }
-    foreach($this->messages as $name => $messages)
-    {
-      foreach($messages as $msg) {
-        $xml .= "<error on=\"$name\">$msg</error>";
-      }
-    }
-    $xml .= "</errors>";
-    return $xml;
-  }
-  */
-  
-  # Iterator
-  
-  /*
-  function rewind() {
-    return reset($this->messages);
-  }
-  
-  function current() {
-    return current($this->messages);
-  }
-  
-  function key() {
-    return key($this->messages);
-  }
-  
-  function next() {
-    return next($this->messages);
-  }
-  
-  function valid() {
-    return ($this->current() !== false);
-  }
-  */
-  
-  /*
-  private function flatten_messages()
-  {
-    $flatten_messages = array();
-    foreach($this->messages as $name => $messages)
-    {
-      foreach($messages as $message) {
-        $flatten_messages[] = array($name, $message)
-      }
-    }
-    return $flatten_messages;
-  }
-  */
 }
 
 ?>
