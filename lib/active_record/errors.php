@@ -93,7 +93,7 @@ class ActiveRecord_Errors
         if (is_symbol($msg)) {
           $msg = $this->symbol_messages[$msg];
         }
-        $this->messages[$attribute][$i] = str_replace("{attribute}", String::humanize($attribute), $msg);
+        $this->messages[$attribute][$i] = str_replace("{{attribute}}", String::humanize($attribute), $msg);
       }
       
       return (count($this->messages[$attribute]) > 1) ?
