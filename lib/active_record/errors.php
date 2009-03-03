@@ -6,18 +6,27 @@
  * @subpackage Validations
  * 
  * TODO: Write tests for ActiveRecord::Errors.
+ * TODO: Transform symbols to full text error messages.
  */
 class ActiveRecord_Errors /*implements Iterator*/
 {
   private $base_messages = array();
   private $messages      = array();
   
+  function __get($attribute)
+  {
+    if (isset($this->$attribute)) {
+      return $this->$attribute;
+    }
+    trigger_error("No such attribute ActiveRecord_Errors::$attribute.", E_USER_NOTICE);
+  }
+  
   function add($attribute, $msg=':invalid')
   {
     if (empty($this->messages[$attribute])) {
-      $this->messages = array();
+      $this->messages[$attribute] = array();
     }
-    $this->messages[$attribute] = $msg;
+    $this->messages[$attribute][] = $msg;
   }
   
   function add_on_blank($attribute)
@@ -50,11 +59,13 @@ class ActiveRecord_Errors /*implements Iterator*/
     return $count;
   }
   
+  # FIXME: ActiveRecord_Errors::full_messages() -> how to concatenate arrays in PHP?
   function full_messages()
   {
     $messages = $this->base_messages;
-    foreach($this->messages as $_messages) {
-      $messages += $_messages;
+    foreach($this->messages as $_messages)
+    {
+      $messages .= $_messages;
     }
     return $messages;
   }
