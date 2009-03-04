@@ -1,6 +1,13 @@
 <?php
 
-class translate
+Translate::startup();
+
+function t($str, $ctx=null) {
+  return Translate::find_translation($str, $ctx);
+}
+
+# TODO: Enable to configure language (currently forced to 'en').
+class Translate
 {
   static private $lang         = 'en';
   static private $translations = array();
@@ -13,55 +20,57 @@ class translate
     self::load_translations();
   }
   
-  # TODO: Add support for in context translations.
-  static function find_translation($str)
+  # TODO: Test translations in a given context.
+  static function find_translation($str, $ctx=null)
   {
-    if (isset(self::$translations[self::$lang][$str]))
-    {
-      return self::$translations[self::$lang][$str];
+    $id = ($ctx !== null) ? "$ctx.$str" : $str;
+    
+    if (isset(self::$translations[self::$lang][$id])) {
+      return self::$translations[self::$lang][$id];
     }
-    else
-    {
-      trigger_error("Missing translation for \"$str\".", E_USER_NOTICE);
-      return $str;
+    else {
+      trigger_error("Missing translation for \"$str\"".(($str !== null) ? " in context '$ctx'" : '').".", E_USER_NOTICE);
     }
+    return $str;
   }
   
-  # OPTIMIZE: Cache parsed YAML file in memory (throught APC).
-  # IMPROVE: Check if locale has been loaded, if not include it (whatever the cache says).
-  # FIXME: PHP's array_merge_recursive is broken and won't overwrite any value (creating arrays instead).
+  # OPTIMIZE: Cache flatten translations hash in memory (throught APC). One cache per language.
   static private function load_translations()
   {
-    self::$translations = Yaml::decode(file_get_contents(MISAGO.'/lib/locales/'.self::$lang.".yml"));
+    $lang = self::$lang;
+    $lang_file = ROOT."/config/locales/$lang.yml";
     
-    $file = ROOT."/config/locales/".self::$lang.".yml";
-    if (file_exists($file)) {
-      self::$translations = hash_merge_recursive(self::$translations, Yaml::decode(file_get_contents($file)));
+    # misago's translations
+    $contents     = file_get_contents(MISAGO."/lib/locales/$lang.yml");
+    $translations = Yaml::decode($contents);
+
+    # app's translations
+    if (file_exists($lang_file))
+    {
+      $contents      = file_get_contents($lang_file);
+      $_translations = Yaml::decode($contents);
+      $translations  = hash_merge_recursive($translations, $_translations);
     }
-
-    print_r(self::$translations);
+    
+    self::$translations[$lang] = self::flatten_translations_hash($translations[$lang]);
   }
-}
-
-translate::startup();
-
-function t($str)
-{
-  return translate::find_translation($str);
   
-  /*
-  # TODO: Move this part to String::replace_vars();
-  if (!empty($vars))
+  static private function & flatten_translations_hash($ary, $parent='')
   {
-    $keys   = array_keys($vars);
-    $values = array_values($vars);
-    foreach($keys as $i => $k) {
-      $keys[$i] = "{{{$keys[$i]}}}";
+    static $hash = array();
+    
+    foreach($ary as $k => $v)
+    {
+      if (is_array($v)) {
+        self::flatten_translations_hash($v, "$parent$k.");
+      }
+      else {
+        $hash["$parent$k"] = $v;
+      }
     }
-    return str_replace($keys, $values, $str);
-  }
-  return $str;
-  */
+    
+    return $hash;
+  } 
 }
 
 ?>

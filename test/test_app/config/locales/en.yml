@@ -3,6 +3,9 @@ en:
     errors:
       messages:
         blank: "{{attribute}} cannot be blank"
+    products:
+      errors:
+        null: "{{attribute}} can't be null"
   toto: "Toto"
   "invalid title": "Title is invalid"
   invalid: "{{attribute}} is invalid"

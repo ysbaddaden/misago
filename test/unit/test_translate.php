@@ -14,13 +14,8 @@ class Test_Translate extends Unit_Test
   
   function test_t_in_context()
   {
-    
-  }
-  
-  function test_t_with_vars()
-  {
-#    $this->assert_equal('simple', t('{{toto}}', null, array('toto' => 'Toto')), 'Toto');
-#    $this->assert_equal('simple', t('{{attribute}} is invalid', null, array('attribute' => 'title')), 'title is invalid');
+    $this->assert_equal('symbol', t('empty', 'active_record.errors.messages'), "{{attribute}} can't be empty");
+    $this->assert_equal('symbol', t('null', 'active_record.products.errors'), "{{attribute}} can't be null");
   }
 }
 
