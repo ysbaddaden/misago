@@ -1,0 +1,9 @@
+en:
+  active_record:
+    errors:
+      messages:
+        blank: "{{attribute}} cannot be blank"
+  toto: "Toto"
+  "invalid title": "Title is invalid"
+  invalid: "{{attribute}} is invalid"
+

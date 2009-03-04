@@ -1,0 +1,8 @@
+en:
+  active_record:
+    errors:
+      messages:
+        blank: "{{attribute}} can't be blank"
+        empty: "{{attribute}} can't be empty"
+        invalid: "{{attribute}} is invalid"
+
