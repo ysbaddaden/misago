@@ -23,6 +23,15 @@ class Test_ActiveSupport_Array extends Unit_Test
     $this->assert_equal("array", array_collection(array('a', 'b', 'cde')), array('a', 'b', 'cde'));
     $this->assert_equal("array with empty values", array_collection(array('a', 'b', ' ', ' cde')), array('a', 'b', 'cde'));
   }
+  
+  function test_hash_merge_recursive()
+  {
+    $test = hash_merge_recursive(array('a' => "b", 'e' => 'f'), array('a' => "c", 'c' => 'd'));
+    $this->assert_equal("one dimension", $test, array('a' => 'c', 'c' => 'd', 'e' => 'f'));
+
+    $test = hash_merge_recursive(array('a' => array('b' => 'c', 'j' => 'k'), 'e' => 'f'), array('a' => array('b' => 'cc'), 'c' => 'd'));
+    $this->assert_equal("two dimensions", $test, array('a' => array('b' => 'cc', 'j' => 'k'), 'c' => 'd', 'e' => 'f'));
+  }
 }
 
 new Test_ActiveSupport_Array();

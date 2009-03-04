@@ -40,4 +40,23 @@ function & array_collection($collection)
   return $_collection;
 }
 
+function & hash_merge_recursive()
+{
+  $hashes = func_get_args();
+  $hash   = array_shift($hashes);
+  foreach($hashes as $k => $h)
+  {
+    foreach($h as $k => $v)
+    {
+      if (isset($hash[$k]) and is_hash($v)) {
+        $hash[$k] = hash_merge_recursive($hash[$k], $v);
+      }
+      else {
+        $hash[$k] = $v;
+      }
+    }
+  }
+  return $hash;
+}
+
 ?>
