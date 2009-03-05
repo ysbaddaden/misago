@@ -14,6 +14,7 @@ class Test_Additions extends Unit_Test
     $this->assert_true("\\n\\t", is_blank("\n\t"));
     $this->assert_false("", is_blank(" t "));
     $this->assert_false("", is_blank("\nt \n\t"));
+    $this->assert_false("", is_blank(0));
   }
 }
 

@@ -5,7 +5,6 @@
  * @package ActiveRecord
  * @subpackage Validations
  * 
- * TODO: Write tests for ActiveRecord::Validations.
  * TODO: Write shortcut validations (validates_xxx).
  */
 class ActiveRecord_Validations extends ActiveRecord_Record
@@ -32,6 +31,8 @@ class ActiveRecord_Validations extends ActiveRecord_Record
   
   function is_valid()
   {
+    $this->errors->clear();
+    
     /*
     $vars = get_class_vars(self);
     foreach($vars as $var)
@@ -49,7 +50,7 @@ class ActiveRecord_Validations extends ActiveRecord_Record
     $action = $this->new_record ? 'validate_on_create' : 'validate_on_update';
     $this->$action();
     
-    return $this->errors()->is_empty();
+    return $this->errors->is_empty();
   }
   
   protected function validate() {}
