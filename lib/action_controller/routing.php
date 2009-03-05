@@ -3,7 +3,7 @@
  * 
  * @package ActionController
  * 
- * FIXME: Do NOT set params[:format] when format isn't explicitly defined in URL.
+ * CHANGED: params[:format] is no longer set if not explicitly defined in URL/mapping. 
  */
 class ActionController_Routing extends Object
 {
@@ -12,7 +12,7 @@ class ActionController_Routing extends Object
     ':method'      => 'GET',
     ':controller'  => 'index',
     ':action'      => 'index',
-    ':format'      => 'html',
+    ':format'      => null,
     'conditions'   => array('method' => 'ANY'),
     'requirements' => array(),
   );

@@ -23,7 +23,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':method'     => 'GET',
       ':controller' => 'welcome',
       ':action'     => 'home',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $map->root(array(':controller' => 'welcome', ':action' => 'home', ':format' => 'xml'));
@@ -47,7 +47,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'posts',
       ':action'     => 'show',
       ':id'         => '1',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('POST /posts/edit/1.xml', $map->route('POST', 'posts/edit/1.xml'), array(
@@ -87,7 +87,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'posts',
       ':action'     => 'show',
       ':id'         => '1',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('GET /posts/1.xml', $map->route('GET', 'posts/1.xml'), array(
@@ -103,7 +103,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'posts',
       ':action'     => 'create',
       ':id'         => '1',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('POST /posts/1/edit.xml', $map->route('POST', 'posts/1/edit.xml'), array(
@@ -133,7 +133,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':method'     => 'GET',
       ':controller' => 'posts',
       ':action'     => 'index',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('GET /posts/1', $map->route('GET', 'posts/1'), array(
@@ -141,7 +141,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'posts',
       ':action'     => 'show',
       ':id'         => '1',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('GET /posts/1/neo', $map->route('GET', 'posts/1/neo'), array(
@@ -149,7 +149,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'posts',
       ':action'     => 'neo',
       ':id'         => '1',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('GET /posts/5/edit.html', $map->route('GET', 'posts/5/edit.html'), array(
@@ -172,7 +172,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'posts',
       ':action'     => 'update',
       ':id'         => '7',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('DELETE /posts/1.json', $map->route('DELETE', 'posts/1.json'), array(
@@ -195,7 +195,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'html_pages',
       ':action'     => 'help',
       ':path'       => 'webcomics/pages/create',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('/help/webcomics/pages/create.xml', $map->route('GET', 'help/webcomics/pages/create.xml'), array(
@@ -227,7 +227,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':controller' => 'pages',
       ':action'     => 'show',
       ':id'         => '456',
-      ':format'     => 'html',
+      ':format'     => null,
     ));
     
     $this->assert_equal('/page/456.xml', $map->route('GET', 'page/456.xml'), array(
