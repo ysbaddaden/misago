@@ -9,6 +9,7 @@
  * TODO: Implement has_and_belongs_to_many association.
  * 
  * TODO: Implement calculations.
+ * IMPROVE: Implement find_:scope_by_:column() magic methods. 
  */
 class ActiveRecord_Base extends ActiveRecord_Validations
 {
@@ -62,6 +63,8 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   
   /**
    * Sets the record's attributes.
+   * 
+   * IMPROVE: Move to ActiveRecord::Record?
    */
   protected function set_attributes($arg)
   {
