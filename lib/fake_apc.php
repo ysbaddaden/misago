@@ -21,7 +21,7 @@ function apc_add($key, $var, $ttl=0)
 }
 
 /**
- * Cache a variable in the data store. 
+ * Caches a variable in the data store. 
  */
 function apc_store($key, $var, $ttl=0)
 {

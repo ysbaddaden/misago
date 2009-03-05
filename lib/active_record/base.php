@@ -3,7 +3,7 @@
  * 
  * @package ActiveRecord
  * 
- * TODO: Extract Associations into ActiveRecord::Associations.
+ * IMPROVE: Extract Associations into ActiveRecord::Associations.
  * TODO: Implement eager loading of associations (:include => 'assoc').
  * TODO: Implement :throught associations.
  * TODO: Implement has_and_belongs_to_many association.

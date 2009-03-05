@@ -6,7 +6,7 @@ function t($str, $ctx=null) {
   return Translate::find_translation($str, $ctx);
 }
 
-# TODO: Enable to configure language (currently forced to 'en').
+# TODO: Enable configuration of default language (currently forced to 'en').
 class Translate
 {
   static private $lang         = 'en';
@@ -17,10 +17,12 @@ class Translate
 #    if (config::is_set('translate', 'default_language')) {
 #      self::$lang = config::get('translate', 'default_language');
 #    }
-    self::load_translations();
+    self::load_translations(self::$lang);
   }
   
-  # TODO: Test translations in a given context.
+  /**
+   * Finds the translation for a string, in a particular (or global) context.
+   */
   static function find_translation($str, $ctx=null)
   {
     $id = ($ctx !== null) ? "$ctx.$str" : $str;
@@ -34,25 +36,33 @@ class Translate
     return $str;
   }
   
-  # OPTIMIZE: Cache flatten translations hash in memory (throught APC). One cache per language.
-  static private function load_translations()
+  static function load_translations($lang)
   {
-    $lang = self::$lang;
-    $lang_file = ROOT."/config/locales/$lang.yml";
-    
-    # misago's translations
-    $contents     = file_get_contents(MISAGO."/lib/locales/$lang.yml");
-    $translations = Yaml::decode($contents);
-
-    # app's translations
-    if (file_exists($lang_file))
-    {
-      $contents      = file_get_contents($lang_file);
-      $_translations = Yaml::decode($contents);
-      $translations  = hash_merge_recursive($translations, $_translations);
+    if (isset(self::$translations[$lang])) {
+      return;
     }
     
-    self::$translations[$lang] = self::flatten_translations_hash($translations[$lang]);
+    $translations = apc_fetch(TMP."/cache/locales.$lang.php", $success);
+    if ($success === false)
+    {
+      # misago's translations
+      $contents     = file_get_contents(MISAGO."/lib/locales/$lang.yml");
+      $translations = Yaml::decode($contents);
+
+      # app's translations
+      $lang_file = ROOT."/config/locales/$lang.yml";
+      if (file_exists($lang_file))
+      {
+        $contents      = file_get_contents($lang_file);
+        $_translations = Yaml::decode($contents);
+        $translations  = hash_merge_recursive($translations, $_translations);
+      }
+      
+      $translations = self::flatten_translations_hash($translations[$lang]);
+      apc_store(TMP."/cache/locales.$lang.php", $translations, strtotime('+1 day'));
+    }
+    
+    self::$translations[$lang] = $translations;
   }
   
   static private function & flatten_translations_hash($ary, $parent='')
