@@ -17,8 +17,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   protected $primary_key = 'id';
   protected $columns     = array();
   
-  protected $new_record  = true;
-  
   protected $associations = array(
     'belongs_to' => array(),
     'has_one'    => array(),
@@ -29,6 +27,7 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   protected $has_many     = array();
   
   
+  # IMPROVE: Check if columns do not conflict with object class attributes.
   function __construct($arg=null)
   {
     # database connection
@@ -36,7 +35,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
     $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
     
     # columns' definition
-    # IMPROVE: Check if columns do not conflict with class attributes.
     $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
     $this->columns = apc_fetch($apc_key, $success);
     if ($success === false)
@@ -136,12 +134,13 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   function __get($attribute)
   {
     # field
-    if (in_array($attribute, array_keys($this->columns))) {
-      return parent::__get($attribute);
-    }
+#    if (in_array($attribute, array_keys($this->columns))) {
+#      return parent::__get($attribute);
+#    }
     
     # association: belongs to
-    elseif (array_key_exists($attribute, $this->belongs_to))
+#    elseif (array_key_exists($attribute, $this->belongs_to))
+    if (array_key_exists($attribute, $this->belongs_to))
     {
       $conditions = array($this->belongs_to[$attribute]['primary_key'] => $this->{$this->belongs_to[$attribute]['foreign_key']});
       $class      = String::camelize($attribute);
@@ -166,6 +165,9 @@ class ActiveRecord_Base extends ActiveRecord_Validations
       $record     = new $class();
       return $this->$attribute = $record->find(':all', array('conditions' => &$conditions));
     }
+    
+    # another
+    return parent::__get($attribute);
   }
   
   /**

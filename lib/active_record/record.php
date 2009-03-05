@@ -6,6 +6,7 @@
 class ActiveRecord_Record extends Object implements Iterator
 {
   protected $__attributes = array();
+  protected $new_record   = true;
   
   function __construct(array $attributes=null)
   {
@@ -15,11 +16,12 @@ class ActiveRecord_Record extends Object implements Iterator
   }
   
   
+  # Attributes overloading
+  
   function __get($attr)
   {
     return isset($this->__attributes[$attr]) ?
-      $this->__attributes[$attr] :
-      null;
+      $this->__attributes[$attr] : null;
   }
   
   function __set($attr, $value) {
@@ -34,6 +36,8 @@ class ActiveRecord_Record extends Object implements Iterator
     unset($this->__attributes[$attr]);
   }
   
+  
+  # Iterator
   
   function rewind() {
     return reset($this->__attributes);

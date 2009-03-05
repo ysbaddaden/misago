@@ -2,8 +2,8 @@
 /**
  * Emulates APC caching features when APC is missing.
  * 
- * TODO: Save data on disk, to emulate between requests cache.
- * TODO: Check for data expiration (done once at request startup?).
+ * IMPROVE: Save data on disk, to emulate between requests cache.
+ * IMPROVE: Check for data expiration (done once at request startup?).
  */
 
 $GLOBALS['__fake_apc_data'] = array();
