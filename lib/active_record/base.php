@@ -183,6 +183,21 @@ class ActiveRecord_Base extends ActiveRecord_Validations
     return $this->find(':first', $options);
   }
   
+  /**
+   * Checkes wether a given record exists or not.
+   */
+  function exists($id)
+  {
+    if (empty($id) and strlen($id) == 0) {
+      return false;
+    }
+    $options = array(
+      'conditions' => array($this->primary_key => $id),
+      'select'     => $this->primary_key,
+    );
+    $self = $this->find(':first', $options);
+    return (gettype($self) == 'object');
+  }
   
   /**
    * Creates or updates the record.
@@ -416,12 +431,16 @@ class ActiveRecord_Base extends ActiveRecord_Validations
    * $post->delete();
    * </code>
    * 
-   * FIXME: Check for record's existence before deleting!
+   * TODO: Test ActiveRecord_Base::delete().
    */
   function delete($id=null)
   {
-    $conditions = array($this->primary_key => isset($id) ? $id : $this->{$this->primary_key});
-    return $this->db->delete($this->table_name, $conditions);
+    $id = isset($id) ? $id : $this->{$this->primary_key};
+    if ($this->exists($id))
+    {
+      $conditions = array($this->primary_key => $id);
+      return $this->db->delete($this->table_name, $conditions);
+    }
   }
   
   /**
@@ -434,19 +453,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   function delete_all($conditions=null, $options=null)
   {
     return $this->db->delete($this->table_name, $conditions, $options);
-  }
-  
-  function exists($id)
-  {
-    if (empty($id) and strlen($id) == 0) {
-      return false;
-    }
-    $options = array(
-      'conditions' => array($this->primary_key => $id),
-      'select'     => $this->primary_key,
-    );
-    $self = $this->find(':first', $options);
-    return (gettype($self) == 'object');
   }
 }
 
