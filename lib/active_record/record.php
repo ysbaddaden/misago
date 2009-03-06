@@ -15,8 +15,18 @@ class ActiveRecord_Record extends Object implements Iterator
     }
   }
   
+  /**
+   * Sets the record's attributes.
+   */
+  protected function set_attributes($arg)
+  {
+    foreach($arg as $attribute => $value) {
+      $this->$attribute = $value;
+    }
+  }
   
-  # Attributes overloading
+  
+  # overloading
   
   function __get($attr)
   {
@@ -37,7 +47,7 @@ class ActiveRecord_Record extends Object implements Iterator
   }
   
   
-  # Iterator
+  # iterator
   
   function rewind() {
     return reset($this->__attributes);

@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 
+# IMPROVE: Arrays (but not hashes) should be compared on values only.
 class Unit_Test
 {
   private $count_tests    = 0;
