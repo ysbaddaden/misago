@@ -27,9 +27,12 @@ class Test_Unit_Test extends Unit_Test
   {
     $this->assert_equal('strings', 'a', 'a');
     $this->assert_equal('integers', 5, 5);
-    $this->assert_equal('single dimension arrays', array('a', 'b', 'c'), array('a', 'b', 'c'));
+    
+    $this->assert_equal('arrays', array('a', 'b', 'c'), array('a', 'b',  'c'));
     $this->assert_equal('multidimensional arrays', array('a', array('b', 'c'), 'd'), array('a', array('b', 'c'), 'd'));
-    $this->assert_equal('multidimensional associative arrays', array('az' => array('a', 'b')), array('az' => array('a', 'b')));
+    $this->assert_equal('hash in order', array('a' => 'b', 'c' => 'd'), array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal('hash in disorder', array('c' => 'd', 'a' => 'b'), array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal('multidimensional hash', array('az' => array('a', 'b')), array('az' => array('a', 'b')));
     
     $this->assert_equal("hash containing null values", array('a' => null), array('a' => null));
     
@@ -43,10 +46,14 @@ class Test_Unit_Test extends Unit_Test
   {
     $this->assert_not_equal('strings', 'a', 'b');
     $this->assert_not_equal('integers', 5, 6);
-    $this->assert_not_equal('single dimension arrays', array('a', 'b', 'c'), array('a', 'd', 'b'));
+    
+    $this->assert_not_equal('arrays', array('a', 'b', 'c'), array('a', 'd', 'b'));
     $this->assert_not_equal('multidimensional arrays', array('a', array('b', 'c'), 'd'), array('a', array('c', 'b'), 'e'));
-    $this->assert_not_equal('multidimensional associative arrays (keys)', array('az' => array('a', 'b')), array('bz' => array('a', 'b')));
-    $this->assert_not_equal('multidimensional associative arrays (values)', array('az' => array('a', 'b')), array('az' => array('d', 'e')));
+    
+    $this->assert_not_equal('hash in order',    array('a' => 'c', 'c' => 'd'), array('a' => 'b', 'c' => 'd'));
+    $this->assert_not_equal('hash in disorder', array('c' => 'e', 'a' => 'b'), array('a' => 'b', 'c' => 'd'));
+    $this->assert_not_equal('multidimensional hash (keys)', array('az' => array('a', 'b')), array('bz' => array('a', 'b')));
+    $this->assert_not_equal('multidimensional hash arrays (values)', array('az' => array('a', 'b')), array('az' => array('d', 'e')));
     
     $a = new FakeClass(); $a->id = 1; $a->price = 9.95; $a->name = 'azerty';
     $b = new FakeClass(); $b->id = 1; $b->price = 10.95; $b->name = 'azerty';

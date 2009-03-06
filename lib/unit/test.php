@@ -1,7 +1,6 @@
 <?php
 error_reporting(E_ALL);
 
-# IMPROVE: Fusionate compare_arrays and compare_objects as compare_iterables.
 class Unit_Test
 {
   private $count_tests    = 0;
@@ -69,29 +68,13 @@ class Unit_Test
   
   protected function assert_equal($comment, $test, $expect)
   {
-    if (is_array($test)) {
-      $success = $this->compare_arrays($test, $expect);
-    }
-    elseif (is_object($test)) {
-      $success = $this->compare_objects($test, $expect);
-    }
-    else {
-      $success = ($test === $expect);
-    }
+    $success = (is_array($test) or is_object($test)) ? ($test == $expect) : ($test === $expect);
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
   protected function assert_not_equal($comment, $test, $expect)
   {
-    if (is_array($test)) {
-      $success = !$this->compare_arrays($test, $expect);
-    }
-    elseif (is_object($test)) {
-      $success = !$this->compare_objects($test, $expect);
-    }
-    else {
-      $success = ($test !== $expect);
-    }
+    $success = (is_array($test) or is_object($test)) ? ($test != $expect) : ($test !== $expect);
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
@@ -119,69 +102,6 @@ class Unit_Test
       printf("  expected: %s\n", print_r($vars['expected'], true));
       printf("       got: %s\n", print_r($vars['got'], true));
     }
-  }
-  
-  private function compare_arrays($arr1, $arr2)
-  {
-    if (!is_array($arr1)
-      or !is_array($arr2)
-      or (count($arr1) != count($arr2)))
-    {
-      return false;
-    }
-    
-    foreach($arr1 as $k => $v)
-    {
-      if (!array_key_exists($k, $arr2)) {
-        return false;
-      }
-      elseif (is_array($v)
-        and (!is_array($arr2[$k]) or $this->compare_arrays($v, $arr2[$k]) === false))
-      {
-        return false;
-      }
-      elseif (is_object($v)
-        and (!is_object($arr2[$k]) or $this->compare_objects($v, $arr2[$k]) === false))
-      {
-        return false;
-      }
-      elseif ($arr2[$k] !== $v) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private function compare_objects($a, $b)
-  {
-    if (!is_object($a)
-      or !is_object($b)
-      or (get_class($a) != get_class($b))
-      or (count($a) != count($b)))
-    {
-      return false;
-    }
-    
-    foreach($a as $k => $v)
-    {
-      if (!isset($b->$k)) {
-        return false;
-      }
-      elseif (is_object($v)
-        and (!is_object($b->$k) or $this->compare_objects($v, $b->$k) === false))
-      {
-        return false;
-      }
-      elseif (is_array($v)
-        and (!is_array($b->$k) or $this->compare_arrays($v, $b->$k) === false))
-      {
-        return false;
-      }
-      elseif ($b->$k !== $v) {
-        return false;
-      }
-    }
-    return true;
   }
 }
 
