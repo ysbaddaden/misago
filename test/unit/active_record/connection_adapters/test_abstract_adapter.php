@@ -79,7 +79,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $test = $db->quote_column('products.*');
     $this->assert_equal("", $test, '"products".*');
   }
-
+  
   function test_quote_columns()
   {
     $db = new FakeAdapter(array());

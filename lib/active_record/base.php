@@ -4,7 +4,6 @@
  * @package ActiveRecord
  * 
  * TODO: Implement eager loading (:include => 'assoc').
- * 
  * TODO: Implement calculations.
  * IMPROVE: Implement find_:scope_by_:column() magic methods. 
  */
@@ -435,6 +434,19 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   function delete_all($conditions=null, $options=null)
   {
     return $this->db->delete($this->table_name, $conditions, $options);
+  }
+  
+  function exists($id)
+  {
+    if (empty($id) and strlen($id) == 0) {
+      return false;
+    }
+    $options = array(
+      'conditions' => array($this->primary_key => $id),
+      'select'     => $this->primary_key,
+    );
+    $self = $this->find(':first', $options);
+    return (gettype($self) == 'object');
   }
 }
 

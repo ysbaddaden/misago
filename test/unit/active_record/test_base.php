@@ -380,6 +380,15 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal('multiple joins', count($products), 3);
     $this->assert_equal('multiple joins', array($products[0]->id, $products[1]->id, $products[2]->id), array(1, 2, 3));
   }
+  
+  function test_exists()
+  {
+    $product = new Product();
+    $this->assert_true('', $product->exists(1));
+    
+    $product = new Product();
+    $this->assert_false('', $product->exists(512));
+  }
 }
 
 new Test_ActiveRecord_Base();
