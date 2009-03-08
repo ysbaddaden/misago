@@ -348,10 +348,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
    * $people = array(1 => array('name' => 'Polly'), 1 => array('name' => 'Jean'));
    * $users = $user->update(array_keys($people), array_values($people));
    * </code>
-   * 
-   * FIXME: Use ActiveRecord::Base::_update() for actual saving.
-   * IMPROVE: Record must be loaded before it is updated, and only *changed attributes* must be recorded.
-   * IMPROVE: Use transactions when updating multiple records.
    */
   function update($id, $attributes)
   {
@@ -365,16 +361,23 @@ class ActiveRecord_Base extends ActiveRecord_Validations
     {
       $records = array();
       $i = 0;
+      
+      $this->db->transaction('begin');
+      
       foreach($id as $_id)
       {
         $rs = $this->update($_id, $attributes[$i]);
         
-        if ($rs === false) {
+        if ($rs === false)
+        {
+          $this->db->transaction('rollback');
           return false;
         }
         $records[] = $rs;
         $i++;
       }
+
+      $this->db->transaction('commit');
       return $records;
     }
   }
