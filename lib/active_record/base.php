@@ -357,24 +357,9 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   {
     if (!is_array($id))
     {
-      if (array_key_exists('updated_at', $this->columns))
-      {
-        $time = new Time(null, 'datetime');
-        $attributes['updated_at'] = $time->to_query();
-      }
-      if (array_key_exists('updated_on', $this->columns))
-      {
-        $time = new Time(null, 'date');
-        $attributes['updated_on'] = $time->to_query();
-      }
-      
-      $conditions = array($this->primary_key => $id);
-      if ($this->db->update($this->table_name, $attributes, $conditions) !== false)
-      {
-        $class = get_class($this);
-        return new $class($id);
-      }
-      return false;
+      $class  = get_class($this);
+      $record = new $class($id);
+      return ($record->_update($attributes) !== false) ? $record : false;
     }
     else
     {
