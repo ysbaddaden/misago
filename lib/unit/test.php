@@ -1,7 +1,6 @@
 <?php
 error_reporting(E_ALL);
 
-# IMPROVE: Arrays (but not hashes) should be compared on values only.
 class Unit_Test
 {
   private $count_tests    = 0;
@@ -69,6 +68,11 @@ class Unit_Test
   
   protected function assert_equal($comment, $test, $expect)
   {
+    if (is_array($test) and !is_hash($test))
+    {
+      array_sort_recursive($test);
+      array_sort_recursive($expect);
+    }
     $success = (is_array($test) or is_object($test)) ? ($test == $expect) : ($test === $expect);
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
