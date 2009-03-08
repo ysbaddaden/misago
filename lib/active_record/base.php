@@ -66,6 +66,41 @@ class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
+   * find_all_by_category();
+   * find_by_id() or find_first_by_id();
+   */
+  function __call($name, $args)
+  {
+    if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $name, $match))
+    {
+      if (!empty($match[2]))
+      {
+        if (!in_array($match[2], array_keys($this->columns)))
+        {
+          trigger_error("No such column '{$match[2]}'.", E_USER_WARNING);
+          return;
+        }
+        if (!isset($args[0]))
+        {
+          trigger_error("Missing parameter: 'value'.", E_USER_WARNING);
+          return;
+        }
+        $options = isset($args[1]) ? $args[1] : array();
+        $options['conditions'] = array($match[2] => $args[0]);
+      }
+      else
+      {
+        $options = isset($args[0]) ? $args[0] : array();
+      }
+      
+      $scope = empty($match[1]) ? ':first' : ':'.$match[1];
+#      var_dump("\n$scope");
+#      var_dump($options);
+      return $this->find($scope, $options);
+    }
+  }
+  
+  /**
    * Finds records in database.
    * 
    * Scopes:

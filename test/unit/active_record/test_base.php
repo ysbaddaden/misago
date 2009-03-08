@@ -389,6 +389,28 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product();
     $this->assert_false('', $product->exists(512));
   }
+  
+  function test_magic_find_methods()
+  {
+    $product  = new Product();
+    
+    $products = $product->find_all_by_name('azerty');
+    $this->assert_equal('', count($products), 1);
+    $this->assert_equal('', $products[0]->id, 3);
+    
+    $product = $product->find_by_id(1);
+    $this->assert_equal('', $product->name, 'bepo');
+    
+    $products = $product->find_all();
+    $this->assert_equal('', count($products), 3);
+    
+    $products = $product->find_first();
+    $this->assert_equal('', count($products), 1);
+    
+    $products = $product->find_all(array('limit' => 1, 'page' => 2, 'order' => 'id asc'));
+    $this->assert_equal('', count($products), 1);
+    $this->assert_equal('', $products[0]->id, 2);
+  }
 }
 
 new Test_ActiveRecord_Base();
