@@ -21,12 +21,12 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $this->assert_false('', $product->is_valid());
     $this->assert_equal('', $product->errors->on('name'), array(
       "Name can't be empty",
-      "Name can't be blank",
+      "Name cannot be blank",
     ));
     
     unset($product->price);
     $this->assert_false('', $product->is_valid());
-    $this->assert_equal('', $product->errors->on('price'), "Price can't be blank");
+    $this->assert_equal('', $product->errors->on('price'), "Price cannot be blank");
     
     $product = new Product();
     $product->name = 'pwerti';

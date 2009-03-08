@@ -5,7 +5,6 @@
  * 
  * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
- * IMPROVE: Implement find_:scope_by_:column() magic methods. 
  */
 class ActiveRecord_Base extends ActiveRecord_Validations
 {

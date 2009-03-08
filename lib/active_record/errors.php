@@ -4,18 +4,11 @@
  * 
  * @package ActiveRecord
  * @subpackage Validations
- * 
- * IMPROVE: Extract ActiveRecord::Errors::$symbol_messages into a configurable/translatable YAML file.
  */
 class ActiveRecord_Errors
 {
   private $base_messages   = array();
   private $messages        = array();
-  private $symbol_messages = array(
-    ':invalid' => "{{attribute}} is invalid",
-    ':blank'   => "{{attribute}} can't be blank",
-    ':empty'   => "{{attribute}} can't be empty",
-  );
   
   function __get($attribute)
   {
@@ -91,11 +84,10 @@ class ActiveRecord_Errors
       foreach($this->messages[$attribute] as $i => $msg)
       { 
         if (is_symbol($msg)) {
-          $msg = $this->symbol_messages[$msg];
+          $msg = t(substr($msg, 1), 'active_record.errors.messages');
         }
         $this->messages[$attribute][$i] = str_replace("{{attribute}}", String::humanize($attribute), $msg);
       }
-      
       return (count($this->messages[$attribute]) > 1) ?
         $this->messages[$attribute] : $this->messages[$attribute][0];
     }

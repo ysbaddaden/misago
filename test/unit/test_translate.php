@@ -1,7 +1,6 @@
 <?php
 
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
-require 'translate.php';
 
 class Test_Translate extends Unit_Test
 {

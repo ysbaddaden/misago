@@ -23,12 +23,13 @@ require 'active_support/string.php';
 require 'active_support/array.php';
 require 'active_support/time.php';
 
-require 'http.php';
-require 'application.php';
-
 if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
+
+require 'http.php';
+require 'translate.php';
+require 'application.php';
 
 function __autoload($class)
 {
