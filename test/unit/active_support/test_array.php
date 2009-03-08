@@ -32,6 +32,17 @@ class Test_ActiveSupport_Array extends Unit_Test
     $test = hash_merge_recursive(array('a' => array('b' => 'c', 'j' => 'k'), 'e' => 'f'), array('a' => array('b' => 'cc'), 'c' => 'd'));
     $this->assert_equal("two dimensions", $test, array('a' => array('b' => 'cc', 'j' => 'k'), 'c' => 'd', 'e' => 'f'));
   }
+  
+  function test_array_sort_recursive()
+  {
+    $test = array('c', 'b', array('b', 'a'));
+    array_sort_recursive($test);
+    $this->assert_equal("one dimension", $test, array(array('a', 'b'), 'b', 'c'));
+    
+    $test = array('c', 'b', array('b' => 'd', 'a' => 'e'));
+    array_sort_recursive($test);
+    $this->assert_equal("one dimension", $test, array(array('b' => 'd', 'a' => 'e'), 'b', 'c'));
+  }
 }
 
 new Test_ActiveSupport_Array();

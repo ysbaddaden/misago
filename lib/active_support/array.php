@@ -24,6 +24,16 @@ function is_hash($arr)
   return false;
 }
 
+/**
+ * Simplifies handling of collections.
+ * 
+ * Examples:
+ *   - $collection = array_collection('a,b,  c, d');
+ *   - $collection = array_collection(array('a', ' b', 'c '));
+ * 
+ * @return Array
+ * @param $collection Mixed.
+ */
 function & array_collection($collection)
 {
   if (!is_array($collection)) {
@@ -40,6 +50,9 @@ function & array_collection($collection)
   return $_collection;
 }
 
+/**
+ * Recursively merges hashes, overwriting non array/hash values.
+ */
 function & hash_merge_recursive()
 {
   $hashes = func_get_args();
@@ -57,6 +70,20 @@ function & hash_merge_recursive()
     }
   }
   return $hash;
+}
+
+/**
+ * Recursively sorts arrays (skipping hashes).
+ */
+function array_sort_recursive(&$ary)
+{
+  sort($ary);
+  foreach($ary as $k => $v)
+  {
+    if (is_array($v) and !is_hash($v)) {
+      array_sort_recursive($ary[$k]);
+    }
+  }
 }
 
 ?>
