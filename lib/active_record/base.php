@@ -87,14 +87,11 @@ class ActiveRecord_Base extends ActiveRecord_Validations
         $options = isset($args[1]) ? $args[1] : array();
         $options['conditions'] = array($match[2] => $args[0]);
       }
-      else
-      {
+      else {
         $options = isset($args[0]) ? $args[0] : array();
       }
       
       $scope = empty($match[1]) ? ':first' : ':'.$match[1];
-#      var_dump("\n$scope");
-#      var_dump($options);
       return $this->find($scope, $options);
     }
   }
@@ -115,7 +112,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
    *   - page (integer)
    * 
    * TODO: Test option 'group'.
-   * IMPROVE: Add scope :last (how is that doable?).
    */
   function & find($scope=':all', $options=null)
   {
@@ -306,8 +302,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
    * $user  = $user->create(array('name' => 'John'));
    * $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
    * </code>
-   * 
-   * IMPROVE: Use transactions when creating multiple records.
    */
   function create(array $attributes)
   {
@@ -316,9 +310,20 @@ class ActiveRecord_Base extends ActiveRecord_Validations
       $args    = func_get_args();
       $records = array();
       
-      foreach($args as $attributes) {
-        $records[] = $this->create($attributes);
+      $this->db->transaction('begin');
+      
+      foreach($args as $attributes)
+      {
+        $record = $this->create($attributes);
+        if ($record === false)
+        {
+          $this->db->transaction('rollback');
+          return false;
+        }
+        $records[] = $record;
       }
+      
+      $this->db->transaction('commit');
       return $records;
     }
     else
