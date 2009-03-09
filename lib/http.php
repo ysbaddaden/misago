@@ -7,6 +7,7 @@ class HTTP
   static $codes = array(
     100 => 'Continue',
     101 => 'Switching Protocols',
+    
     200 => 'OK',
     201 => 'Created',
     202 => 'Accepted',
@@ -14,6 +15,7 @@ class HTTP
     204 => 'No Content',
     205 => 'Reset Content',
     206 => 'Partial Content',
+    
     300 => 'Multiple Choices',
     301 => 'Moved Permanently',
     302 => 'Found',
@@ -22,6 +24,7 @@ class HTTP
     305 => 'Use Proxy',
 #   306 => '',
     307 => 'Temporary Redirect',
+    
     400 => 'Bad Request',
     401 => 'Unauthorized',
 #   402 => 'Payment Required',
@@ -40,6 +43,7 @@ class HTTP
     415 => 'Unsupported Media Type',
     416 => 'Request Range Not Satisfiable',
     417 => 'Expectation Failed',
+    
     500 => 'Internal Server Error',
     501 => 'Not Implemented',
     502 => 'Bad Gateway',

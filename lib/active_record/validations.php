@@ -7,7 +7,7 @@
  * 
  * TODO: Write shortcut validations (validates_xxx).
  */
-class ActiveRecord_Validations extends ActiveRecord_Associations
+abstract class ActiveRecord_Validations extends ActiveRecord_Associations
 {
   protected $validations = array();
   /*

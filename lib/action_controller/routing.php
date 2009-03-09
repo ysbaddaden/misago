@@ -2,8 +2,6 @@
 /**
  * 
  * @package ActionController
- * 
- * CHANGED: params[:format] is no longer set if not explicitly defined in URL/mapping. 
  */
 class ActionController_Routing extends Object
 {

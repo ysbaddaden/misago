@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @package ActionView
+ */
 class ActionView_Base extends Object
 {
   public    $view_path;

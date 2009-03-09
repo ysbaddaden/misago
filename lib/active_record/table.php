@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Helper to create new tables. Generally used in migrations,
  * but permits to create temporary tables too.

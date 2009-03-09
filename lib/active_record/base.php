@@ -3,10 +3,11 @@
  * 
  * @package ActiveRecord
  * 
+ * TODO: Validate before create or update.
  * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
  */
-class ActiveRecord_Base extends ActiveRecord_Validations
+abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
   protected $db;
   protected $table_name;
@@ -305,7 +306,19 @@ class ActiveRecord_Base extends ActiveRecord_Validations
    */
   function create(array $attributes)
   {
-    if (func_num_args() > 1)
+    if (func_num_args() == 1)
+    {
+      $class  = get_class($this);
+      $record = new $class($attributes);
+      
+#      if (!$record->is_valid()) {
+#        return $record;
+#      }
+      if ($record->_create()) {
+        return $record;
+      }
+    }
+    else
     {
       $args    = func_get_args();
       $records = array();
@@ -325,14 +338,6 @@ class ActiveRecord_Base extends ActiveRecord_Validations
       
       $this->db->transaction('commit');
       return $records;
-    }
-    else
-    {
-      $class  = get_class($this);
-      $record = new $class($attributes);
-      if ($record->_create()) {
-        return $record;
-      }
     }
     return false;
   }
@@ -355,6 +360,9 @@ class ActiveRecord_Base extends ActiveRecord_Validations
     {
       $class  = get_class($this);
       $record = new $class($id);
+#      if (!$record->is_valid()) {
+#        return $record;
+#      }
       return ($record->_update($attributes) !== false) ? $record : false;
     }
     else

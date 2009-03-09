@@ -6,7 +6,7 @@
  * TODO: Implement :throught associations.
  * TODO: Implement has_and_belongs_to_many association.
  */
-class ActiveRecord_Associations extends ActiveRecord_Record
+abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
   protected $associations = array(
     'belongs_to' => array(),

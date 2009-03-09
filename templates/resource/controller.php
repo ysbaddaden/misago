@@ -1,6 +1,5 @@
 <?php
 
-# TODO: Set HTTP status codes.
 # TODO: Add respond_to() to handle specific :format requests.
 class #{Class}Controller extends ApplicationController
 {
@@ -18,21 +17,33 @@ class #{Class}Controller extends ApplicationController
   }
   
   # GET /#{class_plural}/create
+  function neo()
+  {
+    $this->#{class} = new #{Class}();
+  }
+  
   # POST /#{class_plural}
   function create()
   {
-    if (!isset($this->params['#{class}']))
-    {
-      $#{class} = new #{Class}();
-      $this->#{class} = $#{class}->create($this->params['#{class}']);
-      
-      if ($this->#{class} !== null) {
-        $this->redirect(show_#{class}_path($this->params[':id']));
-      }
+    $#{class} = new #{Class}();
+    $this->#{class} = $#{class}->create($this->params['#{class}']);
+    
+    if ($this->#{class} !== null) {
+      HTTP::redirect(show_#{class}_path($this->params[':id']), 201);
+    }
+    elseif(!$this->#{class}->errors->is_empty()) {
+      HTTP::status(412);
     }
     else {
-      $this->#{class} = new #{Class}();
+      HTTP::status(500);
     }
+    $this->render('edit');
+  }
+  
+  # GET /#{class_plural}/edit/:id
+  function edit()
+  {
+    $this->#{class} = new #{Class}($this->params[':id']);
   }
   
   # PUT /#{class_plural}/:id
@@ -42,15 +53,27 @@ class #{Class}Controller extends ApplicationController
     $this->#{class} = $#{class}->update($this->params[':id'], $this->params['#{class}']);
     
     if ($this->#{class} !== null) {
-      $this->redirect(show_#{class}_path($this->params[':id']));
+      HTTP::redirect(show_#{class}_path($this->params[':id']), 200);
     }
+    elseif (!$this->#{class}->errors->is_empty()) {
+      HTTP::status(412);
+    }
+    else {
+      HTTP::status(500);
+    }
+    $this->render('edit');
   }
   
   # DELETE /#{class_plural}/:id
   function delete()
   {
     $#{class} = new #{Class}();
-    $#{class}->delete($this->params[':id']);
+    if ($#{class}->delete($this->params[':id'])) {
+      HTTP::status(410);
+    }
+    else {
+      HTTP::status(500);
+    }
   }
 }
 

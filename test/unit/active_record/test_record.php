@@ -5,11 +5,13 @@ $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
+class FakeRecord extends ActiveRecord_Record { }
+
 class Test_ActiveRecord_Record extends Unit_Test
 {
   function test_new()
   {
-    $record = new ActiveRecord_record();
+    $record = new FakeRecord();
     
     $this->assert_equal("__set", $record->id = 123, 123);
     $this->assert_equal("__get", $record->id, 123);
@@ -27,7 +29,7 @@ class Test_ActiveRecord_Record extends Unit_Test
   
   function test_iterates()
   {
-    $record = new ActiveRecord_Record();
+    $record = new FakeRecord();
     $record->id = 123;
     $record->title = 'a';
     
