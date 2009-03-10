@@ -27,14 +27,31 @@ class form
     $attributes['id']    = $name;
     $attributes['name']  = $name;
     if ($value !== null) {
-      $attributes['value'] = $value;
+      $attributes['value'] = htmlspecialchars($value);
     }
     return html::tag('input', $attributes);
   }
   
-  static function text_field()
+  static function text_field($name, $value=null, $attributes=null)
   {
+    $attributes['type']  = 'text';
+    $attributes['id']    = $name;
+    $attributes['name']  = $name;
     
+    if ($value !== null) {
+      $attributes['value'] = htmlspecialchars($value);
+    }
+    
+    if (isset($attributes['disabled']))
+    {
+      if ($attributes['disabled']) {
+        $attributes['disabled'] = "disabled";
+      }
+      else {
+        unset($attributes['disabled']);
+      }
+    }
+    return html::tag('input', $attributes);
   }
   
   static function text_area()

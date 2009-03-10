@@ -30,7 +30,13 @@ class Test_ActionView_Helper_Form extends Unit_Test
     $this->assert_equal('', form::hidden_field('token', 'azerty'), '<input type="hidden" id="token" name="token" value="azerty"/>');
     $this->assert_equal('', form::hidden_field('token', 'azerty', array('onchange' => "alert('hidden field changed')")), '<input onchange="alert(\'hidden field changed\')" type="hidden" id="token" name="token" value="azerty"/>');
   }
-
+  
+  function test_text_field()
+  {
+    $this->assert_equal('', form::text_field('name'), '<input type="text" id="name" name="name"/>');
+    $this->assert_equal('', form::text_field('name', 'toto'), '<input type="text" id="name" name="name" value="toto"/>');
+    $this->assert_equal('', form::text_field('name', null, array('class' => 'special')), '<input class="special" type="text" id="name" name="name"/>');
+  }
 }
 
 new Test_ActionView_Helper_Form();
