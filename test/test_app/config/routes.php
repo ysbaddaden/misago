@@ -12,7 +12,7 @@ $map = ActionController_Routing::draw();
 #   $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
 
 # RESTful resource
-#   $map->resource('products');
+$map->resource('products');
 
 # landing page
 $map->root(array(':controller' => 'welcome'));
