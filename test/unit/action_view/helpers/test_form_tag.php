@@ -4,10 +4,10 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/html.php";
-require_once MISAGO."/lib/action_view/helpers/form.php";
+require_once MISAGO."/lib/action_view/helpers/html_tag.php";
+require_once MISAGO."/lib/action_view/helpers/form_tag.php";
 
-class Test_ActionView_Helper_Form extends Unit_Test
+class Test_ActionView_Helper_FormTag extends Unit_Test
 {
   function test_form_tag()
   {
@@ -104,8 +104,56 @@ class Test_ActionView_Helper_Form extends Unit_Test
     $test = form::check_box('user_agreement', 42, array('disabled' => true, 'checked' => true));
     $this->assert_equal('', $test, '<input disabled="disabled" checked="checked" type="checkbox" id="user_agreement" name="user_agreement" value="42"/>');
   }
+
+  function test_radio_button()
+  {
+    $test = form::radio_button('receive_email', 'yes');
+    $this->assert_equal('', $test, '<input type="radio" id="receive_email" name="receive_email" value="yes"/>');
+    
+    $test = form::radio_button('publication_status', 1, array('disabled' => true));
+    $this->assert_equal('', $test, '<input disabled="disabled" type="radio" id="publication_status" name="publication_status" value="1"/>');
+    
+    $test = form::radio_button('eula', 42, array('checked' => true));
+    $this->assert_equal('', $test, '<input checked="checked" type="radio" id="eula" name="eula" value="42"/>');
+    
+    $test = form::radio_button('user_agreement', 42, array('disabled' => true, 'checked' => true));
+    $this->assert_equal('', $test, '<input disabled="disabled" checked="checked" type="radio" id="user_agreement" name="user_agreement" value="42"/>');
+  }
+
+  function test_select()
+  {
+    $test = form::select('town');
+    $this->assert_equal('', $test, '<select id="town" name="town"></select>');
+    
+    $test = form::select('gender', "<option>male</option><option>female</option>");
+    $this->assert_equal('', $test, '<select id="gender" name="gender"><option>male</option><option>female</option></select>');
+
+    $test = form::select('town', null, array('multiple' => true));
+    $this->assert_equal('', $test, '<select multiple="multiple" id="town" name="town"></select>');
+
+    $test = form::select('town', null, array('multiple' => false));
+    $this->assert_equal('', $test, '<select id="town" name="town"></select>');
+
+    $test = form::select('town', '<option value="">select a town</option>', array('multiple' => true, 'class' => 'towns'));
+    $this->assert_equal('', $test, '<select multiple="multiple" class="towns" id="town" name="town"><option value="">select a town</option></select>');
+  }
+  
+  function test_submit()
+  {
+    $test = form::submit();
+    $this->assert_equal('', $test, '<input type="submit"/>');
+    
+    $test = form::submit('Create');
+    $this->assert_equal('', $test, '<input type="submit" value="Create"/>');
+    
+    $test = form::submit('Create', array('disabled' => true));
+    $this->assert_equal('', $test, '<input disabled="disabled" type="submit" value="Create"/>');
+    
+    $test = form::submit('Create', 'edit', array('disabled' => true));
+    $this->assert_equal('', $test, '<input disabled="disabled" name="edit" type="submit" value="Create"/>');
+  }
 }
 
-new Test_ActionView_Helper_Form();
+new Test_ActionView_Helper_FormTag();
 
 ?>

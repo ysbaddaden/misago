@@ -4,9 +4,9 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/html.php";
+require_once MISAGO."/lib/action_view/helpers/html_tag.php";
 
-class Test_ActionView_Helper_Html extends Unit_Test
+class Test_ActionView_Helper_HtmlTag extends Unit_Test
 {
   function test_cdata()
   {
@@ -35,6 +35,6 @@ class Test_ActionView_Helper_Html extends Unit_Test
   }
 }
 
-new Test_ActionView_Helper_Html();
+new Test_ActionView_Helper_HtmlTag();
 
 ?>

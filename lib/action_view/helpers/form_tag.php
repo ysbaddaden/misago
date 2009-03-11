@@ -64,14 +64,33 @@ class form
     return html::tag('input', $attributes);
   }
   
-  static function select()
+  static function select($name, $options=null, $attributes=null)
   {
-    
+    $attributes = form::input_attributes($name, null, null, $attributes);
+    if (isset($attributes['multiple']))
+    {
+      if ($attributes['multiple']) {
+        $attributes['multiple'] = "multiple";
+      }
+      else {
+        unset($attributes['multiple']);
+      }
+    }
+    return html::tag('select', $options, $attributes);
   }
   
-  static function submit()
+  static function submit($value=null, $name=null, $attributes=null)
   {
-    
+    if ($attributes === null and is_array($name))
+    {
+      $attributes = $name;
+      $name = null;
+    }
+    if ($name !== null) {
+      $attributes['name'] = $name;
+    }
+    $attributes = form::input_attributes(null, 'submit', $value, $attributes);
+    return html::tag('input', $attributes);
   }
   
   private static function input_attributes($name, $type, $value, $attributes)
@@ -79,8 +98,11 @@ class form
     if ($type !== null) {
       $attributes['type']  = $type;
     }
-    $attributes['id']    = $name;
-    $attributes['name']  = $name;
+    if ($name !== null)
+    {
+      $attributes['id']    = $name;
+      $attributes['name']  = $name;
+    }
     
     if ($value !== null) {
       $attributes['value'] = htmlspecialchars($value);
