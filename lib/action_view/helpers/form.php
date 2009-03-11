@@ -55,21 +55,13 @@ class form
   static function check_box($name, $value=1, $attributes=null)
   {
     $attributes = form::input_attributes($name, 'checkbox', $value, $attributes);
-    if (isset($attributes['checked']))
-    {
-      if ($attributes['checked']) {
-        $attributes['checked'] = "checked";
-      }
-      else {
-        unset($attributes['checked']);
-      }
-    }
     return html::tag('input', $attributes);
   }
   
-  static function radio_button()
+  static function radio_button($name, $value, $attributes=null)
   {
-    
+    $attributes = form::input_attributes($name, 'radio', $value, $attributes);
+    return html::tag('input', $attributes);
   }
   
   static function select()
@@ -101,6 +93,19 @@ class form
       }
       else {
         unset($attributes['disabled']);
+      }
+    }
+    
+    if ($type == 'radio' or $type == 'checkbox')
+    {
+      if (isset($attributes['checked']))
+      {
+        if ($attributes['checked']) {
+          $attributes['checked'] = "checked";
+        }
+        else {
+          unset($attributes['checked']);
+        }
       }
     }
     return $attributes;
