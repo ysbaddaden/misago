@@ -23,6 +23,7 @@ class Test_ActionView_Helper_Html extends Unit_Test
 
     $this->assert_equal("", html::tag("br", array('class' => 'toto')), "<br class=\"toto\"/>");
     $this->assert_equal("", html::tag("div", 'azerty', array('class' => 'toto')), "<div class=\"toto\">azerty</div>");
+    $this->assert_equal("", html::tag("span", null, array('class' => 'abcd')), "<span class=\"abcd\"></span>");
   }
   
   function test_link_to()

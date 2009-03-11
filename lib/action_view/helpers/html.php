@@ -19,10 +19,15 @@ class html
     {
       $attributes = $content;
       $content    = null;
+      $inline_tag = true;
     }
+    else {
+      $inline_tag = ($content === null and $attributes === null);
+    }
+    
     $attributes = html::parse_attributes($attributes);
     
-    if ($content === null) {
+    if ($inline_tag) {
       return "<$name$attributes/>";
     }
     return "<$name$attributes>$content</$name>";

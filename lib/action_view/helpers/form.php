@@ -23,18 +23,70 @@ class form
   
   static function hidden_field($name, $value=null, $attributes=null)
   {
-    $attributes['type']  = 'hidden';
-    $attributes['id']    = $name;
-    $attributes['name']  = $name;
-    if ($value !== null) {
-      $attributes['value'] = htmlspecialchars($value);
-    }
+    $attributes = form::input_attributes($name, 'hidden', $value, $attributes);
     return html::tag('input', $attributes);
   }
   
   static function text_field($name, $value=null, $attributes=null)
   {
-    $attributes['type']  = 'text';
+    $attributes = form::input_attributes($name, 'text', $value, $attributes);
+    return html::tag('input', $attributes);
+  }
+  
+  static function text_area($name, $content=null, $attributes=null)
+  {
+    $attributes = form::input_attributes($name, null, null, $attributes);
+    $content    = htmlspecialchars($content);
+    return html::tag('textarea', $content, $attributes);
+  }
+  
+  static function password_field($name, $value=null, $attributes=null)
+  {
+    $attributes = form::input_attributes($name, 'password', $value, $attributes);
+    return html::tag('input', $attributes);
+  }
+  
+  static function file_field($name, $attributes=null)
+  {
+    $attributes = form::input_attributes($name, 'file', null, $attributes);
+    return html::tag('input', $attributes);
+  }
+  
+  static function check_box($name, $value=1, $attributes=null)
+  {
+    $attributes = form::input_attributes($name, 'checkbox', $value, $attributes);
+    if (isset($attributes['checked']))
+    {
+      if ($attributes['checked']) {
+        $attributes['checked'] = "checked";
+      }
+      else {
+        unset($attributes['checked']);
+      }
+    }
+    return html::tag('input', $attributes);
+  }
+  
+  static function radio_button()
+  {
+    
+  }
+  
+  static function select()
+  {
+    
+  }
+  
+  static function submit()
+  {
+    
+  }
+  
+  private static function input_attributes($name, $type, $value, $attributes)
+  {
+    if ($type !== null) {
+      $attributes['type']  = $type;
+    }
     $attributes['id']    = $name;
     $attributes['name']  = $name;
     
@@ -51,42 +103,7 @@ class form
         unset($attributes['disabled']);
       }
     }
-    return html::tag('input', $attributes);
-  }
-  
-  static function text_area()
-  {
-    
-  }
-  
-  static function password_field()
-  {
-    
-  }
-  
-  static function file_field()
-  {
-    
-  }
-  
-  static function check_box()
-  {
-    
-  }
-  
-  static function radio_button()
-  {
-    
-  }
-  
-  static function select()
-  {
-    
-  }
-  
-  static function submit()
-  {
-    
+    return $attributes;
   }
 }
 
