@@ -95,14 +95,14 @@ class Test_ActionView_Helper_Form extends Unit_Test
     $test = form::check_box('receive_email', 'yes');
     $this->assert_equal('', $test, '<input type="checkbox" id="receive_email" name="receive_email" value="yes"/>');
     
-    $test = form::check_box('receive_email', 1, array('disabled' => true));
-    $this->assert_equal('', $test, '<input disabled="disabled" type="checkbox" id="receive_email" name="receive_email" value="1"/>');
+    $test = form::check_box('publication_status', 1, array('disabled' => true));
+    $this->assert_equal('', $test, '<input disabled="disabled" type="checkbox" id="publication_status" name="publication_status" value="1"/>');
     
-    $test = form::check_box('receive_email', 42, array('checked' => true));
-    $this->assert_equal('', $test, '<input checked="checked" type="checkbox" id="receive_email" name="receive_email" value="42"/>');
+    $test = form::check_box('eula', 42, array('checked' => true));
+    $this->assert_equal('', $test, '<input checked="checked" type="checkbox" id="eula" name="eula" value="42"/>');
     
-    $test = form::check_box('receive_email', 42, array('disabled' => true, 'checked' => true));
-    $this->assert_equal('', $test, '<input disabled="disabled" checked="checked" type="checkbox" id="receive_email" name="receive_email" value="42"/>');
+    $test = form::check_box('user_agreement', 42, array('disabled' => true, 'checked' => true));
+    $this->assert_equal('', $test, '<input disabled="disabled" checked="checked" type="checkbox" id="user_agreement" name="user_agreement" value="42"/>');
   }
 }
 
