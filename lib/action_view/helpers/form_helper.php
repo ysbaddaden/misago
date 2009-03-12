@@ -1,9 +1,10 @@
 <?php
 
-# TODO: Continue to test FormHelper class!
+# TODO: Test class based index.
 class FormHelper
 {
   protected $object;
+  protected $index;
   
   function __construct($record_or_name, $args=null)
   {
@@ -14,6 +15,10 @@ class FormHelper
     {
       $class = String::camelize($record_or_name);
       $this->object = new $class;
+    }
+    
+    if (isset($args['index'])) {
+      $this->index = $args['index'];
     }
   }
   
@@ -26,36 +31,61 @@ class FormHelper
    */
   function label($column, $text=null, $attributes=null)
   {
+    $this->preparse_attributes($attributes);
     return form::label($this->object, $column, $text, $attributes);
   }
   
   function hidden_field($column, $attributes=null)
   {
+    $this->preparse_attributes($attributes);
     return form::hidden_field($this->object, $column, $attributes);
   }
   
   function text_field($column, $attributes=null)
   {
+    $this->preparse_attributes($attributes);
     return form::text_field($this->object, $column, $attributes);
   }
   
   function text_area($column, $attributes=null)
   {
+    $this->preparse_attributes($attributes);
     return form::text_area($this->object, $column, $attributes);
+  }
+  
+  function password_field($column, $attributes=null)
+  {
+    $this->preparse_attributes($attributes);
+    return form::password_field($this->object, $column, $attributes);
   }
   
   function check_box($column=null, $attributes=null)
   {
+    $this->preparse_attributes($attributes);
     return form::check_box($this->object, $column, $attributes);
   }
   
   function radio_button($column, $tag_value, $attributes=null)
   {
+    $this->preparse_attributes($attributes);
     return form::radio_button($this->object, $column, $tag_value, $attributes);
+  }
+  
+  # TODO: test select.
+  function select($column, $options, $attributes=null)
+  {
+    $this->preparse_attributes($attributes);
+    return form::select($this->object, $column, $options, $attributes);
+  }
+  
+  function preparse_attributes(&$attributes)
+  {
+    if (!isset($attributes['index']) and isset($this->index)) {
+      $attributes['index'] = $this->index;
+    }
   }
 }
 
-# TODO: Test fields_for
 function fields_for($record_or_name)
 {
   return new FormHelper($record_or_name);

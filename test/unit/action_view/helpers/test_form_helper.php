@@ -34,32 +34,13 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
     $this->assert_equal("", $f->label('username', array('class' => 'username')), '<label class="username" for="product_username">Username</label>');
   }
   
-  function test_check_box()
+  function test_hidden_field()
   {
-    $f = fields_for('Product');
-    $this->assert_equal("", $f->check_box('available'),
-      '<input type="hidden" name="product[available]" value="0"/>'.
-      '<input id="product_available" type="checkbox" name="product[available]" value="1"/>'
-    );
+    $product = new Product(array('price' => 8.97));
     
-    $this->assert_equal("", $f->check_box('available', array('class' => 'test')),
-      '<input type="hidden" name="product[available]" value="0"/>'.
-      '<input class="test" id="product_available" type="checkbox" name="product[available]" value="1"/>'
-    );
-    
-    $product = new Product(array('in_stock' => true));
     $f = fields_for($product);
-    $this->assert_equal("", $f->check_box('in_stock'),
-      '<input type="hidden" name="product[in_stock]" value="0"/>'.
-      '<input id="product_in_stock" checked="checked" type="checkbox" name="product[in_stock]" value="1"/>'
-    );
-    
-    $product = new Product(array('in_stock' => false));
-    $f = fields_for($product);
-    $this->assert_equal("", $f->check_box('in_stock', array('class' => 'checkbox')),
-      '<input type="hidden" name="product[in_stock]" value="0"/>'.
-      '<input class="checkbox" id="product_in_stock" type="checkbox" name="product[in_stock]" value="1"/>'
-    );
+    $this->assert_equal("", $f->hidden_field('price'), '<input id="product_price" type="hidden" name="product[price]" value="8.97"/>');
+    $this->assert_equal("", $f->hidden_field('price', array('class' => 'abcd')), '<input class="abcd" id="product_price" type="hidden" name="product[price]" value="8.97"/>');
   }
   
   function test_text_field()
@@ -91,7 +72,49 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
     );
   }
   
-  # TODO: Fix radio_button name and id by appending value to them!
+  function test_password_field()
+  {
+    $product = new Product(array('name' => 'azerty'));
+    $f = fields_for($product);
+    $this->assert_equal("", $f->password_field('name'),
+      '<input id="product_name" type="password" name="product[name]" value="azerty"/>'
+    );
+    
+    $product = new Product(array('name' => 'bepo'));
+    $f = fields_for($product);
+    $this->assert_equal("", $f->password_field('name', array('class' => 'text')),
+      '<input class="text" id="product_name" type="password" name="product[name]" value="bepo"/>'
+    );
+  }
+  
+  function test_check_box()
+  {
+    $f = fields_for('Product');
+    $this->assert_equal("", $f->check_box('available'),
+      '<input type="hidden" name="product[available]" value="0"/>'.
+      '<input id="product_available" type="checkbox" name="product[available]" value="1"/>'
+    );
+    
+    $this->assert_equal("", $f->check_box('available', array('class' => 'test')),
+      '<input type="hidden" name="product[available]" value="0"/>'.
+      '<input class="test" id="product_available" type="checkbox" name="product[available]" value="1"/>'
+    );
+    
+    $product = new Product(array('in_stock' => true));
+    $f = fields_for($product);
+    $this->assert_equal("", $f->check_box('in_stock'),
+      '<input type="hidden" name="product[in_stock]" value="0"/>'.
+      '<input id="product_in_stock" checked="checked" type="checkbox" name="product[in_stock]" value="1"/>'
+    );
+    
+    $product = new Product(array('in_stock' => false));
+    $f = fields_for($product);
+    $this->assert_equal("", $f->check_box('in_stock', array('class' => 'checkbox')),
+      '<input type="hidden" name="product[in_stock]" value="0"/>'.
+      '<input class="checkbox" id="product_in_stock" type="checkbox" name="product[in_stock]" value="1"/>'
+    );
+  }
+  
   function test_radio_button()
   {
     $product = new Product(array('category' => 'none'));
