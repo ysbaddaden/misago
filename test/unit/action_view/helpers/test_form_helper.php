@@ -94,14 +94,15 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
   # TODO: Fix radio_button name and id by appending value to them!
   function test_radio_button()
   {
-    $product = new Product(array('price' => '9.95'));
+    $product = new Product(array('category' => 'none'));
+    
     $f = fields_for($product);
-    $product->assert_equal("", $f->radio_button('price', 9.95),
-      '<input id="price" checked="checked" type="radio" name="price" value="9.95">');
-    $product->assert_equal("", $f->radio_button('price', 5.95),
-      '<input id="price" type="radio" name="price" value="5.95">');
-    $product->assert_equal("", $f->radio_button('price', 2.95),
-      '<input id="price" type="radio" name="price" value="2.95">');
+    $this->assert_equal("", $f->radio_button('category', 'none'),
+      '<input id="product_category_none" checked="checked" type="radio" name="product[category]" value="none"/>');
+    $this->assert_equal("", $f->radio_button('category', 'keyboard'),
+      '<input id="product_category_keyboard" type="radio" name="product[category]" value="keyboard"/>');
+    $this->assert_equal("", $f->radio_button('category', 'cover'),
+      '<input id="product_category_cover" type="radio" name="product[category]" value="cover"/>');
   }
 }
 
