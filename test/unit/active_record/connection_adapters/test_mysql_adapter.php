@@ -127,11 +127,6 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $this->assert_true("must succeed", $rs);
   }
   
-  function test_select_rows()
-  {
-    
-  }
-  
   function test_select_all()
   {
     $rs = $this->db->select_all("SELECT title FROM products WHERE id = 1 ;");

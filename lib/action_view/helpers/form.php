@@ -94,12 +94,21 @@ class form
     if (!is_array($selected)) {
       $selected = array($selected);
     }
-    
+    /*
+    if (!is_hash($options))
+    {
+      $_options = array();
+      foreach($options as $ary) {
+        $_options[$ary[0]] = $ary[1];
+      }
+      $options =& $_options;
+    }
+    */
     $str = '';
     foreach($options as $name => $value)
     {
-      $selected = (in_array($value, $selected)) ? ' selected="selected"' : '';
-      $str .= "<option value=\"$value\"$selected>$name</option>";
+      $attr = (in_array($value, $selected)) ? ' selected="selected"' : '';
+      $str .= "<option value=\"$value\"$attr>$name</option>";
     }
     return $str;
   }

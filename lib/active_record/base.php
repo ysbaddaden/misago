@@ -138,36 +138,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $options['limit'] = 1;
     }
     
-    # buils SQL
-    $table  = $this->db->quote_table($this->table_name);
-    $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
-    $where  = '';
-    $group  = '';
-    $order  = '';
-    $limit  = '';
-    $joins  = '';
-    
-    if (!empty($options['joins'])) {
-      $joins = is_array($options['joins']) ? implode(' ', $options['joins']) : $options['joins'];
-    }
-    if (!empty($options['conditions'])) {
-      $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
-    }
-    if (!empty($options['group'])) {
-      $group = 'GROUP BY '.$this->db->sanitize_order($options['group']);
-    }
-    if (!empty($options['order'])) {
-      $order = 'ORDER BY '.$this->db->sanitize_order($options['order']);
-    }
-    if (isset($options['limit']))
-    {
-      $page  = isset($options['page']) ? $options['page'] : null;
-      $limit = $this->db->sanitize_limit($options['limit'], $page);
-    }
-    
-    $sql = "SELECT $select FROM $table $joins $where $group $order $limit ;";
-    
     # queries then creates objects
+    $sql = $this->build_sql_from_options(&$options);
     $class = get_class($this);
     switch($scope)
     {
@@ -198,6 +170,38 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
   }
   
+  protected function build_sql_from_options($options)
+  {
+    # builds SQL
+    $table  = $this->db->quote_table($this->table_name);
+    $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
+    $where  = '';
+    $group  = '';
+    $order  = '';
+    $limit  = '';
+    $joins  = '';
+    
+    if (!empty($options['joins'])) {
+      $joins = is_array($options['joins']) ? implode(' ', $options['joins']) : $options['joins'];
+    }
+    if (!empty($options['conditions'])) {
+      $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
+    }
+    if (!empty($options['group'])) {
+      $group = 'GROUP BY '.$this->db->sanitize_order($options['group']);
+    }
+    if (!empty($options['order'])) {
+      $order = 'ORDER BY '.$this->db->sanitize_order($options['order']);
+    }
+    if (isset($options['limit']))
+    {
+      $page  = isset($options['page']) ? $options['page'] : null;
+      $limit = $this->db->sanitize_limit($options['limit'], $page);
+    }
+    
+    return "SELECT $select FROM $table $joins $where $group $order $limit ;";
+  } 
+  
   /**
    * Shortcut for find(:all).
    */
@@ -215,7 +219,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
-   * Checkes wether a given record exists or not.
+   * Checks wether a given record exists or not.
    */
   function exists($id)
   {
@@ -228,6 +232,19 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     );
     $self = $this->find(':first', $options);
     return (gettype($self) == 'object');
+  }
+  
+  function & find_for_select($options_or_select)
+  {
+    $options = is_string($options_or_select) ?
+      array('select' => $options_or_select) : $options_or_select;
+    $sql = $this->build_sql_from_options(&$options);
+    
+    $rs = $this->db->select_all($sql);
+    foreach($rs as $i => $values) {
+      $rs[$i] = array_values($rs[$i]);
+    }
+    return $rs;
   }
   
   /**
