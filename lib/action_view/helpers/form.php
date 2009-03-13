@@ -88,7 +88,6 @@ class form
     return html::select($name, $options, $attributes);
   }
   
-  # TODO: test options_for_select.
   static function options_for_select($options, $selected=null)
   {
     if (!is_array($selected)) {
