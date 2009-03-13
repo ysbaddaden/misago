@@ -1,6 +1,5 @@
 <?php
 
-# TODO: Test class based index.
 class FormHelper
 {
   protected $object;
@@ -86,9 +85,9 @@ class FormHelper
   }
 }
 
-function fields_for($record_or_name)
+function fields_for($record_or_name, $args=null)
 {
-  return new FormHelper($record_or_name);
+  return new FormHelper($record_or_name, $args);
 }
 
 ?>

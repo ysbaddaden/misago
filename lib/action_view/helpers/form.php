@@ -113,7 +113,7 @@ class form
     return $str;
   }
   
-  private static function format_name_and_id($object, $column, $attributes=null)
+  private static function format_name_and_id($object, $column, &$attributes=null)
   {
     $record_name = is_object($object) ? get_class($object) : $object;
     $record_name = String::underscore($record_name);

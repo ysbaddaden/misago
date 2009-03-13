@@ -127,6 +127,30 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
     $this->assert_equal("", $f->radio_button('category', 'cover'),
       '<input id="product_category_cover" type="radio" name="product[category]" value="cover"/>');
   }
+  
+  function test_index()
+  {
+    $f = fields_for('Product', array('index' => 2));
+    
+    $this->assert_equal("", $f->label('available'), '<label for="product_2_available">Available</label>');
+    $this->assert_equal("", $f->hidden_field('price'),
+      '<input id="product_2_price" type="hidden" name="product[2][price]"/>');
+    $this->assert_equal("", $f->text_field('name'),
+      '<input id="product_2_name" type="text" name="product[2][name]"/>'
+    );
+    $this->assert_equal("", $f->text_area('description'),
+      '<textarea id="product_2_description" name="product[2][description]"></textarea>'
+    );
+    $this->assert_equal("", $f->password_field('name'),
+      '<input id="product_2_name" type="password" name="product[2][name]"/>'
+    );
+    $this->assert_equal("", $f->check_box('in_stock'),
+      '<input type="hidden" name="product[2][in_stock]" value="0"/>'.
+      '<input id="product_2_in_stock" type="checkbox" name="product[2][in_stock]" value="1"/>'
+    );
+    $this->assert_equal("", $f->radio_button('category', 'none'),
+      '<input id="product_2_category_none" type="radio" name="product[2][category]" value="none"/>');
+  }
 }
 
 new Test_ActionView_Helper_FormHelper();
