@@ -3,7 +3,6 @@
  * 
  * @package ActiveRecord
  * 
- * TODO: Validate before create or update.
  * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
  */
@@ -250,20 +249,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     $self = $this->find(':first', $options);
     return (gettype($self) == 'object');
   }
-  /*
-  function & find_for_select($options_or_select)
-  {
-    $options = is_string($options_or_select) ?
-      array('select' => $options_or_select) : $options_or_select;
-    $sql = $this->build_sql_from_options(&$options);
-    
-    $rs = $this->db->select_all($sql);
-    foreach($rs as $i => $values) {
-      $rs[$i] = array_values($rs[$i]);
-    }
-    return $rs;
-  }
-  */
   
   /**
    * Creates or updates the record.
@@ -346,9 +331,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $class  = get_class($this);
       $record = new $class($attributes);
       
-#      if (!$record->is_valid()) {
-#        return $record;
-#      }
+      if (!$record->is_valid()) {
+        return $record;
+      }
       if ($record->_create()) {
         return $record;
       }
@@ -393,11 +378,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   {
     if (!is_array($id))
     {
-      $class  = get_class($this);
+      $class = get_class($this);
+      
       $record = new $class($id);
-#      if (!$record->is_valid()) {
-#        return $record;
-#      }
+      $record->set_attributes($attributes);
+      
+      if (!$record->is_valid()) {
+        return $record;
+      }
       return ($record->_update($attributes) !== false) ? $record : false;
     }
     else
