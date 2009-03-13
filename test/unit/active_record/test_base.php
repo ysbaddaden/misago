@@ -412,17 +412,18 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal('', $products[0]->id, 2);
   }
   
-  function test_find_for_select()
+  function test_find_values()
   {
     $product = new Product();
+    $options = $product->find(':values', array('select' => 'name, id', 'order' => 'name asc'));
     
-    $options = $product->find_for_select(array('select' => 'name, id', 'order' => 'name asc'));
+    $this->assert_equal('', count($options), 3);
     $this->assert_equal('', $options[0][0], 'azerty');
     $this->assert_equal('', $options[0][1], '3');
     $this->assert_equal('', $options[1][0], 'bepo');
     $this->assert_equal('', $options[1][1], '1');
 
-    $options = $product->find_for_select('name, id');
+    $options = $product->values(array('select' => 'name, id', 'order' => 'name asc'));
     $this->assert_equal('', count($options), 3);
   }
 }

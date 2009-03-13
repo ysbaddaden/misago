@@ -20,11 +20,12 @@ class Test_ActionView_Helper_Form extends Unit_TestCase
     
     $this->fixtures('products');
     $product = new Product();
-    $options = $product->find_for_select(array('select' => 'name, id'));
+    
+    $options = $product->find(':values', array('select' => 'name, id', 'order' => 'name asc'));
     $test = form::options_for_select($options);
-    $this->assert_equal('', $test, '<option value="1">bepo</option>'.
-      '<option value="2">qwerty</option>'.
-      '<option value="3">azerty</option>'
+    $this->assert_equal('', $test, '<option value="3">azerty</option>'.
+      '<option value="1">bepo</option>'.
+      '<option value="2">qwerty</option>'
     );
   }
 }

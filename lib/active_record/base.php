@@ -140,6 +140,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     # queries then creates objects
     $sql = $this->build_sql_from_options(&$options);
+    
     $class = get_class($this);
     switch($scope)
     {
@@ -166,6 +167,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           $record = null;
         }
         return $record;
+      break;
+      
+      case ':values':
+        $results = $this->db->select_all($sql);
+        foreach($results as $i => $values) {
+          $results[$i] = array_values($results[$i]);
+        }
+        return $results;
       break;
     }
   }
@@ -219,6 +228,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
+   * Shortcut for find(:values).
+   */
+  function values($options=null)
+  {
+    return $this->find(':values', $options);
+  }
+  
+  /**
    * Checks wether a given record exists or not.
    */
   function exists($id)
@@ -233,7 +250,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     $self = $this->find(':first', $options);
     return (gettype($self) == 'object');
   }
-  
+  /*
   function & find_for_select($options_or_select)
   {
     $options = is_string($options_or_select) ?
@@ -246,6 +263,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     return $rs;
   }
+  */
   
   /**
    * Creates or updates the record.

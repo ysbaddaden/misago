@@ -94,7 +94,7 @@ class form
     if (!is_array($selected)) {
       $selected = array($selected);
     }
-    /*
+    
     if (!is_hash($options))
     {
       $_options = array();
@@ -103,7 +103,7 @@ class form
       }
       $options =& $_options;
     }
-    */
+    
     $str = '';
     foreach($options as $name => $value)
     {
