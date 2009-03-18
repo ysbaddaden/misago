@@ -142,11 +142,11 @@ class Test_ActiveRecord_Errors extends Unit_Test
     $errors->clear();
     $this->assert_type('errors where cleared', $errors->on_base(), 'NULL');
   }
-  /*
+  
   function test_full_messages()
   {
     $errors = new ActiveRecord_Errors();
-    $this->assert_type('', $errors->full_messages(), array());
+    $this->assert_equal('', $errors->full_messages(), array());
     
     $errors->add_to_base('generic error msg');
     $this->assert_equal('', $errors->full_messages(), array('generic error msg'));
@@ -158,9 +158,8 @@ class Test_ActiveRecord_Errors extends Unit_Test
     $this->assert_equal('', $errors->full_messages(), array('generic error msg', 'title is invalid', 'title is blank'));
     
     $errors->clear();
-    $this->assert_type('errors where cleared', $errors->full_messages(), array());
+    $this->assert_equal('errors where cleared', $errors->full_messages(), array());
   }
-  */
 }
 
 new Test_ActiveRecord_Errors();

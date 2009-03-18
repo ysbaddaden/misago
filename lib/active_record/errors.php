@@ -56,16 +56,14 @@ class ActiveRecord_Errors
     return $count;
   }
   
-  # FIXME: ActiveRecord_Errors::full_messages() -> how do we concatenate arrays in PHP?
   function full_messages()
   {
     $messages = $this->base_messages;
     foreach($this->messages as $_messages) {
-      $messages += $_messages;
+      $messages = array_merge($messages, $_messages);
     }
     return $messages;
   }
-  
   
   function is_empty()
   {
