@@ -488,8 +488,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * $post = new Post(456);
    * $post->delete();
    * </code>
-   * 
-   * TODO: Test ActiveRecord_Base::delete().
    */
   function delete($id=null)
   {

@@ -245,6 +245,16 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_true("updates record", $product->save());
   }
   
+  function test_delete()
+  {
+    $product = new Product(1);
+    $product->delete();
+    $this->assert_equal("", $product->find(1), null);
+    
+    $product->delete(2);
+    $this->assert_equal("", $product->find(2), null);
+  }
+  
   function test_delete_all()
   {
     $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
