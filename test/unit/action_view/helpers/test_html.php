@@ -40,6 +40,13 @@ class Test_ActionView_Helper_Html extends Unit_Test
     $this->assert_equal('', html::form_tag('/profiles'), '<form action="/profiles" method="post">');
     $this->assert_equal('', html::form_tag('/profiles', array('method' => 'GET')), '<form action="/profiles" method="get">');
     $this->assert_equal('', html::form_tag('/profiles', array('multipart' => true)), '<form action="/profiles" method="post" enctype="multipart/form-data">');
+    
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'put')),
+      '<form action="/profiles" method="post"><input type="hidden" name="_method" value="put"/>');
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'delete')),
+      '<form action="/profiles" method="post"><input type="hidden" name="_method" value="delete"/>');
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'put', 'multipart' => true)),
+      '<form action="/profiles" method="post" enctype="multipart/form-data"><input type="hidden" name="_method" value="put"/>');
   }
   
   function test_label()

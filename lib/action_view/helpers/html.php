@@ -51,12 +51,20 @@ class html
   }
   
   
-  # TODO: Simulate PUT, DELETE HTTP methods (ie. anything but GET/POST).
   static function form_tag($url, $options=null)
   {
     $method  = isset($options['method']) ? strtolower($options['method']) : 'post';
     $enctype = (isset($options['multipart']) and $options['multipart']) ? ' enctype="multipart/form-data"' : '';
-    return "<form action=\"$url\" method=\"$method\"$enctype>";
+    
+    if ($method == 'get' or $method == 'post') {
+      $str = "<form action=\"$url\" method=\"$method\"$enctype>";
+    }
+    else
+    {
+      $str  = "<form action=\"$url\" method=\"post\"$enctype>";
+      $str .= '<input type="hidden" name="_method" value="'.$method.'"/>';
+    }
+    return $str;
   }
   
   static function label($name, $text=null, $attributes=null)
