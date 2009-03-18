@@ -90,7 +90,10 @@ class form
   
   static function options_for_select($options, $selected=null)
   {
-    if (!is_array($selected)) {
+    if ($selected === null) {
+      $selected = array();
+    }
+    elseif (!is_array($selected)) {
       $selected = array($selected);
     }
     

@@ -18,6 +18,10 @@ class Test_ActionView_Helper_Form extends Unit_TestCase
       '<option value="3">azerty</option>'
     );
     
+    $options = array(array('yes', 1), array('no', 0));
+    $test = form::options_for_select($options);
+    $this->assert_equal('', $test, '<option value="1">yes</option><option value="0">no</option>');
+    
     $this->fixtures('products');
     $product = new Product();
     

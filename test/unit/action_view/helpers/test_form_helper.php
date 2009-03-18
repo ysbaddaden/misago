@@ -128,6 +128,23 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
       '<input id="product_category_cover" type="radio" name="product[category]" value="cover"/>');
   }
   
+  function test_select()
+  {
+    $product = new Product(array('category' => 'none'));
+    
+    $f = fields_for($product);
+    $this->assert_equal("", $f->select('category', array()),
+      '<select id="product_category" name="product[category]"></select>');
+    
+    $options = array(array('yes', 1));
+    $this->assert_equal("", $f->select('in_stock', $options),
+      '<select id="product_in_stock" name="product[in_stock]"><option value="1">yes</option></select>');
+    
+    $options = array(array('yes', 1), array('no', 0));
+    $this->assert_equal("", $f->select('in_stock', $options),
+      '<select id="product_in_stock" name="product[in_stock]"><option value="1">yes</option><option value="0">no</option></select>');
+  }
+  
   function test_index()
   {
     $f = fields_for('Product', array('index' => 2));

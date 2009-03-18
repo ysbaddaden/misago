@@ -70,7 +70,6 @@ class FormHelper
     return form::radio_button($this->object, $column, $tag_value, $attributes);
   }
   
-  # TODO: test select.
   function select($column, $options, $attributes=null)
   {
     $this->preparse_attributes($attributes);
