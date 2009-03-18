@@ -50,7 +50,6 @@ class html
     return $map->reverse($mapping);
   }
   
-  
   static function form_tag($url, $options=null)
   {
     $method  = isset($options['method']) ? strtolower($options['method']) : 'post';
