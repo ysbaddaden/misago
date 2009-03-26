@@ -445,7 +445,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product = $product->update(1, array('name' => ''));
     $this->assert_false("must fail on update", $product->errors->is_empty());
-    $this->assert_true("name is invalid",  $product->errors->is_invalid('name'));
+    $this->assert_true("name is invalid", $product->errors->is_invalid('name'));
     
     $product = $product->create(array());
     $this->assert_false("must fail on create", $product->errors->is_empty());

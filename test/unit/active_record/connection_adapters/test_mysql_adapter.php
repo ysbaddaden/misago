@@ -114,7 +114,6 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     ));
   }
   
-  # TODO: Test missing table case.
   function test_insert()
   {
     $rs = $this->db->insert('products', array('title' => 'azerty'));
