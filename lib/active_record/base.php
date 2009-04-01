@@ -261,6 +261,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   
   protected function _create()
   {
+    $this->before_save();
+    $this->before_create();
+    
     # timestamps
     if (array_key_exists('created_at', $this->columns))
     {
@@ -278,7 +281,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     if ($id)
     {
       $this->new_record = false;
-      return $this->{$this->primary_key} = $id;
+      $this->{$this->primary_key} = $id;
+      
+      $this->after_save();
+      $this->after_create();
+      
+      return $id;
     }
     return false;
   }
@@ -291,6 +299,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
         $this->$field = $value;
       }
     }
+    
+    $this->before_save();
+    $this->before_update();
     
     # timestamps
     if (array_key_exists('updated_at', $this->columns))
@@ -313,7 +324,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     # update
     $conditions = array($this->primary_key => $this->{$this->primary_key});
     $updates    = ($attributes === null) ? $this->__attributes : $attributes;
-    return $this->db->update($this->table_name, $updates, $conditions);
+    
+    if ($this->db->update($this->table_name, $updates, $conditions))
+    {
+      $this->after_save();
+      $this->after_update();
+      return true;
+    }
+    return false;
   }
   
   /**
@@ -510,6 +528,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   {
     return $this->db->delete($this->table_name, $conditions, $options);
   }
+  
+  # TODO: Test before_* and after_* callbacks.
+  protected function before_save()   {}
+  protected function before_create() {}
+  protected function before_update() {}
+  protected function after_save()    {}
+  protected function after_create()  {}
+  protected function after_update()  {}
 }
 
 ?>
