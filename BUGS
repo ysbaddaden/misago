@@ -1,11 +1,8 @@
 
 Known bugs and oddities in misago:
 
-script/generate:
- * resource : model test must extend Unit_TestCase and not Unit_Test.
-
 ActiveRecord::Base:
- * tests for updating many record are broken?
  * calling an unknown method of ActiveRecord_Base must trigger a 'no such method' error.
- * misses before_delete and after_delete protected methods.
+ * delete should instanciate the object before deletion.
+ * before_delete and after_delete aren't used.
 

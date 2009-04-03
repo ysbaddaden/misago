@@ -523,6 +523,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * Deletes many records at once.
    * 
    * Available options:
+   * 
    *   - limit
    *   - order
    */
@@ -533,11 +534,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   
   # TODO: Test before_* and after_* callbacks.
   protected function before_save()   {}
-  protected function before_create() {}
-  protected function before_update() {}
   protected function after_save()    {}
+  
+  protected function before_create() {}
   protected function after_create()  {}
+  
   protected function after_update()  {}
+  protected function before_update() {}
+
+  protected function before_delete() {}
+  protected function after_delete()  {}
 }
 
 ?>
