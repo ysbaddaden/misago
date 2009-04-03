@@ -245,6 +245,16 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_true("updates record", $product->save());
   }
   
+  function test_delete()
+  {
+    $product = new Product(1);
+    $product->delete();
+    $this->assert_equal("", $product->find(1), null);
+    
+    $product->delete(2);
+    $this->assert_equal("", $product->find(2), null);
+  }
+  
   function test_delete_all()
   {
     $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
@@ -410,6 +420,36 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $products = $product->find_all(array('limit' => 1, 'page' => 2, 'order' => 'id asc'));
     $this->assert_equal('', count($products), 1);
     $this->assert_equal('', $products[0]->id, 2);
+  }
+  
+  function test_find_values()
+  {
+    $product = new Product();
+    $options = $product->find(':values', array('select' => 'name, id', 'order' => 'name asc'));
+    
+    $this->assert_equal('', count($options), 3);
+    $this->assert_equal('', $options[0][0], 'azerty');
+    $this->assert_equal('', $options[0][1], '3');
+    $this->assert_equal('', $options[1][0], 'bepo');
+    $this->assert_equal('', $options[1][1], '1');
+
+    $options = $product->values(array('select' => 'name, id', 'order' => 'name asc'));
+    $this->assert_equal('', count($options), 3);
+  }
+  
+  function test_validations()
+  {
+    $product = new Product(1);
+    $this->assert_true("", $product->save());
+    $this->assert_true("", $product->errors->is_empty());
+    
+    $product = $product->update(1, array('name' => ''));
+    $this->assert_false("must fail on update", $product->errors->is_empty());
+    $this->assert_true("name is invalid", $product->errors->is_invalid('name'));
+    
+    $product = $product->create(array());
+    $this->assert_false("must fail on create", $product->errors->is_empty());
+    $this->assert_true("name is invalid", $product->errors->is_invalid('name'));
   }
 }
 

@@ -114,7 +114,6 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     ));
   }
   
-  # TODO: Test missing table case.
   function test_insert()
   {
     $rs = $this->db->insert('products', array('title' => 'azerty'));
@@ -125,11 +124,6 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     
     $rs = $this->db->insert('products', array('title' => 'qwerty'));
     $this->assert_true("must succeed", $rs);
-  }
-  
-  function test_select_rows()
-  {
-    
   }
   
   function test_select_all()

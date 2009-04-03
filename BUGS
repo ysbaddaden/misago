@@ -1,0 +1,9 @@
+
+Known bugs and oddities in misago:
+
+script/generate:
+ * resource : model test must extend Unit_TestCase and not Unit_Test.
+
+ActiveRecord::Base:
+ * calling an unknown method of ActiveRecord_Base must trigger a 'no such method' error.
+ * misses before_(save|create|update) and after_(save|create|update) protected methods.

@@ -3,7 +3,6 @@
  * 
  * @package ActiveRecord
  * 
- * TODO: Validate before create or update.
  * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
  */
@@ -138,36 +137,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $options['limit'] = 1;
     }
     
-    # buils SQL
-    $table  = $this->db->quote_table($this->table_name);
-    $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
-    $where  = '';
-    $group  = '';
-    $order  = '';
-    $limit  = '';
-    $joins  = '';
-    
-    if (!empty($options['joins'])) {
-      $joins = is_array($options['joins']) ? implode(' ', $options['joins']) : $options['joins'];
-    }
-    if (!empty($options['conditions'])) {
-      $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
-    }
-    if (!empty($options['group'])) {
-      $group = 'GROUP BY '.$this->db->sanitize_order($options['group']);
-    }
-    if (!empty($options['order'])) {
-      $order = 'ORDER BY '.$this->db->sanitize_order($options['order']);
-    }
-    if (isset($options['limit']))
-    {
-      $page  = isset($options['page']) ? $options['page'] : null;
-      $limit = $this->db->sanitize_limit($options['limit'], $page);
-    }
-    
-    $sql = "SELECT $select FROM $table $joins $where $group $order $limit ;";
-    
     # queries then creates objects
+    $sql = $this->build_sql_from_options(&$options);
+    
     $class = get_class($this);
     switch($scope)
     {
@@ -195,8 +167,48 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
         }
         return $record;
       break;
+      
+      case ':values':
+        $results = $this->db->select_all($sql);
+        foreach($results as $i => $values) {
+          $results[$i] = array_values($results[$i]);
+        }
+        return $results;
+      break;
     }
   }
+  
+  protected function build_sql_from_options($options)
+  {
+    # builds SQL
+    $table  = $this->db->quote_table($this->table_name);
+    $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
+    $where  = '';
+    $group  = '';
+    $order  = '';
+    $limit  = '';
+    $joins  = '';
+    
+    if (!empty($options['joins'])) {
+      $joins = is_array($options['joins']) ? implode(' ', $options['joins']) : $options['joins'];
+    }
+    if (!empty($options['conditions'])) {
+      $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
+    }
+    if (!empty($options['group'])) {
+      $group = 'GROUP BY '.$this->db->sanitize_order($options['group']);
+    }
+    if (!empty($options['order'])) {
+      $order = 'ORDER BY '.$this->db->sanitize_order($options['order']);
+    }
+    if (isset($options['limit']))
+    {
+      $page  = isset($options['page']) ? $options['page'] : null;
+      $limit = $this->db->sanitize_limit($options['limit'], $page);
+    }
+    
+    return "SELECT $select FROM $table $joins $where $group $order $limit ;";
+  } 
   
   /**
    * Shortcut for find(:all).
@@ -215,7 +227,15 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
-   * Checkes wether a given record exists or not.
+   * Shortcut for find(:values).
+   */
+  function values($options=null)
+  {
+    return $this->find(':values', $options);
+  }
+  
+  /**
+   * Checks wether a given record exists or not.
    */
   function exists($id)
   {
@@ -241,6 +261,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   
   protected function _create()
   {
+    $this->before_save();
+    $this->before_create();
+    
     # timestamps
     if (array_key_exists('created_at', $this->columns))
     {
@@ -258,7 +281,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     if ($id)
     {
       $this->new_record = false;
-      return $this->{$this->primary_key} = $id;
+      $this->{$this->primary_key} = $id;
+      
+      $this->after_save();
+      $this->after_create();
+      
+      return $id;
     }
     return false;
   }
@@ -271,6 +299,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
         $this->$field = $value;
       }
     }
+    
+    $this->before_save();
+    $this->before_update();
     
     # timestamps
     if (array_key_exists('updated_at', $this->columns))
@@ -293,7 +324,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     # update
     $conditions = array($this->primary_key => $this->{$this->primary_key});
     $updates    = ($attributes === null) ? $this->__attributes : $attributes;
-    return $this->db->update($this->table_name, $updates, $conditions);
+    
+    if ($this->db->update($this->table_name, $updates, $conditions))
+    {
+      $this->after_save();
+      $this->after_update();
+      return true;
+    }
+    return false;
   }
   
   /**
@@ -311,9 +349,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $class  = get_class($this);
       $record = new $class($attributes);
       
-#      if (!$record->is_valid()) {
-#        return $record;
-#      }
+      if (!$record->is_valid()) {
+        return $record;
+      }
       if ($record->_create()) {
         return $record;
       }
@@ -358,11 +396,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   {
     if (!is_array($id))
     {
-      $class  = get_class($this);
+      $class = get_class($this);
+      
       $record = new $class($id);
-#      if (!$record->is_valid()) {
-#        return $record;
-#      }
+      $record->set_attributes($attributes);
+      
+      if (!$record->is_valid()) {
+        return $record;
+      }
       return ($record->_update($attributes) !== false) ? $record : false;
     }
     else
@@ -465,8 +506,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * $post = new Post(456);
    * $post->delete();
    * </code>
-   * 
-   * TODO: Test ActiveRecord_Base::delete().
    */
   function delete($id=null)
   {
@@ -489,6 +528,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   {
     return $this->db->delete($this->table_name, $conditions, $options);
   }
+  
+  # TODO: Test before_* and after_* callbacks.
+  protected function before_save()   {}
+  protected function before_create() {}
+  protected function before_update() {}
+  protected function after_save()    {}
+  protected function after_create()  {}
+  protected function after_update()  {}
 }
 
 ?>

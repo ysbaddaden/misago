@@ -45,11 +45,6 @@ class ActiveRecord_Connection
       throw new ActiveRecord_AdapterNotSpecified("Adapter not specified in configuration: $environment.");
     }
     
-    # FIXME: file_exists must search in INC path. Is it possible?
-#    if (!file_exists('active_record/connection_adapters/'.String::underscore($config['adapter']).'_adapter.php')) {
-#      throw new ActiveRecord_AdapterNotFound("Adapter {$config['adapter']} can't be found.");
-#    }
-    
     $class = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
     return new $class(&$config);
   }

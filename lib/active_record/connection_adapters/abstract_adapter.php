@@ -61,7 +61,6 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   abstract function & select_values($sql);
   
-  
   /**
    * Returns the columns' definition of a table.
    */

@@ -38,6 +38,21 @@ class Unit_TestCase extends Unit_Test
       }
     }
   }
+  
+  function truncate($tables)
+  {
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    
+    if (!empty($tables)) {
+      $tables = array_collection($tables);
+    }
+    
+    foreach($tables as $table)
+    {
+      $table = $db->quote_table($table);
+      $db->execute("TRUNCATE $table");
+    }
+  }
 }
 
 ?>

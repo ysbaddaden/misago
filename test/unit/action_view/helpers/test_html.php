@@ -4,9 +4,9 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/html_tag.php";
+require_once MISAGO."/lib/action_view/helpers/html.php";
 
-class Test_ActionView_Helper_HtmlTag extends Unit_Test
+class Test_ActionView_Helper_Html extends Unit_Test
 {
   function test_cdata()
   {
@@ -40,6 +40,13 @@ class Test_ActionView_Helper_HtmlTag extends Unit_Test
     $this->assert_equal('', html::form_tag('/profiles'), '<form action="/profiles" method="post">');
     $this->assert_equal('', html::form_tag('/profiles', array('method' => 'GET')), '<form action="/profiles" method="get">');
     $this->assert_equal('', html::form_tag('/profiles', array('multipart' => true)), '<form action="/profiles" method="post" enctype="multipart/form-data">');
+    
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'put')),
+      '<form action="/profiles" method="post"><input type="hidden" name="_method" value="put"/>');
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'delete')),
+      '<form action="/profiles" method="post"><input type="hidden" name="_method" value="delete"/>');
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'put', 'multipart' => true)),
+      '<form action="/profiles" method="post" enctype="multipart/form-data"><input type="hidden" name="_method" value="put"/>');
   }
   
   function test_label()
@@ -180,6 +187,6 @@ class Test_ActionView_Helper_HtmlTag extends Unit_Test
   }
 }
 
-new Test_ActionView_Helper_HtmlTag();
+new Test_ActionView_Helper_Html();
 
 ?>
