@@ -10,7 +10,6 @@ function is_symbol($str)
  * Extensions for strings.
  * 
  * @package ActiveSupport
- * @subpackage Array
  */
 class String extends Inflections
 {
