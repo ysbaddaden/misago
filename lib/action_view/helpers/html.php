@@ -1,7 +1,5 @@
 <?php
 
-# @package ActionView
-# @subpackage Helpers
 class html
 {
   /**

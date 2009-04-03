@@ -1,7 +1,6 @@
 <?php
 
 # IMPROVE: Generate YAML fixtures.
-# @package Generators
 class Generator_Model extends Generator_Base
 {
   function __construct($args, $options=array())

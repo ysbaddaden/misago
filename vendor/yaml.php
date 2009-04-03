@@ -12,7 +12,7 @@
 
 /**
  * A node, used by Spyc for parsing YAML.
- * @package ActiveSupport
+ * @package Spyc
  */
 class SPYC_YAMLNode
 {
@@ -62,7 +62,7 @@ class SPYC_YAMLNode
  *   $parser = new Spyc;
  *   $array  = $parser->load($file);
  * </code>
- * @package ActiveSupport
+ * @package Spyc
  */
 class Yaml
 {

@@ -2,7 +2,7 @@
 /**
  * 
  * @package ActionView
- * @subpackage Builders
+ * @subpackage Builder
  */
 class ActionView_Builders_YamlBuilder extends ActionView_Builder
 {
