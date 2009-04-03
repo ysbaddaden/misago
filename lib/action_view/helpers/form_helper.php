@@ -1,62 +1,92 @@
 <?php
 
-# TODO: Test FormHelper class!
 class FormHelper
 {
-  protected $record;
+  protected $object;
+  protected $index;
   
   function __construct($record_or_name, $args=null)
   {
     if (is_object($record_or_name)) {
-      $this->record = $record_or_name;
+      $this->object = $record_or_name;
     }
     else
     {
       $class = String::camelize($record_or_name);
-      $this->record = new $class;
+      $this->object = new $class;
+    }
+    
+    if (isset($args['index'])) {
+      $this->index = $args['index'];
     }
   }
   
+  /**
+   * form::label('Product', 'in_stock');
+   * form::label('Product', 'in_stock', 'In stock?');
+   * form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
+   * form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
+   * form::label('Invoice', 'address', array('class' => 'invoice-address'));
+   */
   function label($column, $text=null, $attributes=null)
   {
-    return form::label($this->record, $column, $text, $attributes);
+    $this->preparse_attributes($attributes);
+    return form::label($this->object, $column, $text, $attributes);
   }
   
   function hidden_field($column, $attributes=null)
   {
-    return form::hidden_field($this->record, $column, $attributes);
+    $this->preparse_attributes($attributes);
+    return form::hidden_field($this->object, $column, $attributes);
   }
   
   function text_field($column, $attributes=null)
   {
-    return form::text_field($this->record, $column, $attributes);
+    $this->preparse_attributes($attributes);
+    return form::text_field($this->object, $column, $attributes);
   }
   
   function text_area($column, $attributes=null)
   {
-    return form::text_area($this->record, $column, $attributes);
+    $this->preparse_attributes($attributes);
+    return form::text_area($this->object, $column, $attributes);
   }
   
-  /**
-   * Gotcha: an unchecked checkbox is never sent. A solution if to
-   * add a hidden field with the same name before the checkbox. If
-   * the box is unchecked, the hidden field's value will be sent, if
-   * it's checked PHP will overwrite the hidden field's value. 
-   */
+  function password_field($column, $attributes=null)
+  {
+    $this->preparse_attributes($attributes);
+    return form::password_field($this->object, $column, $attributes);
+  }
+  
   function check_box($column=null, $attributes=null)
   {
-    return form::check_box($this->record, $column, $attributes);
+    $this->preparse_attributes($attributes);
+    return form::check_box($this->object, $column, $attributes);
   }
   
   function radio_button($column, $tag_value, $attributes=null)
   {
-    return form::radio_button($this->record, $column, $tag_value, $attributes);
+    $this->preparse_attributes($attributes);
+    return form::radio_button($this->object, $column, $tag_value, $attributes);
+  }
+  
+  function select($column, $options, $attributes=null)
+  {
+    $this->preparse_attributes($attributes);
+    return form::select($this->object, $column, $options, $attributes);
+  }
+  
+  function preparse_attributes(&$attributes)
+  {
+    if (!isset($attributes['index']) and isset($this->index)) {
+      $attributes['index'] = $this->index;
+    }
   }
 }
 
-function fields_for($record_or_name)
+function fields_for($record_or_name, $args=null)
 {
-  return new FormHelper($record_or_name);
+  return new FormHelper($record_or_name, $args);
 }
 
 ?>
