@@ -1,6 +1,8 @@
 <?php
 
 # TODO: Test form helper functions!
+# @package ActionView
+# @subpackage Helpers
 class form
 {
   static function label($object, $column, $text=null, $attributes=null)
@@ -74,6 +76,8 @@ class form
 }
 
 # TODO: Test FormHelper class!
+# @package ActionView
+# @subpackage Helpers
 class FormHelper
 {
   protected $record;

@@ -2,7 +2,7 @@
 /**
  * 
  * @package ActionView
- * @subpackage Builder
+ * @subpackage Builders
  * 
  * TODO: Write ActionView_Builder.
  */

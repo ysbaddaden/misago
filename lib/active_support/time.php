@@ -2,7 +2,6 @@
 /**
  * 
  * @package ActiveSupport
- * @subpackage Time
  */
 class Time extends Object
 {

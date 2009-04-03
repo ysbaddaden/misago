@@ -2,7 +2,7 @@
 /**
  * 
  * @package ActionView
- * @subpackage Builder
+ * @subpackage Builders
  */
 class ActionView_Builders_XmlBuilder extends ActionView_Builder
 {

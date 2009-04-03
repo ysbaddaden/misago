@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 
+# @package Unit
 class Unit_Test
 {
   private $count_tests    = 0;

@@ -29,7 +29,7 @@ if (!isset($arguments[0]))
   exit;
 }
 
-
+# @package Generators
 class Generator_Base
 {
   protected $options = array();

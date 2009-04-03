@@ -1,5 +1,5 @@
 <?php
-
+# @package Unit
 class Unit_TestCase extends Unit_Test
 {
   function __construct()

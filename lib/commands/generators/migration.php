@@ -1,5 +1,6 @@
 <?php
 
+# @package Generators
 class Generator_Migration extends Generator_Base
 {
   function __construct($args, $options=array())
