@@ -5,5 +5,7 @@ script/generate:
  * resource : model test must extend Unit_TestCase and not Unit_Test.
 
 ActiveRecord::Base:
+ * tests for updating many record are broken?
  * calling an unknown method of ActiveRecord_Base must trigger a 'no such method' error.
- * misses before_(save|create|update) and after_(save|create|update) protected methods.
+ * misses before_delete and after_delete protected methods.
+

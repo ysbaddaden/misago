@@ -170,6 +170,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal("attribute must have changed", $product->name, 'swerty');
   }
   
+  # FIXME: Tests for updating many records at once are failing.
   function test_update_many()
   {
     $product = new Product();
