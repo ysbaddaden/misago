@@ -67,7 +67,7 @@ class ActiveRecord_Errors
   
   function is_empty()
   {
-    return empty($this->messages);
+    return (empty($this->messages) && empty($this->base_messages));
   }
   
   function is_invalid($attribute)

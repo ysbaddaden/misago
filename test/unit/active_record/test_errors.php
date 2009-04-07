@@ -99,6 +99,10 @@ class Test_ActiveRecord_Errors extends Unit_Test
     
     $errors->clear();
     $this->assert_true('errors where cleared', $errors->is_empty());
+
+    $errors->clear();
+    $errors->add_to_base('there was an error');
+    $this->assert_false('adding errors to base', $errors->is_empty());
   }
   
   function test_is_invalid()
