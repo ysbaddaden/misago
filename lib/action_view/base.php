@@ -72,6 +72,12 @@ class ActionView_Base extends Object
           include ROOT."/app/views/layouts/{$__layout_file}";
           return ob_get_clean();
         }
+        elseif (file_exists(ROOT."/app/views/layouts/default.{$this->view_format}.tpl"))
+        {
+          ob_start();
+          include ROOT."/app/views/layouts/default.{$this->view_format}.tpl";
+          return ob_get_clean();
+        }
         
         return $this->yield('content');
       }

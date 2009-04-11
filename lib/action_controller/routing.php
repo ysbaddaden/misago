@@ -99,8 +99,9 @@ class ActionController_Routing extends Object
   function resource($name)
   {
     $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'index',   'conditions' => array('method' => 'GET')));
+    $this->connect("$name/new.:format",         array(':controller' => $name, ':action' => 'neo',     'conditions' => array('method' => 'GET')));
     $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'show',    'conditions' => array('method' => 'GET')));
-    $this->connect("$name/:id/:action.:format", array(':controller' => $name,                         'conditions' => array('method' => 'GET')));
+    $this->connect("$name/:id/edit.:format",    array(':controller' => $name, ':action' => 'edit',    'conditions' => array('method' => 'GET')));
     $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'create',  'conditions' => array('method' => 'POST')));
     $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'update',  'conditions' => array('method' => 'PUT')));
     $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'destroy', 'conditions' => array('method' => 'DELETE')));

@@ -144,43 +144,42 @@ class Test_ActionController_Routing extends Unit_Test
       ':format'     => null,
     ));
     
-    $this->assert_equal('GET /posts/1/neo', $map->route('GET', 'posts/1/neo'), array(
+    $this->assert_equal('GET /posts/new', $map->route('GET', 'posts/new'), array(
       ':method'     => 'GET',
       ':controller' => 'posts',
       ':action'     => 'neo',
+      ':format'     => null,
+    ));
+    
+    $this->assert_equal('GET /posts/1/edit', $map->route('GET', 'posts/1/edit'), array(
+      ':method'     => 'GET',
+      ':controller' => 'posts',
+      ':action'     => 'edit',
       ':id'         => '1',
       ':format'     => null,
     ));
     
-    $this->assert_equal('GET /posts/5/edit.html', $map->route('GET', 'posts/5/edit.html'), array(
-      ':method'     => 'GET',
-      ':controller' => 'posts',
-      ':action'     => 'edit',
-      ':id'         => '5',
-      ':format'     => 'html',
-    ));
-    
-    $this->assert_equal('POST /posts.xml', $map->route('POST', 'posts.xml'), array(
+    $this->assert_equal('POST /posts', $map->route('POST', 'posts'), array(
       ':method'     => 'POST',
       ':controller' => 'posts',
       ':action'     => 'create',
-      ':format'     => 'xml',
-    ));
-    
-    $this->assert_equal('PUT /posts/7', $map->route('PUT', 'posts/7'), array(
-      ':method'     => 'PUT',
-      ':controller' => 'posts',
-      ':action'     => 'update',
-      ':id'         => '7',
       ':format'     => null,
     ));
     
-    $this->assert_equal('DELETE /posts/1.json', $map->route('DELETE', 'posts/1.json'), array(
+    $this->assert_equal('PUT /posts/1', $map->route('PUT', 'posts/1'), array(
+      ':method'     => 'PUT',
+      ':controller' => 'posts',
+      ':action'     => 'update',
+      ':id'         => '1',
+      ':format'     => null,
+    ));
+    
+    $this->assert_equal('DELETE /posts/1', $map->route('DELETE', 'posts/1'), array(
       ':method'     => 'DELETE',
       ':controller' => 'posts',
       ':action'     => 'destroy',
       ':id'         => '1',
-      ':format'     => 'json',
+      ':format'     => null,
     ));
   }
   

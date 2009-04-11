@@ -9,3 +9,7 @@ ActiveRecord::Base:
 script/generate resource
  * must create AccountsController and not AccountController. Plural, not singular!
 
+Resource:
+ * resource routes are completely broken;
+ * generate must create plural controller (eg: AccountsController).
+

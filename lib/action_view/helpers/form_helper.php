@@ -1,7 +1,7 @@
 <?php
 
 # IMPROVE: Transparently protect against CSRF attacks.
-# TODO: Test start() and end() methods.
+# TODO: Test start(), end() and submit() methods.
 class FormHelper
 {
   protected $object;
@@ -23,14 +23,18 @@ class FormHelper
     }
   }
   
-  function start($url, $options)
+  function start($url, $options=null)
   {
     return html::form_tag($url, $options);
   }
   
-  function end($url, $options)
+  function end()
   {
     return '</form>';
+  }
+  
+  function submit($value=null, $name=null, $attributes=null) {
+    return html::submit($value, $name, $attributes);
   }
   
   /**

@@ -23,7 +23,7 @@ class form
     list($name, $attributes['for']) = self::format_name_and_id($object, $column, $attributes);
     return html::label($name, $text, $attributes);
   }
-  
+
   static function hidden_field($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
