@@ -65,8 +65,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
-   * find_all_by_category();
-   * find_by_id() or find_first_by_id();
+   * Generates some code.
+   * 
+   *   find_all_by_category();
+   *   find_by_id()
+   *   find_first_by_id();
    */
   function __call($name, $args)
   {

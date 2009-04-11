@@ -1,5 +1,7 @@
 <?php
 
+# IMPROVE: Transparently protect against CSRF attacks.
+# TODO: Test start() and end() methods.
 class FormHelper
 {
   protected $object;
@@ -19,6 +21,16 @@ class FormHelper
     if (isset($args['index'])) {
       $this->index = $args['index'];
     }
+  }
+  
+  function start($url, $options)
+  {
+    return html::form_tag($url, $options);
+  }
+  
+  function end($url, $options)
+  {
+    return '</form>';
   }
   
   /**
@@ -84,8 +96,11 @@ class FormHelper
   }
 }
 
-function fields_for($record_or_name, $args=null)
-{
+function fields_for($record_or_name, $args=null) {
+  return new FormHelper($record_or_name, $args);
+}
+
+function form_for($record_or_name, $args=null) {
   return new FormHelper($record_or_name, $args);
 }
 

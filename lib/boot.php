@@ -29,7 +29,7 @@ if (!function_exists('apc_store')) {
 
 require 'http.php';
 require 'translate.php';
-require 'application.php';
+#require 'application.php';
 
 function __autoload($class)
 {

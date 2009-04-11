@@ -6,3 +6,6 @@ ActiveRecord::Base:
  * delete should instanciate the object before deletion.
  * before_delete and after_delete aren't used.
 
+script/generate resource
+ * must create AccountsController and not AccountController. Plural, not singular!
+
