@@ -29,12 +29,13 @@ if (!function_exists('apc_store')) {
 
 require 'http.php';
 require 'translate.php';
-#require 'application.php';
+require 'application.php';
 
 function __autoload($class)
 {
   $path = str_replace('_', '/', $class);
   $path = String::underscore($path);
+  
   if (!include "$path.php")
   {
     debug_print_backtrace();

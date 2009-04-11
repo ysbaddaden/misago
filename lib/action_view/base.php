@@ -19,6 +19,11 @@ class ActionView_Base extends Object
       $this->controller = $controller;
       $this->view_path  = String::underscore(str_replace('Controller', '', $this->controller->name));
     }
+    
+    # loads helpers
+    require_once 'action_view/helpers/html.php';
+    require_once 'action_view/helpers/form.php';
+    require_once 'action_view/helpers/form_helper.php';
   }
   
   # Renders a template (view, layout or partial).

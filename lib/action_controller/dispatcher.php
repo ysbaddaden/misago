@@ -9,14 +9,16 @@ function ActionController_dispatch($method, $uri)
   $map     = ActionController_Routing::draw();
   $mapping = $map->route($method, $uri);
   
+  $map->build_path_and_url_helpers();
+  
   # controller
   $name  = $mapping[':controller'].'_controller';
   $class = String::camelize($name);
   
   if (file_exists(ROOT."/app/controllers/$name.php"))
   {
-    require 'application.php';
-    require ROOT."/app/controllers/$name.php";
+#    require 'application.php';
+#    require ROOT."/app/controllers/$name.php";
     $controller = new $class($mapping);
     
     # action!

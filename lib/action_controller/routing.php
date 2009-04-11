@@ -312,8 +312,8 @@ class ActionController_Routing extends Object
     {
       while(($file = readdir($dh)) !== false)
       {
-        if (is_file(APP.'/controllers/'.$file) and strpos($file, '_controller.php'))
-        
+        if (is_file(APP.'/controllers/'.$file)
+          and strpos($file, '_controller.php'))
         {
           $controller = str_replace('_controller.php', '', $file);
           $controllers[] = $controller;
