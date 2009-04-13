@@ -18,4 +18,5 @@ require ROOT.'/config/environment.php';
 
 require 'action_controller/dispatcher.php';
 require ROOT.'/config/routes.php';
+
 ?>

@@ -260,7 +260,7 @@ class ActionController_Routing extends Object
             continue;
           }
           $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action);
-          $functions["{$func_base_name}_url"]  = $this->build_url_function($func_base_name);
+#          $functions["{$func_base_name}_url"]  = $this->build_url_function($func_base_name);
         }
       }
     }
@@ -290,12 +290,13 @@ class ActionController_Routing extends Object
       "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n" :
       "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
     
-    $func .= "  return \$path;\n";
+    $func .= "  return '/'.\$path;\n";
     $func .= "}";
     
     return $func;
   }
   
+  /*
   private function build_url_function($func_base_name)
   {
     $func  = "function {$func_base_name}_url(\$keys=array()) {\n";
@@ -303,6 +304,7 @@ class ActionController_Routing extends Object
     $func .= "}";
     return $func;
   }
+  */
   
   private function & get_list_of_controllers()
   {
