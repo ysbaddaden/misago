@@ -290,7 +290,8 @@ class ActionController_Routing extends Object
       "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n" :
       "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
     
-    $func .= "  return '/'.\$path;\n";
+    $method = isset($route['method']) ? $route['method'] : 'GET';
+    $func .= "  return new ActionController_Path('{$method}', \$path);\n";
     $func .= "}";
     
     return $func;
@@ -357,6 +358,23 @@ function path_for($mapping, array $keys=null)
     return $map->reverse($mapping);
   }
   return $map->named_reverse($name, $keys);
+}
+
+class ActionController_Path
+{
+  public $method;
+  public $path;
+  
+  function __construct($method, $path)
+  {
+    $this->method = $method;
+    $this->path   = '/'.$path;
+  }
+  
+  function __toString()
+  {
+    return $this->path;
+  }
 }
 
 ?>

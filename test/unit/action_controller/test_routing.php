@@ -292,17 +292,16 @@ class Test_ActionController_Routing extends Unit_Test
     $map->build_path_and_url_helpers();
     
     $this->assert_true('show_product_path()', function_exists('show_product_path'));
+    $this->assert_true('products_path()',     function_exists('products_path'));
+    
+    $this->assert_equal('/products',    (string)products_path(), '/products/index');
+    $this->assert_equal('/product/123', (string)show_product_path(array(':id' => 123)), '/product/123');
+    $this->assert_equal('/product/123', (string)show_product_path(array(':id' => 123, ':format' => 'html')), '/product/123.html');
+    
+    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_path(array(':id' => 'Julien')), '/say/hello_who/Julien');
+    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_path(array(':id' => 'Julien', ':format' => 'xml')), '/say/hello_who/Julien.xml');
+    
 #    $this->assert_true('show_product_url()',  function_exists('show_product_url'));
-    
-    $this->assert_true('products_path()', function_exists('products_path'));
-    
-    $this->assert_equal('/products',    products_path(), '/products/index');
-    $this->assert_equal('/product/123', show_product_path(array(':id' => 123)), '/product/123');
-    $this->assert_equal('/product/123', show_product_path(array(':id' => 123, ':format' => 'html')), '/product/123.html');
-    
-    $this->assert_equal('/say/hello_who/Julien', hello_who_say_path(array(':id' => 'Julien')), '/say/hello_who/Julien');
-    $this->assert_equal('/say/hello_who/Julien', hello_who_say_path(array(':id' => 'Julien', ':format' => 'xml')), '/say/hello_who/Julien.xml');
-    
 #    $this->assert_equal('/say/hello_who/Julien', hello_who_say_url(array(':id' => 'Julien')), '/say/hello_who/Julien');
   }
 }
