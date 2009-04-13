@@ -38,15 +38,24 @@ class Test_ActionView_Helper_Html extends Unit_Test
   function test_form_tag()
   {
     $this->assert_equal('', html::form_tag('/profiles'), '<form action="/profiles" method="post">');
-    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'GET')), '<form action="/profiles" method="get">');
-    $this->assert_equal('', html::form_tag('/profiles', array('multipart' => true)), '<form action="/profiles" method="post" enctype="multipart/form-data">');
+    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'GET')),
+      '<form action="/profiles" method="get">');
+    $this->assert_equal('', html::form_tag('/profiles', array('multipart' => true)),
+      '<form action="/profiles" method="post" enctype="multipart/form-data">');
     
     $this->assert_equal('', html::form_tag('/profiles', array('method' => 'put')),
       '<form action="/profiles" method="post"><input type="hidden" name="_method" value="put"/>');
-    $this->assert_equal('', html::form_tag('/profiles', array('method' => 'delete')),
-      '<form action="/profiles" method="post"><input type="hidden" name="_method" value="delete"/>');
+    $this->assert_equal('', html::form_tag('/accounts', array('method' => 'delete')),
+      '<form action="/accounts" method="post"><input type="hidden" name="_method" value="delete"/>');
     $this->assert_equal('', html::form_tag('/profiles', array('method' => 'put', 'multipart' => true)),
       '<form action="/profiles" method="post" enctype="multipart/form-data"><input type="hidden" name="_method" value="put"/>');
+
+    $this->assert_equal('', html::form_tag(new ActionController_Path('POST', 'accounts'), array('multipart' => true)),
+      '<form action="/accounts" method="post" enctype="multipart/form-data">');
+    $this->assert_equal('', html::form_tag(new ActionController_Path('GET', 'accounts')),
+      '<form action="/accounts" method="get">');
+    $this->assert_equal('', html::form_tag(new ActionController_Path('PUT', 'profiles')),
+      '<form action="/profiles" method="post"><input type="hidden" name="_method" value="put"/>');
   }
   
   function test_label()

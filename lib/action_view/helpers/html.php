@@ -52,7 +52,15 @@ class html
   
   static function form_tag($url, $options=null)
   {
-    $method  = isset($options['method']) ? strtolower($options['method']) : 'post';
+    if (isset($options['method'])) {
+      $method = strtolower($options['method']);
+    }
+    elseif (is_object($url) and isset($url->method)) {
+      $method = strtolower($url->method);
+    }
+    else {
+      $method = 'post';
+    }
     $enctype = (isset($options['multipart']) and $options['multipart']) ? ' enctype="multipart/form-data"' : '';
     
     if ($method == 'get' or $method == 'post') {

@@ -33,7 +33,8 @@ class FormHelper
     return '</form>';
   }
   
-  function submit($value=null, $name=null, $attributes=null) {
+  function submit($value=null, $name=null, $attributes=null)
+  {
     return html::submit($value, $name, $attributes);
   }
   
