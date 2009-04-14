@@ -321,7 +321,7 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_equal('GET /users/1', show_user_path(array(':id' => 1)), $expected);
     
     $expected = new ActionController_Path('GET', 'users/new');
-    $this->assert_equal('GET /users/new', neo_user_path(), $expected);
+    $this->assert_equal('GET /users/new', new_user_path(), $expected);
     
     $expected = new ActionController_Path('GET', 'users/1/edit');
     $this->assert_equal('GET /users/1/edit', edit_user_path(array(':id' => 1)), $expected);

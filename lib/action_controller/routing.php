@@ -177,9 +177,8 @@ class ActionController_Routing extends Object
           # has keys?
           if ($this->has_keys(&$route, &$_mapping))
           {
-            $path = strtr($route['path'], $_mapping);
-            $path = str_replace(array('/:format', '.:format', '?:format'), '', $path);
-#            return "/$path";
+            $path   = strtr($route['path'], $_mapping);
+            $path   = str_replace(array('/:format', '.:format', '?:format'), '', $path);
             $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
             return new ActionController_Path($method, $path);
           }
@@ -188,7 +187,7 @@ class ActionController_Routing extends Object
           $path = ($_mapping[':action'] == 'index') ?
             "{$_mapping[':controller']}" :
             "{$_mapping[':controller']}/{$_mapping[':action']}";
-#          return isset($_mapping[':format']) ? "$path.{$_mapping[':format']}" : $path;
+          
           if (isset($_mapping[':format'])) {
             $path .= ".{$_mapping[':format']}";
           }
@@ -261,7 +260,8 @@ class ActionController_Routing extends Object
         
         foreach($actions as $action)
         {
-          $func_base_name = ($action == 'index') ? $controller : "{$action}_{$model}";
+          $func_base_name = ($action == 'index') ? $controller :
+            (($action == 'neo') ? "new_{$model}" : "{$action}_{$model}");
           
           if (isset($functions["{$func_base_name}_path"])) {
             continue;
