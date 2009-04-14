@@ -267,11 +267,9 @@ class ActionController_Routing extends Object
             continue;
           }
           $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action);
-#          $functions["{$func_base_name}_url"]  = $this->build_url_function($func_base_name);
         }
       }
     }
-    
     $functions = implode("\n\n", $functions);
     
     if ($_ENV['MISAGO_DEBUG'] == 3) {
@@ -297,7 +295,7 @@ class ActionController_Routing extends Object
       "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n" :
       "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
     
-    $method = isset($route['method']) ? $route['method'] : 'GET';
+    $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
     $func .= "  return new ActionController_Path('{$method}', \$path);\n";
     $func .= "}";
     
