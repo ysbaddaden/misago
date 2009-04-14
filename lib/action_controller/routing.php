@@ -98,13 +98,13 @@ class ActionController_Routing extends Object
    */
   function resource($name)
   {
-    $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'index',   'conditions' => array('method' => 'GET')));
-    $this->connect("$name/new.:format",         array(':controller' => $name, ':action' => 'neo',     'conditions' => array('method' => 'GET')));
-    $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'show',    'conditions' => array('method' => 'GET')));
-    $this->connect("$name/:id/edit.:format",    array(':controller' => $name, ':action' => 'edit',    'conditions' => array('method' => 'GET')));
-    $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'create',  'conditions' => array('method' => 'POST')));
-    $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'update',  'conditions' => array('method' => 'PUT')));
-    $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'destroy', 'conditions' => array('method' => 'DELETE')));
+    $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
+    $this->connect("$name/new.:format",         array(':controller' => $name, ':action' => 'neo',    'conditions' => array('method' => 'GET')));
+    $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET')));
+    $this->connect("$name/:id/edit.:format",    array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET')));
+    $this->connect("$name.:format",             array(':controller' => $name, ':action' => 'create', 'conditions' => array('method' => 'POST')));
+    $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT')));
+    $this->connect("$name/:id.:format",         array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE')));
   }
   
   /**
@@ -179,14 +179,21 @@ class ActionController_Routing extends Object
           {
             $path = strtr($route['path'], $_mapping);
             $path = str_replace(array('/:format', '.:format', '?:format'), '', $path);
-            return "/$path";
+#            return "/$path";
+            $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
+            return new ActionController_Path($method, $path);
           }
           
           # default
           $path = ($_mapping[':action'] == 'index') ?
-            "/{$_mapping[':controller']}" :
-            "/{$_mapping[':controller']}/{$_mapping[':action']}";
-          return isset($_mapping[':format']) ? "$path.{$_mapping[':format']}" : $path;
+            "{$_mapping[':controller']}" :
+            "{$_mapping[':controller']}/{$_mapping[':action']}";
+#          return isset($_mapping[':format']) ? "$path.{$_mapping[':format']}" : $path;
+          if (isset($_mapping[':format'])) {
+            $path .= ".{$_mapping[':format']}";
+          }
+          $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
+          return new ActionController_Path($method, $path);
         }
       }
     }

@@ -177,7 +177,7 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_equal('DELETE /posts/1', $map->route('DELETE', 'posts/1'), array(
       ':method'     => 'DELETE',
       ':controller' => 'posts',
-      ':action'     => 'destroy',
+      ':action'     => 'delete',
       ':id'         => '1',
       ':format'     => null,
     ));
@@ -249,32 +249,38 @@ class Test_ActionController_Routing extends Unit_Test
   {
     $map = ActionController_Routing::draw();
     $map->reset();
+    $map->resource('posts');
     $map->connect('page/:id.:format', array(':controller' => 'pages', ':action' => 'show'));
     $map->connect(':controller/:action/:id.:format');
     
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto');
-    $this->assert_equal("build route", $map->reverse($mapping), '/page/toto');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/page/toto');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 2);
-    $this->assert_equal("build route", $map->reverse($mapping), '/products/edit/2');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/products/edit/2');
     
     $mapping = array(':controller' => 'products', ':action' => 'create');
-    $this->assert_equal("build route", $map->reverse($mapping), '/products/create');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/products/create');
     
     $mapping = array(':controller' => 'products');
-    $this->assert_equal("build route", $map->reverse($mapping), '/products');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/products');
     
     $mapping = array(':controller' => 'products', ':format' => 'html');
-    $this->assert_equal("build route", $map->reverse($mapping), '/products.html');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/products.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'create', ':format' => 'html');
-    $this->assert_equal("build route", $map->reverse($mapping), '/products/create.html');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/products/create.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 10, ':format' => 'xml');
-    $this->assert_equal("build route", $map->reverse($mapping), '/products/edit/10.xml');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/products/edit/10.xml');
     
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
-    $this->assert_equal("build route", $map->reverse($mapping), '/page/toto.json');
+    $this->assert_equal("build route", (string)$map->reverse($mapping), '/page/toto.json');
+    
+    $mapping = array(':controller' => 'posts', ':action' => 'delete', ':id' => 45);
+    $test = $map->reverse($mapping);
+    $this->assert_equal("build route", $test->path, '/posts/45');
+    $this->assert_equal("build route", $test->method, 'DELETE');
   }
   
   function test_path_for()
