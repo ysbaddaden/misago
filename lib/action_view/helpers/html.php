@@ -40,6 +40,19 @@ class html
   
   static function link_to($content, $url, $attributes=null)
   {
+    if (is_object($url) and isset($url->method))
+    {
+      $method = strtolower($url->method);
+      if ($url->method != 'GET')
+      {
+        if (isset($attributes['class'])) {
+          $attributes['class'] .= ' request_method:'.$method;
+        }
+        else {
+          $attributes['class'] = 'request_method:'.$method;
+        }
+      }
+    }
     $attributes['href'] = $url;
     return html::tag('a', $content, $attributes);
   }

@@ -32,6 +32,12 @@ class Test_ActionView_Helper_Html extends Unit_Test
     $this->assert_equal("", html::link_to('azerty', '/page/123'), '<a href="/page/123">azerty</a>');
     $this->assert_equal("", html::link_to('azerty', '/page/123', array('class' => 'toto')), '<a class="toto" href="/page/123">azerty</a>');
     $this->assert_equal("", html::link_to('azerty', '/posts/tag/abcd', array('rel' => 'tag')), '<a rel="tag" href="/posts/tag/abcd">azerty</a>');
+    
+    $html_link = html::link_to('delete me', new ActionController_Path('DELETE', 'page/123'));
+    $this->assert_equal("", $html_link, '<a class="request_method:delete" href="/page/123">delete me</a>');
+    
+    $html_link = html::link_to('delete me', new ActionController_Path('DELETE', 'page/123'), array('class' => 'delete'));
+    $this->assert_equal("", $html_link, '<a class="delete request_method:delete" href="/page/123">delete me</a>');
   }
   
   
