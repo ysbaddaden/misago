@@ -36,8 +36,8 @@ class Test_ActionView_Helper_Html extends Unit_Test
     $html_link = html::link_to('delete me', new ActionController_Path('DELETE', 'page/123'));
     $this->assert_equal("", $html_link, '<a class="request_method:delete" href="/page/123">delete me</a>');
     
-    $html_link = html::link_to('delete me', new ActionController_Path('DELETE', 'page/123'), array('class' => 'delete'));
-    $this->assert_equal("", $html_link, '<a class="delete request_method:delete" href="/page/123">delete me</a>');
+    $html_link = html::link_to('destroy me', new ActionController_Path('DELETE', 'page/123'), array('class' => 'destroy'));
+    $this->assert_equal("", $html_link, '<a class="destroy request_method:delete" href="/page/123">destroy me</a>');
   }
   
   
