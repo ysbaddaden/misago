@@ -77,13 +77,13 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
     $product = new Product(array('name' => 'azerty'));
     $f = fields_for($product);
     $this->assert_equal("", $f->password_field('name'),
-      '<input id="product_name" type="password" name="product[name]" value="azerty"/>'
+      '<input id="product_name" type="password" name="product[name]" value=""/>'
     );
     
     $product = new Product(array('name' => 'bepo'));
     $f = fields_for($product);
     $this->assert_equal("", $f->password_field('name', array('class' => 'text')),
-      '<input class="text" id="product_name" type="password" name="product[name]" value="bepo"/>'
+      '<input class="text" id="product_name" type="password" name="product[name]" value=""/>'
     );
   }
   
@@ -159,7 +159,7 @@ class Test_ActionView_Helper_FormHelper extends Unit_TestCase
       '<textarea id="product_2_description" name="product[2][description]"></textarea>'
     );
     $this->assert_equal("", $f->password_field('name'),
-      '<input id="product_2_name" type="password" name="product[2][name]"/>'
+      '<input id="product_2_name" type="password" name="product[2][name]" value=""/>'
     );
     $this->assert_equal("", $f->check_box('in_stock'),
       '<input type="hidden" name="product[2][in_stock]" value="0"/>'.

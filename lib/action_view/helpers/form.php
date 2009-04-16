@@ -39,7 +39,7 @@ class form
   static function password_field($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
-    return html::password_field($name, is_object($object) ? $object->$column : '', $attributes);
+    return html::password_field($name, /*is_object($object) ? $object->$column :*/ '', $attributes);
   }
   
   static function text_area($object, $column, $attributes=null)

@@ -2,6 +2,7 @@ en:
   active_record:
     errors:
       messages:
+        required: "{{attribute}} is required"
         blank: "{{attribute}} can't be blank"
         empty: "{{attribute}} can't be empty"
         invalid: "{{attribute}} is invalid"

@@ -1,6 +1,6 @@
 <?php
 
-# IMPROVE: Transparently protect against CSRF attacks.
+# IMPROVE: Transparently protect against CSRF attacks (using a hash with the key stored in a cookie).
 # TODO: Test start(), end() and submit() methods.
 class FormHelper
 {
@@ -36,6 +36,45 @@ class FormHelper
   function submit($value=null, $name=null, $attributes=null)
   {
     return html::submit($value, $name, $attributes);
+  }
+  
+  function errors_on($column, $all=false)
+  {
+    if ($this->object->errors->is_invalid($column))
+    {
+      $errors = $this->object->errors->on($column);
+      if (!is_array($errors)) {
+        $errors = array($errors);
+      }
+      if ($all)
+      {
+        $str = "";
+        foreach($errors->on($column) as $err) {
+          $str .= "$err<br/>";
+        }
+        return "<span class=\"error\">{$str}</span>";
+      }
+      else {
+        return "<span class=\"error\">{$errors[0]}</span>";
+      }
+    }
+  }
+  
+  function errors_on_base()
+  {
+    $errors = $this->object->errors->on_base();
+    if (!empty($errors))
+    {
+      if (!is_array($errors)) {
+        $errors = array($errors);
+      }
+      
+      $str = "";
+      foreach($errors as $err) {
+        $str .= "<li>$err</li>";
+      }
+      return "<ul class=\"errors\">{$str}</ul>";
+    }
   }
   
   /**
