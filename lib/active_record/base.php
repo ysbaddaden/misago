@@ -267,6 +267,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     $this->before_save();
     $this->before_create();
     
+    if (!$this->is_valid()) {
+      return false;
+    }
+    
     # timestamps
     if (array_key_exists('created_at', $this->columns))
     {
@@ -305,6 +309,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     $this->before_save();
     $this->before_update();
+    
+    if (!$this->is_valid()) {
+      return false;
+    }
     
     # timestamps
     if (array_key_exists('updated_at', $this->columns))
@@ -353,13 +361,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     {
       $class  = get_class($this);
       $record = new $class($attributes);
+      $record->_create();
       
-      if (!$record->is_valid()) {
-        return $record;
-      }
-      if ($record->_create()) {
-        return $record;
-      }
+      return $record;
     }
     else
     {
@@ -405,11 +409,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       
       $record = new $class($id);
       $record->set_attributes($attributes);
+      $record->_update($attributes);
       
-      if (!$record->is_valid()) {
-        return $record;
-      }
-      return ($record->_update($attributes) !== false) ? $record : false;
+      return $record;
     }
     else
     {
