@@ -168,9 +168,13 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $this->assert_equal('must be a Product', get_class($product), 'Product');
     $this->assert_equal("attribute must have changed", $product->name, 'swerty');
+    
+    $product = $product->update(1, array('name' => 'swerty2', 'some_virtual_field' => ''));
+    $product = new Product(1);
+    $this->assert_equal("virtual field", $product->name, 'swerty2');
   }
   
-  # FIXME: Tests for updating many records at once are failing.
+  # FIXME: Tests failures when updating many records.
   function test_update_many()
   {
     $product = new Product();
