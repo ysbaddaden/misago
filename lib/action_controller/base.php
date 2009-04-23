@@ -13,6 +13,8 @@ abstract class ActionController_Base extends Object
   protected $already_rendered = false;
   protected $skip_view = false;
   
+  protected $helpers   = ':all';
+  
   function __construct(array $mapping=null)
   {
     $this->name   = get_class($this);
@@ -40,6 +42,7 @@ abstract class ActionController_Base extends Object
   {
     $this->action = ($action === null) ? $this->mapping[':action'] : $action;
     
+    $this->before_filters();
     $this->{$this->action}();
     
     if (!$this->already_rendered
@@ -47,14 +50,18 @@ abstract class ActionController_Base extends Object
     {
       $this->render($this->action);
     }
+
+#    $this->after_filters();
   }
   
   function render($action=null, array $options=array())
   {
     $options['action'] = ($action === null) ? $this->action : $action;
     
-    if (!isset($options['format'])) {
-      $options['format'] = empty($this->mapping[':format']) ? 'html' : $this->mapping[':format'];
+    if (!isset($options['format']))
+    {
+      $options['format'] = empty($this->mapping[':format']) ?
+        'html' : $this->mapping[':format'];
     }
     
     $view = new ActionView_Base($this);
@@ -62,6 +69,9 @@ abstract class ActionController_Base extends Object
     
     $this->already_rendered = true;
   }
+  
+  protected function before_filters() {}
+#  protected function after_filters()  {}
 }
 
 ?>

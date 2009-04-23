@@ -58,21 +58,26 @@ class HTTP
   static function status($code=200)
   {
     $status = self::$codes[$code];
-    header("Status: $code {$status}");
+    header("Status: $code", true);
   }
   
   /**
    * Redirects current request.
    */
-  static function redirect($url, $code=303)
+  static function redirect($url, $code=null)
   {
     if (!DEBUG)
     {
-      self::status($code);
+      if ($code) {
+        self::status($code);
+      }
       header("Location: $url");
     }
+    elseif ($code) {
+      echo "<p><a href=\"$url\">$url</a> [status: $code {self::$codes[$code]}]</p>";
+    }
     else {
-      echo "<p><a href=\"$url\">$url</a> [status: $code]</p>";
+      echo "<p><a href=\"$url\">$url</a> [status: 302 Found]</p>";
     }
     exit;
   }

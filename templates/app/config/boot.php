@@ -10,7 +10,7 @@ require MISAGO.'/lib/boot.php';
 
 # forces an environment if none is declared
 if (!isset($_ENV['MISAGO_ENV'])) {
-  $_ENV['MISAGO_ENV'] = 'development';
+  $_ENV['MISAGO_ENV'] = empty($_ENV['environment']) ? 'development' : $_ENV['environment'];
 }
 
 require ROOT."/config/environments/{$_ENV['MISAGO_ENV']}.php";
