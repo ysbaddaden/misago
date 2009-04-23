@@ -12,6 +12,7 @@ class ActionView_Base extends Object
     'title' => ''
   );
   
+  # TODO: load helpers based on the $controller->helpers definition.
   function __construct($controller=null)
   {
     if ($controller instanceof ActionController_Base)
@@ -156,7 +157,7 @@ class ActionView_Base extends Object
     
     $vars = array_diff_key($controller_vars, $view_vars);
     foreach($vars as $k => $v) {
-      $this->$k =& $v;
+      $this->$k = $v;
     }
   }
 }
