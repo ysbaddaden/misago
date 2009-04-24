@@ -518,10 +518,20 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   function delete($id=null)
   {
     $id = isset($id) ? $id : $this->{$this->primary_key};
+    
     if ($this->exists($id))
     {
+      $class = get_class($this);
+      $self  = new $class($id);
+      $self->before_delete();
+      
       $conditions = array($this->primary_key => $id);
-      return $this->db->delete($this->table_name, $conditions);
+      if (!$this->db->delete($this->table_name, $conditions)) {
+        return false;
+      }
+
+      $self->after_delete();
+      return true;
     }
   }
   

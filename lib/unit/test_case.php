@@ -1,5 +1,6 @@
 <?php
 
+# TODO: start and stop a test server (script/server -p 3009 -e test -d 0)
 class Unit_TestCase extends Unit_Test
 {
   function __construct()
@@ -58,20 +59,34 @@ class Unit_TestCase extends Unit_Test
   
   // functional tests
   
-  protected function assert_http_redirect($comment, $rs, $url)
+  protected function assert_redirect($comment, $rs, $url)
   {
     $this->assert_equal($comment, $rs['headers']['location'], $url);
   }
   
-  protected function assert_http_status($comment, $rs, $status)
+  protected function assert_no_redirect($comment, $rs)
+  {
+    $this->assert_false($comment, isset($rs['headers']['location']));
+  }
+  
+  protected function assert_status($comment, $rs, $status)
   {
     $this->assert_equal($comment, $rs['status'], $status);
   }
   
+  protected function assert_cookie($comment, $rs, $cookie)
+  {
+    $this->assert_true($comment, isset($rs['headers']['cookies'][$cookie]));
+  }
+  
+  protected function assert_no_cookie($comment, $rs, $cookie)
+  {
+    $this->assert_false($comment, isset($rs['headers']['cookies'][$cookie]));
+  }
+  
+  
   protected function run_action($method, $uri, $post=null)
   {
-    # TODO: start test server (script/server -p 3009 -e test -d 0)
-    
     # requests a page
     $ch = curl_init();
     
@@ -113,13 +128,19 @@ class Unit_TestCase extends Unit_Test
     }
     
     # parses headers
-    $headers = array();
+    $headers = array('cookies' => array());
     foreach(explode("\n", trim(substr($output, 0, curl_getinfo($ch, CURLINFO_HEADER_SIZE)))) as $line)
     {
       if (strpos($line, ':'))
       {
         list($header, $value) = explode(':', trim($line), 2);
-        $headers[strtolower($header)] = trim($value);
+        $header = strtolower($header);
+        if ($header == 'set-cookie')
+        {
+          preg_match('/^\s*([^=]+)=([^;]+)/', $value, $match);
+          $headers['cookies'][$match[1]] = $match[2];
+        }
+        $headers[$header] = trim($value);
       }
     }
     
