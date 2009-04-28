@@ -42,8 +42,11 @@ abstract class ActionController_Base extends Object
   {
     $this->action = ($action === null) ? $this->mapping[':action'] : $action;
     
-    if (DEBUG == 1) {
-      misago_log(sprintf("-----\nHTTP REQUEST: {$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} [%s]\n", date('Y-m-d H:i:s T')));
+    if (DEBUG == 1)
+    {
+      $time = microtime(true);
+      $date = date('Y-m-d H:i:s T');
+      misago_log(sprintf("\n\nHTTP REQUEST: {$this->mapping[':method']} {$_SERVER['REQUEST_URI']} [%s]\n", $date));
     }
     
     $this->before_filters();
@@ -54,8 +57,14 @@ abstract class ActionController_Base extends Object
     {
       $this->render($this->action);
     }
-
+    
 #    $this->after_filters();
+    
+    if (DEBUG == 1)
+    {
+      $time = microtime(true) - $time;
+      misago_log(sprintf("End of HTTP request ; Elapsed time: %.02fms", $time));
+    }
   }
   
   function render($action=null, array $options=array())
