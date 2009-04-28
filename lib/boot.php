@@ -13,9 +13,6 @@ ini_set('include_path',
 if (!isset($_ENV['MISAGO_DEBUG'])) {
   $_ENV['MISAGO_DEBUG'] = 0;
 }
-#if (isset($_ENV['MISAGO_DEBUG'])) {
-#  define('DEBUG', $_ENV['MISAGO_DEBUG']);
-#}
 
 #require 'object.php';
 require 'active_support/additions.php';
@@ -27,6 +24,7 @@ if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
 
+require 'misago_log.php';
 require 'http.php';
 require 'translate.php';
 require 'application.php';

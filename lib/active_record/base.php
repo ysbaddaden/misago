@@ -538,6 +538,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Deletes many records at once.
    * 
+   * IMPROVE: Get full list of IDs, then call $this->delete($id) for each one.
+   * 
    * Available options:
    * 
    *   - limit

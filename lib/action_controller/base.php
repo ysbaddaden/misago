@@ -42,6 +42,10 @@ abstract class ActionController_Base extends Object
   {
     $this->action = ($action === null) ? $this->mapping[':action'] : $action;
     
+    if (DEBUG == 1) {
+      misago_log(sprintf("-----\nHTTP REQUEST: {$_SERVER['REQUEST_METHOD']} {$_SERVER['REQUEST_URI']} [%s]\n", date('Y-m-d H:i:s T')));
+    }
+    
     $this->before_filters();
     $this->{$this->action}();
     

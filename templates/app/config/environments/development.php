@@ -1,6 +1,6 @@
 <?php
 
-define('DEBUG', 2);
+define('DEBUG', 1);
 error_reporting(E_ALL);
 
 if (isset($_SERVER['HTTP_HOST']))

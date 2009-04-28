@@ -3,8 +3,6 @@ Known bugs and oddities in misago:
 
 ActiveRecord::Base:
  * calling an unknown method of ActiveRecord_Base must trigger a 'no such method' error.
- * delete should instanciate the object before deletion.
- * before_delete and after_delete aren't used.
 
 script/generate resource
  * must create AccountsController and not AccountController. Plural, not singular!

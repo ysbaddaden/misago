@@ -60,19 +60,37 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
-  # IMPROVE: Add some error logging (in 'production' environment).
-  # IMPROVE: SQL requests direct log in HTML (currently only for command line).
   function execute($sql)
   {
-    if (isset($_ENV['MISAGO_DEBUG']) and $_ENV['MISAGO_DEBUG'] == 2) {
-      echo "\n$sql";
-    }
+    $time = microtime(true);
+    $rs   = mysql_query($sql, $this->link);
+    $time = microtime(true) - $time;
     
-    $rs = mysql_query($sql, $this->link);
     if (!$rs)
     {
       $message = "MySQL error [".mysql_errno($this->link)."] ".mysql_error($this->link)."\n$sql";
-      echo "\n$message\n\n";
+      if (DEBUG > 1) {
+        echo "\n$message\n";
+      }
+      elseif (DEBUG) {
+        misago_log("$message\n");
+      }
+      else
+      {
+        # IMPROVE: Add some error logging for 'production' environment.
+        
+      }
+    }
+    else
+    {
+      # IMPROVE: Add some SQL request statistics (affected rows, request time).
+      $message = sprintf("%s\nAffected rows: %d ; Elapsed time: %.02fms\n", $sql, mysql_affected_rows($this->link), $time);
+      if (DEBUG > 1) {
+        echo "\n$message\n";
+      }
+      elseif (DEBUG) {
+        misago_log($message);
+      }
     }
     return $rs;
   }

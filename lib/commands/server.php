@@ -36,7 +36,7 @@ $config_data = file_get_contents($config_file);
 $vars = array(
   "#{ROOT}"        => ROOT,
   "#{PUBLIC_ROOT}" => ROOT.'/public',
-  "#{ENVIRONMENT}" => $environment,
+  "#{MISAGO_ENV}"  => $environment,
   "#{HTTP_HOST}"   => $http_host,
   "#{HTTP_PORT}"   => $http_port,
   "#{TMP}"         => TMP,
@@ -47,9 +47,20 @@ $config_data = str_replace(array_keys($vars), array_values($vars), $config_data)
 $config_file .= '.tmp';
 file_put_contents($config_file, $config_data);
 
+
 # starts server
 echo "Starting lighttpd at http://$http_host:$http_port/\n";
-echo "environment={$environment} lighttpd -Df {$config_file}\n";
-`environment={$environment} lighttpd -Df {$config_file}`;
+echo "MISAGO_ENV={$environment} lighttpd -Df {$config_file}\n";
 
+`MISAGO_ENV={$environment} lighttpd -Df {$config_file}`;
+
+/*
+# tails application's log
+$log_file = ROOT."/log/$environment.log";
+`tail -f $log_file`;
+
+# stops server
+$pid = file_get_contents(TMP.'/lighttpd.pid');
+`kill $pid`;
+*/
 ?>

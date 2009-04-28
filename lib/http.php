@@ -73,8 +73,10 @@ class HTTP
       }
       header("Location: $url");
     }
-    elseif ($code) {
-      echo "<p><a href=\"$url\">$url</a> [status: $code {self::$codes[$code]}]</p>";
+    elseif ($code)
+    {
+      $status = self::$codes[$code];
+      echo "<p><a href=\"$url\">$url</a> [status: $code $status]</p>";
     }
     else {
       echo "<p><a href=\"$url\">$url</a> [status: 302 Found]</p>";

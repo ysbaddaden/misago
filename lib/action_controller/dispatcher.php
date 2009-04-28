@@ -17,8 +17,6 @@ function ActionController_dispatch($method, $uri)
   
   if (file_exists(ROOT."/app/controllers/$name.php"))
   {
-#    require 'application.php';
-#    require ROOT."/app/controllers/$name.php";
     $controller = new $class($mapping);
     
     # action!
