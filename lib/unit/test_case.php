@@ -1,6 +1,6 @@
 <?php
 
-# TODO: start and stop a test server (script/server -p 3009 -e test -d 0)
+# IMPROVE: start and stop a test server (script/server -p 3009 -e test -d 0)
 class Unit_TestCase extends Unit_Test
 {
   function __construct()

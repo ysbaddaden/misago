@@ -12,8 +12,8 @@ class Generator_Resource extends Generator_Base
     }
     $this->options = $options;
     
-    $filename       = String::underscore($args[0]);
-    $class          = String::camelize($args[0]);
+    $class          = String::camelize(String::pluralize(String::singularize(String::underscore($args[0]))));
+    $filename       = String::underscore($class);
     $model          = String::singularize($class);
     $model_filename = String::underscore($model);
     $table          = $filename;
@@ -24,6 +24,7 @@ class Generator_Resource extends Generator_Base
       'class'          => String::underscore($class),
       'class_plural'   => $filename,
       'Model'          => $model,
+      'model'          => String::underscore($model),
       'model_filename' => $model_filename,
       'table'          => $table,
     );

@@ -3,35 +3,35 @@
 # TODO: Add respond_to() to handle specific :format requests.
 class #{Class}Controller extends ApplicationController
 {
-  # GET /#{class_plural}
+  # GET /#{class}
   function index()
   {
-    $#{class} = new #{Class}();
-    $this->#{class_plural} = $#{class}->find(':all');
+    $#{model} = new #{Model}();
+    $this->#{model} = $#{model}->find(':all');
   }
   
-  # GET /#{class_plural}/:id
+  # GET /#{class}/:id
   function show()
   {
-    $this->#{class} = new #{Class}($this->params[':id']);
+    $this->#{model} = new #{Model}($this->params[':id']);
   }
   
-  # GET /#{class_plural}/create
+  # GET /#{class}/new
   function neo()
   {
-    $this->#{class} = new #{Class}();
+    $this->#{model} = new #{Model}();
   }
   
-  # POST /#{class_plural}
+  # POST /#{class}
   function create()
   {
-    $#{class} = new #{Class}();
-    $this->#{class} = $#{class}->create($this->params['#{class}']);
+    $#{model} = new #{Model}();
+    $this->#{model} = $#{model}->create($this->params['#{model}']);
     
-    if ($this->#{class} !== null) {
-      HTTP::redirect(show_#{class}_path($this->params[':id']), 201);
+    if ($this->#{model} !== null) {
+      HTTP::redirect(show_#{model}_path($this->params[':id']), 201);
     }
-    elseif(!$this->#{class}->errors->is_empty()) {
+    elseif(!$this->#{model}->errors->is_empty()) {
       HTTP::status(412);
     }
     else {
@@ -40,22 +40,22 @@ class #{Class}Controller extends ApplicationController
     $this->render('edit');
   }
   
-  # GET /#{class_plural}/edit/:id
+  # GET /#{class}/:id/edit
   function edit()
   {
-    $this->#{class} = new #{Class}($this->params[':id']);
+    $this->#{model} = new #{Model}($this->params[':id']);
   }
   
-  # PUT /#{class_plural}/:id
+  # PUT /#{class}/:id
   function update()
   {
-    $#{class} = new #{Class}();
-    $this->#{class} = $#{class}->update($this->params[':id'], $this->params['#{class}']);
+    $#{model} = new #{Model}();
+    $this->#{model} = $#{model}->update($this->params[':id'], $this->params['#{model}']);
     
     if ($this->#{class} !== null) {
-      HTTP::redirect(show_#{class}_path($this->params[':id']), 200);
+      HTTP::redirect(show_#{model}_path($this->params[':id']), 200);
     }
-    elseif (!$this->#{class}->errors->is_empty()) {
+    elseif (!$this->#{model}->errors->is_empty()) {
       HTTP::status(412);
     }
     else {
@@ -64,11 +64,11 @@ class #{Class}Controller extends ApplicationController
     $this->render('edit');
   }
   
-  # DELETE /#{class_plural}/:id
+  # DELETE /#{class}/:id
   function delete()
   {
-    $#{class} = new #{Class}();
-    if ($#{class}->delete($this->params[':id'])) {
+    $#{model} = new #{Model}();
+    if ($#{model}->delete($this->params[':id'])) {
       HTTP::status(410);
     }
     else {
