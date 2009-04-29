@@ -26,7 +26,7 @@ class #{Controller}Controller extends ApplicationController
     $this->#{model} = $#{model}->create($this->params['#{model}']);
     
     if ($this->#{model}->errors->is_empty()) {
-      HTTP::redirect(show_#{model}_path(array(':id' => $this->#{model}->id)), 201);
+      HTTP::redirect(show_#{model}_path($this->#{model}->id), 201);
     }
 #    else {
 #      HTTP::status(412);
@@ -44,7 +44,7 @@ class #{Controller}Controller extends ApplicationController
     $this->#{model} = $#{model}->update($this->params[':id'], $this->params['#{model}']);
     
     if ($this->#{model}->errors->is_empty()) {
-      HTTP::redirect(show_#{model}_path(array(':id' => $this->#{model}->id)), 200);
+      HTTP::redirect(show_#{model}_path($this->#{model}->id), 200);
     }
 #    else {
 #      HTTP::status(412);
