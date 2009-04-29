@@ -334,6 +334,13 @@ class Test_ActionController_Routing extends Unit_Test
     
     $expected = new ActionController_Path('DELETE', 'users/1');
     $this->assert_equal('DELETE /users/1', delete_user_path(array(':id' => 1)), $expected);
+    
+    
+    $expected = new ActionController_Path('GET', 'users/45/edit');
+    $this->assert_equal('edit_user_path(:id)', edit_user_path(45), $expected);
+    
+    $expected = new ActionController_Path('GET', 'users/72');
+    $this->assert_equal('show_user_path(:id)', show_user_path(72), $expected);
   }
 }
 

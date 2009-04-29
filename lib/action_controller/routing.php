@@ -281,7 +281,10 @@ class ActionController_Routing extends Object
   
   private function build_path_function($func_base_name, $route, $controller, $action)
   {
-    $func = "function {$func_base_name}_path(\$keys=array())\n{\n";
+    $func = "function {$func_base_name}_path(\$keys=array())\n{\n".
+      "  if (!is_array(\$keys)) {\n".
+      "    \$keys = array(':id' => \$keys);\n".
+      "  }\n";
     
     if (strpos($route['path'], ':controller') !== false) {
       $func .= "  \$keys[':controller'] = '$controller';\n";
