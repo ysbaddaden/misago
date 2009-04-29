@@ -45,8 +45,8 @@ class ActionView_Base extends Object
   # Render a collection of partials:
   #   render(array('partial' => 'product', 'collection' => $products));
   #   
-  #   The collection must be an array or an iterable object.
-  #   It creates the following local vars: $product and $product_counter.
+  # The collection must be an array or an iterable object.
+  # It creates the following local vars: $product and $product_counter.
   #
   function render($options)
   {
@@ -86,7 +86,7 @@ class ActionView_Base extends Object
       throw new MisagoException("View template not found: '{$__view_file}'", 404);
     }
     
-    # partial or collection of partials
+    # partial (or collection of partials)
     elseif (isset($options['partial']))
     {
       if (strpos($options['partial'], '/'))

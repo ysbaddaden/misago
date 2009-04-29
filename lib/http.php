@@ -52,6 +52,26 @@ class HTTP
     505 => 'HTTP Version Not Supported',
   );
   
+  static $mimetypes = array(
+    'text' => 'text/plain',
+    'html' => 'text/html',
+    'js'   => 'text/javascript',
+    'css'  => 'text/css',
+    'ics'  => 'text/calendar',
+    'csv'  => 'text/csv',
+    'xml'  => 'application/xml',
+    'rss'  => 'application/rss+xml',
+    'atom' => 'application/atom+xml',
+    'yaml' => 'application/x-yaml',
+    'json' => 'application/json',
+  );
+  
+  static function content_type($type)
+  {
+    $type = self::$mimetypes[$type];
+    header("Content-Type: $type", true);
+  }
+  
   /**
    * Sets status in output HTTP header.
    */
@@ -71,7 +91,7 @@ class HTTP
       if ($code) {
         self::status($code);
       }
-      header("Location: $url");
+      header("Location: $url", true);
     }
     elseif ($code)
     {
