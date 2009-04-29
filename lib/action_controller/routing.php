@@ -225,7 +225,7 @@ class ActionController_Routing extends Object
    */
   function build_path_and_url_helpers()
   {
-    $functions = '';
+    $functions = array();
     
     foreach($this->routes as $route)
     {
@@ -270,13 +270,17 @@ class ActionController_Routing extends Object
         }
       }
     }
-    $functions = implode("\n\n", $functions);
     
-    if ($_ENV['MISAGO_DEBUG'] == 3) {
-      echo "\n\n$functions";
+    if (!empty($functions))
+    {
+      $functions = implode("\n\n", $functions);
+      
+      if ($_ENV['MISAGO_DEBUG'] == 3) {
+        echo "\n\n$functions";
+      }
+      
+      eval($functions);
     }
-    
-    eval($functions);
   }
   
   private function build_path_function($func_base_name, $route, $controller, $action)
