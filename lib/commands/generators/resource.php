@@ -19,12 +19,15 @@ class Generator_Resource extends Generator_Base
     $table          = $filename;
     
     $vars = array(
+#      'Class'          => $class,
+#      'class'          => String::underscore($class),
+#      'class_plural'   => $filename,
       'filename'       => $filename,
-      'Class'          => $class,
-      'class'          => String::underscore($class),
-      'class_plural'   => $filename,
+      'Controller'     => String::underscore($class),
+      'controller'     => String::underscore($class),
       'Model'          => $model,
       'model'          => String::underscore($model),
+      'model_plural'   => String::pluralize(String::underscore($model)),
       'model_filename' => $model_filename,
       'table'          => $table,
     );

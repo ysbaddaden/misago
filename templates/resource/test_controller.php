@@ -6,7 +6,7 @@ if (!isset($_ENV['MISAGO_ENV'])) {
 $location = dirname(__FILE__).'/../..';
 require_once "$location/config/boot.php";
 
-class Test_#{Class}Controller extends Unit_TestCase
+class Test_#{Controller}Controller extends Unit_TestCase
 {
   function test_true()
   {
@@ -14,6 +14,6 @@ class Test_#{Class}Controller extends Unit_TestCase
   }
 }
 
-new Test_#{Class}Controller();
+new Test_#{Controller}Controller();
 
 ?>

@@ -1,28 +1,28 @@
 <?php
 
 # TODO: Add respond_to() to handle specific :format requests.
-class #{Class}Controller extends ApplicationController
+class #{Controller}Controller extends ApplicationController
 {
-  # GET /#{class}
+  # GET /#{controller}
   function index()
   {
     $#{model} = new #{Model}();
-    $this->#{model} = $#{model}->find(':all');
+    $this->#{model_plural} = $#{model}->find(':all');
   }
   
-  # GET /#{class}/:id
+  # GET /#{controller}/:id
   function show()
   {
     $this->#{model} = new #{Model}($this->params[':id']);
   }
   
-  # GET /#{class}/new
+  # GET /#{controller}/new
   function neo()
   {
     $this->#{model} = new #{Model}();
   }
   
-  # POST /#{class}
+  # POST /#{controller}
   function create()
   {
     $#{model} = new #{Model}();
@@ -40,19 +40,19 @@ class #{Class}Controller extends ApplicationController
     $this->render('edit');
   }
   
-  # GET /#{class}/:id/edit
+  # GET /#{controller}/:id/edit
   function edit()
   {
     $this->#{model} = new #{Model}($this->params[':id']);
   }
   
-  # PUT /#{class}/:id
+  # PUT /#{controller}/:id
   function update()
   {
     $#{model} = new #{Model}();
     $this->#{model} = $#{model}->update($this->params[':id'], $this->params['#{model}']);
     
-    if ($this->#{class} !== null) {
+    if ($this->#{controller} !== null) {
       HTTP::redirect(show_#{model}_path($this->params[':id']), 200);
     }
     elseif (!$this->#{model}->errors->is_empty()) {
@@ -64,7 +64,7 @@ class #{Class}Controller extends ApplicationController
     $this->render('edit');
   }
   
-  # DELETE /#{class}/:id
+  # DELETE /#{controller}/:id
   function delete()
   {
     $#{model} = new #{Model}();
