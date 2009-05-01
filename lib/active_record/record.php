@@ -68,6 +68,23 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   function valid() {
     return ($this->current() !== false);
   }
+  
+  
+  # exportations
+  
+  function to_xml()
+  {
+    $xml = '';
+    foreach($this->__attributes as $k => $v)
+    {
+      if (is_string($v)) {
+        $v = "<![CDATA[$v]>";
+      }
+      $xml .= "<$k>$v</$k>";
+    }
+    $model = String::underscore(get_class($this));
+    return "<$model>$xml</$model>";
+  }
 }
 
 ?>

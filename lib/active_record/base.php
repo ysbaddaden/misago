@@ -97,6 +97,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $scope = empty($match[1]) ? ':first' : ':'.$match[1];
       return $this->find($scope, $options);
     }
+    
+    $class = get_class($this);
+    trigger_error("No such method: $class::$name().", E_USER_ERROR);
   }
   
   /**
@@ -116,7 +119,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * 
    * TODO: Test option 'group'.
    */
-  function & find($scope=':all', $options=null)
+  function find($scope=':all', $options=null)
   {
     # arguments
     if (!is_symbol($scope))
@@ -155,7 +158,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           $record->new_record = false;
           $records[] = $record;
         }
-        return $records;
+        return new ActiveArray($records, get_class($this));
       break;
       
       case ':first':

@@ -66,20 +66,35 @@ class ActionView_Base extends Object
         $this->yield('content', ob_get_clean());
         
         # layout
-        $__layout_file = "{$this->view_path}.{$this->view_format}.tpl";
-        if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
+        if (isset($options['layout']))
         {
-          ob_start();
-          include ROOT."/app/views/layouts/{$__layout_file}";
-          return ob_get_clean();
+          $__layout_file = "{$options['layout']}.{$this->view_format}.tpl";
+          if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
+          {
+            ob_start();
+            include ROOT."/app/views/layouts/{$__layout_file}";
+            return ob_get_clean();
+          }
+          else {
+            throw new MisagoException("Layout template not found: '{$options['layout']}'", 404);
+          }
         }
-        elseif (file_exists(ROOT."/app/views/layouts/default.{$this->view_format}.tpl"))
+        else
         {
-          ob_start();
-          include ROOT."/app/views/layouts/default.{$this->view_format}.tpl";
-          return ob_get_clean();
+          $__layout_file = "{$this->view_path}.{$this->view_format}.tpl";
+          if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
+          {
+            ob_start();
+            include ROOT."/app/views/layouts/{$__layout_file}";
+            return ob_get_clean();
+          }
+          elseif (file_exists(ROOT."/app/views/layouts/default.{$this->view_format}.tpl"))
+          {
+            ob_start();
+            include ROOT."/app/views/layouts/default.{$this->view_format}.tpl";
+            return ob_get_clean();
+          }
         }
-        
         return $this->yield('content');
       }
       

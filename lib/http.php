@@ -66,24 +66,25 @@ class HTTP
     'json' => 'application/json',
   );
   
+  # Sets the current type in output HTTP header.
   static function content_type($type)
   {
     $type = self::$mimetypes[$type];
-    header("Content-Type: $type", true);
+    if (!headers_sent()) {
+      header("Content-Type: $type", true);
+    }
   }
   
-  /**
-   * Sets status in output HTTP header.
-   */
+  # Sets status in output HTTP header.
   static function status($code=200)
   {
     $status = self::$codes[$code];
-    header("Status: $code", true);
+    if (!headers_sent()) {
+      header("Status: $code", true);
+    }
   }
   
-  /**
-   * Redirects current request.
-   */
+  # Redirects current request.
   static function redirect($url, $code=null)
   {
     if (!DEBUG)

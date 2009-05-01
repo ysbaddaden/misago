@@ -369,7 +369,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   function test_has_many_relationship()
   {
     $order = new Order(1);
-    $this->assert_type('order->baskets', $order->baskets, 'array');
+    $this->assert_instance_of('order->baskets', $order->baskets, 'ArrayAccess');
     $this->assert_equal('count', count($order->baskets), 3);
   }
   

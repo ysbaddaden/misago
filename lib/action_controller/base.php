@@ -107,6 +107,7 @@ abstract class ActionController_Base extends Object
     if (array_key_exists('xml', $options))
     {
       HTTP::content_type('xml');
+      echo '<?xml version="1.0"?>';
       echo is_string($options['xml']) ? $options['xml'] : $options['xml']->to_xml();
     }
     elseif (array_key_exists('json', $options))
@@ -127,6 +128,14 @@ abstract class ActionController_Base extends Object
     }
     
     $this->already_rendered = true;
+  }
+  
+  # Renders a view or exports a resource, returned as a string.
+  function render_string($options=null)
+  {
+    ob_start();
+    $this->render($options);
+    return ob_get_clean();
   }
   
   protected function before_filters() {}
