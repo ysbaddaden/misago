@@ -65,11 +65,13 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
-   * Generates some code.
+   * Some magic methods.
    * 
+   * Examples:
+   * 
+   *   find_by_id();
+   *   find_first_by_tag();
    *   find_all_by_category();
-   *   find_by_id()
-   *   find_first_by_id();
    */
   function __call($name, $args)
   {
@@ -106,10 +108,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * Finds records in database.
    * 
    * Scopes:
+   * 
    *   - :all
    *   - :first
    * 
    * Options:
+   * 
    *   - select (collection)
    *   - conditions (string, array or hash)
    *   - group (collection)
@@ -265,6 +269,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return (bool)$this->$method();
   }
   
+  # Generic create record method.
+  # 
+  # You better consider this method as private.
+  # Do not use unless you know what you are doing (ie. you're hacking misago).
+  # Use ActiveRecord_Base::create() instead.
   protected function _create()
   {
     $this->before_save();
@@ -301,6 +310,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return false;
   }
   
+  # Generic update record method.
+  # 
+  # You better consider this method as private.
+  # Do not use unless you know what you are doing (ie. you're hacking misago).
+  # Use ActiveRecord_Base::update() or ActiveRecord_Base::update_attributes() instead.
   protected function _update($attributes=null)
   {
     if ($attributes !== null)
