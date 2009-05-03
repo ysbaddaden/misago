@@ -2,6 +2,9 @@
 
 # IMPROVE: Transparently protect against CSRF attacks (using a hash with the key stored in a cookie).
 # TODO: Test start(), end() and submit() methods.
+# 
+# @package ActionView
+# @subpackage Helpers
 class FormHelper
 {
   protected $object;

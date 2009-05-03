@@ -1,8 +1,6 @@
 <?php
-/**
- * 
- * @package ActionController
- */
+
+# @package ActionController
 class ActionController_Routing extends Object
 {
   private $routes          = array();
@@ -353,16 +351,15 @@ class ActionController_Routing extends Object
   }
 }
 
-/**
- * Returns the path for a given mapping.
- * 
- * DEPRECATED: Is the 'path_for()' function necessary, or even useful?
- * 
- * <code>
- * $path = path_for(array(':controller' => 'products'));
- * $path = path_for('product_index');
- * </code>
- */
+
+# Returns the path for a given mapping.
+# 
+# DEPRECATED: Is the 'path_for()' function necessary, or even useful?
+# 
+# <code>
+# $path = path_for(array(':controller' => 'products'));
+# $path = path_for('product_index');
+# </code>
 function path_for($mapping, array $keys=null)
 {
   $map = ActionController_Routing::draw();
@@ -372,6 +369,8 @@ function path_for($mapping, array $keys=null)
   return $map->named_reverse($name, $keys);
 }
 
+# Transparently handles URL (with HTTP method and URI).
+# @package ActionController
 class ActionController_Path
 {
   public $method;

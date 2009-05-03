@@ -1,8 +1,12 @@
 <?php
-/**
- * 
- * @package ActiveRecord
- */
+
+# Generic Record.
+# 
+# * A record consists on a list of attributes.
+# * You may iterate throught attributes (like an array).
+# 
+# @package ActiveRecord
+# IMPROVE: Add serialization support throught the __wakeup() and __sleep() magic methods.
 abstract class ActiveRecord_Record extends Object implements Iterator
 {
   protected $__attributes = array();
@@ -15,9 +19,7 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     }
   }
   
-  /**
-   * Sets the record's attributes.
-   */
+  # Sets the record's attributes.
   protected function set_attributes($arg)
   {
     foreach($arg as $attribute => $value) {
@@ -25,8 +27,6 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     }
   }
   
-  
-  # overloading
   
   function __get($attr)
   {
@@ -46,8 +46,6 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     unset($this->__attributes[$attr]);
   }
   
-  
-  # iterator
   
   function rewind() {
     return reset($this->__attributes);
@@ -70,20 +68,40 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   }
   
   
-  # exportations
+  function __sleep()
+  {
+  	return array_keys($this->__attributes);
+  }
   
+  function __wakeup()
+  {
+  	
+  }
+  
+  
+  # Exports the record as XML.
   function to_xml()
   {
+    $attributes = $this->__sleep();
     $xml = '';
-    foreach($this->__attributes as $k => $v)
+    foreach($attributes as $k)
     {
-      if (is_string($v)) {
-        $v = "<![CDATA[$v]>";
-      }
+    	$v = is_string($this->$k) ? "<![CDATA[".$this->$k."]>" : $this->$k;
       $xml .= "<$k>$v</$k>";
     }
     $model = String::underscore(get_class($this));
     return "<$model>$xml</$model>";
+  }
+  
+  # Exports the record as JSON.
+  function to_json()
+  {
+    $attributes = $this->__sleep();
+  	$data = array();
+    foreach($attributes as $k) {
+    	$data[$k] = $this->$k;
+    }
+  	return json_encode($data);
   }
 }
 

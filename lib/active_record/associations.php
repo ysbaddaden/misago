@@ -1,28 +1,79 @@
 <?php
-/**
- * 
- * @package ActiveRecord
- * 
- * TODO: Implement :throught associations.
- * TODO: Implement has_and_belongs_to_many association.
- */
+
+# Handles ORM relationships.
+# 
+# ==Relationships
+# 
+# ===belongs_to
+#
+# Example: a comment belongs to a blog post.
+# 
+#   class Post Extends ActiveRecord_Base {
+#     protected $has_many = array('comments');
+#   }
+#   
+#   class Comment Extends ActiveRecord_Base {
+#     protected $belongs_to = array('post');
+#   }
+#   
+#   $comment    = new Comment(456);
+#   $post_id    = $comment->post->id;
+#   $post_title = $comment->post->title;
+# 
+# 
+# ===has_many
+# 
+# Example: a blog may have many tags.
+# 
+#   class Post Extends ActiveRecord_Base {
+#     protected $has_many = array('tags');
+#   }
+#   
+#   class Tag Extends ActiveRecord_Base {
+#     protected $belongs_to = array('post');
+#   }
+#   
+#   $post = new Post(123);
+#   foreach($post->tags as $tag) {
+#	    echo $tag->name;
+#   }
+# 
+# 
+# ===has_one
+# 
+# ...
+# 
+# 
+# ===has_and_belongs_to_many
+# 
+# ...
+# 
+# 
+# ==:throught
+# 
+# ...
+# 
+# == Eager Loading (:include)
+#
+# ...
+# 
+# 
+# TODO: Implement :throught associations.
+# TODO: Implement has_and_belongs_to_many association.
+# @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
-  protected $associations = array(
-    'belongs_to' => array(),
-    'has_one'    => array(),
-    'has_many'   => array(),
-  );
+  protected $associations = array();
   protected $belongs_to   = array();
   protected $has_one      = array();
   protected $has_many     = array();
   
   function __construct($arg=null)
   {
-    # relationships
     $this->configure_associations('belongs_to');
     $this->configure_associations('has_one');
     $this->configure_associations('has_many');
+    parent::__construct($arg);
   }
   
   private function configure_associations($type)
@@ -50,53 +101,91 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       {
         switch($type)
         {
-          case 'belongs_to':
-            $def['foreign_key'] = String::underscore($name).'_'.$def['primary_key'];
-          break;
-          
-          case 'has_one':
-            $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key;
-          break;
-          
-          case 'has_many':
-            $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key;
-          break;
+          case 'belongs_to': $def['foreign_key'] = String::underscore($name).'_'.$def['primary_key'];           break;
+          case 'has_one':    $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key; break;
+          case 'has_many':   $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key; break;
         }
+      }
+      
+      switch($type)
+      {
+        case 'belongs_to':
+          $this->associations[$name] = array(
+          	'type'  => 'belongs_to',
+          	'class' => String::camelize($name),
+          	'key'   => $this->primary_key,
+          	'value' => $def['foreign_key'],
+          	'find'  => ':first',
+          );
+        break;
+        
+        case 'has_one':
+          $this->associations[$name] = array(
+          	'type'  => 'has_one',
+          	'class' => String::camelize($name),
+          	'key'   => $def['foreign_key'],
+          	'value' => $this->primary_key,
+          	'find'  => ':first',
+          );
+        break;
+        
+        case 'has_many':
+          $this->associations[$name] = array(
+          	'type'  => 'has_many',
+          	'class' => String::camelize(String::singularize($name)),
+          	'key'   => $def['foreign_key'],
+          	'value' => $this->primary_key,
+          	'find'  => ':all',
+          );
+        break;
       }
     }
   }
   
   function __get($attribute)
   {
-    # association: belongs to
-    if (array_key_exists($attribute, $this->belongs_to))
-    {
-      $conditions = array($this->belongs_to[$attribute]['primary_key'] => $this->{$this->belongs_to[$attribute]['foreign_key']});
-      $class      = String::camelize($attribute);
-      $record     = new $class();
-      return $this->$attribute = $record->find(':first', array('conditions' => &$conditions));
-    }
-    
-    # association: has one
-    elseif (array_key_exists($attribute, $this->has_one))
-    {
-      $conditions = array($this->has_one[$attribute]['foreign_key'] => $this->{$this->primary_key});
-      $class      = String::camelize($attribute);
-      $record     = new $class();
-      return $this->$attribute = $record->find(':first', array('conditions' => &$conditions));
-    }
-    
-    # association: has many
-    elseif (array_key_exists($attribute, $this->has_many))
-    {
-      $conditions = array($this->has_many[$attribute]['foreign_key'] => $this->{$this->primary_key});
-      $class      = String::camelize(String::singularize($attribute));
-      $record     = new $class();
-      return $this->$attribute = $record->find(':all', array('conditions' => &$conditions));
-    }
-    
-    # another
+  	# association?
+		if (array_key_exists($attribute, $this->associations))
+		{
+      $class      = $this->associations[$attribute]['class'];
+			$record     = new $class();
+			return $this->$attribute = $record->find($this->associations[$attribute]['find'], array(
+				'conditions' => array($this->associations[$attribute]['key'] => $this->{$this->associations[$attribute]['value']})
+			));
+		}
+  	
+    # another kind of attribute
     return parent::__get($attribute);
+  }
+  
+  function __sleep()
+  {
+  	$attributes = parent::__sleep();
+  	foreach(array_keys($this->belongs_to) as $k)
+  	{
+  		if (isset($this->$k)) {
+  			$attributes[] = $k;
+  		}
+  	}
+  	foreach(array_keys($this->has_one) as $k)
+  	{
+  		if (isset($this->$k)) {
+  			$attributes[] = $k;
+  		}
+  	}
+  	foreach(array_keys($this->has_many) as $k)
+  	{
+  		if (isset($this->$k)) {
+  			$attributes[] = $k;
+  		}
+  	}
+  	return $attributes;
+  }
+  
+  function __wakeup()
+  {
+  	$this->configure_associations();
+  	parent::__wakeup();
   }
 }
 

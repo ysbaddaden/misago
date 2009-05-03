@@ -3,7 +3,7 @@
  * Mysql adapter.
  * 
  * @package ActiveRecord
- * @subpackage ConnectionAdapters
+ * @subpackage Connection
  */
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {

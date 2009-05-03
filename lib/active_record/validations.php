@@ -29,6 +29,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     return parent::__get($attribute);
   }
   
+  # Runs validation tests. Returns true if tests were successfull, false otherwise.
   function is_valid()
   {
     $this->errors->clear();
@@ -53,8 +54,13 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     return $this->errors->is_empty();
   }
   
+  # Validates record's attributes on creation as well as on update.
   protected function validate() {}
+
+  # Validates record's attributes on creation only.
   protected function validate_on_create() {}
+
+  # Validates record's attributes on update only.
   protected function validate_on_update() {}
   
   /*

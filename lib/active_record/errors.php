@@ -18,6 +18,8 @@ class ActiveRecord_Errors
     trigger_error("No such attribute ActiveRecord_Errors::$attribute.", E_USER_NOTICE);
   }
   
+  # Adds an error message for the associated record's attribute.
+  # The attribute is now marked as invalid.
   function add($attribute, $msg=':invalid')
   {
     if (empty($this->messages[$attribute])) {
@@ -26,27 +28,33 @@ class ActiveRecord_Errors
     $this->messages[$attribute][] = $msg;
   }
   
+  # Shortcut for add($attribute, ':blank').
   function add_on_blank($attribute)
   {
     $this->add($attribute, ':blank');
   }
   
+  # Shortcut for add($attribute, ':empty').
   function add_on_empty($attribute)
   {
     $this->add($attribute, ':empty');
   }
   
+  # Adds an error message not related to a particular attribute.
   function add_to_base($msg)
   {
     $this->base_messages[] = $msg;
   }
   
+  # Clears all error messages.
+  # All attributes are now considered valid.
   function clear()
   {
     $this->base_messages = array();
     $this->messages      = array();
   }
   
+  # Counts how many error messages there are.
   function count()
   {
     $count = count($this->base_messages);
@@ -56,6 +64,7 @@ class ActiveRecord_Errors
     return $count;
   }
   
+  # Returns the full list of error messages.
   function full_messages()
   {
     $messages = $this->base_messages;
@@ -65,16 +74,20 @@ class ActiveRecord_Errors
     return $messages;
   }
   
+  # Returns true if all attributes are valid and no error message was added.
   function is_empty()
   {
     return (empty($this->messages) && empty($this->base_messages));
   }
   
+  # Returns true if associated record attribute is invalid.
   function is_invalid($attribute)
   {
     return (isset($this->messages[$attribute]));
   }
   
+  # Returns error messages for associated record attribute.
+  # Returns null if there is no error.
   function on($attribute)
   {
     if (!empty($this->messages[$attribute]))
@@ -92,6 +105,7 @@ class ActiveRecord_Errors
     return null;
   }
   
+  # Returns error messages for associated record (not related to a particular attribute).
   function on_base()
   {
     if (!empty($this->base_messages))

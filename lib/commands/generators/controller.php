@@ -1,5 +1,6 @@
 <?php
 
+# @package Generator
 class Generator_Controller extends Generator_Base
 {
   function __construct($args, $options=array())

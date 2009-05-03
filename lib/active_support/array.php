@@ -3,7 +3,6 @@
  * Extensions for arrays.
  * 
  * @package ActiveSupport
- * @subpackage Array
  */
 
 /**

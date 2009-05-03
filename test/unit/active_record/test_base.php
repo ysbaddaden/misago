@@ -174,7 +174,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal("virtual field", $product->name, 'swerty2');
   }
   
-  # FIXME: Tests failures when updating many records.
+  # FIXME: Test failures when updating many records.
   function test_update_many()
   {
     $product = new Product();
@@ -347,34 +347,13 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product(1);
     $this->assert_type("set a field to null (recorded?)", $product->in_stock, 'NULL');
   }
-
-  function test_belongs_to_relationship()
-  {
-    $product = new Product();
-    $product->delete_all();
-    $this->fixtures("products, orders, baskets, invoices");
-    
-    $invoice = new Invoice(1);
-    $this->assert_instance_of('invoice->order', $invoice->order, 'Order');
-    $this->assert_equal('invoice->order->id', $invoice->order->id, 1);
-  }
-  
-  function test_has_one_relationship()
-  {
-    $order = new Order(2);
-    $this->assert_instance_of('order->invoice', $order->invoice, 'Invoice');
-    $this->assert_equal('order->invoice->id', $order->invoice->id, 2);
-  }
-  
-  function test_has_many_relationship()
-  {
-    $order = new Order(1);
-    $this->assert_instance_of('order->baskets', $order->baskets, 'ArrayAccess');
-    $this->assert_equal('count', count($order->baskets), 3);
-  }
-  
+	
   function test_find_with_joins()
   {
+  	$this->truncate('products');
+    $this->fixtures("products, orders, baskets, invoices");
+  	
+  	
     $product = new product();
     $products = $product->find(':all', array(
       'select'     => 'products.id',
