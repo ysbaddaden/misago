@@ -1,10 +1,12 @@
 <?php
 
-$location = dirname(__FILE__).'/../../';
 $_ENV['MISAGO_ENV'] = 'test';
 
+$location = dirname(__FILE__).'/../../';
+require_once "$location/lib/terminal.php";
 require_once "$location/lib/unit/test.php";
 require_once "$location/lib/fake_apc.php";
+
 
 class TestFakeApc extends Unit_Test
 {

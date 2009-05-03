@@ -1,10 +1,7 @@
 <?php
 
-$location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
-
-#require "$location/lib/unit/test.php";
-require "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
 class Test_String extends Unit_Test
 {

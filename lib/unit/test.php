@@ -15,7 +15,7 @@ class Unit_Test
   {
     $methods = get_class_methods($this);
     
-    printf("\nLoaded suite %s\n", get_class($this));
+    printf("\nLoaded suite %s\n", Terminal::colorize(get_class($this), 'BOLD'));
 #    echo "Started\n";
     
     $this->time = microtime(true);
@@ -42,7 +42,7 @@ class Unit_Test
         # an exception was raised
         $this->count_errors += 1;
         
-        printf("\nAn exception was raised in %s:\n", $method);
+        printf("\n".Terminal::colorize("An exception was raised", 'RED')." in %s:\n", $method);
         printf("[%d] %s\n\n", $e->getCode(), $e->getMessage());
         printf("Occured at line %d in file %s\n", $e->getLine(), $e->getFile());
         echo $e->getTraceAsString();
@@ -51,10 +51,11 @@ class Unit_Test
     }
     
     # finished
-    $this->time = microtime(true) - $this->time;
+    printf("\nFinished in %f seconds.\n", microtime(true) - $this->time);
     
-    printf("\nFinished in %f seconds.\n%d tests, %d assertions, %d failures, %d errors\n",
-      $this->time, $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors);
+    $text  = sprintf("%d tests, %d assertions, %d failures, %d errors",
+      $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors);
+    echo Terminal::colorize($text, ($this->count_failures + $this->count_errors) ? 'RED' : 'GREEN')."\n";
   }
   
   protected function assert_true($comment, $arg)
@@ -104,9 +105,9 @@ class Unit_Test
     {
       # failure
       $this->count_failures += 1;
-      printf("\n%s failed: %s\n", $this->running_test, $comment);
-      printf("  expected: %s\n", print_r($vars['expected'], true));
-      printf("       got: %s\n", print_r($vars['got'], true));
+      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment);
+      printf(Terminal::colorize("  expected:", 'BOLD')." %s\n", print_r($vars['expected'], true));
+      printf(Terminal::colorize("       got:", 'BOLD')." %s\n", print_r($vars['got'], true));
     }
   }
 }

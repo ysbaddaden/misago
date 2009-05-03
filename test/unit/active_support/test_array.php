@@ -1,10 +1,7 @@
 <?php
 
-$location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
-
-require_once "$location/lib/unit/test.php";
-require_once "$location/lib/active_support/array.php";
+require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
 class Test_ActiveSupport_Array extends Unit_Test
 {

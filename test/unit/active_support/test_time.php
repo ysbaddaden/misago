@@ -1,10 +1,7 @@
 <?php
 
-$location = dirname(__FILE__).'/../../..';
 $_ENV['MISAGO_ENV'] = 'test';
-
-require_once "$location/lib/unit/test.php";
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
 # TODO: Test all is_x() methods
 # TODO: Test ago() method
