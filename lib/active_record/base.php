@@ -66,13 +66,13 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   }
   
   /**
-   * Some magic methods.
+   * Declares some magic methods.
    * 
    * Examples:
    * 
-   *   find_by_id();
-   *   find_first_by_tag();
-   *   find_all_by_category();
+   *   $user  = $user->find_by_id();
+   *   $post  = $post->find_first_by_tag($tag);
+   *   $posts = $post->find_all_by_category_id($category_id);
    */
   function __call($name, $args)
   {
@@ -110,9 +110,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * 
    * Scopes:
    * 
-   *   - :all    Returns all found records.
-   *   - :first  Returns the first found record.
-   *   - :values Returns bare values (uninstanciated).
+   *   :all    Returns all found records.
+   *   :first  Returns the first found record.
+   *   :values Returns bare values (uninstanciated).
    * 
    * Options:
    * 
@@ -126,7 +126,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * 
    * Eager Loading:
    * 
-   * See documentation of [ActiveRecord_Associations].
+   * See documentation of ActiveRecord_Associations.
    * 
    * TODO: Test option 'group'.
    */
@@ -374,10 +374,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Creates a new record.
    * 
-   * <code>
-   * $user  = $user->create(array('name' => 'John'));
-   * $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
-   * </code>
+   *   $user  = $user->create(array('name' => 'John'));
+   *   $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
    */
   function create(array $attributes)
   {
@@ -416,14 +414,15 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Updates one or many records.
    * 
-   * <code>
-   * # update one row
-   * $user = $user->update(1, array('name' => 'Joe'));
-   *
-   * # update many rows
-   * $people = array(1 => array('name' => 'Polly'), 1 => array('name' => 'Jean'));
-   * $users = $user->update(array_keys($people), array_values($people));
-   * </code>
+   *   # update one row
+   *   $user = $user->update(1, array('name' => 'Joe'));
+   *   
+   *   # update many rows
+   *   $people = array(
+   *     1 => array('name' => 'Polly'),
+   *     2 => array('name' => 'Jean')
+   *   );
+   *   $users = $user->update(array_keys($people), array_values($people));
    */
   function update($id, $attributes)
   {
@@ -465,14 +464,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   
   /**
    * Updates one attribute of record.
-   *
-   * <code>
-   * $post = new Post(1);
-   * $post->name = 'my first post [update]';
-   * $post->update_attribute('name');
    * 
-   * $post->update_attribute('name', 'my first post [update 2]');
-   * </code>
+   *   $post = new Post(1);
+   *   $post->name = 'my first post [update]';
+   *   $post->update_attribute('name');
+   *   
+   *   $post->update_attribute('name', 'my first post [update 2]');
    */
   function update_attribute($attribute, $value=null)
   {
@@ -484,18 +481,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Updates some attributes of record.
    * 
-   * <code>
-   * $post = new Post(1);
-   * $post->title    = 'my first post [update]';
-   * $post->category = 2;
-   * $post->update_attributes(array('title', 'category'));
-   * $post->update_attributes('title, category');
-   * 
-   * $post->update_attributes(array(
-   *   'title'    => 'my first post [update 2]',
-   *   'category' => 3
-   * ));
-   * </code>
+   *   $post = new Post(1);
+   *   $post->title    = 'my first post [update]';
+   *   $post->category = 2;
+   *   $post->update_attributes(array('title', 'category'));
+   *   $post->update_attributes('title, category');
+   *   
+   *   $post->update_attributes(array(
+   *     'title'    => 'my first post [update 2]',
+   *     'category' => 3
+   *   ));
    */
   function update_attributes($updates)
   {
@@ -519,6 +514,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * Updates many records at once.
    * 
    * Available options:
+   * 
    *   - limit
    *   - order
    */
@@ -530,14 +526,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Deletes a record.
    * 
-   * <code>
-   * # deletes a given record
-   * $post->delete(123);
-   * 
-   * # deletes current record
-   * $post = new Post(456);
-   * $post->delete();
-   * </code>
+   *   # deletes a given record
+   *   $post->delete(123);
+   *   
+   *   # deletes current record
+   *   $post = new Post(456);
+   *   $post->delete();
    */
   function delete($id=null)
   {
@@ -562,12 +556,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Deletes many records at once.
    * 
-   * IMPROVE: Get full list of IDs, then call $this->delete($id) for each one.
-   * 
    * Available options:
    * 
    *   - limit
    *   - order
+   * 
+   * IMPROVE: Get full list of IDs, then call $this->delete($id) for each one.
    */
   function delete_all($conditions=null, $options=null)
   {
