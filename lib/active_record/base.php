@@ -5,7 +5,7 @@
  * 
  * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
- * TODO: Add destroy() and destroy_all() that destroy records without instanciating them.
+ * TODO: Test destroy() and destroy_all().
  */
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
@@ -556,14 +556,48 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Deletes many records at once.
    * 
+   * Each matching record are instanciated, and deletion callbacks are run.
+   * 
    * Available options:
    * 
    *   - limit
    *   - order
-   * 
-   * IMPROVE: Get full list of IDs, then call $this->delete($id) for each one.
    */
   function delete_all($conditions=null, $options=null)
+  {
+    if (!empty($conditions)) {
+      $options['conditions'] = $conditions;
+    }
+    
+    $sql = $this->build_sql_from_options($options);
+    $ids = $this->db->select_values($sql);
+    
+    foreach($ids as $id)
+    {
+      if (!$this->delete($id[0])) {
+        return false;
+      }
+    }
+    return true;
+#    return $this->db->delete($this->table_name, $conditions, $options);
+  }
+  
+  # Destroys a record.
+  # 
+  # Record isn't instanciated, and deletion callbacks aren't run.
+  function destroy($id=null)
+  {
+    if ($id === null) {
+      $id = $this->{$this->primary_key};
+    }
+    $conditions = array($this->primary_key => $id);
+    return $this->db->delete($this->table_name, $conditions, $options);
+  }
+  
+  # Destroys many records at once.
+  # 
+  # Records aren't instanciated, and deletion callbacks aren't run.
+  function destroy_all($conditions=null, $options=null)
   {
     return $this->db->delete($this->table_name, $conditions, $options);
   }
