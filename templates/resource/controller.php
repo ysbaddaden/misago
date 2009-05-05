@@ -1,23 +1,34 @@
 <?php
 
-# TODO: Add respond_to() to handle specific :format requests.
 class #{Controller}Controller extends ApplicationController
 {
   function index()
   {
     $#{model} = new #{Model}();
     $this->#{model_plural} = $#{model}->find(':all');
+    
+    switch($this->format)
+    {
+      case 'html': break; # index.html.tpl
+      case 'xml': $this->render(array('xml' => $this->#{model_plural})); break;
+    }
   }
   
   function show()
   {
     $this->#{model} = new #{Model}($this->params[':id']);
+    
+    switch($this->format)
+    {
+      case 'html': break; # show.html.tpl
+      case 'xml': $this->render(array('xml' => $this->#{model})); break;
+    }
   }
   
   function neo()
   {
     $this->#{model} = new #{Model}();
-    $this->render('create');
+    $this->render('new');
   }
   
   function create()
@@ -28,9 +39,14 @@ class #{Controller}Controller extends ApplicationController
     if ($this->#{model}->errors->is_empty()) {
       HTTP::redirect(show_#{model}_path($this->#{model}->id), 201);
     }
-#    else {
-#      HTTP::status(412);
-#    }
+    else
+    {
+      switch($this->format)
+      {
+        case 'html': $this->render('new'); break;
+        case 'xml':  $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
+      }
+    }
   }
   
   function edit()
@@ -46,10 +62,14 @@ class #{Controller}Controller extends ApplicationController
     if ($this->#{model}->errors->is_empty()) {
       HTTP::redirect(show_#{model}_path($this->#{model}->id), 200);
     }
-#    else {
-#      HTTP::status(412);
-#    }
-    $this->render('edit');
+    else
+    {
+      switch($this->format)
+      {
+        case 'html': $this->render('edit'); break;
+        case 'xml':  $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
+      }
+    }
   }
   
   function delete()

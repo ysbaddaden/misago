@@ -5,6 +5,7 @@
  * 
  * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
+ * TODO: Add destroy() and destroy_all() that destroy records without instanciating them.
  */
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
