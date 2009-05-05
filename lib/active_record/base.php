@@ -579,7 +579,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       }
     }
     return true;
-#    return $this->db->delete($this->table_name, $conditions, $options);
   }
   
   # Destroys a record.
@@ -591,7 +590,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $id = $this->{$this->primary_key};
     }
     $conditions = array($this->primary_key => $id);
-    return $this->db->delete($this->table_name, $conditions, $options);
+    return $this->db->delete($this->table_name, $conditions);
   }
   
   # Destroys many records at once.

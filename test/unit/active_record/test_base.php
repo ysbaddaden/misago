@@ -298,6 +298,61 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal("delete_all with limit+order", $product->name, 'qwerty');
   }
   
+  function test_destroy()
+  {
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db->execute('TRUNCATE products ;');
+    
+    $data1   = array('name' => "qwerty", 'price' =>  5.98);
+    $data2   = array('name' => "bepo",   'price' => 10.55);
+    $product = new Product();
+    $product->create($data1, $data2);
+    
+    $product = new Product(1);
+    $product->destroy();
+    $this->assert_equal("", $product->find(1), null);
+    
+    $product->destroy(2);
+    $this->assert_equal("", $product->find(2), null);
+  }
+  
+  function test_destroy_all()
+  {
+    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db->execute('TRUNCATE products ;');
+    
+    $data1   = array('name' => "qwerty", 'price' =>  5.98);
+    $data2   = array('name' => "bepo",   'price' => 10.55);
+    $product = new Product();
+    
+    $product->destroy_all();
+    $products = $product->all();
+    $this->assert_equal("destroy_all", count($products), 0);
+    
+    $product->create($data1, $data2);
+    
+    $product->destroy_all('id = 1');
+    $product = $product->first();
+    $this->assert_equal("destroy_all with conditions", $product->name, 'bepo');
+    
+    $product->destroy_all();
+    $product->create($data1, $data2);
+    
+    $product->destroy_all(null, array('limit' => 1));
+    
+    $products = $product->all();
+    $this->assert_equal("destroy_all with limit", count($products), 1);
+    
+    
+    $product->destroy_all();
+    $product->create($data1, $data2);
+    
+    $product->destroy_all(null, array('limit' => 1, 'order' => 'id desc'));
+    $product = $product->first();
+    $this->assert_equal("destroy_all with limit+order", count($products), 1);
+    $this->assert_equal("destroy_all with limit+order", $product->name, 'qwerty');
+  }
+  
   function test_update_attributes()
   {
     $product = new Product();
