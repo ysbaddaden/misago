@@ -55,8 +55,12 @@
 # 
 # == Eager Loading (:include)
 #
-# ...
+# Permits to limitate repetitive requests.
 # 
+# For instance you want the list of tags for each posts on a blog index page.
+# It requires executing as many requests as there are posts displayed. So,
+# for a 100 posts, there would be 101 requests: 1 for the list of posts, plus
+# 100 for each post tags.
 # 
 # TODO: Implement :throught associations.
 # TODO: Implement has_and_belongs_to_many association.

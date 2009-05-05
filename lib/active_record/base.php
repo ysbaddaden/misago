@@ -110,8 +110,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * 
    * Scopes:
    * 
-   *   - :all
-   *   - :first
+   *   - :all    Returns all found records.
+   *   - :first  Returns the first found record.
+   *   - :values Returns bare values (uninstanciated).
    * 
    * Options:
    * 
@@ -121,6 +122,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    *   - order (collection)
    *   - limit (integer)
    *   - page (integer)
+   *   - include (collection)
+   * 
+   * Eager Loading:
+   * 
+   * See documentation of [ActiveRecord_Associations].
    * 
    * TODO: Test option 'group'.
    */
@@ -148,10 +154,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $options['limit'] = 1;
     }
     
-    # queries then creates objects
+    # queries then creates objects.
     $sql = $this->build_sql_from_options(&$options);
     
-    $class = get_class($this);
+    $model = get_class($this);
     switch($scope)
     {
       case ':all':
@@ -159,18 +165,18 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
         $records = array();
         foreach($results as $result)
         {
-          $record = new $class($result);
+          $record = new $model($result);
           $record->new_record = false;
           $records[] = $record;
         }
-        return new ActiveArray($records, get_class($this));
+        return new ActiveArray($records, $model);
       break;
       
       case ':first':
         $result = $this->db->select_one($sql);
         if ($result)
         {
-          $record = new $class($result);
+          $record = new $model($result);
           $record->new_record = false;
         }
         else {
