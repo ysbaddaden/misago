@@ -52,8 +52,9 @@ class Time extends Object
   
   function is_today()
   {
-    $today = strtotime(date('Y-m-d'));
-    return ($this->_time > $today);
+    $today = date('Y-m-d');
+    $date  = date('Y-m-d', $this->_time);
+    return ($date == $today);
   }
   
   function is_tomorrow()

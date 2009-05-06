@@ -286,8 +286,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $products = $product->all();
     $this->assert_equal("delete_all with limit", count($products), 1);
-#    $this->assert_equal("delete_all with limit", $products[0]->name, 'bepo');
-    
     
     $product->delete_all();
     $product->create($data1, $data2);
@@ -342,7 +340,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $products = $product->all();
     $this->assert_equal("destroy_all with limit", count($products), 1);
-    
     
     $product->destroy_all();
     $product->create($data1, $data2);

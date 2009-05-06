@@ -62,8 +62,25 @@
 # for a 100 posts, there would be 101 requests: 1 for the list of posts, plus
 # 100 for each post tags.
 # 
+# Of course it's even badded if you want the list of authors, the list of
+# comments, etc. Since you will had 100 requests each time!
+# 
+# With eager loading it will be reduced to 2 requests: 1 for the list of posts,
+# plus one for the list of tags (filtered by post).
+# 
+# Example: 
+# 
+#   $post = new Post();
+#   $posts = $post->find(':all', array(
+#     'limit'   => 10,
+#     'order'   => 'created_at desc',
+#     'include' => 'tags',
+#   ));
+# 
 # TODO: Implement :throught associations.
 # TODO: Implement has_and_belongs_to_many association.
+# TODO: Implement eager loading.
+# 
 # @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
