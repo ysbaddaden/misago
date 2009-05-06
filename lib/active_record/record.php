@@ -2,11 +2,11 @@
 
 # Generic Record.
 # 
-# * A record consists on a list of attributes.
-# * You may iterate throught attributes (like an array).
+#   * A record is a list of attributes.
+#   * You may iterate throught attributes (like an array).
+#   * You may serialize it's contents to PHP (thought serialize), XML or JSON.
 # 
 # @package ActiveRecord
-# IMPROVE: Add serialization support throught the __wakeup() and __sleep() magic methods.
 abstract class ActiveRecord_Record extends Object implements Iterator
 {
   protected $__attributes = array();
@@ -86,7 +86,12 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     $xml = '';
     foreach($attributes as $k)
     {
-    	$v = is_string($this->$k) ? "<![CDATA[".$this->$k."]>" : $this->$k;
+      switch(gettype($this->$k))
+      {
+        case 'string': $v = "<![CDATA[".$this->$k."]>"; break;
+        case 'object': $v = $this->$k->to_xml();        break;
+        default:       $v = $this->$k;
+      }
       $xml .= "<$k>$v</$k>";
     }
     $model = String::underscore(get_class($this));
@@ -99,7 +104,7 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     $attributes = $this->__sleep();
   	$data = array();
     foreach($attributes as $k) {
-    	$data[$k] = $this->$k;
+    	$data[$k] = is_object($this->$k) ? $this->$k->to_json() : $this->$k;
     }
   	return json_encode($data);
   }

@@ -422,14 +422,16 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   /**
    * Adds an index to a table column.
+   * 
    * By default the index is named "$table_$column_idx" or "$table_$column_uniq".
    * 
    * Available options:
+   * 
    *   - type: null or unique
    *   - name: manual naming of the index
    *   - size: specified size of the index, in case of a blob/text. 
    * 
-   * IMPROVE: Handle multiple column index.
+   * IMPROVE: Support indices on multiple columns.
    */
   function add_index($table, $column, $options=null)
   {
