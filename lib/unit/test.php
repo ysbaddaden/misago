@@ -32,6 +32,8 @@ class Unit_Test
       $this->count_tests += 1;
       echo ".";
       
+      misago_log("------- $method:\n");
+      
       try
       {
         # runs test
@@ -51,6 +53,8 @@ class Unit_Test
     }
     
     # finished
+    misago_log("-------\n");
+    
     printf("\nFinished in %f seconds.\n", microtime(true) - $this->time);
     
     $text  = sprintf("%d tests, %d assertions, %d failures, %d errors",
