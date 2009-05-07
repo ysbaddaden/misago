@@ -133,7 +133,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   function quote_value($value)
   {
-    if ($value === true) {
+    if($value === true) {
       return $this->VALUE_TRUE;
     }
     elseif($value === false) {
@@ -141,6 +141,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     }
     elseif($value === null) {
       return $this->VALUE_NULL;
+    }
+    elseif(is_array($value))
+    {
+      $value = array_map(array($this, 'quote_value'), $value);
+      return implode(', ', $value);
     }
     return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
   }
