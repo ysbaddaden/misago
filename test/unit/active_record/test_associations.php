@@ -29,6 +29,15 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_instance_of('order->baskets', $order->baskets, 'ArrayAccess');
     $this->assert_equal('count', count($order->baskets), 3);
   }
+
+  function test_eager_loading_for_belongs_to()
+  {
+    $invoice  = new Invoice();
+    $invoices = $invoice->find(':all', array('include' => 'order'));
+    $this->assert_true("is loaded", isset($invoices[0]->order));
+    $this->assert_true("is loaded", isset($invoices[1]->order));
+#    $this->assert_instance_of("instance of relation", $invoices[0]->order, 'Order');
+  }
 }
 
 new Test_ActiveRecord_Associations();

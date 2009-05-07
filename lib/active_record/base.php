@@ -153,7 +153,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $options['limit'] = 1;
     }
     
-    # queries then creates objects.
+    # queries then creates objects
     $sql = $this->build_sql_from_options(&$options);
     
     $model = get_class($this);
@@ -168,7 +168,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           $record->new_record = false;
           $records[] = $record;
         }
-        return new ActiveArray($records, $model);
+        $records = new ActiveArray($records, $model);
+        if (!empty($options['include'])) {
+          $this->eager_loading($records, $options['include']);
+        }
+        return $records;
       break;
       
       case ':first':

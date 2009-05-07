@@ -182,19 +182,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   function __sleep()
   {
   	$attributes = parent::__sleep();
-  	foreach(array_keys($this->belongs_to) as $k)
-  	{
-  		if (isset($this->$k)) {
-  			$attributes[] = $k;
-  		}
-  	}
-  	foreach(array_keys($this->has_one) as $k)
-  	{
-  		if (isset($this->$k)) {
-  			$attributes[] = $k;
-  		}
-  	}
-  	foreach(array_keys($this->has_many) as $k)
+  	foreach(array_keys($this->associations) as $k)
   	{
   		if (isset($this->$k)) {
   			$attributes[] = $k;
@@ -207,6 +195,74 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   {
   	$this->configure_associations();
   	parent::__wakeup();
+  }
+  
+  protected function eager_loading($records, $includes)
+  {
+    if (count($records) == 0) {
+      return;
+    }
+    
+    $ids = array();
+    foreach($records as $record) {
+      $ids[] = $record->{$record->primary_key};
+    }
+    
+    foreach(array_collection($includes) as $include)
+    {
+      $fk      = $this->associations[$include]['key'];
+      $class   = $this->associations[$include]['class'];
+      $assoc   = new $class();
+      $results = $assoc->find(':all', array(
+				'conditions' => array($fk => $ids)
+      ));
+      
+      switch($this->associations[$include]['type'])
+      {
+        case 'belongs_to':
+          $record_key = $this->belongs_to[$include]['foreign_key'];
+          foreach($records as $record)
+          {
+            foreach($results as $rs)
+            {
+              if ($rs->{$assoc->primary_key} == $record->{$record_key})
+              {
+                $record->$include = $rs;
+                break;
+              }
+            }
+          }
+        break;
+        
+        case 'has_one':
+          foreach($records as $record)
+          {
+            foreach($results as $rs)
+            {
+              if ($rs->{$record->foreign_key} == $record->{$record->primary_key})
+              {
+                $record->$include = $rs;
+                break;
+              }
+            }
+          }
+        break;
+        
+        case 'has_many':
+          foreach($records as $record)
+          {
+            $_results = array();
+            foreach($results as $rs)
+            {
+              if ($rs->{$record->foreign_key} == $record->{$record->primary_key}) {
+                $_results[] = $rs;
+              }
+            }
+            $record->$include = new ActiveArray($_results);
+          }
+        break;
+      }
+    }
   }
 }
 
