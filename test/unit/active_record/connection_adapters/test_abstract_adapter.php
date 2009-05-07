@@ -114,7 +114,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $this->assert_equal("null", $test, 'NULL');
     
     $test = $db->quote_value(array('a', true, 'b', 1));
-    $this->assert_equal("array", $test, "'a', t, 'b', '1'");
+    $this->assert_equal("array", $test, "('a', t, 'b', '1')");
   }
   
   function test_create_table()

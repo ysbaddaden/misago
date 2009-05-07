@@ -145,7 +145,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     elseif(is_array($value))
     {
       $value = array_map(array($this, 'quote_value'), $value);
-      return implode(', ', $value);
+      return '('.implode(', ', $value).')';
     }
     return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
   }
