@@ -314,6 +314,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     
     $test = $db->sanitize_sql_hash_for_conditions(array('a' => 'b', 'c' => 'd'));
     $this->assert_equal("simple hash", $test, '"a" = \'b\' AND "c" = \'d\'');
+    
+    $test = $db->sanitize_sql_hash_for_conditions(array('a' => 'b', 'c' => array(1, 2, 3)));
+    $this->assert_equal("key IN (values)", $test, '"a" = \'b\' AND "c" IN (\'1\', \'2\', \'3\')');
   }
 
   function test_sanitize_sql_hash_for_assignment()

@@ -269,9 +269,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $sanitized = array();
     foreach($hash as $f => $v)
     {
-      $f = $this->quote_column($f);
-      $v = $this->quote_value($v);
-      $sanitized[] = "$f = $v";
+      $f  = $this->quote_column($f);
+      $vv = $this->quote_value($v);
+      $sanitized[] = is_array($v) ? "$f IN $vv" : "$f = $vv";
     }
     return $sanitized;
   }
