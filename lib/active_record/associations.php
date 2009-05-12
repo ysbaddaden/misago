@@ -204,8 +204,10 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     }
     
     $ids = array();
-    foreach($records as $record) {
-      $ids[] = $record->{$record->primary_key};
+    foreach($records as $record)
+    {
+      $id = $record->{$record->primary_key};
+      $ids[$id] = $record;
     }
     
     foreach(array_collection($includes) as $include)
@@ -214,40 +216,17 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       $class   = $this->associations[$include]['class'];
       $assoc   = new $class();
       $results = $assoc->find(':all', array(
-				'conditions' => array($fk => $ids)
+				'conditions' => array($fk => array_keys($ids))
       ));
       
       switch($this->associations[$include]['type'])
       {
         case 'belongs_to':
-          $assoc_key  = $assoc->primary_key;
-          $record_key = $this->belongs_to[$include]['foreign_key'];
-          foreach($records as $record)
-          {
-            foreach($results as $rs)
-            {
-              if ($rs->{$assoc_key} == $record->{$record_key})
-              {
-                $record->$include = $rs;
-                break;
-              }
-            }
-          }
-        break;
-        
         case 'has_one':
-          $assoc_key  = $record->has_one[$include]['foreign_key'];
-          $record_key = $record->primary_key;
-          foreach($records as $record)
+          foreach($results as $rs)
           {
-            foreach($results as $rs)
-            {
-              if ($rs->{$assoc_key} == $record->{$record_key})
-              {
-                $record->$include = $rs;
-                break;
-              }
-            }
+            $id = $rs->$fk;
+            $ids[$id]->$include = $rs;
           }
         break;
         

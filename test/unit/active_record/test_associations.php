@@ -46,8 +46,11 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true("is loaded", isset($orders[0]->invoice));
     $this->assert_true("is loaded", isset($orders[1]->invoice));
     $this->assert_instance_of("instance of relation", $orders[0]->invoice, 'Invoice');
+    
+#    $this->assert_true("relation must be set even thought there is no relation (to avoid unnecessary requests)",
+#      isset($orders[2]->invoice));
   }
-/*
+
   function test_eager_loading_for_has_many()
   {
     $order  = new Order();
@@ -57,7 +60,6 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_instance_of("container", $orders[0]->baskets, 'ArrayAccess');
     $this->assert_instance_of("instance of relation", $orders[0]->baskets[0], 'Basket');
   }
-*/
 }
 
 new Test_ActiveRecord_Associations();
