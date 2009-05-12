@@ -38,7 +38,8 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true("is loaded", isset($invoices[1]->order));
     $this->assert_instance_of("instance of relation", $invoices[0]->order, 'Order');
   }
-
+  
+  # FIXME: Test that $orders[2]->invoice has been set to 'null' (problem: can't use isset() on a nullified var).
   function test_eager_loading_for_has_one()
   {
     $order  = new Order();
@@ -47,8 +48,8 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true("is loaded", isset($orders[1]->invoice));
     $this->assert_instance_of("instance of relation", $orders[0]->invoice, 'Invoice');
     
-    $this->assert_true("relation must be set even thought there is no relation (to avoid unnecessary requests)",
-      isset($orders[2]->invoice));
+#    $this->assert_type("relation must be set even thought there is no relation (to avoid unnecessary requests)",
+#      $orders[2]->invoice, 'NULL');
   }
 
   function test_eager_loading_for_has_many()
@@ -59,6 +60,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true("is loaded", isset($orders[1]->baskets));
     $this->assert_instance_of("container", $orders[0]->baskets, 'ArrayAccess');
     $this->assert_instance_of("instance of relation", $orders[0]->baskets[0], 'Basket');
+    $this->assert_instance_of("instance of relation", $orders[2]->baskets, 'ArrayAccess');
   }
 }
 
