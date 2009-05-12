@@ -228,6 +228,14 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
             $id = $rs->$fk;
             $ids[$id]->$include = $rs;
           }
+          /*
+          foreach($ids as $record)
+          {
+            if (!isset($record->$include)) {
+              $record->$include = new $class();
+            }
+          }
+          */
         break;
         
         case 'has_many':
