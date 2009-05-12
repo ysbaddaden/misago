@@ -74,24 +74,26 @@
 # Permits to limitate repetitive requests.
 # 
 # Let's say you want the list of tags for each posts on a blog index page.
-# It will require as many requests as there are posts to be displayed. So,
-# for 100 posts there would be 101 requests: 1 for the list of posts, plus
-# 100 for each post tags.
+# That would require as many requests as there are posts to be displayed.
+# Thus for 100 posts there would be 101 requests: 1 for the list of posts,
+# plus 100 for loading tags for each post.
 # 
-# Of course it's even badder if you want the list of authors, the list of
-# comments and much more: you would add 100 requests each time!
+# Of course it's even badder if you want, say, the list of authors, the list of
+# comments, and more : you would add 100 requests each time! That's quite some
+# SQL overhead.
 # 
-# With eager loading such requests will be reduced to one (for the list of
-# posts), plus one for each relationship. Our previous example that required
-# 101 requests, will be reduced to just 2 requests.
+# With eager loading, such requests will be reduced to one for each relationship.
+# Our previous example that required 101 requests, would now be reduced to just
+# 2 requests. That's better.
 # 
 # Example: 
 # 
+#   # only 3 sql requests will be issued:
 #   $post = new Post();
 #   $posts = $post->find(':all', array(
-#     'limit'   => 10,
+#     'limit'   => 100,
 #     'order'   => 'created_at desc',
-#     'include' => 'tags',
+#     'include' => 'tags, authors',
 #   ));
 # 
 # TODO: Implement :throught associations.
