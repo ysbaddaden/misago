@@ -6,7 +6,10 @@
 # 
 # ===belongs_to
 #
-# Example: a comment belongs to a blog post.
+# Represents a one-to-one relationship, in the point of view
+# of the child. For instance a comment belongs to a blog post.
+# The counterpart is either a has_one or has_many relationship
+# (see below).
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('comments');
@@ -21,9 +24,26 @@
 #   $post_title = $comment->post->title;
 # 
 # 
+# ===has_one
+# 
+# Represents a one-to-one relationship, in the point of view
+# of the parent. For instance an order has one invoice. The
+# counterpart is a belongs_to relationship.
+# 
+#   class Order extends ActiveRecord_Base {
+#     public $has_one = 'invoice';
+#   }
+#   
+#   class Invoice extends ActiveRecord_Base {
+#     public $belongs_to = 'order';
+#   }
+# 
+# 
 # ===has_many
 # 
-# Example: a blog may have many tags.
+# Represents a one-to-many relationship, in the point of view
+# of the parent. For instance a post may have many comments.
+# The counterpart is a belongs_to relationship.
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('tags');
@@ -39,34 +59,31 @@
 #   }
 # 
 # 
-# ===has_one
-# 
-# ...
-# 
-# 
 # ===has_and_belongs_to_many
 # 
-# ...
+# [TODO]
 # 
 # 
 # ==:throught
 # 
-# ...
+# [TODO]
+# 
 # 
 # == Eager Loading (:include)
 #
 # Permits to limitate repetitive requests.
 # 
-# For instance you want the list of tags for each posts on a blog index page.
-# It requires executing as many requests as there are posts displayed. So,
-# for a 100 posts, there would be 101 requests: 1 for the list of posts, plus
+# Let's say you want the list of tags for each posts on a blog index page.
+# It will require as many requests as there are posts to be displayed. So,
+# for 100 posts there would be 101 requests: 1 for the list of posts, plus
 # 100 for each post tags.
 # 
-# Of course it's even badded if you want the list of authors, the list of
-# comments, etc. Since you will had 100 requests each time!
+# Of course it's even badder if you want the list of authors, the list of
+# comments and much more: you would add 100 requests each time!
 # 
-# With eager loading it will be reduced to 2 requests: 1 for the list of posts,
-# plus one for the list of tags (filtered by post).
+# With eager loading such requests will be reduced to one (for the list of
+# posts), plus one for each relationship. Our previous example that required
+# 101 requests, will be reduced to just 2 requests.
 # 
 # Example: 
 # 
@@ -79,7 +96,6 @@
 # 
 # TODO: Implement :throught associations.
 # TODO: Implement has_and_belongs_to_many association.
-# TODO: Implement eager loading.
 # 
 # @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record

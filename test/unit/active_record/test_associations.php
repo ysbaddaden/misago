@@ -60,7 +60,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true("is loaded", isset($orders[1]->baskets));
     $this->assert_instance_of("container", $orders[0]->baskets, 'ArrayAccess');
     $this->assert_instance_of("instance of relation", $orders[0]->baskets[0], 'Basket');
-    $this->assert_instance_of("instance of relation", $orders[2]->baskets, 'ArrayAccess');
+    $this->assert_instance_of("instance of empty relation", $orders[2]->baskets, 'ArrayAccess');
   }
 }
 
