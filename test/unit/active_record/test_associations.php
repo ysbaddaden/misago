@@ -36,7 +36,26 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $invoices = $invoice->find(':all', array('include' => 'order'));
     $this->assert_true("is loaded", isset($invoices[0]->order));
     $this->assert_true("is loaded", isset($invoices[1]->order));
-#    $this->assert_instance_of("instance of relation", $invoices[0]->order, 'Order');
+    $this->assert_instance_of("instance of relation", $invoices[0]->order, 'Order');
+  }
+
+  function test_eager_loading_for_has_one()
+  {
+    $order  = new Order();
+    $orders = $order->find(':all', array('include' => 'invoice'));
+    $this->assert_true("is loaded", isset($orders[0]->invoice));
+    $this->assert_true("is loaded", isset($orders[1]->invoice));
+    $this->assert_instance_of("instance of relation", $orders[0]->invoice, 'Invoice');
+  }
+
+  function test_eager_loading_for_has_many()
+  {
+    $order  = new Order();
+    $orders = $order->find(':all', array('include' => 'baskets'));
+    $this->assert_true("is loaded", isset($orders[0]->baskets));
+    $this->assert_true("is loaded", isset($orders[1]->baskets));
+    $this->assert_instance_of("container", $orders[0]->baskets, 'ArrayAccess');
+    $this->assert_instance_of("instance of relation", $orders[0]->baskets[0], 'Basket');
   }
 }
 

@@ -220,12 +220,13 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       switch($this->associations[$include]['type'])
       {
         case 'belongs_to':
+          $assoc_key  = $assoc->primary_key;
           $record_key = $this->belongs_to[$include]['foreign_key'];
           foreach($records as $record)
           {
             foreach($results as $rs)
             {
-              if ($rs->{$assoc->primary_key} == $record->{$record_key})
+              if ($rs->{$assoc_key} == $record->{$record_key})
               {
                 $record->$include = $rs;
                 break;
@@ -235,11 +236,13 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         break;
         
         case 'has_one':
+          $assoc_key  = $record->has_one[$include]['foreign_key'];
+          $record_key = $record->primary_key;
           foreach($records as $record)
           {
             foreach($results as $rs)
             {
-              if ($rs->{$record->foreign_key} == $record->{$record->primary_key})
+              if ($rs->{$assoc_key} == $record->{$record_key})
               {
                 $record->$include = $rs;
                 break;
@@ -249,12 +252,15 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         break;
         
         case 'has_many':
+          $assoc_key  = $record->has_many[$include]['foreign_key'];
+          $record_key = $record->primary_key;
           foreach($records as $record)
           {
             $_results = array();
             foreach($results as $rs)
             {
-              if ($rs->{$record->foreign_key} == $record->{$record->primary_key}) {
+              if ($rs->{$assoc_key} == $record->{$record_key})
+              {
                 $_results[] = $rs;
               }
             }
