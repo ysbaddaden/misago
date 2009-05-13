@@ -3,7 +3,6 @@
  * 
  * @package ActiveRecord
  * 
- * TODO: Implement eager loading (:include => 'assoc').
  * TODO: Implement calculations.
  */
 abstract class ActiveRecord_Base extends ActiveRecord_Validations

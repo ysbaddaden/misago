@@ -83,8 +83,9 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
     else
     {
-      # IMPROVE: Add some SQL request statistics (affected rows, request time).
-      $message = sprintf("%s\nAffected rows: %d ; Elapsed time: %.02fms\n", $sql, mysql_affected_rows($this->link), $time);
+      $message = sprintf("%s\nAffected rows: %d ; Elapsed time: %.02fms\n",
+        $sql, mysql_affected_rows($this->link), $time);
+      
       if (DEBUG > 1) {
         echo "\n$message\n";
       }

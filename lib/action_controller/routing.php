@@ -153,7 +153,6 @@ class ActionController_Routing extends Object
    * Returns a path for a given mapping.
    * 
    * FIXME: Handle special requirements for keys to select the route.
-   * TODO: What about HTTP method calls in reverse routing?
    */
   function reverse(array $mapping)
   {

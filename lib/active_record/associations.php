@@ -59,14 +59,27 @@
 #   }
 # 
 # 
+# ===:through
+# 
+# Declares a many-to-many relationship through a join model. The
+# relationship must be defined in both models.
+# 
+# [TODO]
+# 
+# 
 # ===has_and_belongs_to_many
 # 
-# [TODO]
+# Declares a many-to-many relationship through a join table with no
+# model nor primary key. The HABTM relationship must be defined in both
+# models.
 # 
+#   class Programmer extends ActiveRecord_Base {
+#     protected $has_and_belongs_to_many = array('projects');
+#   }
 # 
-# ==:throught
-# 
-# [TODO]
+#   class Project extends ActiveRecord_Base {
+#     protected $has_and_belongs_to_many = array('programmers');
+#   }
 # 
 # 
 # == Eager Loading (:include)
@@ -88,7 +101,7 @@
 # 
 # Example: 
 # 
-#   # only 3 sql requests will be issued:
+#   # only 3 sql requests will be issued (instead of 301):
 #   $post = new Post();
 #   $posts = $post->find(':all', array(
 #     'limit'   => 100,
@@ -96,8 +109,10 @@
 #     'include' => 'tags, authors',
 #   ));
 # 
-# TODO: Implement :throught associations.
+# TODO: Implement create_other & create_others magic methods.
 # TODO: Implement has_and_belongs_to_many association.
+# TODO: Implement belongs_to :polymorphic association.
+# TODO: Implement has_many :through association.
 # 
 # @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
@@ -106,6 +121,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   protected $belongs_to   = array();
   protected $has_one      = array();
   protected $has_many     = array();
+  protected $has_and_belongs_to_many = array();
   
   function __construct($arg=null)
   {
