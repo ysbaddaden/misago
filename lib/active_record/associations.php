@@ -70,7 +70,7 @@
 # ===has_and_belongs_to_many
 # 
 # Declares a many-to-many relationship through a join table with no
-# model nor primary key. The HABTM relationship must be defined in both
+# model nor primary key. The relationship must be defined in both
 # models.
 # 
 #   class Programmer extends ActiveRecord_Base {
@@ -108,6 +108,11 @@
 #     'order'   => 'created_at desc',
 #     'include' => 'tags, authors',
 #   ));
+#   foreach($posts as $post)
+#   {
+#     print_r($post->tags);
+#     print_r($post->authors);
+#   }
 # 
 # TODO: Implement create_other & create_others magic methods.
 # TODO: Implement has_and_belongs_to_many association.
@@ -193,6 +198,10 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
           	'find'  => ':all',
           );
         break;
+        
+        case 'has_and_belongs_to_many':
+        
+        break;
       }
     }
   }
@@ -202,11 +211,14 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   	# association?
 		if (array_key_exists($attribute, $this->associations))
 		{
-      $class      = $this->associations[$attribute]['class'];
-			$record     = new $class();
-			return $this->$attribute = $record->find($this->associations[$attribute]['find'], array(
-				'conditions' => array($this->associations[$attribute]['key'] => $this->{$this->associations[$attribute]['value']})
-			));
+      $model  = $this->associations[$attribute]['class'];
+			$record = new $model();
+			$conditions = array($this->associations[$attribute]['key'] => $this->{$this->associations[$attribute]['value']});
+			
+			return $this->$attribute = $record->find(
+			  $this->associations[$attribute]['find'],
+		    array('conditions' => &$conditions)
+	    );
 		}
   	
     # another kind of attribute
@@ -247,8 +259,8 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     foreach(array_collection($includes) as $include)
     {
       $fk      = $this->associations[$include]['key'];
-      $class   = $this->associations[$include]['class'];
-      $assoc   = new $class();
+      $model   = $this->associations[$include]['class'];
+      $assoc   = new $model();
       $results = $assoc->find(':all', array(
 				'conditions' => array($fk => array_keys($ids))
       ));
@@ -282,8 +294,12 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
                 $_results[] = $rs;
               }
             }
-            $record->$include = new ActiveArray($_results);
+            $record->$include = new ActiveRecord_Collection($_results, $model);
           }
+        break;
+        
+        case 'has_and_belongs_to_many':
+          
         break;
       }
     }

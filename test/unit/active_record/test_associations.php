@@ -26,7 +26,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   function test_has_many_relationship()
   {
     $order = new Order(1);
-    $this->assert_instance_of('order->baskets', $order->baskets, 'ArrayAccess');
+    $this->assert_instance_of('order->baskets', $order->baskets, 'ActiveRecord_Collection');
     $this->assert_equal('count', count($order->baskets), 3);
   }
 
@@ -57,9 +57,9 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $orders = $order->find(':all', array('include' => 'baskets'));
     $this->assert_true("is loaded", isset($orders[0]->baskets));
     $this->assert_true("is loaded", isset($orders[1]->baskets));
-    $this->assert_instance_of("container", $orders[0]->baskets, 'ArrayAccess');
+    $this->assert_instance_of("container", $orders[0]->baskets, 'ActiveRecord_Collection');
     $this->assert_instance_of("instance of relation", $orders[0]->baskets[0], 'Basket');
-    $this->assert_instance_of("instance of empty relation", $orders[2]->baskets, 'ArrayAccess');
+    $this->assert_instance_of("instance of empty relation", $orders[2]->baskets, 'ActiveRecord_Collection');
   }
 }
 

@@ -1,8 +1,6 @@
 <?php
 
-# Adds useful methods to ArrayObject.
-# @package ActiveSupport
-class ActiveArray extends ArrayObject
+class ActiveRecord_Collection extends ArrayObject
 {
   public $model;
   
