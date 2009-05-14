@@ -144,13 +144,13 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       {
         $name = $assoc;
         unset($this->$type[$i]);
-        $this->$type[$name] = array();
+        $def = array();
       }
-      else {
+      else
+      {
         $name = $i;
+        $def  = $this->{$type}[$name];
       }
-      $def =& $this->{$type}[$name];
-      
       $def['type'] = $type;
       
       if (empty($def['class'])) {
@@ -175,39 +175,28 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       switch($type)
       {
         case 'belongs_to':
-          $this->associations[$name] = array(
-          	'type'  => 'belongs_to',
-          	'class' => String::camelize($name),
-          	'key'   => $this->primary_key,
-          	'value' => $def['foreign_key'],
-          	'find'  => ':first',
-          );
+          $def['find_key']   = $this->primary_key;
+          $def['find_value'] = $def['foreign_key'];
+          $def['find_scope'] = ':first';
         break;
         
         case 'has_one':
-          $this->associations[$name] = array(
-          	'type'  => 'has_one',
-          	'class' => String::camelize($name),
-          	'key'   => $def['foreign_key'],
-          	'value' => $this->primary_key,
-          	'find'  => ':first',
-          );
+          $def['find_key']   = $def['foreign_key'];
+          $def['find_value'] = $this->primary_key;
+          $def['find_scope'] = ':first';
         break;
         
         case 'has_many':
-          $this->associations[$name] = array(
-          	'type'  => 'has_many',
-          	'class' => String::camelize(String::singularize($name)),
-          	'key'   => $def['foreign_key'],
-          	'value' => $this->primary_key,
-          	'find'  => ':all',
-          );
+          $def['find_key']   = $def['foreign_key'];
+          $def['find_value'] = $this->primary_key;
+          $def['find_scope'] = ':all';
         break;
         
         case 'has_and_belongs_to_many':
         
         break;
       }
+      $this->associations[$name] = $def;
     }
   }
   
@@ -217,17 +206,17 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 		if (array_key_exists($attribute, $this->associations))
 		{
 		  $type   = $this->associations[$attribute]['type'];
-      $model  = $this->associations[$attribute]['class'];
+      $model  = $this->associations[$attribute]['class_name'];
 			$record = new $model();
-			$conditions = array($this->associations[$attribute]['key'] => $this->{$this->associations[$attribute]['value']});
+			$conditions = array($this->associations[$attribute]['find_key'] => $this->{$this->associations[$attribute]['find_value']});
 			
 			$found = $record->find(
-			  $this->associations[$attribute]['find'],
+			  $this->associations[$attribute]['find_scope'],
 		    array('conditions' => &$conditions)
 	    );
 	    
 	    return $this->$attribute = ($found instanceof ArrayAccess) ?
-	      new ActiveRecord_Collection($this, $found, $this->{$type}[$attribute]) : $found;
+	      new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
 		}
   	
     # another kind of attribute
@@ -267,9 +256,10 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     
     foreach(array_collection($includes) as $include)
     {
-      $fk      = $this->associations[$include]['key'];
-      $model   = $this->associations[$include]['class'];
-      $assoc   = new $model();
+      $fk    = $this->associations[$include]['find_key'];
+      $model = $this->associations[$include]['class_name'];
+      $assoc = new $model();
+      
       $results = $assoc->find(':all', array(
 				'conditions' => array($fk => array_keys($ids))
       ));
@@ -292,7 +282,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         break;
         
         case 'has_many':
-          $assoc_key  = $record->has_many[$include]['foreign_key'];
+          $assoc_key  = $record->associations[$include]['foreign_key'];
           $record_key = $record->primary_key;
           foreach($records as $record)
           {
@@ -303,7 +293,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
                 $_results[] = $rs;
               }
             }
-            $record->$include = new ActiveRecord_Collection($record, $_results, $this->has_many[$include]);
+            $record->$include = new ActiveRecord_Collection($record, $_results, $this->associations[$include]);
           }
         break;
         
