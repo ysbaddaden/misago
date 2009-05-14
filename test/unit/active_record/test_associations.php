@@ -29,6 +29,11 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_instance_of('order->baskets', $order->baskets, 'ActiveRecord_Collection');
     $this->assert_equal('count', count($order->baskets), 3);
   }
+  
+  function test_has_and_belongs_to_many_relationship()
+  {
+    
+  }
 
   function test_eager_loading_for_belongs_to()
   {

@@ -151,8 +151,13 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       }
       $def =& $this->{$type}[$name];
       
+      $def['type'] = $type;
+      
+      if (empty($def['class'])) {
+        $def['class_name'] = String::camelize(String::singularize(String::underscore($name)));
+      }
       if (empty($def['table'])) {
-        $def['table'] = String::pluralize(String::underscore($name));
+        $def['table'] = String::pluralize(String::underscore($def['class_name']));
       }
       if (empty($def['primary_key'])) {
         $def['primary_key'] = 'id';
@@ -211,14 +216,18 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   	# association?
 		if (array_key_exists($attribute, $this->associations))
 		{
+		  $type   = $this->associations[$attribute]['type'];
       $model  = $this->associations[$attribute]['class'];
 			$record = new $model();
 			$conditions = array($this->associations[$attribute]['key'] => $this->{$this->associations[$attribute]['value']});
 			
-			return $this->$attribute = $record->find(
+			$found = $record->find(
 			  $this->associations[$attribute]['find'],
 		    array('conditions' => &$conditions)
 	    );
+	    
+	    return $this->$attribute = ($found instanceof ArrayAccess) ?
+	      new ActiveRecord_Collection($this, $found, $this->{$type}[$attribute]) : $found;
 		}
   	
     # another kind of attribute
@@ -294,7 +303,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
                 $_results[] = $rs;
               }
             }
-            $record->$include = new ActiveRecord_Collection($_results, $model);
+            $record->$include = new ActiveRecord_Collection($record, $_results, $this->has_many[$include]);
           }
         break;
         

@@ -167,7 +167,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           $record->new_record = false;
           $records[] = $record;
         }
-        $records = new ActiveRecord_Collection($records, $model);
+        $records = new ActiveArray($records, $model);
         if (!empty($options['include'])) {
           $this->eager_loading($records, $options['include']);
         }

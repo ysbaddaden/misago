@@ -1,35 +1,57 @@
 <?php
 
-class ActiveRecord_Collection extends ArrayObject
+# TODO: Tests!
+class ActiveRecord_Collection extends ActiveArray
 {
-  public $model;
+  protected $parent;
+  protected $options;
   
-  function __construct($input, $model=null)
+  function __construct($parent, $childs, $options)
   {
-    parent::__construct($input);
-    $this->model = $model;
+    $this->parent  = $parent;
+    $this->options =& $options;
+    parent::__construct($childs, $this->options['class_name']);
   }
   
-  # Exports to a JSON string.
-  function to_json()
+  function build($attributes)
   {
-    $data = array();
-    foreach($this as $v) {
-      $data[] = $v->to_json();
+    $class = $this->model;
+    $attributes[$this->options['foreign_key']] = $this->parent->{$this->options['foreign_key']};
+    return new $class($this->model);
+  }
+  
+  function create($attributes)
+  {
+    $class  = $this->model;
+    $record = new $class();
+    $attributes[$this->options['foreign_key']] = $this->parent->{$this->options['foreign_key']};
+    return $record->create(&$attributes);
+  }
+  
+  /*
+  function find($args)
+  {
+    $class = $this->model;
+    $args  = func_get_args();
+    return call_user_func_array(array(new $class(), 'find'), &$args);
+  }
+  
+  function delete($record)
+  {
+    $class = $this->model;
+    $args  = func_get_args();
+    foreach($args as $record) {
+      $record->delete();
     }
-    return json_encode($data);
   }
   
-  # Exports to an XML string.
-  function to_xml()
+  function delete_all()
   {
-    $xml = '';
-    foreach($this as $v) {
-      $xml .= $v->to_xml();
+    foreach($this as $record) {
+      $record->delete();
     }
-    $plural = String::pluralize(String::underscore($this->model));
-    return "<$plural>$xml</$plural>";
   }
+  */
 }
 
 ?>
