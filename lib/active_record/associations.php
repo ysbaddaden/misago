@@ -7,11 +7,12 @@
 # ==belongs_to
 #
 # Represents a one-to-one relationship, in the point of view
-# of the child. For instance a comment belongs to a blog post.
-# The counterpart is either a has_one or has_many relationship
-# (see below).
+# of the child. The counterpart is either a has_one or
+# has_many relationship (see below).
 # 
 # ===Example: 
+# 
+# A comment belongs to a blog post.
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('comments');
@@ -29,14 +30,15 @@
 # ==has_one
 # 
 # Represents a one-to-one relationship, in the point of view
-# of the parent. For instance an order has one invoice. The
-# counterpart is a belongs_to relationship.
+# of the parent. The counterpart is a belongs_to relationship.
 # 
 # The difference with a belongs_to relationship, is where the
 # foreign key is located: in this model for a belongs_to
 # relationship; in the related model for a has_one relationship.
 # 
-# ===Example: 
+# ===Example:
+#
+# For instance an order has one invoice.
 # 
 #   class Order extends ActiveRecord_Base {
 #     public $has_one = 'invoice';
@@ -50,10 +52,11 @@
 # ==has_many
 # 
 # Represents a one-to-many relationship, in the point of view
-# of the parent. For instance a post may have many comments.
-# The counterpart is a belongs_to relationship.
+# of the parent. The counterpart is a belongs_to relationship.
 # 
 # ===Example: 
+# 
+# A post may have many comments.
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('tags');
@@ -71,8 +74,7 @@
 # 
 # ===:through
 # 
-# Declares a many-to-many relationship through a join model. The
-# relationship will be defined in both models.
+# Declares a many-to-many relationship through a join model.
 # 
 # [TODO]
 # 
@@ -80,10 +82,12 @@
 # ==has_and_belongs_to_many
 # 
 # Declares a many-to-many relationship through a join table with no
-# model nor primary key. The relationship must be defined in both
-# models.
+# model nor primary key.
 # 
-# ===Example: 
+# ===Example:
+# 
+# A programmer may have many projects, and a project may belong to
+# (or have) many programmers.
 # 
 #   class Programmer extends ActiveRecord_Base {
 #     protected $has_and_belongs_to_many = array('projects');
@@ -92,6 +96,22 @@
 #   class Project extends ActiveRecord_Base {
 #     protected $has_and_belongs_to_many = array('programmers');
 #   }
+# 
+# ===The join table
+# 
+# An HABTM relationship requires the existence of a join table
+# with no primary key but containing foreign keys of both models.
+# 
+# The join table name is built from both models' name, sorted
+# ascending. So for the projects-programmers relationship, from our
+# previous example, the table name would be <code>programmers_projects</code>.
+# 
+# In fact our previous example requires the following table and fields:
+# 
+#   programmers_projects
+#   --------------------
+#   programmer_id
+#   project_id
 # 
 # 
 # =Eager Loading (:include)
@@ -134,21 +154,35 @@
 # @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
-  protected $associations = array();
   protected $belongs_to   = array();
   protected $has_one      = array();
   protected $has_many     = array();
   protected $has_and_belongs_to_many = array();
   
+  protected $associations = array();
+  
   function __construct($arg=null)
   {
-    $this->configure_associations('belongs_to');
-    $this->configure_associations('has_one');
-    $this->configure_associations('has_many');
+    $this->configure_associations();
     parent::__construct($arg);
   }
   
-  private function configure_associations($type)
+  private function configure_associations()
+  {
+    $apc_key = TMP.'/cache/active_records/associations_'.get_class($this);
+    $this->associations = apc_fetch($apc_key, $success);
+    if ($success === false)
+    {
+      $this->associations = array();
+      $this->_configure_associations('belongs_to');
+      $this->_configure_associations('has_one');
+      $this->_configure_associations('has_many');
+      $this->_configure_associations('has_and_belongs_to_many');
+      apc_store($apc_key, $this->associations);
+    }
+  }
+  
+  private function _configure_associations($type)
   {
     foreach($this->$type as $i => $assoc)
     {
@@ -165,11 +199,11 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       }
       $def['type'] = $type;
       
-      if (empty($def['class'])) {
+      if (empty($def['class_name'])) {
         $def['class_name'] = String::camelize(String::singularize(String::underscore($name)));
       }
-      if (empty($def['table'])) {
-        $def['table'] = String::pluralize(String::underscore($def['class_name']));
+      if (empty($def['table_name'])) {
+        $def['table_name'] = String::pluralize(String::singularize(String::underscore($name)));
       }
       if (empty($def['primary_key'])) {
         $def['primary_key'] = 'id';
@@ -178,9 +212,15 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       {
         switch($type)
         {
-          case 'belongs_to': $def['foreign_key'] = String::underscore($name).'_'.$def['primary_key'];           break;
-          case 'has_one':    $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key; break;
-          case 'has_many':   $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key; break;
+          case 'belongs_to':
+          case 'has_and_belongs_to_many':
+            $def['foreign_key'] = String::underscore($def['class_name']).'_'.$def['primary_key'];
+          break;
+          
+          case 'has_one':
+          case 'has_many':
+            $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key;
+          break;
         }
       }
       
@@ -205,7 +245,16 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         break;
         
         case 'has_and_belongs_to_many':
-        
+          $join_table = ($this->table_name < $def['table_name']) ?
+            $this->table_name.'_'.$def['table_name'] : $def['table_name'].'_'.$this->table_name;
+          $other_pk = $def['primary_key'];
+          $other_fk = $def['foreign_key'];
+          $this_fk  = String::underscore(get_class($this)).'_'.$this->primary_key;
+          
+          $def['find_join']  = "INNER JOIN $join_table ON $join_table.$other_fk = {$def['table_name']}.$other_pk";
+          $def['find_key']   = "$join_table.$this_fk";
+          $def['find_value'] = $this->primary_key;
+          $def['find_scope'] = ':all';
         break;
       }
       $this->associations[$name] = $def;
@@ -219,14 +268,15 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 		{
 		  $type   = $this->associations[$attribute]['type'];
       $model  = $this->associations[$attribute]['class_name'];
-			$record = new $model();
+      
+			$record     = new $model();
 			$conditions = array($this->associations[$attribute]['find_key'] => $this->{$this->associations[$attribute]['find_value']});
-			
-			$found = $record->find(
-			  $this->associations[$attribute]['find_scope'],
-		    array('conditions' => &$conditions)
-	    );
-	    
+			$options    = array('conditions' => &$conditions);
+			if (isset($this->associations[$attribute]['find_join'])) {
+			  $options['joins'] = $this->associations[$attribute]['find_join'];
+			}
+			$found = $record->find($this->associations[$attribute]['find_scope'], &$options);
+      
 	    return $this->$attribute = ($found instanceof ArrayAccess) ?
 	      new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
 		}
@@ -272,9 +322,13 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       $model = $this->associations[$include]['class_name'];
       $assoc = new $model();
       
-      $results = $assoc->find(':all', array(
-				'conditions' => array($fk => array_keys($ids))
-      ));
+			$options = array(
+	      'conditions' => array($fk => array_keys($ids)),
+			);
+			if (isset($this->associations[$include]['find_join'])) {
+			  $options['joins'] = $this->associations[$include]['find_join'];
+			}
+      $results = $assoc->find(':all', $options);
       
       switch($this->associations[$include]['type'])
       {
@@ -294,6 +348,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         break;
         
         case 'has_many':
+        case 'has_and_belongs_to_many':
           $assoc_key  = $record->associations[$include]['foreign_key'];
           $record_key = $record->primary_key;
           foreach($records as $record)
@@ -305,12 +360,9 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
                 $_results[] = $rs;
               }
             }
-            $record->$include = new ActiveRecord_Collection($record, $_results, $this->associations[$include]);
+            $record->$include = new ActiveRecord_Collection(
+              $record, $_results, $this->associations[$include]);
           }
-        break;
-        
-        case 'has_and_belongs_to_many':
-          
         break;
       }
     }

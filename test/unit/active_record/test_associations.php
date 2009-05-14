@@ -32,7 +32,11 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_has_and_belongs_to_many_relationship()
   {
+    $this->fixtures('programmers, projects, programmers_projects');
     
+    $programmer = new Programmer(1);
+    $this->assert_instance_of('', $programmer->projects, 'ActiveRecord_Collection');
+    $this->assert_equal('count', count($programmer->projects), 2);
   }
 
   function test_eager_loading_for_belongs_to()
@@ -65,6 +69,17 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_instance_of("container", $orders[0]->baskets, 'ActiveRecord_Collection');
     $this->assert_instance_of("instance of relation", $orders[0]->baskets[0], 'Basket');
     $this->assert_instance_of("instance of empty relation", $orders[2]->baskets, 'ActiveRecord_Collection');
+  }
+
+  function test_eager_loading_for_has_and_belongs_to_many()
+  {
+    $programmer  = new Programmer();
+    $programmers = $programmer->find(':all', array('include' => 'projects'));
+    $this->assert_true("is loaded", isset($programmers[0]->projects));
+    $this->assert_true("is loaded", isset($programmers[1]->projects));
+    $this->assert_instance_of("container", $programmers[0]->projects, 'ActiveRecord_Collection');
+    $this->assert_instance_of("instance of relation", $programmers[1]->projects[0], 'Project');
+    $this->assert_instance_of("instance of empty relation", $programmers[2]->projects, 'ActiveRecord_Collection');
   }
 }
 
