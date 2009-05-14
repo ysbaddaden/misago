@@ -2,14 +2,16 @@
 
 # Handles ORM relationships.
 # 
-# ==Relationships
+# =Relationships
 # 
-# ===belongs_to
+# ==belongs_to
 #
 # Represents a one-to-one relationship, in the point of view
 # of the child. For instance a comment belongs to a blog post.
 # The counterpart is either a has_one or has_many relationship
 # (see below).
+# 
+# ===Example: 
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('comments');
@@ -24,11 +26,17 @@
 #   $post_title = $comment->post->title;
 # 
 # 
-# ===has_one
+# ==has_one
 # 
 # Represents a one-to-one relationship, in the point of view
 # of the parent. For instance an order has one invoice. The
 # counterpart is a belongs_to relationship.
+# 
+# The difference with a belongs_to relationship, is where the
+# foreign key is located: in this model for a belongs_to
+# relationship; in the related model for a has_one relationship.
+# 
+# ===Example: 
 # 
 #   class Order extends ActiveRecord_Base {
 #     public $has_one = 'invoice';
@@ -39,11 +47,13 @@
 #   }
 # 
 # 
-# ===has_many
+# ==has_many
 # 
 # Represents a one-to-many relationship, in the point of view
 # of the parent. For instance a post may have many comments.
 # The counterpart is a belongs_to relationship.
+# 
+# ===Example: 
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('tags');
@@ -62,16 +72,18 @@
 # ===:through
 # 
 # Declares a many-to-many relationship through a join model. The
-# relationship must be defined in both models.
+# relationship will be defined in both models.
 # 
 # [TODO]
 # 
 # 
-# ===has_and_belongs_to_many
+# ==has_and_belongs_to_many
 # 
 # Declares a many-to-many relationship through a join table with no
 # model nor primary key. The relationship must be defined in both
 # models.
+# 
+# ===Example: 
 # 
 #   class Programmer extends ActiveRecord_Base {
 #     protected $has_and_belongs_to_many = array('projects');
@@ -82,7 +94,7 @@
 #   }
 # 
 # 
-# == Eager Loading (:include)
+# =Eager Loading (:include)
 #
 # Permits to limitate repetitive requests.
 # 
@@ -99,7 +111,7 @@
 # Our previous example that required 101 requests, would now be reduced to just
 # 2 requests. That's better.
 # 
-# Example: 
+# ==Example: 
 # 
 #   # only 3 sql requests will be issued (instead of 301):
 #   $post = new Post();
