@@ -77,15 +77,15 @@
 # 
 # ===:through
 # 
-# Declares a many-to-many relationship through a join model.
+# Declares a has_many relationship, but through a join model.
 # 
 # [TODO]
 # 
 # 
 # ==has_and_belongs_to_many
 # 
-# Declares a many-to-many relationship through a join table with no
-# model nor primary key.
+# Declares a many-to-many relationship, using a join table with no
+# associated model nor primary key.
 # 
 # ===Example:
 # 
@@ -100,16 +100,18 @@
 #     protected $has_and_belongs_to_many = array('programmers');
 #   }
 # 
-# ===The join table
+# ===Join table
 # 
 # An HABTM relationship requires the existence of a join table
 # with no primary key but containing foreign keys of both models.
 # 
-# The join table name is built from both models' name, sorted
-# ascending. So for the projects-programmers relationship, from our
-# previous example, the table name would be <code>programmers_projects</code>.
+# The join table name is made by comparing sizes of both models'
+# name, using the '<' operator. The smaller one before. For our
+# previous example, the projects-programmers relationship, the
+# join table name would be <code>programmers_projects</code>.
 # 
-# In fact our previous example requires the following table and fields:
+# In fact previous example requires the following table and
+# fields:
 # 
 #   programmers_projects
 #   --------------------
@@ -119,24 +121,25 @@
 # 
 # =Eager Loading (include)
 #
-# Permits to limitate repetitive requests.
+# Permits to limitate repetitive requests of relationships' data by
+# requesting it all at once.
 # 
 # Let's say you want the list of tags for each posts on a blog index page.
 # That would require as many requests as there are posts to be displayed.
 # Thus for 100 posts there would be 101 requests: 1 for the list of posts,
-# plus 100 for loading tags for each post.
+# and 100 for loading the list of tags for each post.
 # 
-# Of course it's even badder if you want, say, the list of authors, the list of
-# comments, and more : you would add 100 requests each time! That's quite some
-# SQL overhead.
+# Of course it's even badder if you also want, say, the list of authors,
+# the list of comments, and more : you would add 100 requests each time!
+# That's quite some SQL overhead, and can be dreadful.
 # 
-# With eager loading, such requests will be reduced to one for each relationship.
-# Our previous example that required 101 requests, would now be reduced to just
-# 2 requests. That's better.
+# With eager loading, such requests will be reduced to one for each
+# relationship. Our previous example that required 101 requests, would now
+# be reduced to just 2 requests. Which is better.
 # 
 # ==Example: 
 # 
-# Only 3 sql requests will be issued (instead of 301):
+# Only 3 SQL requests will be issued (instead of 301):
 # 
 #   $post = new Post();
 #   $posts = $post->find(':all', array(
@@ -150,7 +153,7 @@
 #     print_r($post->authors);
 #   }
 # 
-# TODO: Implement create_other & create_others magic methods.
+# TODO: Implement create_other and build_other magic methods (for belongs_to & has_one relationships).
 # TODO: Implement has_many :through association.
 # TODO: Implement belongs_to :polymorphic association.
 # 
