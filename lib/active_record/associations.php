@@ -216,18 +216,9 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       }
       if (empty($def['foreign_key']))
       {
-        switch($type)
-        {
-          case 'belongs_to':
-          case 'has_and_belongs_to_many':
-            $def['foreign_key'] = String::underscore($def['class_name']).'_'.$def['primary_key'];
-          break;
-          
-          case 'has_one':
-          case 'has_many':
-            $def['foreign_key'] = String::underscore(get_class($this)).'_'.$this->primary_key;
-          break;
-        }
+        $def['foreign_key'] = ($type == 'belongs_to') ?
+          String::underscore($def['class_name']).'_'.$def['primary_key'] :
+          String::underscore(get_class($this)).'_'.$this->primary_key;
       }
       
       switch($type)
@@ -248,19 +239,38 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
           $def['find_key']   = $def['foreign_key'];
           $def['find_value'] = $this->primary_key;
           $def['find_scope'] = ':all';
+          $def['find_options'] = array_intersect_key($def, array(
+            'select' => '',
+            'order'  => '',
+            'limit'  => '',
+          ));
+#          if (!isset($def['find_options']['select'])) {
+#            $def['find_options']['select'] = '*';
+#          }
         break;
         
         case 'has_and_belongs_to_many':
-          $join_table = ($this->table_name < $def['table_name']) ?
-            $this->table_name.'_'.$def['table_name'] : $def['table_name'].'_'.$this->table_name;
-          $other_pk = $def['primary_key'];
-          $other_fk = $def['foreign_key'];
-          $this_fk  = String::underscore(get_class($this)).'_'.$this->primary_key;
+          if (!isset($def['join_table']))
+          {
+            $def['join_table'] = ($this->table_name < $def['table_name']) ?
+              $this->table_name.'_'.$def['table_name'] : $def['table_name'].'_'.$this->table_name;
+          }
+          if (!isset($def['association_foreign_key'])) {
+            $def['association_foreign_key'] = String::underscore($def['class_name']).'_'.$def['primary_key'];
+          }
           
-          $def['find_join']  = "INNER JOIN $join_table ON $join_table.$other_fk = {$def['table_name']}.$other_pk";
-          $def['find_key']   = "$join_table.$this_fk";
+#          $def['find_join']  = "INNER JOIN {$def['join_table']} ON {$def['join_table']}.{$def['association_foreign_key']} = {$def['table_name']}.{$def['primary_key']}";
+          $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
           $def['find_value'] = $this->primary_key;
           $def['find_scope'] = ':all';
+          
+          $options = array_intersect_key($def, array(
+            'select' => '',
+            'order'  => '',
+            'limit'  => '',
+            'page'   => '',
+          ));
+          $def['find_options']['joins'] = "INNER JOIN {$def['join_table']} ON {$def['join_table']}.{$def['association_foreign_key']} = {$def['table_name']}.{$def['primary_key']}";
         break;
       }
       $this->associations[$name] = $def;
@@ -275,13 +285,12 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 		  $type   = $this->associations[$attribute]['type'];
       $model  = $this->associations[$attribute]['class_name'];
       
-			$record     = new $model();
-			$conditions = array($this->associations[$attribute]['find_key'] => $this->{$this->associations[$attribute]['find_value']});
-			$options    = array('conditions' => &$conditions);
-			if (isset($this->associations[$attribute]['find_join'])) {
-			  $options['joins'] = $this->associations[$attribute]['find_join'];
-			}
-			$found = $record->find($this->associations[$attribute]['find_scope'], &$options);
+			$options = isset($this->associations[$attribute]['find_options']) ?
+			  $this->associations[$attribute]['find_options'] : array();
+			$options['conditions'] = array($this->associations[$attribute]['find_key'] => $this->{$this->associations[$attribute]['find_value']});
+			
+			$record = new $model();
+			$found  = $record->find($this->associations[$attribute]['find_scope'], &$options);
       
 	    return $this->$attribute = ($found instanceof ArrayAccess) ?
 	      new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
@@ -345,14 +354,12 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     {
       $fk    = $this->associations[$include]['find_key'];
       $model = $this->associations[$include]['class_name'];
-      $assoc = new $model();
       
-			$options = array(
-	      'conditions' => array($fk => array_keys($ids)),
-			);
-			if (isset($this->associations[$include]['find_join'])) {
-			  $options['joins'] = $this->associations[$include]['find_join'];
-			}
+			$options = isset($this->associations[$include]['find_options']) ?
+			  $this->associations[$include]['find_options'] : array();
+	    $options['conditions'] = array($fk => array_keys($ids));
+	    
+      $assoc   = new $model();
       $results = $assoc->find(':all', $options);
       
       switch($this->associations[$include]['type'])
