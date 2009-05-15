@@ -291,6 +291,15 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     return parent::__get($attribute);
   }
   
+  function __call($fn, $args)
+  {
+    if (preg_match('/^build_($association)$/', $fn, $match))
+    {
+      
+    }
+    return parent::__call($fn, $args);
+  }
+  
   function __sleep()
   {
   	$attributes = parent::__sleep();

@@ -46,6 +46,11 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     unset($this->__attributes[$attr]);
   }
   
+  function __call($func, $args)
+  {
+    $class = get_class($this);
+    trigger_error("No such method: $class::$func().", E_USER_ERROR);
+  }
   
   function rewind() {
     return reset($this->__attributes);

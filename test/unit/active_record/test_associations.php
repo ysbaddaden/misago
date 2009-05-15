@@ -81,6 +81,12 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_instance_of("instance of relation", $programmers[1]->projects[0], 'Project');
     $this->assert_instance_of("instance of empty relation", $programmers[2]->projects, 'ActiveRecord_Collection');
   }
+  
+  function test_build_other()
+  {
+    $order = new Order(1);
+    $order->build_invoice();
+  }
 }
 
 new Test_ActiveRecord_Associations();

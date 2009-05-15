@@ -72,9 +72,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    *   $post  = $post->find_first_by_tag($tag);
    *   $posts = $post->find_all_by_category_id($category_id);
    */
-  function __call($name, $args)
+  function __call($func, $args)
   {
-    if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $name, $match))
+    if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $func, $match))
     {
       if (!empty($match[2]))
       {
@@ -98,9 +98,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $scope = empty($match[1]) ? ':first' : ':'.$match[1];
       return $this->find($scope, $options);
     }
-    
-    $class = get_class($this);
-    trigger_error("No such method: $class::$name().", E_USER_ERROR);
+    return parent::__call($func, $args);
   }
   
   /**
