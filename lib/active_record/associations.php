@@ -38,7 +38,7 @@
 # 
 # ===Example:
 #
-# For instance an order has one invoice.
+# An order has one invoice.
 # 
 #   class Order extends ActiveRecord_Base {
 #     public $has_one = 'invoice';
@@ -47,6 +47,9 @@
 #   class Invoice extends ActiveRecord_Base {
 #     public $belongs_to = 'order';
 #   }
+#   
+#   $order = new Order(456);
+#   $invoice_id = $order->invoice->id;
 # 
 # 
 # ==has_many
@@ -68,7 +71,7 @@
 #   
 #   $post = new Post(123);
 #   foreach($post->tags as $tag) {
-#	    echo $tag->name;
+#	    echo $tag->name.", ";
 #   }
 # 
 # 
@@ -114,7 +117,7 @@
 #   project_id
 # 
 # 
-# =Eager Loading (:include)
+# =Eager Loading (include)
 #
 # Permits to limitate repetitive requests.
 # 
@@ -133,7 +136,8 @@
 # 
 # ==Example: 
 # 
-#   # only 3 sql requests will be issued (instead of 301):
+# Only 3 sql requests will be issued (instead of 301):
+# 
 #   $post = new Post();
 #   $posts = $post->find(':all', array(
 #     'limit'   => 100,
@@ -147,9 +151,8 @@
 #   }
 # 
 # TODO: Implement create_other & create_others magic methods.
-# TODO: Implement has_and_belongs_to_many association.
-# TODO: Implement belongs_to :polymorphic association.
 # TODO: Implement has_many :through association.
+# TODO: Implement belongs_to :polymorphic association.
 # 
 # @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
