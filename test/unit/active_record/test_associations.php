@@ -86,6 +86,8 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   {
     $order = new Order(1);
     $order->build_invoice();
+    $this->assert_true('is built', property_exists($order, 'invoice'));
+    $this->assert_instance_of('instance of relation', $order->invoice, 'Invoice');
   }
 }
 

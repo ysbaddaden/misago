@@ -293,9 +293,19 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   
   function __call($fn, $args)
   {
-    if (preg_match('/^build_($association)$/', $fn, $match))
+    if (preg_match('/^build_(.+)$/', $fn, $match))
     {
-      
+      $association = $match[1];
+      if (isset($this->associations[$association]))
+      {
+        $class = $this->associations[$association]['class_name'];
+        $fk    = $this->associations[$association]['foreign_key'];
+        switch ($this->associations[$association]['type'])
+        {
+          case 'belongs_to': return $this->$association = new $class(array($this->primary_key => $this->$fk));   break;
+          case 'has_one':    return $this->$association = new $class(array($fk => $this->{$this->primary_key})); break;
+        }
+      }
     }
     return parent::__call($fn, $args);
   }
