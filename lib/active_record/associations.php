@@ -153,7 +153,7 @@
 #     print_r($post->authors);
 #   }
 # 
-# TODO: Implement create_other and build_other magic methods (for belongs_to & has_one relationships).
+# TODO: Implement create_other magic method (for belongs_to & has_one relationships).
 # TODO: Implement has_many :through association.
 # TODO: Implement belongs_to :polymorphic association.
 # 
@@ -295,17 +295,27 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   
   function __call($fn, $args)
   {
-    if (preg_match('/^build_(.+)$/', $fn, $match))
+    if (preg_match('/^(create|build)_(.+)$/', $fn, $match))
     {
-      $association = $match[1];
-      if (isset($this->associations[$association]))
+      $assoc = $match[2];
+      
+      if (isset($this->associations[$assoc]))
       {
-        $class = $this->associations[$association]['class_name'];
-        $fk    = $this->associations[$association]['foreign_key'];
-        switch ($this->associations[$association]['type'])
+        $class = $this->associations[$assoc]['class_name'];
+        $fk    = $this->associations[$assoc]['foreign_key'];
+        
+        switch ($this->associations[$assoc]['type'])
         {
-          case 'belongs_to': return $this->$association = new $class(array($this->primary_key => $this->$fk));   break;
-          case 'has_one':    return $this->$association = new $class(array($fk => $this->id)); break;
+          case 'belongs_to': $attributes = array($this->primary_key => $this->$fk); break;
+          case 'has_one':    $attributes = array($fk => $this->id); break;
+        }
+        if (isset($attributes))
+        {
+          $this->$assoc = new $class($attributes);
+          if ($match[1] == 'create') {
+            $this->$assoc->save();
+          }
+          return $this->$assoc;
         }
       }
     }
