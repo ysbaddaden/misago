@@ -1,6 +1,6 @@
 <?php
 
-# Handles ORM relationships.
+# Model object relationships.
 # 
 # =Relationships
 # 

@@ -7,7 +7,142 @@
 # through ActiveRecord::Associations, and relations through
 # ActiveRecord::Associations.
 # 
+# =CRUD
+# 
+# All the examples will use this single model:
+# 
+#   class Post extends ActiveRecord_Base {
+#     
+#   }
+# 
+# ==Create
+# 
+# There are two ways to create a new record. You either save an already
+# built object, or you create it directly.
+# 
+#   $post = new Post(array('title' => 'aaa', 'body' => 'bbb'));
+#   $post->save();
+#   
+#   $post = new Post();
+#   $new_post = $post->create(array('title' => 'aaa', 'body' => 'bbb'));
+# 
+# ===Callbacks
+# 
+# One may interact with the creation of entries, through the use of
+# special protected methods: before_create() and after_create(). That
+# way it's possible to create or modify attributes, before and after
+# creating the entry in database.
+# 
+# There is also generic methods: before_save() and after_save(). These
+# will be called before and after the creation or update of an entry.
+# 
+# 
+# ==Read
+# 
+# ===find one
+# 
+# All the following methods will return a single post. As a matter of fact,
+# they all return the same post (in these examples):
+# 
+#   $post = new Post(1);
+#   $post = $post->find(1);
+#   $post = $post->find(':first', array('conditions' => array('id' => 1)));
+#   $post = $post->find(':first', array('conditions' => 'id = 1'));
+#   $post = $post->find_by_id(1);
+# 
+# ===find all
+# 
+# The following methods will return a collection of posts:
+# 
+#   $post  = new Post();
+#   $posts = $post->find();
+#   $posts = $post->find(':all');
+#   $posts = $post->find(':all', array('order' => 'created_at desc', 'limit' => 25));
+#   $posts = $post->find_all_by_category('aaa');
+#   $posts = $post->find_all_by_category('aaa', array('order' => 'title asc'));
+# 
+# 
+# ==Update
+# 
+# There are several ways to update a record.
+# 
+#   $post = new Post();
+#   $updated_post = $post->update(3, array('category' => 'ccc'));
+#   
+#   $post = new Post(2);
+#   $post->title = 'abcd';
+#   $post->save();
+#   
+#   $post = new Post(4);
+#   $post->update_attributes(array('category' => 'ddd'));
+#   
+# Check update(), update_attribute() and update_attributes() for
+# more examples.
+# 
+# ===Callbacks
+# 
+# One may interact with the update of entries, through the use of
+# special protected methods: before_update() and after_update(). That
+# way it's possible to create or modify attributes, before and after
+# updating the entry in database.
+# 
+# There is also generic methods: before_save() and after_save(). These
+# will be called before and after the creation or update of an entry.
+# 
+# 
+# ==Delete
+# 
+# There are two ways to delete records: delete or destroy.
+# 
+# The difference is that delete always instanciates the record
+# before deletion, permitting to interact with it. To delete an
+# uploaded photo when deleting an image from a web gallery for
+# instance.
+# 
+# On the contrary, destroy will delete all records at once in
+# the database. There is no way to interact with the deletion
+# of a particular entry.
+# 
+# The advantage of delete is to be able to interact with the
+# deletion, but the advantage of destroy is it should be faster,
+# especially when deleting many records.
+# 
+# ===delete
+#
+#   $post = new Post(5);
+#   $post->delete();
+# 
+#   $post = new Post();
+#   $post->delete(3);
+# 
+#   $post = new Post();
+#   $post->delete_all(array('category' => 'aaa'));
+#   $post->delete_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
+# 
+# ===destroy
+#
+#   $post = new Post(5);
+#   $post->destroy();
+# 
+#   $post = new Post();
+#   $post->destroy(3);
+# 
+#   $post = new Post();
+#   $post->destroy_all(array('category' => 'aaa'));
+#   $post->destroy_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
+# 
+# ===Callbacks
+# 
+# One may interact with the deletion of entries, through the use of
+# special protected methods: before_delete() and after_delete(). That
+# way it's possible to do whatever you want before and after deleting
+# an entry from database.
+#
+# Remember that only delete has callbacks. Destroy has no such methods.
+# 
+# 
 # @package ActiveRecord
+# 
 # TODO: Implement calculations.
 #
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
@@ -333,7 +468,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     if ($id)
     {
       $this->new_record = false;
-#      $this->{$this->primary_key} = $id;
       $this->id = $id;
       
       $this->after_save();
@@ -384,7 +518,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # update
-#    $conditions = array($this->primary_key => $this->{$this->primary_key});
     $conditions = array($this->primary_key => $this->id);
     $updates    = ($attributes === null) ? $this->__attributes : $attributes;
     
@@ -563,7 +696,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    */
   function delete($id=null)
   {
-#    $id = isset($id) ? $id : $this->{$this->primary_key};
     $id = isset($id) ? $id : $this->id;
     
     if ($this->exists($id))
@@ -616,7 +748,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   function destroy($id=null)
   {
     if ($id === null) {
-#      $id = $this->{$this->primary_key};
       $id = $this->id;
     }
     $conditions = array($this->primary_key => $id);
