@@ -152,7 +152,9 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       while ($row = mysql_fetch_row($results))
       {
         list($name, $type, $is_null, $key, $default,) = $row;
-        $column = array();
+        $column = array(
+          'primary_key' => ($key === 'PRI'),
+        );
         $type   = strtoupper($type);
         
         if (stripos($type, 'UNSIGNED') !== false)

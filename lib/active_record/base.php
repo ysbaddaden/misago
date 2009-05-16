@@ -1,10 +1,15 @@
 <?php
-/**
- * 
- * @package ActiveRecord
- * 
- * TODO: Implement calculations.
- */
+
+# Database object abstraction.
+# 
+# Permits to handle database entries like objects. It supports
+# CRUD operations (create, read, update and delete), validations
+# through ActiveRecord::Associations, and relations through
+# ActiveRecord::Associations.
+# 
+# @package ActiveRecord
+# TODO: Implement calculations.
+#
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
   protected $db;
@@ -26,6 +31,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     {
       $this->columns = $this->db->columns($this->table_name);
       apc_store($apc_key, $this->columns);
+    }
+    
+    # primary key
+    foreach($this->columns as $attribute => $def)
+    {
+      if ($def['primary_key'])
+      {
+        $this->primary_key = $attribute;
+        break;
+      }
     }
     
     # relationships
@@ -58,9 +73,20 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       }
       return parent::__set($attribute, $value);
     }
+    elseif ($attribute == 'id') {
+      return $this->id = parent::__set($this->primary_key, $value);
+    }
     else {
       return $this->$attribute = $value;
     }
+  }
+  
+  function __get($attribute)
+  {
+    if ($attribute == 'id' and !isset($this->columns['id'])) {
+      $attribute = $this->primary_key;
+    }
+    return parent::__get($attribute);
   }
   
   /**
@@ -307,7 +333,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     if ($id)
     {
       $this->new_record = false;
-      $this->{$this->primary_key} = $id;
+#      $this->{$this->primary_key} = $id;
+      $this->id = $id;
       
       $this->after_save();
       $this->after_create();
@@ -357,7 +384,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # update
-    $conditions = array($this->primary_key => $this->{$this->primary_key});
+#    $conditions = array($this->primary_key => $this->{$this->primary_key});
+    $conditions = array($this->primary_key => $this->id);
     $updates    = ($attributes === null) ? $this->__attributes : $attributes;
     
     $rs = $this->db->update($this->table_name, $updates, $conditions);
@@ -535,7 +563,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    */
   function delete($id=null)
   {
-    $id = isset($id) ? $id : $this->{$this->primary_key};
+#    $id = isset($id) ? $id : $this->{$this->primary_key};
+    $id = isset($id) ? $id : $this->id;
     
     if ($this->exists($id))
     {
@@ -587,7 +616,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   function destroy($id=null)
   {
     if ($id === null) {
-      $id = $this->{$this->primary_key};
+#      $id = $this->{$this->primary_key};
+      $id = $this->id;
     }
     $conditions = array($this->primary_key => $id);
     return $this->db->delete($this->table_name, $conditions);
