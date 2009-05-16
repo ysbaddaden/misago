@@ -388,6 +388,28 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return "SELECT $select FROM $table $joins $where $group $order $limit ;";
   } 
   
+  protected function merge_conditions($a, $b)
+  {
+    if (!empty($a) and empty($b)) {
+      return $a;
+    }
+    if (empty($a) and !empty($b)) {
+      return $b;
+    }
+    $a = $this->db->sanitize_sql_for_conditions($a);
+    $b = $this->db->sanitize_sql_for_conditions($b);
+    return "($a) AND ($b)";
+  }
+  
+  protected function & merge_options($a, $b)
+  {
+    $c = array_merge_recursive($a, $b);
+    if (!empty($a['conditions']) and !empty($b['conditions'])) {
+      $c['conditions'] = $this->merge_conditions($a['conditions'], $b['conditions']);
+    }
+    return $c;
+  }
+  
   /**
    * Shortcut for find(:all).
    */

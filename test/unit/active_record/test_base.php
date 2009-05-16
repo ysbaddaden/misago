@@ -484,6 +484,36 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_false("must fail on create", $product->errors->is_empty());
     $this->assert_true("name is invalid", $product->errors->is_invalid('name'));
   }
+  
+  function test_merge_options()
+  {
+    $programmer = new Programmer();
+    
+    $a = array();
+    $b = array();
+    $c = $programmer->test_merge_options($a, $b);
+    $this->assert_equal("", $c, array());
+    
+    $a = array('limit' => 10, 'select' => 'a.*');
+    $b = array();
+    $c = $programmer->test_merge_options($a, $b);
+    $this->assert_equal("", $c, array('limit' => 10, 'select' => 'a.*'));
+    
+    $a = array();
+    $b = array('conditions' => 'a = 1', 'limit' => 100);
+    $c = $programmer->test_merge_options($a, $b);
+    $this->assert_equal("", $c, array('conditions' => 'a = 1', 'limit' => 100));
+    
+    $a = array('conditions' => "b <> 'aze'");
+    $b = array('conditions' => 'a = 1', 'limit' => 100);
+    $c = $programmer->test_merge_options($a, $b);
+    $this->assert_equal("", $c, array('conditions' => "(b <> 'aze') AND (a = 1)", 'limit' => 100));
+    
+    $a = array('conditions' => "b <> 'aze'");
+    $b = array('conditions' => array('a = :a', array('a' => 12)), 'limit' => 100);
+    $c = $programmer->test_merge_options($a, $b);
+    $this->assert_equal("", $c, array('conditions' => "(b <> 'aze') AND (a = '12')", 'limit' => 100));
+  }
 }
 
 new Test_ActiveRecord_Base();
