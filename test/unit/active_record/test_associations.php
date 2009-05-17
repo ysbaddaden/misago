@@ -88,6 +88,22 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $order->build_invoice();
     $this->assert_true('is built', property_exists($order, 'invoice'));
     $this->assert_instance_of('instance of relation', $order->invoice, 'Invoice');
+    $this->assert_equal('relation id', $order->invoice->order_id, 1);
+    
+    $order = new Order(2);
+    $order->build_invoice(array('title' => "aze"));
+    $this->assert_equal('relation id', $order->invoice->order_id, 2);
+    $this->assert_equal('passed attributes', $order->invoice->title, 'aze');
+  }
+  
+  function test_create_other()
+  {
+    $order = new Order(3);
+    $order->create_invoice(array('name' => 'brice'));
+    $this->assert_true('is created', property_exists($order, 'invoice'));
+    $this->assert_instance_of('instance of relation', $order->invoice, 'Invoice');
+    $this->assert_equal('relation id', $order->invoice->order_id, 3);
+    $this->assert_equal('passed attributes', $order->invoice->name, 'brice');
   }
 }
 
