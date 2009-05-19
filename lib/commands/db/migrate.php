@@ -28,8 +28,11 @@ foreach($migration_files as $file)
     if ($result) {
        ActiveRecord_Migration::save_version($ts);
     }
-    else {
+    else
+    {
+      echo Terminal::colorize("An error occured.\n", 'RED');
       die();
+#      die("An error occured.\n");
     }
   }
 }
