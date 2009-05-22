@@ -1,6 +1,6 @@
 <?php
 
-# NOTE: form functions are tested throught FormHelper tests.
+# NOTE: form functions are tested throught RecordHelper tests.
 # 
 # @package ActionView
 # @subpackage Helpers
@@ -51,12 +51,12 @@ class form
     return html::text_area($name, is_object($object) ? $object->$column : '', $attributes);
   }
   
-  /**
-   * Gotcha: an unchecked checkbox is never sent. A solution if to
-   * add a hidden field with the same name before the checkbox. If
-   * the box is unchecked, the hidden field's value will be sent, if
-   * it's checked PHP will overwrite the hidden field's value. 
-   */
+  # Renders a checkbox.
+  #
+  # Gotcha: an unchecked checkbox is never sent. A solution if to
+  # add a hidden field with the same name before the checkbox. If
+  # the box is unchecked, the hidden field's value will be sent;
+  # if checked PHP will overwrite the hidden field's value. 
   static function check_box($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);

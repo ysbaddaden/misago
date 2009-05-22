@@ -216,58 +216,66 @@ class ActionController_Routing extends Object
    * will make the 'show_product_path()' and 'show_product_url()' functions available.
    * 
    * IMPROVE: Recognize keys' special requirements (?)
-   * OPTIMIZE: Cache generated code (into a PHP file on disk, or in memory with APC).
    * 
    * TODO: Handle :format if defined in route path or in mapping.
    */
   function build_path_and_url_helpers()
   {
-    $functions = array();
-    
-    foreach($this->routes as $route)
+    if (DEBUG
+      or !file_exists(TMP.'/built_path_and_url_helpers.php')
+      or time() - strtotime('-24 hours') > filemtime(TMP.'/built_path_and_url_helpers.php'))
     {
-      if (isset($route['mapping'][':controller']))
-      {
-        # explicit controller
-        $controllers = array($route['mapping'][':controller']);
-      }
-      elseif (strpos($route['path'], ':controller') !== false)
-      {
-        # implicit controller
-        $controllers = $this->get_list_of_controllers();
-      }
+      $functions = array();
       
-      foreach($controllers as $controller)
+      foreach($this->routes as $route)
       {
-        if (isset($route['mapping'][':action']))
+        if (isset($route['mapping'][':controller']))
         {
-          # explicit action
-          $actions = array($route['mapping'][':action']);
+          # explicit controller
+          $controllers = array($route['mapping'][':controller']);
         }
-        elseif (strpos($route['path'], ':action') !== false)
+        elseif (strpos($route['path'], ':controller') !== false)
         {
-          # implicit action
-          $actions = $this->extract_actions_from_controller($controller);
-        }
-        if (empty($actions)) {
-          continue;
+          # implicit controller
+          $controllers = $this->get_list_of_controllers();
         }
         
-        $model = String::singularize($controller);
-        
-        foreach($actions as $action)
+        foreach($controllers as $controller)
         {
-          $func_base_name = ($action == 'index') ? $controller :
-            (($action == 'neo') ? "new_{$model}" : "{$action}_{$model}");
-          
-          if (isset($functions["{$func_base_name}_path"])) {
+          if (isset($route['mapping'][':action']))
+          {
+            # explicit action
+            $actions = array($route['mapping'][':action']);
+          }
+          elseif (strpos($route['path'], ':action') !== false)
+          {
+            # implicit action
+            $actions = $this->extract_actions_from_controller($controller);
+          }
+          if (empty($actions)) {
             continue;
           }
-          $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action);
+          
+          $model = String::singularize($controller);
+          
+          foreach($actions as $action)
+          {
+            $func_base_name = ($action == 'index') ? $controller :
+              (($action == 'neo') ? "new_{$model}" : "{$action}_{$model}");
+            
+            if (isset($functions["{$func_base_name}_path"])) {
+              continue;
+            }
+            $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action);
+          }
         }
       }
+      $contents = '<?php '.implode("\n\n", $functions).' ?>';
+      file_put_contents(TMP.'/built_path_and_url_helpers.php', $contents);
     }
     
+    include TMP.'/built_path_and_url_helpers.php';
+    /*
     if (!empty($functions))
     {
       $functions = implode("\n\n", $functions);
@@ -278,6 +286,7 @@ class ActionController_Routing extends Object
       
       eval($functions);
     }
+    */
   }
   
   private function build_path_function($func_base_name, $route, $controller, $action)
