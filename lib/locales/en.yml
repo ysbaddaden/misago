@@ -6,4 +6,9 @@ en:
         blank: "{{attribute}} can't be blank"
         empty: "{{attribute}} can't be empty"
         invalid: "{{attribute}} is invalid"
+        too_short: "{{attribute}} is too short"
+        too_long: "{{attribute}} is too long"
+        wrong_length: "{{attribute}} is wrong length"
+        not_included: "{{attribute}} is not included in the list"
+        reserved: "{{attribute}}'s value is reserved"
 
