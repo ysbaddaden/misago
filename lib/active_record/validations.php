@@ -4,22 +4,12 @@
  * 
  * @package ActiveRecord
  * @subpackage Validations
- * 
- * TODO: Write shortcut validations (validates_xxx).
  */
 abstract class ActiveRecord_Validations extends ActiveRecord_Associations
 {
-  protected $validations = array();
-  /*
-  protected $validates_associated;
-  protected $validates_each;
-  protected $validates_format_of;
-  protected $validates_exclusion_of;
-  protected $validates_inclusion_of;
-  protected $validates_length_of;
-  protected $validates_presence_of;
-  protected $validates_uniqueness_of;
-  */
+  protected $validates_presence_of = array();
+  protected $validates_length_of   = array();
+  
   
   function __get($attribute)
   {
@@ -32,23 +22,13 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # Runs validation tests. Returns true if tests were successfull, false otherwise.
   function is_valid()
   {
+    $on = $this->new_record ? 'create' : 'update';
     $this->errors->clear();
     
-    /*
-    $vars = get_class_vars(self);
-    foreach($vars as $var)
-    {
-      if (strpos($var, 'validates_')
-        and !empty($this->$var))
-      {
-        $this->{$var}();
-      }
-    }
-    */
-    
+    $this->automated_validation('validates_presence_of', $on);
     $this->validate();
     
-    $action = $this->new_record ? 'validate_on_create' : 'validate_on_update';
+    $action = "validate_on_$on";
     $this->$action();
     
     return $this->errors->is_empty();
@@ -63,47 +43,30 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # Validates record's attributes on update only.
   protected function validate_on_update() {}
   
-  /*
-  private function validates_associated()
+  
+  private function automated_validation($rules, $on)
   {
-    
+    $action = "_{$rules}";
+    foreach($this->$rules as $attribute => $options)
+    {
+      if (is_numeric($attribute))
+      {
+        $attribute = $options;
+        $options   = array();
+      }
+      elseif (isset($options['on']) and $options['on'] != $on) {
+        continue;
+      }
+      $this->$action($attribute, $options);
+    }
   }
   
-  private function validates_each()
+  private function _validates_presence_of($attribute, $options=null)
   {
-    
+    if (!isset($this->$attribute) or is_blank($this->$attribute)) {
+      $this->errors->add($attribute, isset($options['message']) ? $options['message'] : ':blank');
+    }
   }
-  
-  private function validates_format_of()
-  {
-    
-  }
-  
-  private function validates_exclusion_of()
-  {
-    
-  }
-  
-  private function validates_inclusion_of()
-  {
-    
-  }
-  
-  private function validates_length_of()
-  {
-    
-  }
-  
-  private function validates_presence_of()
-  {
-    
-  }
-  
-  private function validates_uniqueness_of()
-  {
-    
-  }
-  */
 }
 
 ?>
