@@ -1,181 +1,142 @@
 <?php
 
-# Helps to create a HTML form for a record.
-# 
-# Examples:
-#   $f = new FormHelper('User');
-#   
-#   $user = new User(456);
-#   $f = new FormHelper($user);
-#   
-#   $f->start(update_user_path($user->id))
-#   $f->label('username');
-#   $f->text_field('username');
-#   $f->submit('Save');
-#   $f->end();
-# 
-# IMPROVE: Transparently protect against CSRF attacks (using a hash stored in a cookie).
+# NOTE: form functions are tested throught FormHelper tests.
 # 
 # @package ActionView
 # @subpackage Helpers
-class FormHelper
+class form
 {
-  protected $object;
-  protected $index;
-  
-  function __construct($record_or_name, $args=null)
+  /**
+   * form::label('Product', 'in_stock');
+   * form::label('Product', 'in_stock', 'In stock?');
+   * form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
+   * form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
+   * form::label('Invoice', 'address', array('class' => 'invoice-address'));
+   */
+  static function label($object, $column, $text=null, $attributes=null)
   {
-    if (is_object($record_or_name)) {
-      $this->object = $record_or_name;
+    if (is_array($text))
+    {
+      $attributes = $text;
+      $text = null;
+    }
+    if ($text === null) {
+      $text = String::humanize($column);
+    }
+    list($name, $attributes['for']) = self::format_name_and_id($object, $column, $attributes);
+    return html::label($name, $text, $attributes);
+  }
+
+  static function hidden_field($object, $column, $attributes=null)
+  {
+    list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
+    return html::hidden_field($name, is_object($object) ? $object->$column : '', $attributes);
+  }
+  
+  static function text_field($object, $column, $attributes=null)
+  {
+    list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
+    return html::text_field($name, is_object($object) ? $object->$column : '', $attributes);
+  }
+  
+  static function password_field($object, $column, $attributes=null)
+  {
+    list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
+    return html::password_field($name, /*is_object($object) ? $object->$column :*/ '', $attributes);
+  }
+  
+  static function text_area($object, $column, $attributes=null)
+  {
+    list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
+    return html::text_area($name, is_object($object) ? $object->$column : '', $attributes);
+  }
+  
+  /**
+   * Gotcha: an unchecked checkbox is never sent. A solution if to
+   * add a hidden field with the same name before the checkbox. If
+   * the box is unchecked, the hidden field's value will be sent, if
+   * it's checked PHP will overwrite the hidden field's value. 
+   */
+  static function check_box($object, $column, $attributes=null)
+  {
+    list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
+    if (is_object($object)
+      and $object->$column)
+    {
+      $attributes['checked'] = true;
+    }
+    $str  = html::tag('input', array('type' => 'hidden', 'name' => $name, 'value' => 0));
+    $str .= html::check_box($name, 1, $attributes);
+    return $str;
+  }
+  
+  static function radio_button($object, $column, $tag_value, $attributes=null)
+  {
+    list($name, $id) = self::format_name_and_id($object, $column, $attributes);
+    $attributes['id'] = "{$id}_{$tag_value}";
+    
+    if (is_object($object)
+      and $object->$column == $tag_value)
+    {
+      $attributes['checked'] = true;
+    }
+    return html::radio_button($name, $tag_value, $attributes);
+  }
+  
+  static function select($object, $column, $options, $attributes=null)
+  {
+    list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
+    $value   = is_object($object) ? $object->$column : null;
+    $options = self::options_for_select($options, $value);
+    return html::select($name, $options, $attributes);
+  }
+  
+  static function options_for_select($options, $selected=null)
+  {
+    if ($selected === null) {
+      $selected = array();
+    }
+    elseif (!is_array($selected)) {
+      $selected = array($selected);
+    }
+    
+    if (!is_hash($options))
+    {
+      $_options = array();
+      foreach($options as $ary) {
+        $_options[$ary[0]] = $ary[1];
+      }
+      $options =& $_options;
+    }
+    
+    $str = '';
+    foreach($options as $name => $value)
+    {
+      $attr = (in_array($value, $selected)) ? ' selected="selected"' : '';
+      $str .= "<option value=\"$value\"$attr>$name</option>";
+    }
+    return $str;
+  }
+  
+  private static function format_name_and_id($object, $column, &$attributes=null)
+  {
+    $record_name = is_object($object) ? get_class($object) : $object;
+    $record_name = String::underscore($record_name);
+    
+    if (isset($attributes['index']))
+    {
+      $name = "{$record_name}[{$attributes['index']}][{$column}]";
+      $id   = "{$record_name}_{$attributes['index']}_{$column}";
+      unset($attributes['index']);
     }
     else
     {
-      $class = String::camelize($record_or_name);
-      $this->object = new $class;
+      $name = "{$record_name}[{$column}]";
+      $id   = "{$record_name}_{$column}";
     }
-    
-    if (isset($args['index'])) {
-      $this->index = $args['index'];
-    }
+    $rs = array($name, $id);
+    return $rs;
   }
-  
-  # Starts the HTML form.
-  function start($url, $options=null)
-  {
-    return html::form_tag($url, $options);
-  }
-  
-  # Ends the HTML form.
-  function end()
-  {
-    return '</form>';
-  }
-  
-  # Displays a submit button.
-  function submit($value=null, $name=null, $attributes=null)
-  {
-    return html::submit($value, $name, $attributes);
-  }
-  
-  # Displays errors related to a column.
-  # Shows only the first error by default.
-  function errors_on($column, $all=false)
-  {
-    if ($this->object->errors->is_invalid($column))
-    {
-      $errors = $this->object->errors->on($column);
-      if (!is_array($errors)) {
-        $errors = array($errors);
-      }
-      if ($all)
-      {
-        $str = "";
-        foreach($errors->on($column) as $err) {
-          $str .= "$err<br/>";
-        }
-        return "<span class=\"error\">{$str}</span>";
-      }
-      else {
-        return "<span class=\"error\">{$errors[0]}</span>";
-      }
-    }
-  }
-  
-  # Displays errors related to the record itself.
-  function errors_on_base()
-  {
-    $errors = $this->object->errors->on_base();
-    if (!empty($errors))
-    {
-      if (!is_array($errors)) {
-        $errors = array($errors);
-      }
-      
-      $str = "";
-      foreach($errors as $err) {
-        $str .= "<li>$err</li>";
-      }
-      return "<ul class=\"errors\">{$str}</ul>";
-    }
-  }
-  
-  # Renders a label for a column.
-  # 
-  #   form::label('Product', 'in_stock');
-  #   form::label('Product', 'in_stock', 'In stock?');
-  #   form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
-  #   form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
-  #   form::label('Invoice', 'address', array('class' => 'invoice-address'));
-  function label($column, $text=null, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::label($this->object, $column, $text, $attributes);
-  }
-  
-  # Renders a hidden field.
-  function hidden_field($column, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::hidden_field($this->object, $column, $attributes);
-  }
-  
-  # Renders a text input field.
-  function text_field($column, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::text_field($this->object, $column, $attributes);
-  }
-  
-  # Renders a text area.
-  function text_area($column, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::text_area($this->object, $column, $attributes);
-  }
-  
-  # Renders a password field.
-  function password_field($column, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::password_field($this->object, $column, $attributes);
-  }
-  
-  # Renders a checkable box.
-  function check_box($column=null, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::check_box($this->object, $column, $attributes);
-  }
-  
-  # Renders a radio button.
-  function radio_button($column, $tag_value, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::radio_button($this->object, $column, $tag_value, $attributes);
-  }
-  
-  # Renders a select field.
-  function select($column, $options, $attributes=null)
-  {
-    $this->preparse_attributes($attributes);
-    return form::select($this->object, $column, $options, $attributes);
-  }
-  
-  protected function preparse_attributes(&$attributes)
-  {
-    if (!isset($attributes['index']) and isset($this->index)) {
-      $attributes['index'] = $this->index;
-    }
-  }
-}
-
-function fields_for($record_or_name, $args=null) {
-  return new FormHelper($record_or_name, $args);
-}
-
-# Shortcut for new FormHelper(). It's easier to use and understand.
-function form_for($record_or_name, $args=null) {
-  return new FormHelper($record_or_name, $args);
 }
 
 ?>

@@ -12,37 +12,71 @@ class ActionView_Base extends Object
     'title' => ''
   );
   
-  # TODO: load helpers based on the $controller->helpers definition.
   function __construct($controller=null)
   {
     if ($controller instanceof ActionController_Base)
     {
       $this->controller = $controller;
-      $this->view_path  = String::underscore(str_replace('Controller', '', $this->controller->name));
+      $this->view_path  = String::underscore(str_replace('Controller', '', get_class($this->controller)));
+      $helpers = $this->controller->helpers;
     }
     
-    # loads helpers
-    require_once 'action_view/helpers/html.php';
-    require_once 'action_view/helpers/form.php';
-    require_once 'action_view/helpers/form_helper.php';
+    if (!isset($helpers) or $helpers == ':all')
+    {
+      $helpers = apc_fetch(TMP.'/list_of_helpers', &$success);
+      
+      if ($success === false)
+      {
+        $helpers = array();
+        $this->_find_helpers($helpers, MISAGO.'/lib/action_view/helpers/');
+        $this->_find_helpers($helpers, ROOT.'/app/helpers/');
+        apc_store(TMP.'/list_of_helpers', $helpers, strtotime('+24 hours'));
+      }
+    }
+    
+    if (is_array($helpers))
+    {
+      foreach($helpers as $helper) {
+        require_once "{$helper}_helper.php";
+      }
+    }
+  }
+  
+  protected function _find_helpers(&$helpers, $path)
+  {
+    $dh = opendir($path);
+    if ($dh)
+    {
+      while(($file = readdir($dh)) !== false) {
+        if (is_file($path)) {
+          $helpers[] = str_replace('_helper.php', '', $file);
+        }
+      }
+      closedir($dh);
+    }
   }
   
   # Renders a template (view, layout or partial).
   # 
   # Generic option(s):
-  #   format: which format to use? defaults to 'html'
+  # 
+  # - format: which format to use? defaults to 'html'
   #
   # Render a view:
+  # 
   #   render(array('action' => 'index'));
   # 
   # Render a view inside a layout:
+  # 
   #   render(array('action' => 'index', 'layout' => 'products'));
   # 
   # Render a partial:
+  # 
   #   render(array('partial' => 'form'));
   #   render(array('partial' => 'form', 'locals' => array('f' => $f)));
   # 
   # Render a collection of partials:
+  # 
   #   render(array('partial' => 'product', 'collection' => $products));
   #   
   # The collection must be an array or an iterable object.

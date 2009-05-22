@@ -4,7 +4,7 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/html.php";
+require_once MISAGO."/lib/action_view/helpers/html_helper.php";
 
 class Test_ActionView_Helper_Html extends Unit_Test
 {

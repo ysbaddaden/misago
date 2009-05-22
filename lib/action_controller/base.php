@@ -8,12 +8,12 @@ abstract class ActionController_Base extends Object
   public    $name;
   public    $action;
   public    $params;
-
+	
   protected $mapping;
   protected $already_rendered = false;
   protected $skip_view = false;
   
-  protected $helpers   = ':all';
+  public    $helpers   = ':all';
   
   function __construct(array $mapping=null)
   {
