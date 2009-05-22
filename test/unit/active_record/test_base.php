@@ -194,7 +194,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $products = $product->all();
     $this->assert_equal("update_all",
       array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array('2008-12-21 00:01:00', '2008-12-21 00:01:00', '2008-12-21 00:01:00')
+      array(new Time('2008-12-21 00:01:00'), new Time('2008-12-21 00:01:00'), new Time('2008-12-21 00:01:00'))
     );
     
     $updates = array('updated_at' => '2008-12-21 00:02:00');
@@ -202,7 +202,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $products = $product->all();
     $this->assert_equal("update_all with conditions",
       array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array('2008-12-21 00:02:00', '2008-12-21 00:01:00', '2008-12-21 00:01:00')
+      array(new Time('2008-12-21 00:02:00'), new Time('2008-12-21 00:01:00'), new Time('2008-12-21 00:01:00'))
     );
     
     $updates = array('updated_at' => '2008-12-21 00:03:00');
@@ -210,7 +210,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $products = $product->all();
     $this->assert_equal("update_all with limit",
       array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array('2008-12-21 00:03:00', '2008-12-21 00:03:00', '2008-12-21 00:01:00')
+      array(new Time('2008-12-21 00:03:00'), new Time('2008-12-21 00:03:00'), new Time('2008-12-21 00:01:00'))
     );
     
     $updates = array('updated_at' => '2008-12-21 00:04:00');
@@ -218,7 +218,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $products = $product->all();
     $this->assert_equal("update_all with limit+order",
       array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array('2008-12-21 00:03:00', '2008-12-21 00:04:00', '2008-12-21 00:04:00')
+      array(new Time('2008-12-21 00:03:00'), new Time('2008-12-21 00:04:00'), new Time('2008-12-21 00:04:00'))
     );
   }
   

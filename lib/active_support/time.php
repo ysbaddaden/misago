@@ -113,17 +113,19 @@ class Time extends Object
     }
   }
   
-  /**
-   * RSS date format (RFC2822)
-   */
+  function to_timestamp()
+  {
+    return $this->_time;
+  }
+  
+  
+  # RSS date format (RFC2822)
   function to_rfc2822()
   {
     return date('r', $this->_time);
   }
   
-  /**
-   * ATOM date format (ISO8601)
-   */
+  # ATOM date format (ISO8601)
   function to_iso8601()
   {
     return date('c', $this->_time);

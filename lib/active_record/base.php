@@ -204,6 +204,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           case 'integer': $value = (int)$value;    break;
           case 'double':  $value = (double)$value; break;
           case 'bool':    $value = (bool)$value;   break;
+          case 'date': case 'datetime': case 'time':
+            $value = new Time($value);
+          break;
         }
       }
       return parent::__set($attribute, $value);
