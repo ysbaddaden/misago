@@ -54,6 +54,60 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $monit = $monit->update(1, array('description' => 'about server1'));
     $this->assert_false("field isn't blank", $monit->errors->is_invalid('description'));
   }
+  
+  function test_validate_length_of()
+  {
+    $this->truncate('monitorings');
+    $this->fixtures('monitorings');
+    $monit = new Monitoring();
+    
+    $monit = $monit->create(array());
+    $this->assert_false("field can be null/blank", $monit->errors->is_invalid('length_string'));
+    
+    
+    $monit = $monit->create(array('length_string' => str_repeat('A', 30)));
+    $this->assert_true("string is too long", $monit->errors->is_invalid('length_string'));
+    
+    $monit = $monit->create(array('length_string2' => str_repeat('A', 45)));
+    $this->assert_true("string2 is too long", $monit->errors->is_invalid('length_string2'));
+    
+    $monit = $monit->create(array('length_string2' => 'ABC'));
+    $this->assert_true("string2 is too short", $monit->errors->is_invalid('length_string2'));
+    
+    
+    $monit = $monit->create(array('length_minmax' => 10));
+    $this->assert_true("integer is too short", $monit->errors->is_invalid('length_minmax'));
+    
+    $monit = $monit->create(array('length_minmax' => 3209));
+    $this->assert_true("integer is too long", $monit->errors->is_invalid('length_minmax'));
+    
+    
+    $monit = $monit->create(array('length_is' => str_repeat('A', 40)));
+    $this->assert_false("string is good length", $monit->errors->is_invalid('length_is'));
+    
+    $monit = $monit->create(array('length_is' => str_repeat('A', 30)));
+    $this->assert_true("string is wrong length", $monit->errors->is_invalid('length_is'));
+    
+    
+    $monit = $monit->create(array('length_within' => 60));
+    $this->assert_false("integer is within boudaries", $monit->errors->is_invalid('length_within'));
+    
+    $monit = $monit->create(array('length_within' => 120));
+    $this->assert_true("integer is over boudaries", $monit->errors->is_invalid('length_within'));
+    
+    $monit = $monit->create(array('length_within' => 15));
+    $this->assert_true("integer is bellow boudaries", $monit->errors->is_invalid('length_within'));
+    
+    
+    $monit = $monit->create(array('length_date' => '2009-05-01'));
+    $this->assert_false("date is between boudaries", $monit->errors->is_invalid('length_date'));
+    
+    $monit = $monit->create(array('length_date' => '2008-05-01'));
+    $this->assert_true("date is below minimum", $monit->errors->is_invalid('length_date'));
+    
+    $monit = $monit->create(array('length_date' => '2010-05-01'));
+    $this->assert_true("date is over maximum", $monit->errors->is_invalid('length_date'));
+  }
 }
 
 new Test_ActiveRecord_Validations();
