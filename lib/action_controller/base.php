@@ -74,11 +74,13 @@ abstract class ActionController_Base extends Object
   # Renders a view or exports a resource.
   # 
   # Renders a view:
+  # 
   #   $this->render();
   #   $this->render('edit');
   #   $this->render(array('action' => 'edit', 'format' => 'xml'));
   # 
   # Exports a resource in a particular file format:
+  # 
   #   $this->render(array('xml' => $this->user));
   #   $this->render(array('json' => $this->products));
   # 

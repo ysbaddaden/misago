@@ -6,13 +6,11 @@
 # @subpackage Helpers
 class form
 {
-  /**
-   * form::label('Product', 'in_stock');
-   * form::label('Product', 'in_stock', 'In stock?');
-   * form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
-   * form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
-   * form::label('Invoice', 'address', array('class' => 'invoice-address'));
-   */
+  #   form::label('Product', 'in_stock');
+  #   form::label('Product', 'in_stock', 'In stock?');
+  #   form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
+  #   form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
+  #   form::label('Invoice', 'address', array('class' => 'invoice-address'));
   static function label($object, $column, $text=null, $attributes=null)
   {
     if (is_array($text))

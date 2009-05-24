@@ -4,17 +4,17 @@
 # @subpackage Helpers
 class html
 {
-  /**
-   * <code>
-   * # inline tags:
-   * html::tag('hr')
-   * html::tag('a', array('href' => 'http://www.toto.com/'))
-   * 
-   * # content tags:
-   * html::tag('article', $content)
-   * html::tag('div', $content, array('class' => 'article'))
-   * </code>
-   */
+  # Renders an HTML tag.
+  # 
+  # Inline tags:
+  # 
+  #   html::tag('hr')
+  #   html::tag('a', array('href' => 'http://www.toto.com/'))
+  # 
+  # Content tags:
+  # 
+  # html::tag('article', $content)
+  # html::tag('div', $content, array('class' => 'article'))
   static function tag($name, $content=null, $attributes=null)
   {
     if (is_array($content))

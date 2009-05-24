@@ -210,13 +210,13 @@ class ActionController_Routing extends Object
   }
   
   /**
-   * Creates helper functions to build paths and URL from routing definition (aka reverse routing).
-   * 
-   * For instance the route 'product/:id' => {:controller => 'products', :action => 'show'}
-   * will make the 'show_product_path()' and 'show_product_url()' functions available.
+   * Creates helper functions to build paths and URL from routing definition
+   * (aka reverse routing). For instance the following route will produce the
+   * 'show_product_path()' and 'show_product_url()' functions:
+   *
+   *   'product/:id' => {:controller => 'products', :action => 'show'}
    * 
    * IMPROVE: Recognize keys' special requirements (?)
-   * 
    * TODO: Handle :format if defined in route path or in mapping.
    */
   function build_path_and_url_helpers()
@@ -275,18 +275,6 @@ class ActionController_Routing extends Object
     }
     
     include TMP.'/built_path_and_url_helpers.php';
-    /*
-    if (!empty($functions))
-    {
-      $functions = implode("\n\n", $functions);
-      
-      if ($_ENV['MISAGO_DEBUG'] == 3) {
-        echo "\n\n$functions";
-      }
-      
-      eval($functions);
-    }
-    */
   }
   
   private function build_path_function($func_base_name, $route, $controller, $action)
@@ -362,12 +350,10 @@ class ActionController_Routing extends Object
 
 # Returns the path for a given mapping.
 # 
-# DEPRECATED: Is the 'path_for()' function necessary, or even useful?
+#   $path = path_for(array(':controller' => 'products'));
+#   $path = path_for('product_index');
 # 
-# <code>
-# $path = path_for(array(':controller' => 'products'));
-# $path = path_for('product_index');
-# </code>
+# DEPRECATED: Is the 'path_for()' function necessary, or even useful?
 function path_for($mapping, array $keys=null)
 {
   $map = ActionController_Routing::draw();

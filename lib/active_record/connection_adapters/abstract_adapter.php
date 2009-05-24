@@ -210,6 +210,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   /**
    * Accepts an array, hash, or string of SQL conditions and
    * sanitizes them into a valid SQL fragment for a WHERE clause.
+   * 
+   * See sanitize_sql_array() and sanitize_sql_hash() for examples.
    */
   function sanitize_sql_for_conditions($conditions)
   {
@@ -226,10 +228,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Accepts an array of conditions. The array has each value
    * sanitized and interpolated into the SQL statement.
    * 
-   * <code>
-   * ["name = :name", {name => 'toto'}]
-   * ["name = '%s' AND group_id = %d", 'toto', 123]
-   * </code>
+   *   array("name = :name", array('name' => 'toto'));
+   *   array("name = '%s' AND group_id = %d", 'toto', 123);
    */ 
   function sanitize_sql_array($ary)
   {
@@ -260,9 +260,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Sanitizes a hash of attribute/value pairs for use in
    * SQL conditions or assignments.
    *
-   * <code>
-   * ["a" => 'b', "c" => 'd']
-   * </code>
+   *   array("a" => 'b', "c" => 'd')
    */
   function & sanitize_sql_hash(array $hash)
   {
@@ -301,9 +299,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Returns a helper to create a new table.
    *
    * Available options:
-   *   - temporary (bool), true to create a temporary table
-   *   - id        (bool), true to automatically add an auto incrementing id column
-   *   - options   (string), eg: "engine = innodb"
+   * 
+   * - temporary (bool), true to create a temporary table
+   * - id        (bool), true to automatically add an auto incrementing id column
+   * - options   (string), eg: "engine = innodb"
    */
   function new_table($table, array $options=null)
   {
@@ -314,10 +313,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Creates a table.
    * 
    * Definition:
-   *   - temporary (bool), true to create a temporary table
-   *   - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed}}
-   *   - options   (string), eg: "engine = innodb"
-   *   - force     (null, bool), true: drop table before create, false: create if not exists.
+   * 
+   * - temporary (bool), true to create a temporary table
+   * - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed}}
+   * - options   (string), eg: "engine = innodb"
+   * - force     (null, bool), true: drop table before create, false: create if not exists.
    */
   function create_table($table, array $definition)
   {
@@ -357,7 +357,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Drops a table.
    * 
    * Options:
-   *   - temporary (bool), true if table to drop is a temporary table.
+   * 
+   * - temporary (bool), true if table to drop is a temporary table.
    */
   function drop_table($table, array $options=null)
   {
@@ -432,9 +433,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * 
    * Available options:
    * 
-   *   - type: null or unique
-   *   - name: manual naming of the index
-   *   - size: specified size of the index, in case of a blob/text. 
+   * - type: null or unique
+   * - name: manual naming of the index
+   * - size: specified size of the index, in case of a blob/text. 
    * 
    * IMPROVE: Support indices on multiple columns.
    */
@@ -530,9 +531,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Handles database transactions.
    * 
    * Available actions:
-   *   - begin: starts a transaction
-   *   - commit: ends a transaction and commits statements to the database.
-   *   - rollback: ends a transaction and drops statements (nothing is recorded in the database).
+   * 
+   * - begin: starts a transaction
+   * - commit: ends a transaction and commits statements to the database.
+   * - rollback: ends a transaction and drops statements (nothing is recorded in the database).
    */
   function transaction($action)
   {

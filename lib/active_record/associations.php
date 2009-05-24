@@ -59,7 +59,7 @@
 # 
 # ===Example: 
 # 
-# A post may have many comments.
+# A post may have many tags.
 # 
 #   class Post Extends ActiveRecord_Base {
 #     protected $has_many = array('tags');

@@ -20,9 +20,7 @@ class Translate
     self::load_translations(self::$lang);
   }
   
-  /**
-   * Finds the translation for a string, in a particular (or global) context.
-   */
+  # Finds the translation for a string, in a particular (or global) context.
   static function find_translation($str, $ctx=null)
   {
     $id = ($ctx !== null) ? "$ctx.$str" : $str;

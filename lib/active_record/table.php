@@ -54,9 +54,10 @@ class ActiveRecord_Table
    * Adds timestamp columns to table's definition.
    * 
    * $type can be:
-   *   - date, which will create created_on & updated_on.
-   *   - time, which will create created_at & updated_at.
-   *   - datetime, which will create created_at & updated_at.
+   * 
+   * - date, which will create created_on & updated_on.
+   * - time, which will create created_at & updated_at.
+   * - datetime, which will create created_at & updated_at.
    */
   function add_timestamps($type='datetime')
   {

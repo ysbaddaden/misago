@@ -2,9 +2,9 @@
 
 # Generic Record.
 # 
-#   * A record is a list of attributes.
-#   * You may iterate throught attributes (like an array).
-#   * You may serialize it's contents to PHP (thought serialize), XML or JSON.
+# * A record is a list of attributes.
+# * You may iterate throught attributes (like an array).
+# * You may serialize it's contents to PHP (thought serialize), XML or JSON.
 # 
 # @package ActiveRecord
 abstract class ActiveRecord_Record extends Object implements Iterator

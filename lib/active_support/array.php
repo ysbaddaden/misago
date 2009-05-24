@@ -27,8 +27,9 @@ function is_hash($arr)
  * Simplifies handling of collections.
  * 
  * Examples:
- *   - $collection = array_collection('a,b,  c, d');
- *   - $collection = array_collection(array('a', ' b', 'c '));
+ * 
+ * - $collection = array_collection('a,b,  c, d');
+ * - $collection = array_collection(array('a', ' b', 'c '));
  * 
  * @return Array
  * @param $collection Mixed.

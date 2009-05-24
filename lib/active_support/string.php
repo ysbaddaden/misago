@@ -82,9 +82,7 @@ class String extends Inflections
 	 * Changes spaces and non ascii chars to a dash,
 	 * but should preserve accented characters).
 	 * 
-	 * <code>
-	 * "This is a title" => "this-is-a-title"
-	 * </code>
+	 *   "This is a title" => "this-is-a-title"
 	 */
 	static function slug($str, $strtolower=true)
 	{
