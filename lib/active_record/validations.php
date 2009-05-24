@@ -6,9 +6,6 @@
 # @subpackage Validations
 # 
 # TODO: Implement validates_uniqueness_of.
-# TODO: Test validates_inclusion_of.
-# TODO: Test validates_exclusion_of.
-# TODO: Test validates_format_of.
 # TODO: Test custom error messages for validates_length_of.
 #
 abstract class ActiveRecord_Validations extends ActiveRecord_Associations
