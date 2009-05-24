@@ -108,6 +108,42 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $monit = $monit->create(array('length_date' => '2010-05-01'));
     $this->assert_true("date is over maximum", $monit->errors->is_invalid('length_date'));
   }
+  
+  function test_validate_inclusion_of()
+  {
+    $monit = new Monitoring();
+    
+    $monit = $monit->create(array('inclusion_string' => ''));
+    $this->assert_false("field can be null", $monit->errors->is_invalid('inclusion_string'));
+    
+    $monit = $monit->create(array('inclusion_string' => '  '));
+    $this->assert_false("field can be blank", $monit->errors->is_invalid('inclusion_string'));
+    
+    $monit = $monit->create(array('inclusion_string' => 'azerty'));
+    $this->assert_false("string is in inclusion list", $monit->errors->is_invalid('inclusion_string'));
+    
+    $monit = $monit->create(array('inclusion_string' => 'mwert'));
+    $this->assert_true("string isn't in inclusion list", $monit->errors->is_invalid('inclusion_string'));
+    $this->assert_equal("custom error message", $monit->errors->on('inclusion_string'), "This is bad.");
+    
+    
+    $monit = $monit->create(array('inclusion_integer' => 1));
+    $this->assert_false("int is in inclusion list", $monit->errors->is_invalid('inclusion_integer'));
+    
+    $monit = $monit->create(array('inclusion_integer' => 5));
+    $this->assert_true("int is not in inclusion list", $monit->errors->is_invalid('inclusion_integer'));
+    $this->assert_equal("generic error message", $monit->errors->on('inclusion_integer'), "Inclusion integer is not included in the list");
+  }
+  
+  function test_validate_exclusion_of()
+  {
+    
+  }
+  
+  function test_validate_format_of()
+  {
+    
+  }
 }
 
 new Test_ActiveRecord_Validations();

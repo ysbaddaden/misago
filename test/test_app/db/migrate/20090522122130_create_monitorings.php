@@ -20,6 +20,17 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t->add_column('datetime', 'length_datetime');
     $t->add_column('time',     'length_time');
     
+    # validates_inclusion_of
+    $t->add_column('string',  'inclusion_string');
+    $t->add_column('integer', 'inclusion_integer');
+    
+    # validates_exclusion_of
+    $t->add_column('string',  'inclusion_string');
+    $t->add_column('integer', 'inclusion_integer');
+    
+    # validates_format_of
+    $t->add_column('string',  'format_string');
+    
     return $t->create();
   }
   
