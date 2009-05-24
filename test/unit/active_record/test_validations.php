@@ -144,23 +144,46 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $monit = $monit->create(array('exclusion_string' => '  '));
     $this->assert_false("field can be blank", $monit->errors->is_invalid('exclusion_string'));
     
-    $monit = $monit->create(array('exclusion_string' => 'azerty'));
-    $this->assert_true("string is in exclusion list", $monit->errors->is_invalid('exclusion_string'));
-    
     $monit = $monit->create(array('exclusion_string' => 'mwert'));
     $this->assert_false("string isn't in exclusion list", $monit->errors->is_invalid('exclusion_string'));
-    $this->assert_equal("custom error message", $monit->errors->on('exclusion_string'), "This is bad.");
     
-    $monit = $monit->create(array('exclusion_integer' => 1));
-    $this->assert_true("int is in exclusion list", $monit->errors->is_invalid('exclusion_integer'));
+    $monit = $monit->create(array('exclusion_string' => 'azerty'));
+    $this->assert_true("string is in exclusion list", $monit->errors->is_invalid('exclusion_string'));
+    $this->assert_equal("custom error message", $monit->errors->on('exclusion_string'), "This is bad.");
     
     $monit = $monit->create(array('exclusion_integer' => 5));
     $this->assert_false("int is not in exclusion list", $monit->errors->is_invalid('exclusion_integer'));
-    $this->assert_equal("generic error message", $monit->errors->on('exclusion_integer'), "Exclusion integer is not included in the list");
+    
+    $monit = $monit->create(array('exclusion_integer' => 1));
+    $this->assert_true("int is in exclusion list", $monit->errors->is_invalid('exclusion_integer'));
+    $this->assert_equal("generic error message", $monit->errors->on('exclusion_integer'), "Exclusion integer's value is reserved");
   }
   
   function test_validate_format_of()
   {
+    $monit = new Monitoring();
+    
+    $monit = $monit->create(array('email' => ''));
+    $this->assert_true("field can't be null (as defined in DB)", $monit->errors->is_invalid('email'));
+    
+    $monit = $monit->create(array('email' => '  '));
+    $this->assert_true("field can't be blank", $monit->errors->is_invalid('email'));
+    
+    $monit = $monit->create(array('email2' => ''));
+    $this->assert_false("field can be null", $monit->errors->is_invalid('email2'));
+    
+    $monit = $monit->create(array('email2' => '  '));
+    $this->assert_false("field can be blank", $monit->errors->is_invalid('email2'));
+    
+    $monit = $monit->create(array('email' => 'toto@toto.com'));
+    $this->assert_false("email is ok", $monit->errors->is_invalid('email'));
+    
+    $monit = $monit->create(array('email' => 'toto.com'));
+    $this->assert_true("email is wrong", $monit->errors->is_invalid('email'));
+    $this->assert_equal("generic error message", $monit->errors->on('email'), "Email is invalid");
+    
+    $monit = $monit->create(array('email2' => 'toto.com'));
+    $this->assert_equal("custom error message", $monit->errors->on('email2'), "Bad email.");
     
   }
 }

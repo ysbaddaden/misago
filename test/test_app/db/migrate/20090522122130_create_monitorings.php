@@ -10,6 +10,10 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t->add_column('string', 'title');
     $t->add_column('string', 'description');
     
+    # validates_format_of
+    $t->add_column('string', 'email', array('null' => false));
+    $t->add_column('string', 'email2');
+    
     # validates_length_of
     $t->add_column('string',   'length_string',  array('limit' => 20));
     $t->add_column('string',   'length_string2', array('limit' => 20));
@@ -25,11 +29,8 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t->add_column('integer', 'inclusion_integer');
     
     # validates_exclusion_of
-    $t->add_column('string',  'inclusion_string');
-    $t->add_column('integer', 'inclusion_integer');
-    
-    # validates_format_of
-    $t->add_column('string',  'format_string');
+    $t->add_column('string',  'exclusion_string');
+    $t->add_column('integer', 'exclusion_integer');
     
     return $t->create();
   }

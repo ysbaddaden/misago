@@ -34,6 +34,10 @@ class Monitoring extends ActiveRecord_Base
     'exclusion_integer' => array('in' => array(1, 3, 6)),
   );
   
+  protected $validates_format_of = array(
+    'email'  => array('with' => '/[\w\.\-_]+\@[\w\.\-_]+\.\w{2,}/'),
+    'email2' => array('with' => '/[\w\.\-_]+\@[\w\.\-_]+\.\w{2,}/', 'message' => 'Bad email.', 'allow_blank' => true),
+  );
 }
 
 ?>
