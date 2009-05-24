@@ -25,6 +25,15 @@ class Monitoring extends ActiveRecord_Base
     'inclusion_integer' => array('in' => array(1, 3, 6)),
   );
   
+  protected $validates_exclusion_of = array(
+    'exclusion_string' => array(
+      'allow_blank' => true,
+      'in' => array('azerty', 'qwerty', 'bepo'),
+      'message' => 'This is bad.'
+    ),
+    'exclusion_integer' => array('in' => array(1, 3, 6)),
+  );
+  
 }
 
 ?>

@@ -126,7 +126,6 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $this->assert_true("string isn't in inclusion list", $monit->errors->is_invalid('inclusion_string'));
     $this->assert_equal("custom error message", $monit->errors->on('inclusion_string'), "This is bad.");
     
-    
     $monit = $monit->create(array('inclusion_integer' => 1));
     $this->assert_false("int is in inclusion list", $monit->errors->is_invalid('inclusion_integer'));
     
@@ -137,7 +136,27 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
   
   function test_validate_exclusion_of()
   {
+    $monit = new Monitoring();
     
+    $monit = $monit->create(array('exclusion_string' => ''));
+    $this->assert_false("field can be null", $monit->errors->is_invalid('exclusion_string'));
+    
+    $monit = $monit->create(array('exclusion_string' => '  '));
+    $this->assert_false("field can be blank", $monit->errors->is_invalid('exclusion_string'));
+    
+    $monit = $monit->create(array('exclusion_string' => 'azerty'));
+    $this->assert_true("string is in exclusion list", $monit->errors->is_invalid('exclusion_string'));
+    
+    $monit = $monit->create(array('exclusion_string' => 'mwert'));
+    $this->assert_false("string isn't in exclusion list", $monit->errors->is_invalid('exclusion_string'));
+    $this->assert_equal("custom error message", $monit->errors->on('exclusion_string'), "This is bad.");
+    
+    $monit = $monit->create(array('exclusion_integer' => 1));
+    $this->assert_true("int is in exclusion list", $monit->errors->is_invalid('exclusion_integer'));
+    
+    $monit = $monit->create(array('exclusion_integer' => 5));
+    $this->assert_false("int is not in exclusion list", $monit->errors->is_invalid('exclusion_integer'));
+    $this->assert_equal("generic error message", $monit->errors->on('exclusion_integer'), "Exclusion integer is not included in the list");
   }
   
   function test_validate_format_of()
