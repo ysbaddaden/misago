@@ -107,11 +107,25 @@ class Unit_Test
     $this->count_assertions += 1;
     if (!$test)
     {
+      switch(gettype($vars['expected']))
+      {
+        case 'NULL': $str_expected = 'null'; break;
+        case 'boolean': $str_expected = $vars['expected'] ? 'true' : 'false'; break;
+        default: $str_expected = print_r($vars['expected'], true);
+      }
+      
+      switch(gettype($vars['got']))
+      {
+        case 'NULL': $str_got = 'null'; break;
+        case 'boolean': $str_got = $vars['got'] ? 'true' : 'false'; break;
+        default: $str_got = print_r($vars['got'], true);
+      }
+      
       # failure
       $this->count_failures += 1;
       printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment);
-      printf(Terminal::colorize("  expected:", 'BOLD')." %s\n", print_r($vars['expected'], true));
-      printf(Terminal::colorize("       got:", 'BOLD')." %s\n", print_r($vars['got'], true));
+      printf(Terminal::colorize("  expected:", 'BOLD')." %s\n", $str_expected);
+      printf(Terminal::colorize("       got:", 'BOLD')." %s\n", $str_got);
     }
   }
 }
