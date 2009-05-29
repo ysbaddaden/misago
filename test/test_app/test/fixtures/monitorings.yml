@@ -2,4 +2,9 @@
   id: 1
   title: "server1"
   description: ""
+-
+  id: 2
+  title: "server3"
+  description: ""
+  email: "root@server3.net"
 

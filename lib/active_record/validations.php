@@ -26,9 +26,9 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # - maximum: int
   # - within: 'min..max'
   # - is: int
-  # - message: generic error message
-  # - too_short: error message when length < minimum
-  # - too_long: error message when length > maximum
+  # - message: generic error message.
+  # - too_short: error message when length < minimum.
+  # - too_long: error message when length > maximum.
   # - wrong_length: error message when length isn't exactly the 'is' size.
   protected $validates_length_of = array();
   
@@ -37,8 +37,8 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # - on: validate on 'create' or 'update' only
   # - allow_null: allows the attribute to be null (defaults to nullity in DB).
   # - allow_blank: allows the attribute to be blank (defaults to false).
-  # - message: generic error message
-  # - in: an enumerable list of values
+  # - message: generic error message.
+  # - in: an enumerable list of values.
   protected $validates_inclusion_of = array();
   
   # Validates if an attribute isn't within a list of values.
@@ -46,8 +46,8 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # - on: validate on 'create' or 'update' only
   # - allow_null: allows the attribute to be null (defaults to nullity in DB).
   # - allow_blank: allows the attribute to be blank (defaults to false).
-  # - message: error message
-  # - in: an enumerable list of values
+  # - message: error message.
+  # - in: an enumerable list of values.
   protected $validates_exclusion_of = array();
   
   # Validates the format of an attribute, using a regular expression.
@@ -55,16 +55,19 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # - on: validate on 'create' or 'update' only
   # - allow_null: allows the attribute to be null (defaults to nullity in DB).
   # - allow_blank: allows the attribute to be blank (defaults to false).
-  # - message: error message
+  # - message: error message.
   # - with: the regular expression to use.
   protected $validates_format_of = array();
   
   # Validates if a field is unique.
+  #
+  # On create the check checks if the column isn't already present in the
+  # database. On update it does the same, but excluding the record itself.
   # 
   # - on: validate on 'create' or 'update' only
   # - allow_null: allows the attribute to be null (defaults to nullity in DB).
   # - allow_blank: allows the attribute to be blank (defaults to false).
-  # - message: error message
+  # - message: error message.
   protected $validates_uniqueness_of = array();
   
   
@@ -99,18 +102,17 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   
   # Validates record's attributes on creation as well as on update.
   protected function validate() {}
-
+	
   # Validates record's attributes on creation only.
   protected function validate_on_create() {}
-
+	
   # Validates record's attributes on update only.
   protected function validate_on_update() {}
   
   
-  private function automated_validation($rules, $on)
+  private function automated_validation($action, $on)
   {
-    $action = "_{$rules}";
-    foreach($this->$rules as $attribute => $options)
+    foreach($this->$action as $attribute => $options)
     {
       if (is_numeric($attribute))
       {
@@ -121,7 +123,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
         continue;
       }
       
-      if ($rules != 'validates_presence_of')
+      if ($action != 'validates_presence_of')
       {
         if (!isset($options['allow_null'])
           and isset($this->columns[$attribute], $this->columns[$attribute]['null']))
@@ -139,14 +141,14 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     }
   }
   
-  private function _validates_presence_of($attribute, $options=null)
+  protected function validates_presence_of($attribute, $options=null)
   {
     if (!isset($this->$attribute) or is_blank($this->$attribute)) {
       $this->errors->add($attribute, isset($options['message']) ? $options['message'] : ':blank');
     }
   }
   
-  private function _validates_length_of($attribute, $options=null)
+  protected function validates_length_of($attribute, $options=null)
   {
     if (isset($options['within']))
     {
@@ -185,8 +187,13 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
           trigger_error("Unsupported object type: ".get_class($this->$attribute), E_USER_WARNING);
         }
       break;
-      case 'string': $length = strlen($this->$attribute); break;
-      default: $length = $this->$attribute;
+      
+      case 'string':
+      	$length = strlen($this->$attribute);
+      break;
+      
+      default:
+      	$length = $this->$attribute;
     }
     
     # validation
@@ -209,7 +216,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     }
   }
   
-  private function _validates_inclusion_of($attribute, $options=null)
+  protected function validates_inclusion_of($attribute, $options=null)
   {
     foreach($options['in'] as $v)
     {
@@ -220,7 +227,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     $this->errors->add($attribute, isset($options['message']) ? $options['message'] : ":not_included");
   }
   
-  private function _validates_exclusion_of($attribute, $options=null)
+  protected function validates_exclusion_of($attribute, $options=null)
   {
     foreach($options['in'] as $v)
     {
@@ -232,16 +239,33 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     }
   }
   
-  private function _validates_format_of($attribute, $options=null)
+  protected function validates_format_of($attribute, $options=null)
   {
     if (!preg_match($options['with'], $this->$attribute)) {
       $this->errors->add($attribute, isset($options['message']) ? $options['message'] : ":invalid");
     }
   }
   
-  private function _validates_uniqueness_of($attribute, $options)
+  protected function validates_uniqueness_of($attribute, $options=null)
   {
+    if (!$this->new_record)
+    {
+      $conditions = array("$attribute = :value AND {$this->primary_key} <> :id", array(
+        'value' => $this->$attribute,
+        'id'    => $this->id
+      ));
+    }
+    else {
+      $conditions = array($attribute => $this->$attribute);
+    }
     
+    $record = $this->find(':first', array(
+    	'select'     => $this->primary_key,
+    	'conditions' => &$conditions,
+    ));
+		if ($record and $record->id) {
+			$this->errors->add($attribute, isset($options['message']) ? $options['message'] : ":taken");
+		}
   }
 }
 

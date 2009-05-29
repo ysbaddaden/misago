@@ -38,6 +38,11 @@ class Monitoring extends ActiveRecord_Base
     'email'  => array('with' => '/[\w\.\-_]+\@[\w\.\-_]+\.\w{2,}/'),
     'email2' => array('with' => '/[\w\.\-_]+\@[\w\.\-_]+\.\w{2,}/', 'message' => 'Bad email.', 'allow_blank' => true),
   );
+  
+  protected $validates_uniqueness_of = array(
+	  'title',
+	  'email' => array('message' => 'Too late.')
+  );
 }
 
 ?>

@@ -11,4 +11,5 @@ en:
         wrong_length: "{{attribute}} is wrong length"
         not_included: "{{attribute}} is not included in the list"
         reserved: "{{attribute}}'s value is reserved"
+        taken: "{{attribute}} is already taken"
 

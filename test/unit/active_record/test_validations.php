@@ -184,6 +184,22 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     
     $monit = $monit->create(array('email2' => 'toto.com'));
     $this->assert_equal("custom error message", $monit->errors->on('email2'), "Bad email.");
+  }
+  
+  function test_validate_uniqueness_of()
+  {
+		$monit = new Monitoring();
+    
+    $monit = $monit->create(array('title' => 'server456'));
+    $this->assert_false("no duplicate title", $monit->errors->is_invalid('title'));
+    
+    $monit = $monit->create(array('title' => 'server1'));
+    $this->assert_true("duplicate title", $monit->errors->is_invalid('title'));
+    $this->assert_equal("generic message", $monit->errors->on('title'), 'Title is already taken');
+    
+    $monit = $monit->create(array('email' => 'root@server3.net'));
+    $this->assert_true("duplicate email", $monit->errors->is_invalid('email'));
+    $this->assert_equal("customized message", $monit->errors->on('email'), 'Too late.');
     
   }
 }
