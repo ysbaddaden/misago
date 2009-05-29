@@ -37,7 +37,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   # - on: validate on 'create' or 'update' only
   # - message: error message
   protected function validates_presence_of($attribute, $options=null) {
-    $this->call_validation('validates_presence_of', $attribute, $options);
+    $this->_validates_presence_of($attribute, $options);
   }
   
   # Validates the length of an attribute.
@@ -116,19 +116,16 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   
   private function call_validation($action, $attribute, $options=null)
   {
-    if ($action != 'validates_presence_of')
+    if (!isset($options['allow_null'])
+      and isset($this->columns[$attribute], $this->columns[$attribute]['null']))
     {
-      if (!isset($options['allow_null'])
-        and isset($this->columns[$attribute], $this->columns[$attribute]['null']))
-      {
-        $options['allow_null'] = $this->columns[$attribute]['null'];
-      }
-      if (isset($options['allow_null']) and $options['allow_null'] and !isset($this->$attribute)) {
-        return;
-      }
-      if (isset($options['allow_blank']) and $options['allow_blank'] and is_blank($this->$attribute)) {
-        return;
-      }
+      $options['allow_null'] = $this->columns[$attribute]['null'];
+    }
+    if (isset($options['allow_null']) and $options['allow_null'] and !isset($this->$attribute)) {
+      return;
+    }
+    if (isset($options['allow_blank']) and $options['allow_blank'] and is_blank($this->$attribute)) {
+      return;
     }
     $action = "_$action";
     $this->$action($attribute, &$options);
