@@ -6,7 +6,7 @@ class #{Class} extends ActiveRecord_Migration
   {
     $t = $this->db->new_table('#{table}');
     
-    #$t->add_column('string', 'title');
+    #$t->add_column('title', 'string');
     
     $t->add_timestamps();
     return $t->create();

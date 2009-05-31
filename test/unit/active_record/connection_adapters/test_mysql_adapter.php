@@ -63,8 +63,8 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $options = array('options' => 'ENGINE=innodb');
     
     $t = $this->db->new_table("misago_test.products", $options);
-    $t->add_column("string", 'title', array('limit' => 100, 'null' => false));
-    $t->add_column("double", 'price', array('signed' => false));
+    $t->add_column('title', "string", array('limit' => 100, 'null' => false));
+    $t->add_column('price', "double", array('signed' => false));
     $t->add_timestamps();
     $rs = $t->create();
     
@@ -101,7 +101,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
   
   function test_add_column()
   {
-    $this->db->add_column('products', 'bool', 'in_stock');
+    $this->db->add_column('products', 'in_stock', 'bool');
     
     $columns = $this->db->columns('products');
     $this->assert_equal("", $columns, array(

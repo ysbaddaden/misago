@@ -27,14 +27,14 @@ class ActiveRecord_Table
       $this->definitions = array_merge($this->definitions, $definitions);
     }
     if (isset($this->definitions['id']) and $this->definitions['id']) {
-      $this->add_column('primary_key', $this->definitions['primary_key']);
+      $this->add_column($this->definitions['primary_key'], 'primary_key');
     }
   }
   
   /**
    * Adds a columns to table's definition.
    */
-  function add_column($type, $name, array $options=null)
+  function add_column($column, $type, array $options=null)
   {
     $definition = array(
       'type' => $type,
@@ -43,11 +43,11 @@ class ActiveRecord_Table
       $definition = array_merge($definition, $options);
     }
     
-    if (isset($this->columns[$name])) {
-      trigger_error("Column $name already defined (overwriting it).", E_USER_WARNING);
+    if (isset($this->columns[$column])) {
+      trigger_error("Column $column already defined (overwriting it).", E_USER_WARNING);
     }
     
-    $this->columns[$name] = $definition;
+    $this->columns[$column] = $definition;
   }
   
   /**
@@ -55,9 +55,9 @@ class ActiveRecord_Table
    * 
    * $type can be:
    * 
-   * - date, which will create created_on & updated_on.
-   * - time, which will create created_at & updated_at.
-   * - datetime, which will create created_at & updated_at.
+   * - date: will add created_on & updated_on.
+   * - time: will add created_at & updated_at.
+   * - datetime: will add created_at & updated_at.
    */
   function add_timestamps($type='datetime')
   {
@@ -65,21 +65,21 @@ class ActiveRecord_Table
     {
       case 'date':
         $type = $this->db->NATIVE_DATABASE_TYPES['date'];
-        $this->add_column($type['name'], 'created_on');
-        $this->add_column($type['name'], 'updated_on');
+        $this->add_column('created_on', $type['name']);
+        $this->add_column('updated_on', $type['name']);
       break;
       
       case 'time':
         $type = $this->db->NATIVE_DATABASE_TYPES['time'];
-        $this->add_column($type['name'], 'created_at');
-        $this->add_column($type['name'], 'updated_at');
+        $this->add_column('created_at', $type['name']);
+        $this->add_column('updated_at', $type['name']);
       break;
       
       case 'datetime':
       default:
         $type = $this->db->NATIVE_DATABASE_TYPES['datetime'];
-        $this->add_column($type['name'], 'created_at');
-        $this->add_column($type['name'], 'updated_at');
+        $this->add_column('created_at', $type['name']);
+        $this->add_column('updated_at', $type['name']);
     }
   }
   

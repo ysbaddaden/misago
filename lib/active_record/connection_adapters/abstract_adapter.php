@@ -402,7 +402,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   /**
    * Adds a column to a table.
    */
-  function add_column($table, $type, $name, array $options=null)
+  function add_column($table, $column, $type, array $options=null)
   {
     $definition = array(
       'type' => $type,
@@ -412,18 +412,18 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     }
     
     $table  = $this->quote_table($table);
-    $column = $this->build_column_definition($name, $definition);
+    $column = $this->build_column_definition($column, $definition);
     return $this->execute("ALTER TABLE $table ADD $column ;");
   }
   
   /**
    * Removes a column from a table.
    */
-  function drop_column($table, $name)
+  function drop_column($table, $column)
   {
-    $table = $this->quote_table($table);
-    $name  = $this->quote_column($name);
-    return $this->execute("ALTER TABLE $table DROP $name ;");
+    $table  = $this->quote_table($table);
+    $column = $this->quote_column($column);
+    return $this->execute("ALTER TABLE $table DROP $column ;");
   }
   
   /**

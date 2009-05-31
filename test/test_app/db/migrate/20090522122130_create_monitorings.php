@@ -7,30 +7,30 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t = $this->db->new_table('monitorings');
     
     # validates_presence_of
-    $t->add_column('string', 'title');
-    $t->add_column('string', 'description');
+    $t->add_column('title',       'string');
+    $t->add_column('description', 'string');
     
     # validates_format_of
-    $t->add_column('string', 'email', array('null' => false));
-    $t->add_column('string', 'email2');
+    $t->add_column('email',  'string', array('null' => false));
+    $t->add_column('email2', 'string');
     
     # validates_length_of
-    $t->add_column('string',   'length_string',  array('limit' => 20));
-    $t->add_column('string',   'length_string2', array('limit' => 20));
-    $t->add_column('string',   'length_is',      array('limit' => 40));
-    $t->add_column('integer',  'length_minmax');
-    $t->add_column('integer',  'length_within');
-    $t->add_column('date',     'length_date');
-    $t->add_column('datetime', 'length_datetime');
-    $t->add_column('time',     'length_time');
+    $t->add_column('length_string',   'string', array('limit' => 20));
+    $t->add_column('length_string2',  'string', array('limit' => 20));
+    $t->add_column('length_is',       'string', array('limit' => 40));
+    $t->add_column('length_minmax',   'integer');
+    $t->add_column('length_within',   'integer');
+    $t->add_column('length_date',     'date');
+    $t->add_column('length_datetime', 'datetime');
+    $t->add_column('length_time',     'time');
     
     # validates_inclusion_of
-    $t->add_column('string',  'inclusion_string');
-    $t->add_column('integer', 'inclusion_integer');
+    $t->add_column('inclusion_string',  'string');
+    $t->add_column('inclusion_integer', 'integer');
     
     # validates_exclusion_of
-    $t->add_column('string',  'exclusion_string');
-    $t->add_column('integer', 'exclusion_integer');
+    $t->add_column('exclusion_string',  'string');
+    $t->add_column('exclusion_integer', 'integer');
     
     return $t->create();
   }

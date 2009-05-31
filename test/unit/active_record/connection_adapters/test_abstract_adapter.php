@@ -167,16 +167,16 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $this->assert_equal("no primary key", $t->columns, array());
     
     $t = $db->new_table('products');
-    $t->add_column('string', 'name');
+    $t->add_column('name', 'string');
     $this->assert_equal("add column", $t->columns, array(
       'id'   => array('type' => 'primary_key'),
       'name' => array('type' => 'string'),
     ));
     
     $t = $db->new_table('products', array('options' => 'ENGINE=innodb'));
-    $t->add_column('string', 'name', array('limit' => 100));
-    $t->add_column('text', 'description');
-    $t->add_column('float', 'price', array('signed' => false));
+    $t->add_column('name', 'string', array('limit' => 100));
+    $t->add_column('description', 'text');
+    $t->add_column('price', 'float', array('signed' => false));
     $this->assert_equal("add column with options", $t->columns, array(
       'id'   => array('type' => 'primary_key'),
       'name' => array('type' => 'string', 'limit' => 100),
@@ -198,11 +198,11 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
   {
     $db = new FakeAdapter(array());
     
-    $sql = $db->add_column('products', 'bool', 'in_stock');
-    $this->assert_equal("no particular option", $sql,
+    $sql = $db->add_column('products', 'in_stock', 'bool');
+    $this->assert_equal("no options", $sql,
       'ALTER TABLE "products" ADD "in_stock" BOOLEAN ;');
     
-    $sql = $db->add_column('products', 'bool', 'in_stock', array('null' => false, 'default' => true));
+    $sql = $db->add_column('products', 'in_stock', 'bool', array('null' => false, 'default' => true));
     $this->assert_equal("with all options", $sql,
       'ALTER TABLE "products" ADD "in_stock" BOOLEAN NOT NULL DEFAULT t ;');
   }

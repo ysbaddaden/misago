@@ -6,9 +6,9 @@ class CreateInvoice extends ActiveRecord_Migration
   {
     $t = $this->db->new_table('invoices');
     
-    $t->add_column('integer', 'order_id');
-    $t->add_column('string', 'name');
-    $t->add_column('string', 'address');
+    $t->add_column('order_id', 'integer');
+    $t->add_column('name', 'string');
+    $t->add_column('address', 'string');
     
     $t->add_timestamps();
     return $t->create();
