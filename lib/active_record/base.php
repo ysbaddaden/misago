@@ -207,7 +207,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           case 'double':  $value = (double)$value; break;
           case 'bool':    $value = (bool)$value;   break;
           case 'date': case 'datetime': case 'time':
-            $value = new Time($value);
+            if (!($value instanceof Time)) {
+              $value = new Time($value);
+            }
           break;
         }
       }
@@ -227,6 +229,20 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $attribute = $this->primary_key;
     }
     return parent::__get($attribute);
+  }
+  
+  private function & _get_attributes($attributes=null)
+  {
+    if ($attributes === null) {
+      $attributes = $this->__attributes;
+    }
+    foreach(array_keys($attributes) as $k)
+    {
+      if (is_object($attributes[$k]) and method_exists($attributes[$k], 'to_s')) {
+        $attributes[$k] = $attributes[$k]->to_s('db');
+      }
+    }
+    return $attributes;
   }
   
   /**
@@ -479,19 +495,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # timestamps
-    if (array_key_exists('created_at', $this->columns))
-    {
-      $time = new Time(null, 'datetime');
-      $this->created_at = $time->to_query();
+    if (array_key_exists('created_at', $this->columns)) {
+      $this->created_at = new Time(null, 'datetime');
     }
-    if (array_key_exists('created_on', $this->columns))
-    {
-      $time = new Time(null, 'date');
-      $this->created_on = $time->to_query();
+    if (array_key_exists('created_on', $this->columns)) {
+      $this->created_on = new Time(null, 'date');
     }
     
     # create
-    $id = $this->db->insert($this->table_name, $this->__attributes, $this->primary_key);
+    $attributes = $this->_get_attributes();
+    $id = $this->db->insert($this->table_name, $attributes, $this->primary_key);
     if ($id)
     {
       $this->new_record = false;
@@ -529,16 +542,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     # timestamps
     if (array_key_exists('updated_at', $this->columns))
     {
-      $time = new Time(null, 'datetime');
-      $this->updated_at = $time->to_query();
+      $this->updated_at = new Time(null, 'datetime');
       if ($attributes !== null) {
         $attributes['updated_at'] = $this->updated_at;
       }
     }
     if (array_key_exists('updated_on', $this->columns))
     {
-      $time = new Time(null, 'date');
-      $this->updated_on = $time->to_query();
+      $this->updated_on = new Time(null, 'date');
       if ($attributes !== null) {
         $attributes['updated_on'] = $this->updated_on;
       }
@@ -546,7 +557,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     # update
     $conditions = array($this->primary_key => $this->id);
-    $updates    = ($attributes === null) ? $this->__attributes : $attributes;
+#    $updates    = ($attributes === null) ? $this->__attributes : $attributes;
+    $updates = $this->_get_attributes($attributes);
     
     $rs = $this->db->update($this->table_name, $updates, $conditions);
     
