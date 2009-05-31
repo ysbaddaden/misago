@@ -156,7 +156,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   function __construct($arg=null)
   {
     # database connection
-    $this->table_name = String::underscore(String::pluralize(get_class($this)));
+    if (empty($this->table_name)) {
+      $this->table_name = String::underscore(String::pluralize(get_class($this)));
+    }
     $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
     
     # columns' definition
