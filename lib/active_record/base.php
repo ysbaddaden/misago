@@ -231,11 +231,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return parent::__get($attribute);
   }
   
-  private function & _get_attributes($attributes=null)
+  private function & _get_attributes()
   {
-    if ($attributes === null) {
-      $attributes = $this->__attributes;
-    }
+    $attributes = $this->__attributes;
     foreach(array_keys($attributes) as $k)
     {
       if (is_object($attributes[$k]) and method_exists($attributes[$k], 'to_s')) {
@@ -540,24 +538,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # timestamps
-    if (array_key_exists('updated_at', $this->columns))
-    {
+    if (array_key_exists('updated_at', $this->columns)) {
       $this->updated_at = new Time(null, 'datetime');
-      if ($attributes !== null) {
-        $attributes['updated_at'] = $this->updated_at;
-      }
     }
-    if (array_key_exists('updated_on', $this->columns))
-    {
+    if (array_key_exists('updated_on', $this->columns)) {
       $this->updated_on = new Time(null, 'date');
-      if ($attributes !== null) {
-        $attributes['updated_on'] = $this->updated_on;
-      }
     }
     
     # update
     $conditions = array($this->primary_key => $this->id);
-    $updates = $this->_get_attributes($attributes);
+    $updates = $this->_get_attributes();
     
     $rs = $this->db->update($this->table_name, $updates, $conditions);
     
