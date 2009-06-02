@@ -2,7 +2,7 @@
 
 class ApplicationController extends ActionController_Base
 {
-  protected $helpers = ':all';
+  public $helpers = ':all';
 }
 
 ?>
