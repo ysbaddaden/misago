@@ -17,6 +17,11 @@ class Test_Unit_Test extends Unit_Test
     $this->assert_false('', false);
   }
   
+  function test_assert_null()
+  {
+    $this->assert_null('', null);
+  }
+  
   function test_assert_equal()
   {
     $this->assert_equal('strings', 'a', 'a');

@@ -72,6 +72,11 @@ class Unit_Test
     $this->return_assert($comment, $arg === false, array('got' => $arg, 'expected' => false));
   }
   
+  protected function assert_null($comment, $arg)
+  {
+    $this->return_assert($comment, $arg === null, array('got' => $arg, 'expected' => null));
+  }
+  
   protected function assert_equal($comment, $test, $expect)
   {
     if (is_array($test) and !is_hash($test))
