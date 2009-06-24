@@ -47,8 +47,9 @@ class ActionView_Base extends Object
     $dh = opendir($path);
     if ($dh)
     {
-      while(($file = readdir($dh)) !== false) {
-        if (is_file($path)) {
+      while(($file = readdir($dh)) !== false)
+      {
+        if (is_file($path.$file)) {
           $helpers[] = str_replace('_helper.php', '', $file);
         }
       }
