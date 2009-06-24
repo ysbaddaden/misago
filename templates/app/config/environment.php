@@ -1,5 +1,6 @@
 <?php
 
+# charsets
 ini_set('default_charset', 'UTF-8');
 
 mb_language('uni');
@@ -9,5 +10,8 @@ if (extension_loaded('mbstring')) {
 }
 
 date_default_timezone_set('UTC');
+
+# mailer
+# cfg::set('mailer_return_path', 'me@domain.com');
 
 ?>

@@ -70,8 +70,6 @@ class ActionMailer_Mail extends Object
     $headers = $this->headers;
     
     $headers['From'] = $this->from;
-#    $headers['To']   = implode(', ', $this->to);
-    
     if (!empty($this->reply_to)) {
       $headers['Reply-To'] = $this->reply_to;
     }
@@ -80,6 +78,13 @@ class ActionMailer_Mail extends Object
     }
     if (!empty($this->bcc)) {
       $headers['Bcc'] = implode(', ', $this->bcc);
+    }
+    
+    if (!empty($this->return_path)) {
+      $header['Return-Path'] = $this->return_path;
+    }
+    elseif (cfg::is_set('mailer_return_path')) {
+      $header['Return-Path'] = cfg::get('mailer_return_path');
     }
     
     return $headers;
