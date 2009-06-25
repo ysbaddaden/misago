@@ -23,6 +23,7 @@ class Generator_Mailer extends Generator_Base
     );
     
     $this->create_directory('app/models');
+    $this->create_directory('app/views/'.$filename);
     $this->create_directory('test/unit');
     
     $test = $this->create_file_from_template("app/models/{$filename}.php", 'model/model.php', &$vars);
