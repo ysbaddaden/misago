@@ -26,6 +26,7 @@ if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
 
+require 'cfg.php';
 require 'misago_log.php';
 require 'http.php';
 require 'translate.php';

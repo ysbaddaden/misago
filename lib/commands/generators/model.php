@@ -8,7 +8,7 @@ class Generator_Model extends Generator_Base
   {
     if (empty($args))
     {
-      echo "Syntax error: script/generate controller <name>\n";
+      echo "Syntax error: script/generate model <name>\n";
       exit;
     }
     $this->options = $options;

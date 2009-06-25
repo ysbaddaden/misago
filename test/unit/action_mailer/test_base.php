@@ -12,20 +12,27 @@ class Test_ActionMailer_Base extends Unit_TestCase
     $this->fixtures('monitorings');
     $notifier = new Notifier();
     
-    $email = $notifier->monitoring_alert(new Monitoring(1));
-    $notifier->render($email);
-    $this->assert_equal('body_plain', trim($email->body_plain), "An error occured on server1.\n\nPlease check.");
-    $this->assert_equal('body_html',  trim($email->body_html),  "<p>An error occured on server1.</p>\n<p>Please check.</p>");
+    $mail = $notifier->monitoring_alert(new Monitoring(1));
+    $notifier->render($mail);
+    $this->assert_equal('body_plain', trim($mail->body_plain), "An error occured on server1.\n\nPlease check.");
+    $this->assert_equal('body_html',  trim($mail->body_html),  "<p>An error occured on server1.</p>\n<p>Please check.</p>");
     
-    $email = $notifier->monitoring_alert(new Monitoring(2));
-    $notifier->render($email);
-    $this->assert_equal('body_plain', trim($email->body_plain), "An error occured on server3.\n\nPlease check.");
-    $this->assert_equal('body_html',  trim($email->body_html),  "<p>An error occured on server3.</p>\n<p>Please check.</p>");
+    $mail = $notifier->monitoring_alert(new Monitoring(2));
+    $notifier->render($mail);
+    $this->assert_equal('body_plain', trim($mail->body_plain), "An error occured on server3.\n\nPlease check.");
+    $this->assert_equal('body_html',  trim($mail->body_html),  "<p>An error occured on server3.</p>\n<p>Please check.</p>");
   }
   
   function test_deliver()
   {
-    // ...
+    $notifier = new Notifier();
+    
+    /*
+    $mail = $notifier->monitoring_alert(new Monitoring(3));
+    $notifier->deliver($mail);
+    */
+    
+    $notifier->deliver_monitoring_alert(new Monitoring(3));
   }
 }
 
