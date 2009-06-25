@@ -20,6 +20,7 @@ class ActionMailer_Mail extends Object
   function __construct($action)
   {
     $this->action = $action;
+    $this->from(cfg::get('mailer_default_email'));
   }
   
   function subject($subject)

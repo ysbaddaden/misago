@@ -9,11 +9,13 @@ if (extension_loaded('mbstring')) {
   ini_set('mbstring.func_overload', 7);
 }
 
+# date & tz
 date_default_timezone_set('UTC');
 
 # mailer
 # cfg::set('mailer_perform_deliveries', false);
 # cfg::set('delivery_method', 'sendmail');
 # cfg::set('mailer_return_path', 'postmaster@domain.com');
+# cfg::set('mailer_default_from', 'me <contact@domain.com>');
 
 ?>

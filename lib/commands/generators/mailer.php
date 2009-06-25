@@ -26,8 +26,8 @@ class Generator_Mailer extends Generator_Base
     $this->create_directory('app/views/'.$filename);
     $this->create_directory('test/unit');
     
-    $test = $this->create_file_from_template("app/models/{$filename}.php", 'model/model.php', &$vars);
-    $this->create_file_from_template("test/unit/test_{$filename}.php", 'model/test.php', &$vars);
+    $test = $this->create_file_from_template("app/models/{$filename}.php", 'mailer/model.php', &$vars);
+    $this->create_file_from_template("test/unit/test_{$filename}.php", 'mailer/test.php', &$vars);
   }
 }
 
