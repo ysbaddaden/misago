@@ -17,28 +17,30 @@ class Test_ActionController_Base extends Unit_TestCase
     $this->assert_equal("get+post", $controller->params,
       array('test' => '2', 'toto' => 'brocoli'));
     
-    $controller = new SayController(array(
+    ob_start();
+    $controller->execute(array(
       ':method' => 'GET',
       ':controller' => 'say',
       ':action' => 'hello',
       ':format' => 'html',
       ':id' => '123'
     ));
+    ob_get_clean();
     $this->assert_equal("get+post+params", $controller->params,
       array('test' => '2', 'toto' => 'brocoli', ':id' => '123'));
   }
   
   function test_execute_and_render()
   {
-    $controller = new SayController(array(
+    $controller = new SayController();
+    ob_start();
+    $controller->execute(array(
       ':method' => 'GET',
       ':controller' => 'say',
       ':action' => 'hello',
       ':format' => 'html',
       ':id' => '123'
     ));
-    ob_start();
-    $controller->execute();
     $html = trim(ob_get_clean());
     $this->assert_equal("mapped action", $html, "<p>Hello world!</p>");
     
@@ -59,6 +61,11 @@ class Test_ActionController_Base extends Unit_TestCase
     $controller = new SayController();
     $html = $controller->render_string(array('action' => 'hello', 'format' => 'xml'));
     $this->assert_equal("action+controller layout+format", trim($html), "<say><message>hello world</message>\n</say>");
+    
+    $controller = new SayController();
+    $controller->action = 'hello';
+    $html = $controller->render_string(array('layout' => 'basic'));
+    $this->assert_equal("layout", trim($html), "<html><body><p>Hello world!</p></body></html>");
     
     
     $this->fixtures('products');
