@@ -36,7 +36,8 @@ abstract class ActionController_Base extends Object
       ));
       $this->params = array_merge($this->params, $params);
       
-      $this->format =& $this->mapping[':format'];
+      $this->format = empty($this->mapping[':format']) ?
+        'html' : $this->mapping[':format'];
     }
   }
   
