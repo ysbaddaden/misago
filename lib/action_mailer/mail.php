@@ -37,34 +37,40 @@ class ActionMailer_Mail extends Object
     $this->reply_to = $reply_to;
   }
   
+  # Add some recipients.
   function recipient($recipient)
   {
     $recipients = func_get_args();
     $this->add_recipients($recipients, 'to');
   }
   
+  # Add some recipients in copy.
   function cc($recipient)
   {
     $recipients = func_get_args();
     $this->add_recipients($recipients, 'cc');
   }
   
+  # Add some hidden recipients in copy.
   function bcc($recipient)
   {
     $recipients = func_get_args();
     $this->add_recipients($recipients, 'bcc');
   }
   
+  # Data to be passed to the view.
   function body($data_for_body)
   {
     $this->data =& $data_for_body;
   }
   
+  # Returns the list of recipients (to).
   function recipients()
   {
     return implode(', ', $this->to);
   }
   
+  # Returns the headers.
   function headers()
   {
     $headers = $this->headers;
@@ -90,6 +96,7 @@ class ActionMailer_Mail extends Object
     return $headers;
   }
   
+  # Returns mail's multipart body.
   function contents()
   {
     $mime_boundary = "=boundary=".md5(time()).'=';
@@ -115,7 +122,6 @@ class ActionMailer_Mail extends Object
     
     return $contents;
   }
-  
   
   protected function add_recipients($recipients, $type='to')
   {

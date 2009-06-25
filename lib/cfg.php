@@ -14,7 +14,7 @@ class cfg
     cfg::$data[$var] = $value;
   }
   
-  static function is_set()
+  static function is_set($var)
   {
     return isset(cfg::$data[$var]);
   }

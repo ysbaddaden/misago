@@ -1,5 +1,56 @@
 <?php
 
+# Delivers emails.
+# 
+# =Example
+# 
+#   class Notifier extends ActionMailer_Base
+#   {
+#     function signup_notification($recipient)
+#     {
+#       $mail = new ActionMailer_Mail('signup_notification');
+#       $mail->from('me <me@domain>');
+#       $mail->to($recipient->email);
+#       $mail->body('account' => $recipient);
+#       return $mail;
+#     }
+#   }
+# 
+# 
+# =Configuration
+#
+# See documentation of ActionMailer_Mail.
+# 
+# The 'return-path' header may be defined in environment's configuration.
+# For instance:
+# 
+#   cfg::set('mailer_return_path', 'postmaster@domain.com');
+# 
+# 
+# =Mail body
+# 
+# The body is just a view template. For instance:
+# 
+# - app/views/notifier/signup_notification.plain.tpl
+# - app/views/notifier/signup_notification.html.tpl
+# 
+# For the time being, it is necessary to have both the
+# 'plain' and 'html' templates.
+# 
+# 
+# =Delivering
+# 
+# Simply call the deliver() method:
+# 
+#   $notifier = new Notifier();
+#   $mail = $notifier->signup_notification($account);
+#   $notifier->deliver($mail);
+# 
+# There is also a magic shortcut:
+# 
+#   $notifier = new Notifier();
+#   $notifier->deliver_signup_notification($account);
+# 
 class ActionMailer_Base extends Object
 {
   public $helpers = ':all';
@@ -7,7 +58,7 @@ class ActionMailer_Base extends Object
   
   function __call($func, $args)
   {
-    if (preg_match('/^deliver_(.+)$/', $func, $match) === 0)
+    if (preg_match('/^deliver_(.+)$/', $func, $match))
     {
       $mail = call_user_func_array(array($this, $match[1]), $args);
       return $this->deliver($mail);
@@ -15,6 +66,7 @@ class ActionMailer_Base extends Object
     trigger_error('No such method '.get_class($this).'::'.$func.'().', E_USER_ERROR);
   }
   
+  # Delivers a prepared mail.
   function deliver($mail)
   {
     $contents = $this->render($mail);
