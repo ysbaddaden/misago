@@ -12,6 +12,8 @@ if (extension_loaded('mbstring')) {
 date_default_timezone_set('UTC');
 
 # mailer
-# cfg::set('mailer_return_path', 'me@domain.com');
+# cfg::set('mailer_perform_deliveries', false);
+# cfg::set('delivery_method', 'sendmail');
+# cfg::set('mailer_return_path', 'postmaster@domain.com');
 
 ?>

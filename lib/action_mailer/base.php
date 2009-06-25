@@ -17,14 +17,9 @@
 #   }
 # 
 # 
-# =Configuration
+# =Mail
 #
-# See documentation of ActionMailer_Mail.
-# 
-# The 'return-path' header may be defined in environment's configuration.
-# For instance:
-# 
-#   cfg::set('mailer_return_path', 'postmaster@domain.com');
+# See documentation of ActionMailer_Mail for configuration methods.
 # 
 # 
 # =Mail body
@@ -37,6 +32,8 @@
 # For the time being, it is necessary to have both the
 # 'plain' and 'html' templates.
 # 
+# You may use $mail->body() to pass data from the ActionMailer
+# to the view template.
 # 
 # =Delivering
 # 
@@ -50,6 +47,14 @@
 # 
 #   $notifier = new Notifier();
 #   $notifier->deliver_signup_notification($account);
+# 
+# =Configuration option
+# 
+# You may set the following configuration options, using cfg::set(). 
+#
+# - mailer_perform_deliveries: set to false to prevent all email from being sent. Set to true otherwise (default).
+# - mailer_delivery_method: defines a delivery method. Only 'sendmail' is supported right now.
+# - mailer_return_path: you may define a default return-path for all your emails.
 # 
 class ActionMailer_Base extends Object
 {
@@ -69,6 +74,9 @@ class ActionMailer_Base extends Object
   # Delivers a prepared mail.
   function deliver($mail)
   {
+    if (cfg::is_set('mailer_perform_deliveries') and !cfg::get('mailer_perform_deliveries')) {
+      return true;
+    }
     $contents = $this->render($mail);
     $headers  = '';
     foreach($mail->headers() as $k => $v) {
