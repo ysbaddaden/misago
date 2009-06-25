@@ -11,7 +11,7 @@ class cfg
   
   static function set($var, $value)
   {
-    cfg::data[$var] = $value;
+    cfg::$data[$var] = $value;
   }
   
   static function is_set()
