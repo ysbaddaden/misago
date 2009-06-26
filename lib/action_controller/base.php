@@ -155,6 +155,12 @@ abstract class ActionController_Base extends Object
   
   protected function before_filters() {}
 #  protected function after_filters()  {}
+
+  protected function flash($message, $url, $code=302)
+  {
+    Session::flash($message);
+    HTTP::redirect($url, $code);
+  }
 }
 
 ?>
