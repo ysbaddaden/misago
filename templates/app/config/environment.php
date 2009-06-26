@@ -9,6 +9,9 @@ if (extension_loaded('mbstring')) {
   ini_set('mbstring.func_overload', 7);
 }
 
+# languages
+cfg::set('i18n_default_locale', 'en');
+
 # date & tz
 date_default_timezone_set('UTC');
 
