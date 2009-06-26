@@ -65,10 +65,12 @@ class html
     return $map->reverse($mapping);
   }
   
-  static function form_tag($url, $options=null)
+  static function form_tag($url, $attributes=null)
   {
-    if (isset($options['method'])) {
-      $method = strtolower($options['method']);
+    if (isset($attributes['method']))
+    {
+      $method = strtolower($attributes['method']);
+      unset($attributes['method']);
     }
     elseif (is_object($url) and isset($url->method)) {
       $method = strtolower($url->method);
@@ -76,14 +78,19 @@ class html
     else {
       $method = 'post';
     }
-    $enctype = (isset($options['multipart']) and $options['multipart']) ? ' enctype="multipart/form-data"' : '';
+    if (isset($attributes['multipart']) and $attributes['multipart'])
+    {
+      $attributes['enctype'] = "multipart/form-data";
+      unset($attributes['multipart']);
+    }
+    $attributes = html::parse_attributes($attributes);
     
     if ($method == 'get' or $method == 'post') {
-      $str = "<form action=\"$url\" method=\"$method\"$enctype>";
+      $str = "<form action=\"$url\" method=\"$method\"$attributes>";
     }
     else
     {
-      $str  = "<form action=\"$url\" method=\"post\"$enctype>";
+      $str  = "<form action=\"$url\" method=\"post\"$attributes>";
       $str .= '<input type="hidden" name="_method" value="'.$method.'"/>';
     }
     return $str;
