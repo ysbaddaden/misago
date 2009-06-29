@@ -14,6 +14,9 @@ ini_set('include_path',
 if (!isset($_ENV['MISAGO_DEBUG'])) {
   $_ENV['MISAGO_DEBUG'] = 0;
 }
+if (!isset($_ENV['MISAGO_ENV'])) {
+  $_ENV['MISAGO_ENV'] = 'development';
+}
 
 #require 'object.php';
 require 'active_support/additions.php';
@@ -26,10 +29,20 @@ if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
 
+require 'cfg.php';
 require 'misago_log.php';
 require 'http.php';
-require 'translate.php';
 require 'application.php';
+
+require ROOT."/config/environments/{$_ENV['MISAGO_ENV']}.php";
+require ROOT.'/config/environment.php';
+
+require 'i18n.php';
+I18n::startup();
+
+require 'action_controller/dispatcher.php';
+require ROOT.'/config/routes.php';
+
 
 function __autoload($class)
 {

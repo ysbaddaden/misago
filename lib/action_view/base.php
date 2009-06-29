@@ -14,11 +14,11 @@ class ActionView_Base extends Object
   
   function __construct($controller=null)
   {
-    if ($controller instanceof ActionController_Base)
+    if ($controller !== null)
     {
       $this->controller = $controller;
-      $this->view_path  = String::underscore(str_replace('Controller', '', get_class($this->controller)));
-      $helpers = $this->controller->helpers;
+      $this->view_path = String::underscore(str_replace('Controller', '', get_class($this->controller)));
+      $helpers         = $this->controller->helpers;
     }
     
     if (!isset($helpers) or $helpers == ':all')
@@ -47,8 +47,9 @@ class ActionView_Base extends Object
     $dh = opendir($path);
     if ($dh)
     {
-      while(($file = readdir($dh)) !== false) {
-        if (is_file($path)) {
+      while(($file = readdir($dh)) !== false)
+      {
+        if (is_file($path.$file)) {
           $helpers[] = str_replace('_helper.php', '', $file);
         }
       }
@@ -100,6 +101,14 @@ class ActionView_Base extends Object
   # 
   function render($options)
   {
+    # locals
+    if (!empty($options['locals']))
+    {
+      foreach($options['locals'] as $k => $v) {
+        $$k = $v;
+      }
+    }
+    
     # view (+layout)
     if (isset($options['action']))
     {
@@ -108,7 +117,9 @@ class ActionView_Base extends Object
       
       if (file_exists(ROOT."/app/views/{$__view_file}"))
       {
-        $this->copy_controller_vars();
+        if ($this->controller !== null) {
+          $this->copy_controller_vars();
+        }
         
         # view
         ob_start();
@@ -166,14 +177,6 @@ class ActionView_Base extends Object
       
       if (file_exists(ROOT."/app/views/{$__partial_file}"))
       {
-        # locals
-        if (!empty($options['locals']))
-        {
-          foreach($options['locals'] as $k => $v) {
-            $$k = $v;
-          }
-        }
-        
         ob_start();
         
         if (!isset($options['collection']))
@@ -218,7 +221,7 @@ class ActionView_Base extends Object
     $this->params =& $this->controller->params;
     
     $controller_vars = get_object_vars($this->controller);
-    $view_vars = get_class_vars(get_class($this));
+    $view_vars       = get_class_vars(get_class($this));
     
     $vars = array_diff_key($controller_vars, $view_vars);
     foreach($vars as $k => $v) {

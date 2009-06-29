@@ -17,7 +17,7 @@ function ActionController_dispatch($method, $uri)
   
   if (file_exists(ROOT."/app/controllers/$name.php"))
   {
-    $controller = new $class($mapping);
+    $controller = new $class();
     
     # action!
     if (method_exists($controller, $mapping[':action']))
@@ -26,7 +26,7 @@ function ActionController_dispatch($method, $uri)
         and strpos($mapping[':action'], '__') !== 0
         and is_callable(array($controller, $mapping[':action'])))
       {
-        $controller->execute($mapping[':action']);
+        $controller->execute(&$mapping);
       }
       else {
         throw new MisagoException("Tried to call a private/protected method as a public action: {$mapping[':action']}", 400);

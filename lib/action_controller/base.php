@@ -9,13 +9,13 @@ abstract class ActionController_Base extends Object
   public    $action;
   public    $params;
 	
-  protected $mapping;
+  protected $mapping = array();
   protected $already_rendered = false;
   protected $skip_view = false;
   
   public    $helpers   = ':all';
   
-  function __construct(array $mapping=null)
+  function __construct()
   {
     $this->name   = get_class($this);
     $this->params = array_merge($_GET, $_POST);
@@ -23,10 +23,24 @@ abstract class ActionController_Base extends Object
     if (get_magic_quotes_gpc()) {
       sanitize_magic_quotes($this->params);
     }
-    
-    if ($mapping !== null)
+  }
+  
+  function execute($mapping)
+  {
+    if (!is_array($mapping))
+    {
+      $this->action  = $mapping;
+      $this->mapping = array(
+        ':method' => 'GET',
+        ':controller' => String::underscore($this->name),
+        ':action' => $mapping,
+        ':format' => 'html',
+      );
+    }
+    else
     {
       $this->mapping =& $mapping;
+      $this->action  = $this->mapping[':action'];
       
       $params = array_diff_key($this->mapping, array(
         ':controller' => '',
@@ -36,13 +50,9 @@ abstract class ActionController_Base extends Object
       ));
       $this->params = array_merge($this->params, $params);
       
-      $this->format =& $this->mapping[':format'];
+      $this->format = empty($this->mapping[':format']) ?
+        'html' : $this->mapping[':format'];
     }
-  }
-  
-  function execute($action=null)
-  {
-    $this->action = ($action === null) ? $this->mapping[':action'] : $action;
     
     if (DEBUG == 1)
     {
@@ -125,6 +135,9 @@ abstract class ActionController_Base extends Object
       if ($options['format'] != 'html') {
         HTTP::content_type($options['format']);
       }
+      if (!isset($options['action'])) {
+        $options['action'] = $this->action;
+      }
       $view = new ActionView_Base($this);
       echo $view->render($options);
     }
@@ -142,6 +155,22 @@ abstract class ActionController_Base extends Object
   
   protected function before_filters() {}
 #  protected function after_filters()  {}
+  
+  # Redirects to another URL, passing a text message to the next page.
+  # 
+  # Example:
+  # 
+  #   $this->flash("Post has been published.", show_post_path($this->post->id), 201);
+  # 
+  # And in your template:
+  # 
+  #   <?= Session::flash() ?\>
+  #
+  protected function flash($message, $url, $code=302)
+  {
+    Session::flash($message);
+    HTTP::redirect($url, $code);
+  }
 }
 
 ?>

@@ -3,12 +3,12 @@
 $_ENV['MISAGO_ENV'] = 'test';
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
-class Test_Translate extends Unit_Test
+class Test_I18n extends Unit_Test
 {
   function test_t()
   {
     $this->assert_equal('simple', t('toto'), 'Toto');
-    $this->assert_equal('text', t('invalid title'), 'Title is invalid');
+    $this->assert_equal('text',   t('invalid title'), 'Title is invalid');
     $this->assert_equal('symbol', t('invalid'), '{{attribute}} is invalid');
   }
   
@@ -19,6 +19,6 @@ class Test_Translate extends Unit_Test
   }
 }
 
-new Test_Translate();
+new Test_I18n();
 
 ?>

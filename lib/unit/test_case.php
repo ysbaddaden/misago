@@ -123,8 +123,7 @@ class Unit_TestCase extends Unit_Test
     # executes the request
     $output = curl_exec($ch);
     
-    if ($output === false)
-    {
+    if ($output === false) {
       die("\nERROR: please start a test server:\nMISAGO_DEBUG=0 script/server -e test -p 3009\n\n");
     }
     
@@ -150,6 +149,7 @@ class Unit_TestCase extends Unit_Test
       'url'     => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
       'status'  => curl_getinfo($ch, CURLINFO_HTTP_CODE),
       'headers' => $headers,
+      'body'    => trim(substr($output, curl_getinfo($ch, CURLINFO_HEADER_SIZE))),
     );
     
     curl_close($ch);
