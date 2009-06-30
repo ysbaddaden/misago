@@ -118,6 +118,12 @@ class Time extends Object
     return $this->_time;
   }
   
+  # There is no XML format, but it's used by some to_xml() methods.
+  function to_xml()
+  {
+    return $this->to_query();
+  }
+  
   
   # RSS date format (RFC2822)
   function to_rfc2822()

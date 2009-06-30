@@ -39,7 +39,7 @@
 # 
 # ==Read
 # 
-# ===find one
+# ===Find one
 # 
 # All the following methods will return a single post. As a matter of fact,
 # they all return the same post (in these examples):
@@ -50,7 +50,7 @@
 #   $post = $post->find(':first', array('conditions' => 'id = 1'));
 #   $post = $post->find_by_id(1);
 # 
-# ===find all
+# ===Find all
 # 
 # The following methods will return a collection of posts:
 # 
@@ -60,6 +60,32 @@
 #   $posts = $post->find(':all', array('order' => 'created_at desc', 'limit' => 25));
 #   $posts = $post->find_all_by_category('aaa');
 #   $posts = $post->find_all_by_category('aaa', array('order' => 'title asc'));
+# 
+# ===Scopes
+# 
+# Scopes are predefined options for find requests.
+# 
+# 
+# ====Default scope
+# 
+# You may define a default scope for all finds. In the following example,
+# all find requests to Comment will be returned ordered by creation date:
+# 
+#   class Comment {
+#     protected $default_scope = array('order' => 'created_at asc');
+#   }
+# 
+# Attention:
+# 
+# - once a default scope has been defined all find requests will be
+#   affected. This could be troublesome, sometimes.
+# - the default scope also affects the 'include' option, which shall
+#   be pretty convenient.
+# 
+# 
+# ====Named scopes
+# 
+# [TODO]
 # 
 # 
 # ==Update
@@ -144,6 +170,7 @@
 # @package ActiveRecord
 # 
 # TODO: Implement calculations.
+# TODO: Named scopes.
 #
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
@@ -151,6 +178,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   protected $table_name;
   protected $primary_key   = 'id';
   protected $columns       = array();
+  protected $default_scope = array();
   
   # IMPROVE: Check if columns do not conflict with object class attributes.
   function __construct($arg=null)
@@ -327,6 +355,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     else {
       $method = $method_or_id;
     }
+    
+    # default scope
+    $options = is_array($options) ?
+      hash_merge_recursive($this->default_scope, $options) : $this->default_scope;
     
     # optimization(s)
     if ($method == ':first' and !isset($options['limit'])) {

@@ -514,6 +514,28 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $c = $programmer->test_merge_options($a, $b);
     $this->assert_equal("", $c, array('conditions' => "(b <> 'aze') AND (a = '12')", 'limit' => 100));
   }
+  
+  function test_find_with_default_scope()
+  {
+    $invoice = new Invoice();
+    $invoices = $invoice->find(':all');
+    
+    $this->assert_equal('result must be ordered (a)', $invoices[0]->id, 2);
+    $this->assert_equal('result must be ordered (b)', $invoices[1]->id, 1);
+  }
+  
+  function test_eager_loading_with_default_scope()
+  {
+    $this->truncate('baskets,orders');
+    $this->fixtures('baskets,orders');
+    
+    $order  = new Order();
+    $orders = $order->find(':all', array('conditions' => 'id = 1', 'include' => 'baskets'));
+    
+    $this->assert_equal('result must be ordered (a)', $orders[0]->baskets[0]->id, 2);
+    $this->assert_equal('result must be ordered (b)', $orders[0]->baskets[1]->id, 1);
+    $this->assert_equal('result must be ordered (c)', $orders[0]->baskets[2]->id, 3);
+  }
 }
 
 new Test_ActiveRecord_Base();
