@@ -86,4 +86,33 @@ function array_sort_recursive(&$ary)
   }
 }
 
+# Transforms an array with mixed keys (array and hash) into a full hash one.
+# 
+# Example:
+#  
+#   $includes = array('tags', 'comments' => array('order' => 'created_at asc'));
+#   $includes = linearize_options_tree($includes);
+# 
+# $includes will be:
+# 
+#   array(
+#     'tags' => array(),
+#     'comments' => array('order' => 'created_at asc'),
+#   );
+# 
+function linearize_options_tree($ary)
+{
+  $h = array();
+  foreach($ary as $k => $v)
+  {
+    if (is_int($k)) {
+      $h[$v] = array();
+    }
+    else {
+      $h[$k] = is_array($v) ? linearize_options_tree($v) : $v;
+    }
+  }
+  return $h;
+}
+
 ?>
