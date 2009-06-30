@@ -149,8 +149,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
   protected $db;
   protected $table_name;
-  protected $primary_key = 'id';
-  protected $columns     = array();
+  protected $primary_key   = 'id';
+  protected $columns       = array();
   
   # IMPROVE: Check if columns do not conflict with object class attributes.
   function __construct($arg=null)
@@ -275,8 +275,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
         $options = isset($args[0]) ? $args[0] : array();
       }
       
-      $scope = empty($match[1]) ? ':first' : ':'.$match[1];
-      return $this->find($scope, $options);
+      $method = empty($match[1]) ? ':first' : ':'.$match[1];
+      return $this->find($method, $options);
     }
     return parent::__call($func, $args);
   }
@@ -284,7 +284,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   /**
    * Finds records in database.
    * 
-   * Scopes:
+   * Methods:
    * 
    * - :all    Returns all found records.
    * - :first  Returns the first found record.
@@ -302,31 +302,34 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
    * 
    * Eager Loading:
    * 
-   * See documentation of ActiveRecord_Associations.
+   * See ActiveRecord_Associations.
    * 
    * TODO: Test option 'group'.
    */
-  function find($scope=':all', $options=null)
+  function find($method_or_id=':all', $options=null)
   {
     # arguments
-    if (!is_symbol($scope))
+    if (!is_symbol($method_or_id))
     {
-      if (is_array($scope) and !is_array($options))
+      if (is_array($method_or_id) and !is_array($options))
       {
-        $options =& $scope;
-        $scope = ':all';
+        $options =& $method_or_id;
+        $method = ':all';
       }
       else
       {
         $options = array(
-          'conditions' => array($this->primary_key => $scope),
+          'conditions' => array($this->primary_key => $method_or_id),
         );
-        $scope = ':first';
+        $method = ':first';
       }
+    }
+    else {
+      $method = $method_or_id;
     }
     
     # optimization(s)
-    if ($scope == ':first' and !isset($options['limit'])) {
+    if ($method == ':first' and !isset($options['limit'])) {
       $options['limit'] = 1;
     }
     
@@ -334,7 +337,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     $sql = $this->build_sql_from_options(&$options);
     
     $model = get_class($this);
-    switch($scope)
+    switch($method)
     {
       case ':all':
         $results = $this->db->select_all($sql);
