@@ -40,7 +40,7 @@ class Test_ActiveSupport_Array extends Unit_Test
     array_sort_recursive($test);
     $this->assert_equal("one dimension", $test, array(array('b' => 'd', 'a' => 'e'), 'b', 'c'));
   }
-  
+  /*
   function test_linearize_options_tree()
   {
     $includes = array('tags', 'comments' => array('order' => 'created_at asc'));
@@ -51,6 +51,7 @@ class Test_ActiveSupport_Array extends Unit_Test
     $includes = linearize_options_tree($includes);
     $this->assert_equal('recursive', $includes, array('tags' => array(), 'comments' => array('order' => 'created_at asc', 'include' => array('user' => array()))));
   }
+  */
 }
 
 new Test_ActiveSupport_Array();

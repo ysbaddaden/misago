@@ -86,6 +86,7 @@ function array_sort_recursive(&$ary)
   }
 }
 
+/*
 # Transforms an array with mixed keys (array and hash) into a full hash one.
 # 
 # Example:
@@ -114,5 +115,5 @@ function linearize_options_tree($ary)
   }
   return $h;
 }
-
+*/
 ?>
