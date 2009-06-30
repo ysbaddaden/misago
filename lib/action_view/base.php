@@ -59,30 +59,46 @@ class ActionView_Base extends Object
   
   # Renders a template (view, layout or partial).
   # 
-  # Generic option(s):
+  # = Generic option(s):
   # 
   # - format: which format to use? defaults to 'html'
-  # 
-  # Render a view:
+  #
+  # = Render a view:
   # 
   #   render(array('action' => 'index'));
   # 
-  # Render a view inside a layout:
+  # This will render the view 'index.html.tpl'.
+  # 
+  # = Render a view inside a layout:
   # 
   #   render(array('action' => 'index', 'layout' => 'products'));
   # 
-  # Render a partial:
+  # This will render the view 'index.html.tpl' inside the layout 'products.html.tpl'.
+  # 
+  # = Render a partial:
   # 
   #   render(array('partial' => 'form'));
   #   render(array('partial' => 'form', 'locals' => array('f' => $f)));
   # 
-  # Render a collection of partials:
+  # This will render the partial '_form.html.tpl'.
+  # 
+  # = Render a collection of partials:
   # 
   #   render(array('partial' => 'product', 'collection' => $products));
-  #   
+  # 
   # The collection must be an array or an iterable object.
-  # It creates the following local vars: $product and $product_counter.
-  #
+  # This will create the following local vars: $product and $product_counter.
+  # 
+  # = Rendering shared partials
+  # 
+  # You may share partials between controllers.
+  # 
+  #   render(array('partial' => 'posts/post'));
+  #   render(array('partial' => 'posts/post', 'collection' => $posts));
+  # 
+  # This will render the partial 'posts/_post.html.tpl', regardless of
+  # which controller this is being called from.
+  # 
   function render($options)
   {
     # locals
