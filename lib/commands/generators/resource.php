@@ -1,6 +1,5 @@
 <?php
 
-# IMPROVE: Generate YAML fixtures.
 # @package Generator
 class Generator_Resource extends Generator_Base
 {
@@ -36,7 +35,7 @@ class Generator_Resource extends Generator_Base
     $this->create_directory('app/models');
     $this->create_directory('test/functional');
     $this->create_directory('test/unit');
-#   $this->create_directory('test/fixtures');
+    $this->create_directory('test/fixtures');
     
     # controller
     $this->create_file_from_template("app/controllers/{$filename}_controller.php",      'resource/controller.php', &$vars);
@@ -46,7 +45,7 @@ class Generator_Resource extends Generator_Base
     # model
     $this->create_file_from_template("app/models/{$model_filename}.php",     'resource/model.php',      &$vars);
     $this->create_file_from_template("test/unit/test_{$model_filename}.php", 'resource/test_model.php', &$vars);
-#   $this->create_file_from_template("test/fixtures/{$table}.yml",           'resource/fixture.yml',    &$vars);
+    $this->create_file_from_template("test/fixtures/{$table}.yml",           'resource/fixture.yml',    &$vars);
     
     # migration
     $migration_filename = gmdate('YmdHis').'_create_'.$table;
