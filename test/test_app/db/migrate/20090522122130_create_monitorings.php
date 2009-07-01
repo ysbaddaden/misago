@@ -18,6 +18,7 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t->add_column('length_string',   'string', array('limit' => 20));
     $t->add_column('length_string2',  'string', array('limit' => 20));
     $t->add_column('length_is',       'string', array('limit' => 40));
+    $t->add_column('length_is2',      'string', array('limit' => 50));
     $t->add_column('length_minmax',   'integer');
     $t->add_column('length_within',   'integer');
     $t->add_column('length_date',     'date');

@@ -6,7 +6,6 @@
 # @subpackage Validations
 # 
 # TODO: Test validates_associated.
-# TODO: Test custom error messages for validates_length_of().
 #
 abstract class ActiveRecord_Validations extends ActiveRecord_Associations
 {
@@ -198,14 +197,14 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     }
     
     # validation
-    if (isset($options['minimum']) and $length < $options['minimum']) {
-      $message = 'too_short';
+    if (isset($options['is']) and $length != $options['is']) {
+      $message = 'wrong_length';
     }
     elseif (isset($options['maximum']) and $length > $options['maximum']) {
       $message = 'too_long';
     }
-    elseif (isset($options['is']) and $length != $options['is']) {
-      $message = 'wrong_length';
+    elseif (isset($options['minimum']) and $length < $options['minimum']) {
+      $message = 'too_short';
     }
     
     # reports error

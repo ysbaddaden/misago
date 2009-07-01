@@ -218,7 +218,6 @@ class ActionController_Routing extends Object
    * 
    * IMPROVE: Recognize keys' special requirements (?)
    * TODO: Handle :format if defined in route path or in mapping.
-   * TODO: Generate root_path() function.
    */
   function build_path_and_url_helpers()
   {

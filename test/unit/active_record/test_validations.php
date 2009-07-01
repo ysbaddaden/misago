@@ -75,11 +75,13 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $this->assert_true("string2 is too short", $monit->errors->is_invalid('length_string2'));
     
     
-    $monit = $monit->create(array('length_minmax' => 10));
+    $monit = $monit->create(array('length_minmax' => 10, 'too_short' => 'too little'));
     $this->assert_true("integer is too short", $monit->errors->is_invalid('length_minmax'));
+    $this->assert_equal("custom error message: too short", $monit->errors->on('length_minmax'), "Too small");
     
-    $monit = $monit->create(array('length_minmax' => 3209));
+    $monit = $monit->create(array('length_minmax' => 3209, 'too_long' => 'too big'));
     $this->assert_true("integer is too long", $monit->errors->is_invalid('length_minmax'));
+    $this->assert_equal("custom error message: too long", $monit->errors->on('length_minmax'), "Too big");
     
     
     $monit = $monit->create(array('length_is' => str_repeat('A', 40)));
@@ -87,6 +89,10 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     
     $monit = $monit->create(array('length_is' => str_repeat('A', 30)));
     $this->assert_true("string is wrong length", $monit->errors->is_invalid('length_is'));
+    $this->assert_equal("generic error message: wrong length", $monit->errors->on('length_is'), "Length is is wrong length");
+    
+    $monit = $monit->create(array('length_is2' => str_repeat('A', 60)));
+    $this->assert_equal("custom error message: wrong length", $monit->errors->on('length_is2'), "Your miss");
     
     
     $monit = $monit->create(array('length_within' => 60));
@@ -104,9 +110,12 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     
     $monit = $monit->create(array('length_date' => '2008-05-01'));
     $this->assert_true("date is below minimum", $monit->errors->is_invalid('length_date'));
+    $this->assert_equal("generic error message: too short", $monit->errors->on('length_date'), "Length date is too short");
     
     $monit = $monit->create(array('length_date' => '2010-05-01'));
     $this->assert_true("date is over maximum", $monit->errors->is_invalid('length_date'));
+    $this->assert_equal("generic error message: too long", $monit->errors->on('length_date'), "Length date is too long");
+    
   }
   
   function test_validate_inclusion_of()

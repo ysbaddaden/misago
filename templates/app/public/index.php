@@ -2,9 +2,6 @@
 
 require dirname(__FILE__).'/../config/boot.php';
 
-# TODO: Analyze host to permit creation of URL
-#$host = ActionController_analyse_host();
-
 try
 {
   $method = isset($_POST['_method']) ? strtoupper($_POST['_method']) : $_SERVER['REQUEST_METHOD'];

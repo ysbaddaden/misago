@@ -8,8 +8,9 @@ class Monitoring extends ActiveRecord_Base
     
     $this->validate_length_of('length_string');
     $this->validate_length_of('length_string2', array('minimum' => 5));
-    $this->validate_length_of('length_minmax',  array('minimum' => 20, 'maximum' => 2500));
+    $this->validate_length_of('length_minmax',  array('minimum' => 20, 'maximum' => 2500, 'too_short' => 'Too small', 'too_long' => 'Too big'));
     $this->validate_length_of('length_is',      array('is' => 40));
+    $this->validate_length_of('length_is2',     array('is' => 50, 'wrong_length' => 'Your miss'));
     $this->validate_length_of('length_within',  array('within' => '18..99'));
     $this->validate_length_of('length_date',    array('minimum' => '2009-04-15', 'maximum' => '2010-04-15'));
     
