@@ -40,8 +40,9 @@ require ROOT.'/config/environment.php';
 require 'i18n.php';
 I18n::startup();
 
-require 'action_controller/dispatcher.php';
+require 'action_controller/functions.php';
 require ROOT.'/config/routes.php';
+ActionController_HostAnalyzer();
 
 
 function __autoload($class)

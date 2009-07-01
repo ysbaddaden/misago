@@ -1,8 +1,11 @@
 <?php
-/**
- * 
- * @package ActionController
- */
+# Dispatches the current request.
+# 
+# This will route the request, make some preparations
+# (eg: build route functions)build controller and run
+# the action.
+# 
+# @package ActionController
 function ActionController_dispatch($method, $uri)
 {
   # route
@@ -38,6 +41,20 @@ function ActionController_dispatch($method, $uri)
   }
   else {
     throw new MisagoException("No such controller: {$class}", 404);
+  }
+}
+
+# Analyzes host, in order to produce some URL.
+# 
+# @package ActionController
+function ActionController_HostAnalyzer()
+{
+  if (isset($_SERVER['HTTP_HOST']))
+  {
+    $protocol  = isset($_SERVER['HTTPS']) ? 'https' : 'http';
+    $host      = $_SERVER['HTTP_HOST'];
+    $base_path = isset($_SERVER['REDIRECT_URI']) ? dirname($_SERVER['REDIRECT_URI']) : '/';
+    cfg::set('base_url', "{$protocol}://{$host}{$base_path}");
   }
 }
 
