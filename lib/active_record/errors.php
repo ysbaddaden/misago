@@ -88,6 +88,8 @@ class ActiveRecord_Errors
   
   # Returns error messages for associated record attribute.
   # Returns null if there is no error.
+  # 
+  # TODO: Try to translate in ActiveRecord's contexts ('active_record.errors.models.<model>.attributes.<attribute>' & 'active_record.errors.models.<model>'), before translating in the generic one ('active_record.errors.messages').
   function on($attribute)
   {
     if (!empty($this->messages[$attribute]))
@@ -95,9 +97,17 @@ class ActiveRecord_Errors
       foreach($this->messages[$attribute] as $i => $msg)
       { 
         if (is_symbol($msg)) {
-          $msg = t(substr($msg, 1), 'active_record.errors.messages');
+          $msg = substr($msg, 1);
         }
-        $this->messages[$attribute][$i] = str_replace("{{attribute}}", String::humanize($attribute), $msg);
+        $this->messages[$attribute][$i] = I18n::translate($msg, array(
+          'context' => 'active_record.errors.messages',
+#          'context' => array(
+#            "active_record.errors.models.$model.attributes.$attribute",
+#            "active_record.errors.models.$model",
+#            'active_record.errors.messages',
+#          ),
+          'attribute' => String::humanize($attribute)
+        ));
       }
       return (count($this->messages[$attribute]) > 1) ?
         $this->messages[$attribute] : $this->messages[$attribute][0];

@@ -1,17 +1,28 @@
 <?php
 
 # Shortcut for I18n::translate();
-function t($str, $ctx=null, $options=null)
+# 
+# Examples:
+# 
+#   t($string, $context);
+#   t($string, array('context' => $context));
+#   t($string, array('context' => $context, 'foo' => 'bar'));
+# 
+function t($str, $options=null)
 {
-  $options['ctx'] = $ctx;
+  if (!is_array($options) and !empty($options)) {
+    $options = array('context' => $options);
+  }
   return I18n::translate($str, &$options);
 }
 
 # Handles translations of strings.
 # 
 # TODO: I18n::available_locales();
-# TODO: Implement interpolation. ie. t("foo {{bar}}", array('bar' => 'baz'))
 # TODO: Implement pluralization. ie. t(array("post", "posts"), array('count' => 1))
+# 
+# Check http://iain.nl/tag/i18n/ for Rails' I18n explanations.
+# 
 class I18n
 {
   static private $locale       = 'en';
@@ -39,18 +50,64 @@ class I18n
     self::load_translations(self::$locale);
   }
   
-  # Finds the translation for a string, in a particular (or global) context.
+  # Finds the translation for a string.
+  # 
+  # =Context
+  # 
+  # You may specify a particular context to search the translation in.
+  # Either as passing the 'context' option, or by prepending the
+  # string in the following way: `context.string`
+  # 
+  # You may have subcontexts, like: `active_record.error.messages.empty`
+  # 
+  # =Pluralization [todo]
+  # 
+  # In case there are many translations available, depending on
+  # a particular number, you may use the 'count' option to
+  # determine which one is to be used.
+  # 
+  # Example:
+  # 
+  #   $strings = array(
+  #     'There is {{count}} message',
+  #     'There are {{count}} messages',
+  #   );
+  #   I18n::translate($strings, array('count' => 1));  # => There is 1 message
+  #   I18n::translate($strings, array('count' => 29)); # => There are 29 messages
+  # 
+  # =Interpolation
+  # 
+  # Any other option, plus the `count` option, will be used for interpolating
+  # variables in the string.
+  # 
+  # Example:
+  # 
+  #   I18n::translate('{{user_name}} sent you a message', array('user_name' => 'James'));
+  #   # => James sent you a message
+  # 
   static function translate($str, $options=null)
   {
-    $ctx = isset($options['ctx']) ? $options['ctx'] : null;
+    $ctx = isset($options['context']) ? $options['context'] : null;
     $key = empty($ctx) ? $str : "$ctx.$str";
     
-    if (isset(self::$translations[self::$locale][$key])) {
-      return self::$translations[self::$locale][$key];
+    if (isset(self::$translations[self::$locale][$key]))
+    {
+      $translation = self::$translations[self::$locale][$key];
+      
+      if (is_array($options))
+      {
+        $vars = array();
+        foreach($options as $k => $v) {
+          $vars['{{'.$k.'}}'] = $v;
+        }
+        return strtr($translation, $vars);
+      }
+      
+      return $translation;
     }
-    else {
-      trigger_error("Missing translation for \"$str\"".(($str !== null) ? " in context '$ctx'" : '').".", E_USER_NOTICE);
-    }
+#    else {
+#      trigger_error("Missing translation for \"$str\"".(($str !== null) ? " in context '$ctx'" : '').".", E_USER_NOTICE);
+#    }
     return $str;
   }
   

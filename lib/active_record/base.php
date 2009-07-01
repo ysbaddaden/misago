@@ -146,7 +146,7 @@
 #   $post->delete_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
 # 
 # ===destroy
-#
+# 
 #   $post = new Post(5);
 #   $post->destroy();
 # 
@@ -163,7 +163,7 @@
 # special protected methods: before_delete() and after_delete(). That
 # way it's possible to do whatever you want before and after deleting
 # an entry from database.
-#
+# 
 # Remember that only delete has callbacks. Destroy has no such methods.
 # 
 # 
@@ -171,7 +171,8 @@
 # 
 # TODO: Implement calculations.
 # TODO: Named scopes.
-#
+# TODO: Implement human_attribute_name($attribute), with translation within 'active_record.attributes.<model>' context.
+# 
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
   protected $db;
