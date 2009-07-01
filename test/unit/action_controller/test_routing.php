@@ -300,47 +300,82 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_true('show_product_path()', function_exists('show_product_path'));
     $this->assert_true('products_path()',     function_exists('products_path'));
     
+    $this->assert_true('show_product_url()', function_exists('show_product_url'));
+    $this->assert_true('products_url()',     function_exists('products_url'));
+    
     $this->assert_equal('/products',    (string)products_path(), '/products/index');
     $this->assert_equal('/product/123', (string)show_product_path(array(':id' => 123)), '/product/123');
     $this->assert_equal('/product/123', (string)show_product_path(array(':id' => 123, ':format' => 'html')), '/product/123.html');
     
+    $this->assert_equal('/products',    (string)products_url(), 'http://localhost:3009/products/index');
+    $this->assert_equal('/product/123', (string)show_product_url(array(':id' => 123)), 'http://localhost:3009/product/123');
+    $this->assert_equal('/product/123', (string)show_product_url(array(':id' => 456, ':format' => 'html')), 'http://localhost:3009/product/456.html');
+    
     $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_path(array(':id' => 'Julien')), '/say/hello_who/Julien');
     $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_path(array(':id' => 'Julien', ':format' => 'xml')), '/say/hello_who/Julien.xml');
     
-#    $this->assert_true('show_product_url()',  function_exists('show_product_url'));
-#    $this->assert_equal('/say/hello_who/Julien', hello_who_say_url(array(':id' => 'Julien')), '/say/hello_who/Julien');
+    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_url(array(':id' => 'Julien')), 'http://localhost:3009/say/hello_who/Julien');
+    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_url(array(':id' => 'Julien', ':format' => 'xml')), 'http://localhost:3009/say/hello_who/Julien.xml');
 
     $map->reset();
     $map->resource('users');
     $map->build_path_and_url_helpers();
     
     $expected = new ActionController_Path('GET', 'users');
-    $this->assert_equal('GET /users', users_path(array(':id' => 1)), $expected);
+    $this->assert_equal('GET /users', users_path(), $expected);
+    $expected = new ActionController_Url('GET', 'users');
+    $this->assert_equal('GET /users', users_url(), $expected);
     
     $expected = new ActionController_Path('GET', 'users/1');
     $this->assert_equal('GET /users/1', show_user_path(array(':id' => 1)), $expected);
+    $expected = new ActionController_Url('GET', 'users/1');
+    $this->assert_equal('GET /users/1', show_user_url(array(':id' => 1)), $expected);
     
     $expected = new ActionController_Path('GET', 'users/new');
     $this->assert_equal('GET /users/new', new_user_path(), $expected);
+    $expected = new ActionController_Url('GET', 'users/new');
+    $this->assert_equal('GET /users/new', new_user_url(), $expected);
     
     $expected = new ActionController_Path('GET', 'users/1/edit');
     $this->assert_equal('GET /users/1/edit', edit_user_path(array(':id' => 1)), $expected);
+    $expected = new ActionController_Url('GET', 'users/1/edit');
+    $this->assert_equal('GET /users/1/edit', edit_user_url(array(':id' => 1)), $expected);
     
     $expected = new ActionController_Path('POST', 'users');
     $this->assert_equal('POST /users', create_user_path(), $expected);
+    $expected = new ActionController_Url('POST', 'users');
+    $this->assert_equal('POST /users', create_user_url(), $expected);
     
     $expected = new ActionController_Path('PUT', 'users/1');
     $this->assert_equal('PUT /users/1', update_user_path(array(':id' => 1)), $expected);
+    $expected = new ActionController_Url('PUT', 'users/1');
+    $this->assert_equal('PUT /users/1', update_user_url(array(':id' => 1)), $expected);
     
     $expected = new ActionController_Path('DELETE', 'users/1');
     $this->assert_equal('DELETE /users/1', delete_user_path(array(':id' => 1)), $expected);
+    $expected = new ActionController_Url('DELETE', 'users/1');
+    $this->assert_equal('DELETE /users/1', delete_user_url(array(':id' => 1)), $expected);
     
     
     $expected = new ActionController_Path('GET', 'users/45/edit');
     $this->assert_equal('edit_user_path(:id)', edit_user_path(45), $expected);
+    $expected = new ActionController_url('GET', 'users/45/edit');
+    $this->assert_equal('edit_user_url(:id)', edit_user_url(45), $expected);
     
     $expected = new ActionController_Path('GET', 'users/72');
     $this->assert_equal('show_user_path(:id)', show_user_path(72), $expected);
+    $expected = new ActionController_Url('GET', 'users/72');
+    $this->assert_equal('show_user_url(:id)', show_user_url(72), $expected);
+    
+    $map->reset();
+    $map->root(array(':controller' => 'welcome'));
+    $map->build_path_and_url_helpers();
+    
+    $this->assert_true('root_path() exists', function_exists('root_path'));
+    $this->assert_true('root_url() exists',  function_exists('root_url'));
+    
+    $this->assert_equal('/', (string)root_path(), '/');
+    $this->assert_equal('/', (string)root_url(), 'http://localhost:3009/');
   }
 }
 

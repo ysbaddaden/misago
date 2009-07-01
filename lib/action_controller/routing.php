@@ -219,7 +219,6 @@ class ActionController_Routing extends Object
    * IMPROVE: Recognize keys' special requirements (?)
    * TODO: Handle :format if defined in route path or in mapping.
    * TODO: Generate root_path() function.
-   * TODO: Generate *_url() functions.
    */
   function build_path_and_url_helpers()
   {
@@ -231,6 +230,14 @@ class ActionController_Routing extends Object
       
       foreach($this->routes as $route)
       {
+        if (empty($route['path']))
+        {
+          $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
+          $functions["root_path"] = $this->build_path_function('root', &$route, $route['mapping'][':controller'], $action, 'path');
+          $functions["root_url"]  = $this->build_path_function('root', &$route, $route['mapping'][':controller'], $action, 'url');
+          continue;
+        }
+        
         if (isset($route['mapping'][':controller']))
         {
           # explicit controller
@@ -265,10 +272,12 @@ class ActionController_Routing extends Object
             $func_base_name = ($action == 'index') ? $controller :
               (($action == 'neo') ? "new_{$model}" : "{$action}_{$model}");
             
-            if (isset($functions["{$func_base_name}_path"])) {
-              continue;
+            if (!isset($functions["{$func_base_name}_path"])) {
+              $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action, 'path');
             }
-            $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action);
+            if (!isset($functions["{$func_base_name}_url"])) {
+              $functions["{$func_base_name}_url"] = $this->build_path_function($func_base_name, &$route, $controller, $action, 'url');
+            }
           }
         }
       }
@@ -279,9 +288,9 @@ class ActionController_Routing extends Object
     include TMP.'/built_path_and_url_helpers.php';
   }
   
-  private function build_path_function($func_base_name, $route, $controller, $action)
+  private function build_path_function($func_base_name, $route, $controller, $action, $type='path')
   {
-    $func = "function {$func_base_name}_path(\$keys=array())\n{\n".
+    $func = "function {$func_base_name}_{$type}(\$keys=array())\n{\n".
       "  if (!is_array(\$keys)) {\n".
       "    \$keys = array(':id' => \$keys);\n".
       "  }\n";
@@ -299,21 +308,11 @@ class ActionController_Routing extends Object
       "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
     
     $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
-    $func .= "  return new ActionController_Path('{$method}', \$path);\n";
+    $func .= "  return new ActionController_".String::camelize($type)."('{$method}', \$path);\n";
     $func .= "}";
     
     return $func;
   }
-  
-  /*
-  private function build_url_function($func_base_name)
-  {
-    $func  = "function {$func_base_name}_url(\$keys=array()) {\n";
-    $func .= "  return '/'.{$func_base_name}_path(\$keys);\n";
-    $func .= "}";
-    return $func;
-  }
-  */
   
   private function & get_list_of_controllers()
   {
@@ -381,6 +380,25 @@ class ActionController_Path
   function __toString()
   {
     return $this->path;
+  }
+}
+
+# Transparently handles URL (with HTTP method and URI).
+# @package ActionController
+class ActionController_Url
+{
+  public $method;
+  public $uri;
+  
+  function __construct($method, $uri)
+  {
+    $this->method = $method;
+    $this->uri    = cfg::get('base_url').$uri;
+  }
+  
+  function __toString()
+  {
+    return $this->uri;
   }
 }
 
