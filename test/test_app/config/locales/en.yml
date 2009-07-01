@@ -9,4 +9,7 @@ en:
   toto: "Toto"
   "invalid title": "Title is invalid"
   invalid: "{{attribute}} is invalid"
+  interpolation: "foo {{bar}}"
+  messages:
+    foo: "foo {{bar}}"
 

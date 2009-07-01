@@ -6,7 +6,7 @@
 # 
 #   t($string, $context);
 #   t($string, array('context' => $context));
-#   t($string, array('context' => $context, 'foo' => 'bar'));
+#   t("foor {{bar}}", array('context' => $context, 'bar' => 'baz'));
 # 
 function t($str, $options=null)
 {
@@ -52,6 +52,8 @@ class I18n
   
   # Finds the translation for a string.
   # 
+  # Returns the string unstranslated if no translation is found.
+  # 
   # =Context
   # 
   # You may specify a particular context to search the translation in.
@@ -60,7 +62,7 @@ class I18n
   # 
   # You may have subcontexts, like: `active_record.error.messages.empty`
   # 
-  # =Pluralization [todo]
+  # =Pluralization [todo, specification unfinished]
   # 
   # In case there are many translations available, depending on
   # a particular number, you may use the 'count' option to
@@ -87,6 +89,13 @@ class I18n
   # 
   static function translate($str, $options=null)
   {
+    $translation = self::do_translate($str, $options);
+    return ($translation !== null) ? $translation : $str;
+  }
+  
+  # Same as I18n::translate(), but returns null if no translation is found.
+  static function do_translate($str, $options=null)
+  {
     $ctx = isset($options['context']) ? $options['context'] : null;
     $key = empty($ctx) ? $str : "$ctx.$str";
     
@@ -96,21 +105,17 @@ class I18n
       
       if (is_array($options))
       {
+        # interpolation
         $vars = array();
         foreach($options as $k => $v) {
           $vars['{{'.$k.'}}'] = $v;
         }
         return strtr($translation, $vars);
       }
-      
       return $translation;
     }
-#    else {
-#      trigger_error("Missing translation for \"$str\"".(($str !== null) ? " in context '$ctx'" : '').".", E_USER_NOTICE);
-#    }
-    return $str;
+    return null;
   }
-  
   
   static private function load_translations($locale)
   {
