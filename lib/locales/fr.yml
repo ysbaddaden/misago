@@ -1,0 +1,15 @@
+fr:
+  active_record:
+    errors:
+      messages:
+        required: "{{attribute}} est requis"
+        blank: "{{attribute}} ne peut être vide"
+        empty: "{{attribute}} ne peut être vide"
+        invalid: "{{attribute}} est invalide"
+        too_short: "{{attribute}} est trop court"
+        too_long: "{{attribute}} est trop long"
+        wrong_length: "{{attribute}} n'est pas de la bonne taille"
+        not_included: "{{attribute}} n'est pas présent dans la liste'"
+        reserved: "La valeur de {{attribute}} est réservée"
+        taken: "{{attribute}} est déjà pris"
+
