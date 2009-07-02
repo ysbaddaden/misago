@@ -536,6 +536,16 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal('result must be ordered (b)', $orders[0]->baskets[1]->id, 1);
     $this->assert_equal('result must be ordered (c)', $orders[0]->baskets[2]->id, 3);
   }
+  
+  function test_human_name()
+  {
+    
+  }
+  
+  function test_human_attribute_name()
+  {
+    
+  }
 }
 
 new Test_ActiveRecord_Base();

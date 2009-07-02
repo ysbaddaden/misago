@@ -107,7 +107,14 @@ class String extends Inflections
   # TODO: Capitalizes the first word and turns underscores into spaces and strips a trailing "_id".
 	static function humanize($str)
 	{
+	  $str = preg_replace('/_id$/', '', $str);
 	  return ucfirst(str_replace('_', ' ', String::underscore($str)));
+	}
+	
+  # TODO: Replaces accented characters with their ascii equivalents.
+	static function transliterate($str)
+	{
+	  return $str;
 	}
 }
 

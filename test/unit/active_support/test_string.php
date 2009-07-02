@@ -60,6 +60,8 @@ class Test_String extends Unit_Test
     $this->assert_equal('', String::humanize('UserAgreement'), 'User agreement');
     $this->assert_equal('', String::humanize('User Agreement'), 'User agreement');
     $this->assert_equal('', String::humanize('User test'), 'User test');
+
+    $this->assert_equal('', String::humanize('author_id'), 'Author');
   }
 }
 
