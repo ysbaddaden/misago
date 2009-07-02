@@ -5,7 +5,9 @@ en:
     
     attributes:
       monitoring:
-        length_is: "Fixed length"
+        length_string2: "My length"
+      product:
+        price: "Price of product"
     
     errors:
       messages:
@@ -20,7 +22,7 @@ en:
     products:
       errors:
         null: "{{attribute}} can't be null"
-        
+  
   toto: "Toto"
   invalid: "{{attribute}} is invalid"
   "invalid title": "Title is invalid"

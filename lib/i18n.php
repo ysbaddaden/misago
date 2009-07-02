@@ -21,7 +21,7 @@ function t($str, $options=null)
 # TODO: Implement pluralization.
 # IMPROVE: Possibility to separate translations in a directory structure (ie. following the context).
 # 
-# Check http://iain.nl/tag/i18n/ for Rails' I18n explanations.
+# Check http://iain.nl/2008/09/translating-activerecord/ for Rails' I18n explanations.
 # 
 class I18n
 {

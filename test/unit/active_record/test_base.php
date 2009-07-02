@@ -551,7 +551,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $monitoring = new Monitoring();
     $this->assert_equal('defaults to humanize()', $monitoring->human_attribute_name('title'), 'Title');
     $this->assert_equal('defaults to humanize()', $monitoring->human_attribute_name('length_string'), 'Length string');
-    $this->assert_equal('specified translation',  $monitoring->human_attribute_name('length_is'), 'Fixed length');
+    $this->assert_equal('specified translation',  $monitoring->human_attribute_name('length_string2'), 'My length');
   }
 }
 

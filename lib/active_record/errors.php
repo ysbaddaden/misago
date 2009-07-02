@@ -112,7 +112,7 @@ class ActiveRecord_Errors
         }
         
         $options = array(
-          'attribute' => String::humanize($attribute),
+          'attribute' => isset($this->model) ? $this->model->human_attribute_name($attribute) : String::humanize($attribute),
         );
         if (isset($this->model_name))
         {

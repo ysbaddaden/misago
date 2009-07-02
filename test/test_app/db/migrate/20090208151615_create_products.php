@@ -8,8 +8,8 @@ class CreateProduct extends ActiveRecord_Migration
     
     $t->add_column('name',  'string', array('null' => false, 'limit' => 100));
     $t->add_column('price', 'double', array('null' => false, 'signed' => false));
-    
     $t->add_timestamps();
+    
     return $t->create();
   }
   

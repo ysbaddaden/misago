@@ -19,7 +19,7 @@ class form
       $text = null;
     }
     if ($text === null) {
-      $text = String::humanize($column);
+      $text = $object->human_attribute_name($column);
     }
     list($name, $attributes['for']) = self::format_name_and_id($object, $column, $attributes);
     return html::label($name, $text, $attributes);

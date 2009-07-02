@@ -27,7 +27,7 @@ class Monitoring extends ActiveRecord_Base
       'message' => 'This is bad.',
     ));
     $this->validate_exclusion_of('exclusion_integer', array('in' => array(1, 3, 6)));
-  
+    
     $this->validate_uniqueness_of('title');
 	  $this->validate_uniqueness_of('email', array('message' => 'Too late.'));
 	  

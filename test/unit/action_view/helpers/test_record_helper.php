@@ -27,11 +27,14 @@ class Test_ActionView_Helper_Record extends Unit_TestCase
   {
     $f = fields_for('Product');
     $this->assert_equal("", $f->label('available'), '<label for="product_available">Available</label>');
-    $this->assert_equal("", $f->label('title'),     '<label for="product_title">Title</label>');
+    $this->assert_equal("", $f->label('title'), '<label for="product_title">Title</label>');
+    
     $this->assert_equal("", $f->label('username', 'User name'), '<label for="product_username">User name</label>');
     $this->assert_equal("", $f->label('username', 'User name', array('class' => 'username')), '<label class="username" for="product_username">User name</label>');
     $this->assert_equal("", $f->label('username', null, array('class' => 'username')), '<label class="username" for="product_username">Username</label>');
     $this->assert_equal("", $f->label('username', array('class' => 'username')), '<label class="username" for="product_username">Username</label>');
+    
+    $this->assert_equal("", $f->label('price'), '<label for="product_price">Price of product</label>');
   }
   
   function test_hidden_field()

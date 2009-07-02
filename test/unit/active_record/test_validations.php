@@ -26,7 +26,8 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     
     unset($product->price);
     $this->assert_false('', $product->is_valid());
-    $this->assert_equal('', $product->errors->on('price'), "Price cannot be blank");
+    $this->assert_equal('I18n translated attribute name in error message',
+      $product->errors->on('price'), "Price of product cannot be blank");
     
     $product = new Product();
     $product->name = 'pwerti';
