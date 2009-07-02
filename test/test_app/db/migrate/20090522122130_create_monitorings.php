@@ -33,6 +33,10 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t->add_column('exclusion_string',  'string');
     $t->add_column('exclusion_integer', 'integer');
     
+    # translation of messages per model/attribute
+    $t->add_column('title2', 'string');
+    $t->add_column('title3', 'string');
+    
     return $t->create();
   }
   

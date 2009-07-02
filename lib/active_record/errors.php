@@ -7,8 +7,19 @@
  */
 class ActiveRecord_Errors
 {
-  private $base_messages   = array();
-  private $messages        = array();
+  private $base_messages = array();
+  private $messages      = array();
+  private $model;
+  private $model_name;
+  
+  function __construct($model=null)
+  {
+    if ($model !== null)
+    {
+      $this->model = $model;
+      $this->model_name = String::underscore(get_class($model));
+    }
+  }
   
   function __get($attribute)
   {
@@ -89,7 +100,7 @@ class ActiveRecord_Errors
   # Returns error messages for associated record attribute.
   # Returns null if there is no error.
   # 
-  # TODO: Try to translate in ActiveRecord's contexts ('active_record.errors.models.<model>.attributes.<attribute>' & 'active_record.errors.models.<model>'), before translating in the generic one ('active_record.errors.messages').
+  # TODO: Test translation in different error messages contexts available.
   function on($attribute)
   {
     if (!empty($this->messages[$attribute]))
@@ -99,15 +110,31 @@ class ActiveRecord_Errors
         if (is_symbol($msg)) {
           $msg = substr($msg, 1);
         }
-        $this->messages[$attribute][$i] = I18n::translate($msg, array(
-          'context' => 'active_record.errors.messages',
-#          'context' => array(
-#            "active_record.errors.models.$model.attributes.$attribute",
-#            "active_record.errors.models.$model",
-#            'active_record.errors.messages',
-#          ),
-          'attribute' => String::humanize($attribute)
-        ));
+        
+        $options = array(
+          'attribute' => String::humanize($attribute),
+        );
+        if (isset($this->model_name))
+        {
+          $options['context'] = "active_record.errors.models.{$this->model_name}.attributes.$attribute";
+          $translation = I18n::do_translate($msg, $options);
+          if ($translation === null)
+          {
+            $options['context'] = "active_record.errors.models.{$this->model_name}";
+            $translation = I18n::do_translate($msg, $options);
+            if ($translation === null)
+            {
+              $options['context'] = 'active_record.errors.messages';
+              $translation = I18n::translate($msg, $options);
+            }
+          }
+        }
+        else
+        {
+          $options['context'] = 'active_record.errors.messages';
+          $translation = I18n::translate($msg, $options);
+        }
+        $this->messages[$attribute][$i] = $translation;
       }
       return (count($this->messages[$attribute]) > 1) ?
         $this->messages[$attribute] : $this->messages[$attribute][0];

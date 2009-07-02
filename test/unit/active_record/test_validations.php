@@ -209,7 +209,6 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
     $monit = $monit->create(array('email' => 'root@server3.net'));
     $this->assert_true("duplicate email", $monit->errors->is_invalid('email'));
     $this->assert_equal("customized message", $monit->errors->on('email'), 'Too late.');
-    
   }
 }
 

@@ -5,7 +5,7 @@ $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
-class Test_ActiveRecord_Errors extends Unit_Test
+class Test_ActiveRecord_Errors extends Unit_TestCase
 {
   function test_add()
   {
@@ -163,6 +163,17 @@ class Test_ActiveRecord_Errors extends Unit_Test
     
     $errors->clear();
     $this->assert_equal('errors where cleared', $errors->full_messages(), array());
+  }
+  
+  function test_translated_error_messages()
+  {
+    $errors = new ActiveRecord_Errors(new Monitoring());
+    
+    $errors->add('title2', ':required');
+    $this->assert_equal('attribute as its own translation', $errors->on('title2'), 'please fill this');
+    
+    $errors->add('title3', ':required');
+    $this->assert_equal('model has its own translation', $errors->on('title3'), 'Title3 in monitoring cannot be blank');
   }
 }
 

@@ -14,7 +14,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   function __get($attribute)
   {
     if ($attribute == 'errors') {
-      return $this->errors = new ActiveRecord_Errors();
+      return $this->errors = new ActiveRecord_Errors($this);
     }
     return parent::__get($attribute);
   }
