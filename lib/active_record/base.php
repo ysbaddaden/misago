@@ -171,7 +171,6 @@
 # 
 # TODO: Implement calculations.
 # TODO: Named scopes.
-# TODO: Implement human_attribute_name($attribute), with translation within 'active_record.attributes.<model>' context.
 # 
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
@@ -270,6 +269,22 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       }
     }
     return $attributes;
+  }
+  
+  # TODO: test human_name();
+  function human_name()
+  {
+    $model = String::underscore(get_class($this));
+    $human_name = I18n::do_translate($model, array('context' => "active_record.models"));
+    return String::humanize($human_name);
+  }
+  
+  # TODO: test human_attribute_name();
+  function human_attribute_name($attribute)
+  {
+    $model = String::underscore(get_class($this));
+    $human_name = I18n::do_translate($attribute, array('context' => "active_record.attributes.$model"));
+    return String::humanize($human_name);
   }
   
   /**
