@@ -1,5 +1,12 @@
 en:
   active_record:
+    models:
+      monitoring: "Guardian"
+    
+    attributes:
+      monitoring:
+        length_is: "Fixed length"
+    
     errors:
       messages:
         blank: "{{attribute}} cannot be blank"
@@ -9,13 +16,15 @@ en:
           attributes:
             title2:
               required: "please fill this"
+    
     products:
       errors:
         null: "{{attribute}} can't be null"
         
   toto: "Toto"
-  "invalid title": "Title is invalid"
   invalid: "{{attribute}} is invalid"
+  "invalid title": "Title is invalid"
+  
   interpolation: "foo {{bar}}"
   messages:
     foo: "foo {{bar}}"

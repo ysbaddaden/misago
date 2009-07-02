@@ -275,7 +275,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   function human_name()
   {
     $model = String::underscore(get_class($this));
-    $human_name = I18n::do_translate($model, array('context' => "active_record.models"));
+    $human_name = I18n::translate($model, array('context' => "active_record.models"));
     return String::humanize($human_name);
   }
   
@@ -283,7 +283,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   function human_attribute_name($attribute)
   {
     $model = String::underscore(get_class($this));
-    $human_name = I18n::do_translate($attribute, array('context' => "active_record.attributes.$model"));
+    $human_name = I18n::translate($attribute, array('context' => "active_record.attributes.$model"));
     return String::humanize($human_name);
   }
   

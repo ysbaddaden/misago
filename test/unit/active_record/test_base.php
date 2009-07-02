@@ -539,12 +539,19 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_human_name()
   {
+    $order = new Order();
+    $this->assert_equal('defaults to String::humanize()', $order->human_name(), 'Order');
     
+    $monitoring = new Monitoring();
+    $this->assert_equal('specified human name (I18n)', $monitoring->human_name(), 'Guardian');
   }
   
   function test_human_attribute_name()
   {
-    
+    $monitoring = new Monitoring();
+    $this->assert_equal('defaults to humanize()', $monitoring->human_attribute_name('title'), 'Title');
+    $this->assert_equal('defaults to humanize()', $monitoring->human_attribute_name('length_string'), 'Length string');
+    $this->assert_equal('specified translation',  $monitoring->human_attribute_name('length_is'), 'Fixed length');
   }
 }
 

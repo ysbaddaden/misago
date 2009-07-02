@@ -18,8 +18,8 @@ function t($str, $options=null)
 
 # Handles translations of strings.
 # 
-# TODO: I18n::available_locales();
-# TODO: Implement pluralization. ie. t(array("post", "posts"), array('count' => 1))
+# TODO: Implement pluralization.
+# IMPROVE: Possibility to separate translations in a directory structure (ie. following the context).
 # 
 # Check http://iain.nl/tag/i18n/ for Rails' I18n explanations.
 # 
@@ -38,16 +38,23 @@ class I18n
   }
   
   # Returns the list of available locales.
+  # 
+  # TODO: I18n::available_locales();
   static function available_locales()
   {
     // ...
   }
   
-  # Sets the current locale, and loads associated translations.
+  # Sets or returns the current locale.
+  # On setting, loads associated translation strings.
   static function locale($locale=null)
   {
-    self::$locale = $locale;
-    self::load_translations(self::$locale);
+    if ($locale !== null)
+    {
+      self::$locale = $locale;
+      self::load_translations(self::$locale);
+    }
+    return self::$locale;
   }
   
   # Finds the translation for a string.
