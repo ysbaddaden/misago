@@ -11,6 +11,7 @@ if (extension_loaded('mbstring')) {
 
 # languages
 cfg::set('i18n_default_locale', 'en');
+setlocale('LC_ALL', 'en_US.UTF-8');
 
 # date & tz
 date_default_timezone_set('UTC');

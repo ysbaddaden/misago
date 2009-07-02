@@ -100,7 +100,7 @@ class ActiveRecord_Errors
   # Returns error messages for associated record attribute.
   # Returns null if there is no error.
   # 
-  # TODO: Test translation in different error messages contexts available.
+  # TODO: Add count interpolation variable for validate_length_of().
   function on($attribute)
   {
     if (!empty($this->messages[$attribute]))
