@@ -111,12 +111,15 @@ class ActiveRecord_Errors
           $msg = substr($msg, 1);
         }
         
-        $options = array(
-          'attribute' => isset($this->model) ? $this->model->human_attribute_name($attribute) : String::humanize($attribute),
-        );
-        if (isset($this->model_name))
+        if (isset($this->model))
         {
-          $options['context'] = "active_record.errors.models.{$this->model_name}.attributes.$attribute";
+          $options = array(
+            'model'     => $this->model->human_name(),
+            'attribute' => $this->model->human_attribute_name($attribute),
+            'value'     => $this->model->$attribute,
+            'context'   => "active_record.errors.models.{$this->model_name}.attributes.$attribute",
+          );
+#          $options['context'] = "active_record.errors.models.{$this->model_name}.attributes.$attribute";
           $translation = I18n::do_translate($msg, $options);
           if ($translation === null)
           {
@@ -131,7 +134,11 @@ class ActiveRecord_Errors
         }
         else
         {
-          $options['context'] = 'active_record.errors.messages';
+          $options = array(
+            'attribute' => String::humanize($attribute),
+            'context'   => 'active_record.errors.messages',
+          );
+#          $options['context'] = 'active_record.errors.messages';
           $translation = I18n::translate($msg, $options);
         }
         $this->messages[$attribute][$i] = $translation;

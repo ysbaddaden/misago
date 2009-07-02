@@ -175,6 +175,25 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
     $errors->add('title3', ':required');
     $this->assert_equal('model has its own translation', $errors->on('title3'), 'Title3 in monitoring cannot be blank');
   }
+  
+  function test_translated_error_messages_with_interpolation()
+  {
+    $error = new Error();
+    $error = $error->create(array(
+      'title' => 'my title',
+      'subtitle' => 'my sub-title',
+    ));
+    $errors = new ActiveRecord_Errors($error);
+    
+    $errors->add('title', ':taken');
+    $this->assert_equal('attribute + value', $errors->on('title'), "Title 'my title' is already taken");
+    
+    $errors->add('subtitle', ':taken');
+    $this->assert_equal('attribute + value (check)', $errors->on('subtitle'), "Subtitle 'my sub-title' is already taken");
+    
+    $errors->add('domain', ':reserved');
+    $this->assert_equal('model', $errors->on('domain'), "Already reserved in Error");
+  }
 }
 
 new Test_ActiveRecord_Errors();
