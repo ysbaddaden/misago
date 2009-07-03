@@ -276,8 +276,9 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 		{
       $model = $this->associations[$attribute]['class_name'];
       
-		  if (isset($this->id))
+		  if (!$this->new_record)
 		  {
+		    # parent already exists
 			  $options = isset($this->associations[$attribute]['find_options']) ?
 			    $this->associations[$attribute]['find_options'] : array();
 			  $options['conditions'] = array($this->associations[$attribute]['find_key'] => $this->id);
@@ -285,10 +286,16 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 			  $record = new $model();
 			  $found  = $record->find($this->associations[$attribute]['find_scope'], &$options);
         
-	      return $this->$attribute = ($found instanceof ArrayAccess) ?
-	        new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
-       }
-       return $this->$attribute = new $model;
+        if ($found)
+        {
+          # association exists
+	        return $this->$attribute = ($found instanceof ArrayAccess) ?
+	          new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
+        }
+      }
+      
+      # association doesn't exists
+      return $this->$attribute = new $model;
 		}
   	
     # another kind of attribute
