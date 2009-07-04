@@ -31,6 +31,8 @@ class Unit_TestCase extends Unit_Test
       $fixtures = array_collection($fixtures);
     }
     
+    $this->truncate($fixtures);
+    
     foreach($fixtures as $fixture)
     {
       $contents = file_get_contents(ROOT."/test/fixtures/$fixture.yml");
