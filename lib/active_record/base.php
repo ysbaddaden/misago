@@ -225,7 +225,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
         $arg = $this->find($arg);
         $this->new_record = false;
       }
-      $this->set_attributes($arg);
+      ActiveRecord_Record::__construct($arg);
     }
   }
   
@@ -265,9 +265,24 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return parent::__get($attribute);
   }
   
+  # DEPRECATED: ActiveRecord_Base::_get_attributes().
   private function & _get_attributes()
   {
     $attributes = $this->__attributes;
+    foreach(array_keys($attributes) as $k)
+    {
+      if (is_object($attributes[$k]) and method_exists($attributes[$k], 'to_s')) {
+        $attributes[$k] = $attributes[$k]->to_s('db');
+      }
+    }
+    return $attributes;
+  }
+  
+  private function & _parse_attributes($attributes=null)
+  {
+    if ($attributes === null) {
+      $attributes = $this->__attributes;
+    }
     foreach(array_keys($attributes) as $k)
     {
       if (is_object($attributes[$k]) and method_exists($attributes[$k], 'to_s')) {
@@ -562,7 +577,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # create
-    $attributes = $this->_get_attributes();
+#    $attributes = $this->_get_attributes();
+    $attributes = $this->_parse_attributes();
     $id = $this->db->insert($this->table_name, $attributes, $this->primary_key);
     if ($id)
     {
@@ -572,6 +588,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $this->after_create();
       $this->after_save();
       
+      $this->__original_attributes = $this->__attributes;
       return $id;
     }
     return false;
@@ -608,7 +625,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     # update
     $conditions = array($this->primary_key => $this->id);
-    $updates = $this->_get_attributes();
+#    $updates = $this->_get_attributes();
+    $updates = $this->_parse_attributes($this->changes());
     
     $rs = $this->db->update($this->table_name, $updates, $conditions);
     
@@ -616,6 +634,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     {
       $this->after_update();
       $this->after_save();
+      
+      $this->__original_attributes = $this->__attributes;
+      
       return $rs;
     }
     return false;

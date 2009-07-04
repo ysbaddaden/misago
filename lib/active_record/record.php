@@ -2,24 +2,60 @@
 
 # Generic Record.
 # 
-# * A record is a list of attributes.
-# * You may iterate throught attributes (like an array).
-# * You may serialize it's contents to PHP (thought serialize), XML or JSON.
+# - A record is a list of attributes.
+# - You may iterate throught attributes (like an array).
+# - You may serialize it's contents to PHP (thought serialize), XML or JSON.
+# 
+# =Dirty objects
+#
+# You may track attribute changes.
+# 
+# Has a model changed?
+# 
+#   $product = new Product(array('title' => 'qwerty'));;
+#   $product->changed          # => false
+# 
+# Change an attribute:
+# 
+#   $product->title = 'azerty'
+#   $product->changed          # => true
+#   $product->title_changed    # => true
+#   $product->title_was        # => 'qwerty'
+#   $product->title_change     # => array('qwerty', 'azerty')
+#   $product->title = 'swerty'
+#   $product->title_change     # => array('qwerty', 'swerty')
+# 
+# Saving resets contexts:
+# 
+#   $product->save()
+#   $product->changed          # => false
+#   $product->title_changed    # => false
+# 
+# Assigning identical values keeps the record unchanged.
+# 
+#   $product->title = 'swerty'
+#   $product->changed          # => false
+#   $product->title_changed    # => false
+#   $product->title_change     # => null
 # 
 # @package ActiveRecord
 abstract class ActiveRecord_Record extends Object implements Iterator
 {
-  protected $__attributes = array();
-  protected $new_record   = true;
+  protected $__attributes          = array();
+  protected $__original_attributes = array();
+  protected $new_record            = true;
   
-  function __construct(array $attributes=null)
+  
+  function __construct($attributes=null)
   {
-    if (!empty($this->attributes)) {
-      $this->__attributes = $attributes;
+    if (!empty($attributes))
+    {
+      $this->set_attributes($attributes);
+      $this->__original_attributes = $this->__attributes;
     }
   }
   
-  # Sets the record's attributes.
+  # Sets record's attributes.
   protected function set_attributes($arg)
   {
     foreach($arg as $attribute => $value) {
@@ -27,23 +63,77 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     }
   }
   
-  
-  function __get($attr)
+  # List of attributes with unsaved changes.
+  function & changed()
   {
-    return isset($this->__attributes[$attr]) ?
-      $this->__attributes[$attr] : null;
+    $changes = $this->changes();
+    $changed = array_keys($changes);
+    return $changed;
   }
   
-  function __set($attr, $value) {
-    return $this->__attributes[$attr] = $value;
+  # Returns the list of changed attributes, with associated values.
+  function & changes()
+  {
+    $changes = array_diff_assoc($this->__attributes, $this->__original_attributes);
+    return $changes;
   }
   
-  function __isset($attr) {
-    return isset($this->__attributes[$attr]);
+  private function attribute_changed($attribute)
+  {
+    if (isset($this->__attributes[$attribute])) {
+      return ($this->__attributes[$attribute] !== $this->__original_attributes[$attribute]);
+    }
+    return false;
   }
   
-  function __unset($attr) {
-    unset($this->__attributes[$attr]);
+  private function attribute_was($attribute)
+  {
+    return isset($this->__original_attributes[$attribute]) ?
+      $this->__original_attributes[$attribute] : null;
+  }
+  
+  private function attribute_change($attribute)
+  {
+    if (isset($this->__attributes[$attribute])
+      and $this->__attributes[$attribute] !== $this->__original_attributes[$attribute])
+    {
+      return array($this->__attributes[$attribute], $this->__original_attributes[$attribute]);
+    }
+    return null;
+  }
+  
+  
+  function __get($attribute)
+  {
+    if (isset($this->__attributes[$attribute])) {
+      return $this->__attributes[$attribute];
+    }
+    elseif ($attribute == 'changed')
+    {
+      $changes = $this->changes();
+      return (!empty($changes));
+    }
+    elseif (preg_match('/^(.+)_(changed|was|change)$/', $attribute, $match))
+    {
+      $func = 'attribute_'.$match[2];
+      return $this->$func($match[1]);
+    }
+    
+    # return parent::__get($attribute);
+    return null;
+  }
+  
+  function __set($attribute, $value)
+  {
+    return $this->__attributes[$attribute] = $value;
+  }
+  
+  function __isset($attribute) {
+    return isset($this->__attributes[$attribute]);
+  }
+  
+  function __unset($attribute) {
+    unset($this->__attributes[$attribute]);
   }
   
   function __call($func, $args)
@@ -51,6 +141,7 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     $class = get_class($this);
     trigger_error("No such method: $class::$func().", E_USER_ERROR);
   }
+  
   
   function rewind() {
     return reset($this->__attributes);
