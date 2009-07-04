@@ -26,16 +26,6 @@
 #   $post = new Post();
 #   $new_post = $post->create(array('title' => 'aaa', 'body' => 'bbb'));
 # 
-# ===Callbacks
-# 
-# One may interact with the creation of entries, through the use of
-# special protected methods: before_create() and after_create(). That
-# way it's possible to create or modify attributes, before and after
-# creating the entry in database.
-# 
-# There is also generic methods: before_save() and after_save(). These
-# will be called before and after the creation or update of an entry.
-# 
 # 
 # ==Read
 # 
@@ -105,16 +95,6 @@
 # Check update(), update_attribute() and update_attributes() for
 # more examples.
 # 
-# ===Callbacks
-# 
-# One may interact with the update of entries, through the use of
-# special protected methods: before_update() and after_update(). That
-# way it's possible to create or modify attributes, before and after
-# updating the entry in database.
-# 
-# There is also generic methods: before_save() and after_save(). These
-# will be called before and after the creation or update of an entry.
-# 
 # 
 # ==Delete
 # 
@@ -157,20 +137,46 @@
 #   $post->destroy_all(array('category' => 'aaa'));
 #   $post->destroy_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
 # 
-# ===Callbacks
+# ==Callbacks
 # 
-# One may interact with the deletion of entries, through the use of
-# special protected methods: before_delete() and after_delete(). That
-# way it's possible to do whatever you want before and after deleting
-# an entry from database.
+# Callbacks are hooks inside the lifecycle of an action to the record.
 # 
-# Remember that only delete has callbacks. Destroy has no such methods.
+# For instance when saving a new record:
+# 
+# - save()
+# - is_valid()
+# - before_validation()
+# - before_validation_on_create()
+# - validation()
+# - validation_on_create()
+# - after_validation_on_create()
+# - after_validation()
+# - before_save()
+# - before_create()
+# - create()
+# - after_create()
+# - after_save()
+# 
+# As you can see, there is a lot of callbacks, which permits you to
+# interact with the creation process at every step of it. Same goes
+# for update, which as the same lifecycle, but uses particular
+# `on_update` callbacks instead of `on_create`.
+# 
+# Delete has callbacks too. But the lifecycle is simplier:
+# 
+# - delete()
+# - before_delete()
+# - *actually deletes the entry*
+# - after_delete()
+# 
+# Remember that only delete has callbacks, destroy has no such methods.
 # 
 # 
 # @package ActiveRecord
 # 
 # TODO: Implement calculations.
 # TODO: Named scopes.
+# IMPROVE: Test callbacks.
 # 
 abstract class ActiveRecord_Base extends ActiveRecord_Validations
 {
@@ -540,12 +546,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   # Use ActiveRecord_Base::create() instead.
   protected function _create()
   {
-    $this->before_save();
-    $this->before_create();
-    
     if (!$this->is_valid()) {
       return false;
     }
+    
+    $this->before_save();
+    $this->before_create();
     
     # timestamps
     if (array_key_exists('created_at', $this->columns) and empty($this->created_at)) {
@@ -563,8 +569,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $this->new_record = false;
       $this->id = $id;
       
-      $this->after_save();
       $this->after_create();
+      $this->after_save();
       
       return $id;
     }
@@ -585,12 +591,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       }
     }
     
-    $this->before_save();
-    $this->before_update();
-    
     if (!$this->is_valid()) {
       return false;
     }
+    
+    $this->before_save();
+    $this->before_update();
     
     # timestamps
     if (array_key_exists('updated_at', $this->columns) and empty($this->updated_at)) {
@@ -608,8 +614,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     if ($rs !== false)
     {
-      $this->after_save();
       $this->after_update();
+      $this->after_save();
       return $rs;
     }
     return false;
@@ -852,8 +858,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   protected function before_create() {}
   protected function after_create()  {}
   
-  protected function after_update()  {}
   protected function before_update() {}
+  protected function after_update()  {}
 
   protected function before_delete() {}
   protected function after_delete()  {}

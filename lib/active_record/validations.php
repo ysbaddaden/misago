@@ -23,11 +23,20 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
   function is_valid()
   {
     $on = $this->new_record ? 'create' : 'update';
-    $validate_on = "validate_on_$on";
+    $validate_on          = "validate_on_$on";
+    $before_validation_on = "before_validation_on_$on";
+    $after_validation_on  = "after_validation_on_$on";
     
     $this->errors->clear();
-    $this->$validate_on();
+    
+    $this->before_validation();
+    $this->$before_validation_on();
+    
     $this->validate();
+    $this->$validate_on();
+    
+    $this->$after_validation_on();
+    $this->after_validation();
     
     if (!$this->validate_associated()) {
       return false;
@@ -267,6 +276,14 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
 			$this->errors->add($attribute, isset($options['message']) ? $options['message'] : ":taken");
 		}
   }
+  
+  protected function before_validation() {}
+  protected function before_validation_on_create() {}
+  protected function before_validation_on_update() {}
+  
+  protected function after_validation() {}
+  protected function after_validation_on_create() {}
+  protected function after_validation_on_update() {}
 }
 
 ?>
