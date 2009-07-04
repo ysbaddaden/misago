@@ -274,18 +274,28 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   	# association?
 		if (array_key_exists($attribute, $this->associations))
 		{
-		  $type   = $this->associations[$attribute]['type'];
-      $model  = $this->associations[$attribute]['class_name'];
+      $model = $this->associations[$attribute]['class_name'];
       
-			$options = isset($this->associations[$attribute]['find_options']) ?
-			  $this->associations[$attribute]['find_options'] : array();
-			$options['conditions'] = array($this->associations[$attribute]['find_key'] => $this->id);
+		  if (!$this->new_record)
+		  {
+		    # parent already exists
+			  $options = isset($this->associations[$attribute]['find_options']) ?
+			    $this->associations[$attribute]['find_options'] : array();
+			  $options['conditions'] = array($this->associations[$attribute]['find_key'] => $this->id);
 			
-			$record = new $model();
-			$found  = $record->find($this->associations[$attribute]['find_scope'], &$options);
+			  $record = new $model();
+			  $found  = $record->find($this->associations[$attribute]['find_scope'], &$options);
+        
+        if ($found)
+        {
+          # association exists
+	        return $this->$attribute = ($found instanceof ArrayAccess) ?
+	          new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
+        }
+      }
       
-	    return $this->$attribute = ($found instanceof ArrayAccess) ?
-	      new ActiveRecord_Collection($this, $found, $this->associations[$attribute]) : $found;
+      # association doesn't exists
+      return $this->$attribute = new $model;
 		}
   	
     # another kind of attribute

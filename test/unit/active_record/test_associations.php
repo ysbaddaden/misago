@@ -38,6 +38,21 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_instance_of('', $programmer->projects, 'ActiveRecord_Collection');
     $this->assert_equal('count', count($programmer->projects), 2);
   }
+  
+  function test_loading_association_on_non_saved_parent()
+  {
+    $order = new Order();
+    $this->assert_instance_of('must return the associated object', $order->invoice, 'Invoice');
+    $this->assert_null('association must be a fresh object', $order->invoice->id);
+  }
+  
+  function test_loading_association_when_association_is_missing()
+  {
+    $order = new Order(3);
+    $this->assert_instance_of('must return the associated object', $order->invoice, 'Invoice');
+    $this->assert_null('association must be a fresh object', $order->invoice->id);
+  }
+  
 
   function test_eager_loading_for_belongs_to()
   {
