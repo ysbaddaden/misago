@@ -2,13 +2,17 @@
 
 # Helps to create a HTML form for a record.
 # 
-# Examples:
+# Initiate helper for a class:
 # 
 #   $f = form_for('User');
-#   
+# 
+# Initiate helper for an instance:
+# 
 #   $user = new User(456);
 #   $f = form_for($user);
-#   
+# 
+# Build a form:
+# 
 #   $f->start(update_user_path($user->id))
 #   $f->label('username');
 #   $f->text_field('username');

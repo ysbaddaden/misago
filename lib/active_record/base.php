@@ -4,24 +4,25 @@
 # 
 # Permits to handle database entries like objects. It supports
 # CRUD operations (create, read, update and delete), validations
-# through ActiveRecord::Associations, and relations through
-# ActiveRecord::Associations.
+# through ActiveRecord_Validations, and relations through
+# ActiveRecord_Associations.
 # 
 # =CRUD
 # 
 # All the examples will use this single model:
 # 
-#   class Post extends ActiveRecord_Base {
-#     
+#   class Post extends ActiveRecord_Base
+#   {
 #   }
 # 
 # ==Create
 # 
-# There are two ways to create a new record. You either save an already
-# built object, or you create it directly.
+# You can create a new record, then save it:
 # 
 #   $post = new Post(array('title' => 'aaa', 'body' => 'bbb'));
 #   $post->save();
+# 
+# Or you can create it directly:
 #   
 #   $post = new Post();
 #   $new_post = $post->create(array('title' => 'aaa', 'body' => 'bbb'));
@@ -61,16 +62,15 @@
 # You may define a default scope for all finds. In the following example,
 # all find requests to Comment will be returned ordered by creation date:
 # 
-#   class Comment {
+#   class Comment extends ActiveRecord_Base
+#   {
 #     protected $default_scope = array('order' => 'created_at asc');
 #   }
 # 
 # Attention:
 # 
-# - once a default scope has been defined all find requests will be
-#   affected. This could be troublesome, sometimes.
-# - the default scope also affects the 'include' option, which shall
-#   be pretty convenient.
+# - once a default scope has been defined all find requests will be affected. This could be troublesome, sometimes.
+# - the default scope also affects the 'include' option, which shall be pretty convenient.
 # 
 # 
 # ====Named scopes
@@ -145,17 +145,17 @@
 # 
 # - save()
 # - is_valid()
-# - before_validation()
-# - before_validation_on_create()
+# - [1] before_validation()
+# - [2] before_validation_on_create()
 # - validation()
 # - validation_on_create()
-# - after_validation_on_create()
-# - after_validation()
-# - before_save()
-# - before_create()
+# - [3] after_validation_on_create()
+# - [4] after_validation()
+# - [5] before_save()
+# - [6] before_create()
 # - create()
-# - after_create()
-# - after_save()
+# - [7] after_create()
+# - [8] after_save()
 # 
 # As you can see, there is a lot of callbacks, which permits you to
 # interact with the creation process at every step of it. Same goes
@@ -165,9 +165,9 @@
 # Delete has callbacks too. But the lifecycle is simplier:
 # 
 # - delete()
-# - before_delete()
+# - [1] before_delete()
 # - *actually deletes the entry*
-# - after_delete()
+# - [2] after_delete()
 # 
 # Remember that only delete has callbacks, destroy has no such methods.
 # 
@@ -577,7 +577,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # create
-#    $attributes = $this->_get_attributes();
     $attributes = $this->_parse_attributes();
     $id = $this->db->insert($this->table_name, $attributes, $this->primary_key);
     if ($id)
@@ -625,7 +624,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     # update
     $conditions = array($this->primary_key => $this->id);
-#    $updates = $this->_get_attributes();
     $updates = $this->_parse_attributes($this->changes());
     
     $rs = $this->db->update($this->table_name, $updates, $conditions);
@@ -872,7 +870,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return $this->db->delete($this->table_name, $conditions, $options);
   }
   
-  # TODO: Test before_* and after_* callbacks.
   protected function before_save()   {}
   protected function after_save()    {}
   

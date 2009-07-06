@@ -6,6 +6,8 @@
 # @subpackage Helpers
 class form
 {
+  # Renders an HTML label tag.
+  # 
   #   form::label('Product', 'in_stock');
   #   form::label('Product', 'in_stock', 'In stock?');
   #   form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));

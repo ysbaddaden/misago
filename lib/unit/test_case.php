@@ -22,7 +22,9 @@ class Unit_TestCase extends Unit_Test
     exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/drop");
   }
   
-  
+  # Loads one or many fixtures into the database.
+  # 
+  #   $this->fixtures('chapters,pages');
   function fixtures($fixtures)
   {
     $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
@@ -44,6 +46,9 @@ class Unit_TestCase extends Unit_Test
     }
   }
   
+  # Truncates one or many tables in database.
+  # 
+  #   $this->truncate('chapters,pages');
   function truncate($tables)
   {
     $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
@@ -59,8 +64,6 @@ class Unit_TestCase extends Unit_Test
     }
   }
   
-  
-  // functional tests
   
   protected function assert_redirect($comment, $rs, $url)
   {

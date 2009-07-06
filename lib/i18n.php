@@ -21,7 +21,43 @@ function t($str, $options=null)
 # TODO: Implement pluralization.
 # IMPROVE: Possibility to separate translations in a directory structure (ie. following the context).
 # 
-# Check http://iain.nl/2008/09/translating-activerecord/ for Rails' I18n explanations.
+# =Translating a string
+# 
+#   I18n::translate('my string')
+#   t('my other string')
+# 
+# =Context
+# 
+# You may specify a particular context to search the translation in.
+# Either as passing the 'context' option, or by prepending the
+# string in the following way: `context.string`
+# 
+# You may have subcontexts, like: `active_record.error.messages.empty`
+# 
+# =Pluralization [todo, specification unfinished]
+# 
+# In case there are many translations available, depending on
+# a particular number, you may use the 'count' option to
+# determine which one is to be used.
+# 
+# Example:
+# 
+#   $strings = array(
+#     'There is {{count}} message',
+#     'There are {{count}} messages',
+#   );
+#   t($strings, array('count' => 1));  # => There is 1 message
+#   t($strings, array('count' => 29)); # => There are 29 messages
+# 
+# =Interpolation
+# 
+# Any other option, plus the `count` option, will be used for interpolating
+# variables in the string.
+# 
+# Example:
+# 
+#   t('{{user_name}} sent you a message', array('user_name' => 'James'));
+#   # => James sent you a message
 # 
 class I18n
 {
@@ -60,47 +96,13 @@ class I18n
   # Finds the translation for a string.
   # 
   # Returns the string unstranslated if no translation is found.
-  # 
-  # =Context
-  # 
-  # You may specify a particular context to search the translation in.
-  # Either as passing the 'context' option, or by prepending the
-  # string in the following way: `context.string`
-  # 
-  # You may have subcontexts, like: `active_record.error.messages.empty`
-  # 
-  # =Pluralization [todo, specification unfinished]
-  # 
-  # In case there are many translations available, depending on
-  # a particular number, you may use the 'count' option to
-  # determine which one is to be used.
-  # 
-  # Example:
-  # 
-  #   $strings = array(
-  #     'There is {{count}} message',
-  #     'There are {{count}} messages',
-  #   );
-  #   I18n::translate($strings, array('count' => 1));  # => There is 1 message
-  #   I18n::translate($strings, array('count' => 29)); # => There are 29 messages
-  # 
-  # =Interpolation
-  # 
-  # Any other option, plus the `count` option, will be used for interpolating
-  # variables in the string.
-  # 
-  # Example:
-  # 
-  #   I18n::translate('{{user_name}} sent you a message', array('user_name' => 'James'));
-  #   # => James sent you a message
-  # 
   static function translate($str, $options=null)
   {
     $translation = self::do_translate($str, $options);
     return ($translation !== null) ? $translation : $str;
   }
   
-  # Same as I18n::translate(), but returns null if no translation is found.
+  # Same as translate(), but returns null if no translation is found.
   static function do_translate($str, $options=null)
   {
     $ctx = isset($options['context']) ? $options['context'] : null;
