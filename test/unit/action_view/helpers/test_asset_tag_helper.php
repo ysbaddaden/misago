@@ -7,7 +7,7 @@ require_once "$location/test/test_app/config/boot.php";
 require_once MISAGO."/lib/action_view/helpers/html_helper.php";
 require_once MISAGO."/lib/action_view/helpers/asset_tag_helper.php";
 
-class Test_ActionView_Helper_AssetTag extends Unit_Test
+class Test_ActionView_Helper_AssetTagHelper extends Unit_Test
 {
   function test_image_path()
   {
@@ -116,6 +116,6 @@ class Test_ActionView_Helper_AssetTag extends Unit_Test
   }
 }
 
-new Test_ActionView_Helper_AssetTag();
+new Test_ActionView_Helper_AssetTagHelper();
 
 ?>
