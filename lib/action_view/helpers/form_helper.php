@@ -1,12 +1,25 @@
 <?php
 
+# Helpful functions to render form fields for a model.
+# 
+# Example:
+# 
+#   <? $search = new Search(); ?\>
+#   <?= html::form_tag(search_path()) ?\>
+#     <p>
+#       <?= form::label($search, 'query') ?\>
+#       <?= form::text_field($search, 'query') ?\>
+#       <?= html::submit() ?\>
+#     </p>
+#   </form>
+# 
 # NOTE: form functions are tested throught RecordHelper tests.
 # 
 # @package ActionView
 # @subpackage Helpers
 class form
 {
-  # Renders an HTML label tag.
+  # Renders a label tag.
   # 
   #   form::label('Product', 'in_stock');
   #   form::label('Product', 'in_stock', 'In stock?');
@@ -27,34 +40,38 @@ class form
     return html::label($name, $text, $attributes);
   }
 
+  # Renders a hidden field.
   static function hidden_field($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
     return html::hidden_field($name, is_object($object) ? $object->$column : '', $attributes);
   }
   
+  # Renders a text field.
   static function text_field($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
     return html::text_field($name, is_object($object) ? $object->$column : '', $attributes);
   }
   
+  # Renders a password field.
   static function password_field($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
     return html::password_field($name, /*is_object($object) ? $object->$column :*/ '', $attributes);
   }
   
+  # Renders a text area.
   static function text_area($object, $column, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
     return html::text_area($name, is_object($object) ? $object->$column : '', $attributes);
   }
   
-  # Renders a checkbox.
+  # Renders a check box.
   #
-  # Gotcha: an unchecked checkbox is never sent. A solution if to
-  # add a hidden field with the same name before the checkbox. If
+  # Gotcha: an unchecked check box is never sent. A solution if to
+  # add a hidden field with the same name before the check box. If
   # the box is unchecked, the hidden field's value will be sent;
   # if checked PHP will overwrite the hidden field's value. 
   static function check_box($object, $column, $attributes=null)
@@ -70,6 +87,7 @@ class form
     return $str;
   }
   
+  # Renders a radio button.
   static function radio_button($object, $column, $tag_value, $attributes=null)
   {
     list($name, $id) = self::format_name_and_id($object, $column, $attributes);
@@ -83,6 +101,7 @@ class form
     return html::radio_button($name, $tag_value, $attributes);
   }
   
+  # Renders a select option field.
   static function select($object, $column, $options, $attributes=null)
   {
     list($name, $attributes['id']) = self::format_name_and_id($object, $column, $attributes);
@@ -91,6 +110,7 @@ class form
     return html::select($name, $options, $attributes);
   }
   
+  # Parses options for a select option field.
   static function options_for_select($options, $selected=null)
   {
     if ($selected === null) {

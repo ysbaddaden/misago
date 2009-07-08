@@ -1,7 +1,12 @@
 <?php
-/**
- * @package ActionView
- */
+
+# Renders templates.
+# 
+# See ActionController_base::render() for actual help, since
+# you shall not need to use this object directly, except for
+# a few methods, like `yield()`.
+# 
+# @package ActionView
 class ActionView_Base extends Object
 {
   public    $view_path;
