@@ -4,10 +4,10 @@
  */
 class ActiveRecord_Errors
 {
-  private $base_messages = array();
-  private $messages      = array();
   private $model;
   private $model_name;
+  private $base_messages = array();
+  private $messages      = array();
   
   function __construct($model=null)
   {

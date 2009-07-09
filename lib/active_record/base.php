@@ -627,6 +627,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     # update
     $conditions = array($this->primary_key => $this->id);
     $updates = $this->_parse_attributes($this->changes());
+    if (empty($updates)) {
+      return true;
+    }
     
     $rs = $this->db->update($this->table_name, $updates, $conditions);
     
