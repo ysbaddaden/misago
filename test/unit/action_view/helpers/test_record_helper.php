@@ -9,19 +9,19 @@ require_once MISAGO."/lib/action_view/helpers/form_tag_helper.php";
 require_once MISAGO."/lib/action_view/helpers/form_helper.php";
 require_once MISAGO."/lib/action_view/helpers/record_helper.php";
 
-class Test_ActionView_Helper_Record extends Unit_TestCase
+class Test_ActionView_Helpers_RecordHelper extends Unit_TestCase
 {
   function test_fields_for()
   {
     $f = fields_for('Product');
-    $this->assert_instance_of("Passing a camelized string", $f, 'RecordHelper');
+    $this->assert_instance_of("Passing a camelized string", $f, 'ActionView_Helpers_RecordHelper_NS');
     
     $f = fields_for('basket');
-    $this->assert_instance_of("Passing an underscored string", $f, 'RecordHelper');
+    $this->assert_instance_of("Passing an underscored string", $f, 'ActionView_Helpers_RecordHelper_NS');
     
     $product = new Product();
     $f = fields_for($product);
-    $this->assert_instance_of("Passing an ActiveRecord", $f, 'RecordHelper');
+    $this->assert_instance_of("Passing an ActiveRecord", $f, 'ActionView_Helpers_RecordHelper_NS');
   }
   
   function test_label()
@@ -174,6 +174,6 @@ class Test_ActionView_Helper_Record extends Unit_TestCase
   }
 }
 
-new Test_ActionView_Helper_Record();
+new Test_ActionView_Helpers_RecordHelper();
 
 ?>

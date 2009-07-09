@@ -1,9 +1,4 @@
 <?php
-# TODO: mail_to()
-# TODO: is_current_page()
-# TODO: button_to()
-# TODO: link_to_unless_current()
-
 # Creates a link.
 # 
 # @namespace ActionView_Helpers_UrlHelper
@@ -33,6 +28,34 @@ function url_for($mapping)
 {
   $map = ActionController_Routing::draw();
   return $map->reverse($mapping);
+}
+
+# TODO: mail_to()
+# @namespace ActionView_Helpers_UrlHelper
+function mail_to()
+{
+  
+}
+
+# TODO: is_current_page()
+# @namespace ActionView_Helpers_UrlHelper
+function is_current_page()
+{
+  
+}
+
+# TODO: button_to()
+# @namespace ActionView_Helpers_UrlHelper
+function button_to()
+{
+  
+}
+
+# TODO: link_to_unless_current()
+# @namespace ActionView_Helpers_UrlHelper
+function link_to_unless_current()
+{
+  
 }
 
 ?>

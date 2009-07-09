@@ -1,20 +1,21 @@
 <?php
-
-# Helpful functions to render form fields for a model.
-# 
-# Example:
-# 
-#   <? $search = new Search(); ?\>
-#   <?= form_tag(search_path()) ?\>
-#     <p>
-#       <?= label($search, 'query') ?\>
-#       <?= text_field($search, 'query') ?\>
-#       <?= submit_tag() ?\>
-#     </p>
-#   </form>
-# 
-class ActionView_Helpers_FormHelper_Klass
+/**
+ * Helpful functions to render form fields for a model.
+ * 
+ * Example:
+ * 
+ *   <? $search = new Search() ?>
+ *   <?= form_tag(search_path()) ?>
+ *     <p>
+ *       <?= label($search, 'query') ?>
+ *       <?= text_field($search, 'query') ?>
+ *       <?= submit_tag() ?>
+ *     </p>
+ *   </form>
+ */
+class ActionView_Helpers_FormHelper_NS
 {
+  # 
   # @private
   static function format_name_and_id($object, $column, &$attributes=null)
   {
@@ -56,7 +57,7 @@ function label($object, $column, $text=null, $attributes=null)
   if ($text === null) {
     $text = $object->human_attribute_name($column);
   }
-  list($name, $attributes['for']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['for']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   return label_tag($name, $text, $attributes);
 }
 
@@ -65,7 +66,7 @@ function label($object, $column, $text=null, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function hidden_field($object, $column, $attributes=null)
 {
-  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   return hidden_field_tag($name, is_object($object) ? $object->$column : '', $attributes);
 }
 
@@ -74,7 +75,7 @@ function hidden_field($object, $column, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function text_field($object, $column, $attributes=null)
 {
-  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   return text_field_tag($name, is_object($object) ? $object->$column : '', $attributes);
 }
 
@@ -83,7 +84,7 @@ function text_field($object, $column, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function password_field($object, $column, $attributes=null)
 {
-  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   return password_field_tag($name, /*is_object($object) ? $object->$column :*/ '', $attributes);
 }
 
@@ -92,7 +93,7 @@ function password_field($object, $column, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function text_area($object, $column, $attributes=null)
 {
-  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   return text_area_tag($name, is_object($object) ? $object->$column : '', $attributes);
 }
 
@@ -106,7 +107,7 @@ function text_area($object, $column, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function check_box($object, $column, $attributes=null)
 {
-  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   if (is_object($object)
     and $object->$column)
   {
@@ -122,7 +123,7 @@ function check_box($object, $column, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function radio_button($object, $column, $tag_value, $attributes=null)
 {
-  list($name, $id) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $id) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   $attributes['id'] = "{$id}_{$tag_value}";
   
   if (is_object($object)
@@ -138,7 +139,7 @@ function radio_button($object, $column, $tag_value, $attributes=null)
 # @namespace ActionView_Helpers_FormHelper
 function select($object, $column, $options, $attributes=null)
 {
-  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_Klass::format_name_and_id($object, $column, $attributes);
+  list($name, $attributes['id']) = ActionView_Helpers_FormHelper_NS::format_name_and_id($object, $column, $attributes);
   $value   = is_object($object) ? $object->$column : null;
   $options = options_for_select($options, $value);
   return select_tag($name, $options, $attributes);

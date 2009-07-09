@@ -10,7 +10,7 @@
 # caching must be handled by your web server (ie. the 'compress' module
 # of LightTPD).
 # 
-class ActionView_Helpers_AssetTag_Klass
+class ActionView_Helpers_AssetTag_NS
 {  
   # @private
   static function linearize_path($base_path, $path)
@@ -63,7 +63,7 @@ function auto_discovery_link_tag($type='rss', $url=null, $attributes=array())
 # @namespace ActionView_Helpers_AssetTag
 function image_path($src)
 {
-  return ActionView_Helpers_AssetTag_Klass::linearize_path('/img', $src);
+  return ActionView_Helpers_AssetTag_NS::linearize_path('/img', $src);
 }
 
 # Linearizes a javascript path.
@@ -75,7 +75,7 @@ function image_path($src)
 # @namespace ActionView_Helpers_AssetTag
 function javascript_path($src)
 {
-  return ActionView_Helpers_AssetTag_Klass::linearize_path('/js', $src);
+  return ActionView_Helpers_AssetTag_NS::linearize_path('/js', $src);
 }
 
 # Linearizes a stylesheet path.
@@ -87,7 +87,7 @@ function javascript_path($src)
 # @namespace ActionView_Helpers_AssetTag
 function stylesheet_path($href)
 {
-  return ActionView_Helpers_AssetTag_Klass::linearize_path('/css', $href);
+  return ActionView_Helpers_AssetTag_NS::linearize_path('/css', $href);
 }
 
 # Renders an IMG tag.

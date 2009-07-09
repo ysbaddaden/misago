@@ -3,7 +3,7 @@
 # A collection of helpful functions to render HTML content.
 # 
 # TODO: Move URL functions to UrlHelper.
-class ActionView_Helpers_TagHelper_Klass
+class ActionView_Helpers_TagHelper_NS
 {
   # Parses attributes for form input fields. Creates `id` from `name`;
   # quotes the `value` attribute; parses the `disabled` and `checked`
@@ -95,7 +95,7 @@ function tag($name, $content=null, $attributes=null)
     $inline_tag = ($content === null and $attributes === null);
   }
   
-  $attributes = ActionView_Helpers_TagHelper_Klass::parse_attributes($attributes);
+  $attributes = ActionView_Helpers_TagHelper_NS::parse_attributes($attributes);
   
   if ($inline_tag) {
     return "<$name$attributes/>";

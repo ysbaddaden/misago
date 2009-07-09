@@ -34,9 +34,8 @@
 #   $f->end();
 # 
 # IMPROVE: Transparently protect against CSRF attacks (using a hash stored in a cookie/session).
-# TODO: Rename to ActionView_Helpers_FormHelper_Klass.
 # 
-class RecordHelper
+class ActionView_Helpers_RecordHelper_NS
 {
   protected $object;
   protected $index;
@@ -189,12 +188,14 @@ class RecordHelper
   }
 }
 
+# @namespace ActionView_Helpers_RecordHelper
 function fields_for($record_or_name, $args=null) {
-  return new RecordHelper($record_or_name, $args);
+  return new ActionView_Helpers_RecordHelper_NS($record_or_name, $args);
 }
 
+# @namespace ActionView_Helpers_RecordHelper
 function form_for($record_or_name, $args=null) {
-  return new RecordHelper($record_or_name, $args);
+  return new ActionView_Helpers_RecordHelper_NS($record_or_name, $args);
 }
 
 ?>
