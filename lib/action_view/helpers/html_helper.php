@@ -1,8 +1,8 @@
 <?php
-
+/*
 # A collection of helpful functions to render HTML content.
 # 
-# TODO: Create TagHelper & FormTagHelper instead of HtmlHelper.
+# DEPRECATED
 class ActionView_Helpers_HtmlHelper_Klass
 {
   # Parses attributes for form input fields. Creates `id` from `name`;
@@ -295,5 +295,5 @@ function submit_tag($value=null, $name=null, $attributes=null)
   $attributes = ActionView_Helpers_HtmlHelper_Klass::input_attributes(null, 'submit', $value, $attributes);
   return tag('input', $attributes);
 }
-
+*/
 ?>

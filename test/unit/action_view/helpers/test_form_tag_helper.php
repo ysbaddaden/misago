@@ -4,43 +4,11 @@ $location = dirname(__FILE__).'/../../../..';
 $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/html_helper.php";
+require_once MISAGO."/lib/action_view/helpers/tag_helper.php";
+require_once MISAGO."/lib/action_view/helpers/form_tag_helper.php";
 
-class Test_ActionView_Helpers_HtmlHelper extends Unit_Test
+class Test_ActionView_Helpers_FormTagHelper extends Unit_Test
 {
-  function test_cdata()
-  {
-    $this->assert_equal("", cdata_section("a"), "<![CDATA[a]]>");
-    $this->assert_equal("", cdata_section("aroidfkjdf"), "<![CDATA[aroidfkjdf]]>");
-  }
-  
-  function test_tag()
-  {
-    $this->assert_equal("", tag("hr"), "<hr/>");
-    $this->assert_equal("", tag("br"), "<br/>");
-    $this->assert_equal("", tag("div", ''), "<div></div>");
-    $this->assert_equal("", tag("div", 'abcd'), "<div>abcd</div>");
-
-    $this->assert_equal("", tag("br", array('class' => 'toto')), "<br class=\"toto\"/>");
-    $this->assert_equal("", tag("div", 'azerty', array('class' => 'toto')), "<div class=\"toto\">azerty</div>");
-    $this->assert_equal("", tag("span", null, array('class' => 'abcd')), "<span class=\"abcd\"></span>");
-  }
-  
-  function test_link_to()
-  {
-    $this->assert_equal("", link_to('abcd', '/'), '<a href="/">abcd</a>');
-    $this->assert_equal("", link_to('azerty', '/page/123'), '<a href="/page/123">azerty</a>');
-    $this->assert_equal("", link_to('azerty', '/page/123', array('class' => 'toto')), '<a class="toto" href="/page/123">azerty</a>');
-    $this->assert_equal("", link_to('azerty', '/posts/tag/abcd', array('rel' => 'tag')), '<a rel="tag" href="/posts/tag/abcd">azerty</a>');
-    
-    $html_link = link_to('delete me', new ActionController_Path('DELETE', 'page/123'));
-    $this->assert_equal("", $html_link, '<a class="request_method:delete" href="/page/123">delete me</a>');
-    
-    $html_link = link_to('destroy me', new ActionController_Path('DELETE', 'page/123'), array('class' => 'destroy'));
-    $this->assert_equal("", $html_link, '<a class="destroy request_method:delete" href="/page/123">destroy me</a>');
-  }
-  
-  
   function test_form_tag()
   {
     $this->assert_equal('', form_tag('/profiles'), '<form action="/profiles" method="post">');
@@ -202,6 +170,6 @@ class Test_ActionView_Helpers_HtmlHelper extends Unit_Test
   }
 }
 
-new Test_ActionView_Helpers_HtmlHelper();
+new Test_ActionView_Helpers_FormTagHelper();
 
 ?>
