@@ -6,7 +6,7 @@
 
 # Creates a link.
 # 
-# @namespace ActionView_Helpers_TagHelper
+# @namespace ActionView_Helpers_UrlHelper
 function link_to($content, $url, $attributes=null)
 {
   if (is_object($url) and isset($url->method))
@@ -28,7 +28,7 @@ function link_to($content, $url, $attributes=null)
 
 # Returns the URL for a given mapping.
 # 
-# @namespace ActionView_Helpers_TagHelper
+# @namespace ActionView_Helpers_UrlHelper
 function url_for($mapping)
 {
   $map = ActionController_Routing::draw();
