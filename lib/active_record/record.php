@@ -37,8 +37,6 @@
 #   $product->changed          # => false
 #   $product->title_changed    # => false
 #   $product->title_change     # => null
-# 
-# @package ActiveRecord
 abstract class ActiveRecord_Record extends Object implements Iterator
 {
   protected $__attributes          = array();

@@ -1,6 +1,7 @@
 <?php
 
 # TODO: Tests!
+# @namespace ActiveSupport
 class ActiveArray extends ArrayObject
 {
   public $model;

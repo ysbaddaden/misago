@@ -2,9 +2,6 @@
 
 # Validation methods for ActiveRecords.
 # 
-# @package ActiveRecord
-# @subpackage Validations
-# 
 # TODO: Test validates_associated.
 #
 abstract class ActiveRecord_Validations extends ActiveRecord_Associations

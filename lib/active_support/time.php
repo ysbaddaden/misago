@@ -1,8 +1,5 @@
 <?php
-/**
- * 
- * @package ActiveSupport
- */
+# @namespace ActiveSupport
 class Time extends Object
 {
   protected $_time;

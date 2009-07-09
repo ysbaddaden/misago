@@ -11,6 +11,7 @@ $GLOBALS['__fake_apc_data'] = array();
 
 
 # Caches a variable in the data store, only if it's not already stored. 
+# @namespace APC
 function apc_add($key, $var, $ttl=0)
 {
   if (!array_key_exists($key, $GLOBALS['__fake_apc_data'])) {
@@ -20,6 +21,7 @@ function apc_add($key, $var, $ttl=0)
 }
 
 # Caches a variable in the data store. 
+# @namespace APC
 function apc_store($key, $var, $ttl=0)
 {
   $GLOBALS['__fake_apc_data'][$key] = $var;
@@ -28,6 +30,7 @@ function apc_store($key, $var, $ttl=0)
 }
 
 # Fetches a stored variable from the cache.
+# @namespace APC
 function apc_fetch($key, &$success=null)
 {
   if (isset($GLOBALS['__fake_apc_data'][$key]))
@@ -39,6 +42,7 @@ function apc_fetch($key, &$success=null)
 }
 
 # Removes a stored variable from the cache.
+# @namespace APC
 function apc_delete($key)
 {
   unset($GLOBALS['__fake_apc_data'][$key]);
@@ -47,6 +51,7 @@ function apc_delete($key)
 }
 
 # Clears user cache.
+# @namespace APC
 function apc_clear_cache()
 {
   $GLOBALS['__fake_apc_data']    = array();

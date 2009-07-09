@@ -1,9 +1,6 @@
 <?php
 /**
  * Abstract adapter to build real ActiveRecord adapters.
- * 
- * @package ActiveRecord
- * @subpackage Connection
  */
 abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
 {

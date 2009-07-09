@@ -155,8 +155,6 @@
 # 
 # TODO: Implement has_many :through association.
 # TODO: Implement belongs_to :polymorphic association.
-# 
-# @package ActiveRecord
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
   protected $belongs_to   = array();

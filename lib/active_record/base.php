@@ -172,8 +172,6 @@
 # Remember that only delete has callbacks, destroy has no such methods.
 # 
 # 
-# @package ActiveRecord
-# 
 # TODO: Implement calculations.
 # TODO: Named scopes.
 # IMPROVE: Test callbacks.
@@ -559,6 +557,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   # You better consider this method as private.
   # Do not use unless you know what you are doing (ie. you're hacking misago).
   # Use ActiveRecord_Base::create() instead.
+  # 
+  # @private
   protected function _create()
   {
     if (!$this->is_valid()) {
@@ -598,6 +598,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   # You better consider this method as private.
   # Do not use unless you know what you are doing (ie. you're hacking misago).
   # Use ActiveRecord_Base::update() or ActiveRecord_Base::update_attributes() instead.
+  # 
+  # @private
   protected function _update($attributes=null)
   {
     if ($attributes !== null)

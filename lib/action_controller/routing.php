@@ -1,6 +1,5 @@
 <?php
 
-# @package ActionController
 class ActionController_Routing extends Object
 {
   private $routes          = array();
@@ -364,7 +363,6 @@ function path_for($mapping, array $keys=null)
 }
 
 # Transparently handles URL (with HTTP method and URI).
-# @package ActionController
 class ActionController_Path
 {
   public $method;
@@ -383,7 +381,6 @@ class ActionController_Path
 }
 
 # Transparently handles URL (with HTTP method and URI).
-# @package ActionController
 class ActionController_Url
 {
   public $method;

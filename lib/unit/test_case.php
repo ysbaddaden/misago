@@ -1,7 +1,6 @@
 <?php
 
 # IMPROVE: start and stop a test server (script/server -p 3009 -e test -d 0)
-# @package Unit
 class Unit_TestCase extends Unit_Test
 {
   function __construct()

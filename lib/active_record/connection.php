@@ -2,9 +2,6 @@
 require_once 'active_record/exception.php';
 
 # Handles database connections.
-# 
-# @package ActiveRecord
-# @subpackage Connection
 class ActiveRecord_Connection
 {
   public  static $configurations;

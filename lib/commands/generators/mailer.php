@@ -1,6 +1,5 @@
 <?php
 
-# @package Generator
 class Generator_Mailer extends Generator_Base
 {
   function __construct($args, $options=array())

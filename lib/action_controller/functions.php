@@ -5,7 +5,7 @@
 # (eg: build route functions)build controller and run
 # the action.
 # 
-# @package ActionController
+# @namespace ActionController
 function ActionController_dispatch($method, $uri)
 {
   # route
@@ -46,7 +46,7 @@ function ActionController_dispatch($method, $uri)
 
 # Analyzes host, in order to produce some URL.
 # 
-# @package ActionController
+# @namespace ActionController
 function ActionController_HostAnalyzer()
 {
   if (isset($_SERVER['HTTP_HOST']))

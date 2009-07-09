@@ -1,8 +1,6 @@
 <?php
 /**
  * Handles database migrations.
- * 
- * @package ActiveRecord
  */
 class ActiveRecord_Migration
 {

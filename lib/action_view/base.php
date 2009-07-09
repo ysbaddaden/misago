@@ -6,7 +6,6 @@
 # you shall not need to use this object directly, except for
 # a few methods, like `yield()`.
 # 
-# @package ActionView
 class ActionView_Base extends Object
 {
   public    $view_path;
@@ -47,6 +46,7 @@ class ActionView_Base extends Object
     }
   }
   
+  # @private
   protected function _find_helpers(&$helpers, $path)
   {
     $dh = opendir($path);
@@ -221,6 +221,7 @@ class ActionView_Base extends Object
   }
   
   # Copies public vars from controller, not overriding view's own class vars.
+  # @private
   protected function copy_controller_vars()
   {
     $this->params =& $this->controller->params;

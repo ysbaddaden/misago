@@ -1,9 +1,6 @@
 <?php
 /**
- * 
- * 
- * @package ActiveRecord
- * @subpackage Validations
+ * Handles errors for a given record.
  */
 class ActiveRecord_Errors
 {

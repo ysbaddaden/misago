@@ -1,12 +1,8 @@
 <?php
-/**
- * Extensions for arrays.
- * 
- * @package ActiveSupport
- */
 
 /**
  * Checks wether an array is a hash of key/value pairs or just a list of values.
+ * @namespace ActiveSupport_Array
  */
 function is_hash($arr)
 {
@@ -31,8 +27,7 @@ function is_hash($arr)
  * - $collection = array_collection('a,b,  c, d');
  * - $collection = array_collection(array('a', ' b', 'c '));
  * 
- * @return Array
- * @param $collection Mixed.
+ * @namespace ActiveSupport_Array
  */
 function & array_collection($collection)
 {
@@ -52,6 +47,7 @@ function & array_collection($collection)
 
 /**
  * Recursively merges hashes, overwriting non array/hash values.
+ * @namespace ActiveSupport_Array
  */
 function & hash_merge_recursive()
 {
@@ -74,6 +70,7 @@ function & hash_merge_recursive()
 
 /**
  * Recursively sorts arrays (skipping hashes).
+ * @namespace ActiveSupport_Array
  */
 function array_sort_recursive(&$ary)
 {

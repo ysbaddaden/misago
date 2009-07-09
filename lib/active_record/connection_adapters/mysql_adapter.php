@@ -1,9 +1,6 @@
 <?php
 /**
  * Mysql adapter.
- * 
- * @package ActiveRecord
- * @subpackage Connection
  */
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {

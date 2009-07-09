@@ -9,7 +9,7 @@ function is_symbol($str)
 /**
  * Extensions for strings.
  * 
- * @package ActiveSupport
+ * @namespace ActiveSupport
  */
 class String extends Inflections
 {

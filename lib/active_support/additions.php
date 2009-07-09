@@ -1,5 +1,6 @@
 <?php
 
+# @namespace ActiveSupport
 function is_blank($var)
 {
   if (empty($var)) {
