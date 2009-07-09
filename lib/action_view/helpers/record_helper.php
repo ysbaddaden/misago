@@ -34,9 +34,8 @@
 #   $f->end();
 # 
 # IMPROVE: Transparently protect against CSRF attacks (using a hash stored in a cookie/session).
+# TODO: Rename to ActionView_Helpers_FormHelper_Klass.
 # 
-# @package ActionView
-# @subpackage Helpers
 class RecordHelper
 {
   protected $object;
@@ -61,7 +60,7 @@ class RecordHelper
   # Starts the HTML form.
   function start($url, $options=null)
   {
-    return html::form_tag($url, $options);
+    return form_tag($url, $options);
   }
   
   # Ends the HTML form.
@@ -70,11 +69,13 @@ class RecordHelper
     return '</form>';
   }
   
+  /*
   # Displays a submit button.
   function submit($value=null, $name=null, $attributes=null)
   {
-    return html::submit($value, $name, $attributes);
+    return submit_tag($value, $name, $attributes);
   }
+  */
   
   # Displays errors related to a column.
   # Shows only the first error by default.
@@ -128,56 +129,56 @@ class RecordHelper
   function label($column, $text=null, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::label($this->object, $column, $text, $attributes);
+    return label($this->object, $column, $text, $attributes);
   }
   
   # Renders a hidden field.
   function hidden_field($column, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::hidden_field($this->object, $column, $attributes);
+    return hidden_field($this->object, $column, $attributes);
   }
   
   # Renders a text input field.
   function text_field($column, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::text_field($this->object, $column, $attributes);
+    return text_field($this->object, $column, $attributes);
   }
   
   # Renders a text area.
   function text_area($column, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::text_area($this->object, $column, $attributes);
+    return text_area($this->object, $column, $attributes);
   }
   
   # Renders a password field.
   function password_field($column, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::password_field($this->object, $column, $attributes);
+    return password_field($this->object, $column, $attributes);
   }
   
   # Renders a checkable box.
   function check_box($column=null, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::check_box($this->object, $column, $attributes);
+    return check_box($this->object, $column, $attributes);
   }
   
   # Renders a radio button.
   function radio_button($column, $tag_value, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::radio_button($this->object, $column, $tag_value, $attributes);
+    return radio_button($this->object, $column, $tag_value, $attributes);
   }
   
   # Renders a select field.
   function select($column, $options, $attributes=null)
   {
     $this->preparse_attributes($attributes);
-    return form::select($this->object, $column, $options, $attributes);
+    return select($this->object, $column, $options, $attributes);
   }
   
   protected function preparse_attributes(&$attributes)
@@ -192,7 +193,6 @@ function fields_for($record_or_name, $args=null) {
   return new RecordHelper($record_or_name, $args);
 }
 
-# Shortcut for new RecordHelper(). It's easier to use and understand.
 function form_for($record_or_name, $args=null) {
   return new RecordHelper($record_or_name, $args);
 }

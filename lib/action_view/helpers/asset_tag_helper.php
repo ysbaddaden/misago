@@ -51,7 +51,7 @@ function auto_discovery_link_tag($type='rss', $url=null, $attributes=array())
     'href'  => $url,
     'title' => strtoupper($type),
   ), $attributes);
-  return html::tag('link', $attributes);
+  return tag('link', $attributes);
 }
 
 # Linearizes an image path.
@@ -102,7 +102,7 @@ function image_tag($src, $attributes=null)
   if (!isset($attributes['alt'])) {
     $attributes['alt'] = '';
   }
-  return html::tag('img', $attributes);
+  return tag('img', $attributes);
 }
 
 # Includes one or more javascript files.
@@ -122,7 +122,7 @@ function javascript_include_tag($args)
       'charset' => 'utf-8',
       'src' => javascript_path($src),
     );
-    $tags[] = html::tag('script', '', $attributes);
+    $tags[] = tag('script', '', $attributes);
   }
   return implode("\n", $tags);
 }
@@ -148,7 +148,7 @@ function stylesheet_link_tag($args)
       'charset' => 'utf-8',
       'href' => stylesheet_path($href),
     ));
-    $tags[] = html::tag('link', $attributes);
+    $tags[] = tag('link', $attributes);
   }
   return implode("\n", $tags);
 }
