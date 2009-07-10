@@ -16,13 +16,13 @@ class Test_Time extends Unit_Test
   function test_to_string()
   {
     $obj = new Time('21:52:23', 'time');
-    $this->assert_equal('type time', (string)$obj, '09:52:23pm');
+    $this->assert_equal('type time', (string)$obj, '21:52:23');
     
     $obj = new Time('2009-01-21', 'date');
-    $this->assert_equal('type date', (string)$obj, '01/21/2009');
+    $this->assert_equal('type date', (string)$obj, '2009-01-21');
     
     $obj = new Time('2009-01-21 09:52:23', 'datetime');
-    $this->assert_equal('type datetime', (string)$obj, '01/21/2009 09:52:23am');
+    $this->assert_equal('type datetime', (string)$obj, '2009-01-21 09:52:23');
   }
   
   function test_to_s()

@@ -75,12 +75,15 @@ class Time extends Object
   
   function __toString()
   {
+    /*
     switch($this->type)
     {
       case 'datetime': return strftime('%m/%d/%Y %I:%M:%S%P', $this->_time);
       case 'date':     return strftime('%m/%d/%Y', $this->_time);
       case 'time':     return strftime('%I:%M:%S%P', $this->_time);
     }
+    */
+    return $this->to_query();
   }
   
   function to_query($type=null)
