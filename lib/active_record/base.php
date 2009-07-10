@@ -705,7 +705,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $class = get_class($this);
       
       $record = new $class($id);
-      $attributes = array_intersect_key($attributes, $this->columns);
       $record->_update($attributes);
       
       return $record;
