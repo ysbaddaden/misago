@@ -258,7 +258,8 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
             'limit'  => '',
             'page'   => '',
           ));
-          $def['find_options']['joins'] = "INNER JOIN {$def['join_table']} ON {$def['join_table']}.{$def['association_foreign_key']} = {$def['table_name']}.{$def['association_primary_key']}";
+          $def['find_options']['joins'] = "INNER JOIN {$def['join_table']} ".
+            "ON {$def['join_table']}.{$def['association_foreign_key']} = {$def['table_name']}.{$def['association_primary_key']}";
           $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
           $def['find_scope'] = ':all';
         break;

@@ -584,15 +584,47 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $this->new_record = false;
       $this->id = $id;
       
+      $this->save_associated();
+      
       $this->after_create();
       $this->after_save();
       
-      # dirty object: original attributes are now the just recorded one
+      # dirty object:
       $this->__original_attributes = $this->__attributes;
       
       return $id;
     }
     return false;
+  }
+  
+  # TODO: Test save_associated().
+  private function save_associated()
+  {
+    $rs = true;
+    foreach(array_keys($this->associations) as $assoc)
+    {
+      if (isset($this->$assoc))
+      {
+        if ($this->associations[$assoc]['type'] == 'belongs_to'
+          or $this->associations[$assoc]['type'] == 'has_one')
+        {
+          $fk = $this->associations[$assoc]['foreign_key'];
+          
+          switch($this->associations[$assoc]['type'])
+          {
+            case 'belongs_to': $this->$assoc->{$this->primary_key} = $this->$fk; break;
+            case 'has_one':    $this->$assoc->$fk = $this->id; break;
+          }
+        }
+        else
+        {
+          # TODO: Handle has_many & HABTM relationships too in save_associated().
+#          $this->$assoc->set_foreign_key($this->id);
+        }
+        $rs &= $this->$assoc->save();
+      }
+    }
+    return $rs;
   }
   
   # Generic update record method.
@@ -615,6 +647,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     $this->before_save();
     $this->before_update();
     
+    # nothing changed?
+    #if (!$this->changed()) {
+    #  return true;
+    #}
+    
     # timestamps
     if (array_key_exists('updated_at', $this->columns) and empty($this->updated_at)) {
       $this->updated_at = new Time(null, 'datetime');
@@ -634,10 +671,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     if ($rs !== false)
     {
+      $this->save_associated();
+      
       $this->after_update();
       $this->after_save();
       
-      # dirty object: original attributes are now the just recorded one
+      # dirty object:
       $this->__original_attributes = $this->__attributes;
       
       return $rs;

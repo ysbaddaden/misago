@@ -5,6 +5,7 @@ $_ENV['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
+# TODO: Test usage of virtual attributes.
 class Test_ActiveRecord_Base extends Unit_TestCase
 {
   function test_no_such_table()

@@ -47,10 +47,10 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     foreach($this->validates_associated as $assoc)
     {
       if (isset($this->$assoc) and !$this->$assoc->is_valid()) {
-        return false;
+        $rs = false;
       }
     }
-    return true;
+    return isset($rs) ? $rs : true;
   }
   
   # Validates the presence of an attribute.
