@@ -587,7 +587,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $this->after_create();
       $this->after_save();
       
+      # dirty object: original attributes are now the just recorded one
       $this->__original_attributes = $this->__attributes;
+      
       return $id;
     }
     return false;
@@ -602,11 +604,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   # @private
   protected function _update($attributes=null)
   {
-    if ($attributes !== null)
-    {
-      foreach($attributes as $field => $value) {
-        $this->$field = $value;
-      }
+    if ($attributes !== null) {
+      $this->set_attributes($attributes);
     }
     
     if (!$this->is_valid()) {
@@ -638,6 +637,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $this->after_update();
       $this->after_save();
       
+      # dirty object: original attributes are now the just recorded one
       $this->__original_attributes = $this->__attributes;
       
       return $rs;
@@ -705,7 +705,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $class = get_class($this);
       
       $record = new $class($id);
-      $record->set_attributes($attributes);
       $attributes = array_intersect_key($attributes, $this->columns);
       $record->_update($attributes);
       
