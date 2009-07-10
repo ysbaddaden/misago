@@ -7,6 +7,8 @@ require_once "$location/test/test_app/config/boot.php";
 
 class FakeRecord extends ActiveRecord_Record { }
 
+# TODO: Test dirty objects.
+# TODO: Test attributes().
 class Test_ActiveRecord_Record extends Unit_TestCase
 {
   function test_new()

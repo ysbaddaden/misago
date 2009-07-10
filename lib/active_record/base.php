@@ -238,9 +238,11 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           case 'integer': $value = (int)$value;    break;
           case 'double':  $value = (double)$value; break;
           case 'bool':    $value = (bool)$value;   break;
-          case 'date': case 'datetime': case 'time':
+          case 'date':
+          case 'datetime':
+          case 'time':
             if (!($value instanceof Time)) {
-              $value = new Time($value);
+              $value = new Time($value, $this->columns[$attribute]['type']);
             }
           break;
         }
@@ -261,33 +263,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       $attribute = $this->primary_key;
     }
     return parent::__get($attribute);
-  }
-  
-  # DEPRECATED: ActiveRecord_Base::_get_attributes().
-  private function & _get_attributes()
-  {
-    $attributes = $this->__attributes;
-    foreach(array_keys($attributes) as $k)
-    {
-      if (is_object($attributes[$k]) and method_exists($attributes[$k], 'to_s')) {
-        $attributes[$k] = $attributes[$k]->to_s('db');
-      }
-    }
-    return $attributes;
-  }
-  
-  private function & _parse_attributes($attributes=null)
-  {
-    if ($attributes === null) {
-      $attributes = $this->__attributes;
-    }
-    foreach(array_keys($attributes) as $k)
-    {
-      if (is_object($attributes[$k]) and method_exists($attributes[$k], 'to_s')) {
-        $attributes[$k] = $attributes[$k]->to_s('db');
-      }
-    }
-    return $attributes;
   }
   
   # Returns the I18n translation of model name
@@ -552,51 +527,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return (bool)$this->$method();
   }
   
-  # Generic create record method.
-  # 
-  # You better consider this method as private.
-  # Do not use unless you know what you are doing (ie. you're hacking misago).
-  # Use ActiveRecord_Base::create() instead.
-  # 
-  # @private
-  protected function _create()
-  {
-    if (!$this->is_valid()) {
-      return false;
-    }
-    
-    $this->before_save();
-    $this->before_create();
-    
-    # timestamps
-    if (array_key_exists('created_at', $this->columns) and empty($this->created_at)) {
-      $this->created_at = new Time(null, 'datetime');
-    }
-    if (array_key_exists('created_on', $this->columns) and empty($this->created_on)) {
-      $this->created_on = new Time(null, 'date');
-    }
-    
-    # create
-    $attributes = $this->_parse_attributes();
-    $id = $this->db->insert($this->table_name, $attributes, $this->primary_key);
-    if ($id)
-    {
-      $this->new_record = false;
-      $this->id = $id;
-      
-      $this->save_associated();
-      
-      $this->after_create();
-      $this->after_save();
-      
-      # dirty object:
-      $this->__original_attributes = $this->__attributes;
-      
-      return $id;
-    }
-    return false;
-  }
-  
   # TODO: Test save_associated().
   private function save_associated()
   {
@@ -627,6 +557,51 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     return $rs;
   }
   
+  # Generic create record method.
+  # 
+  # You better consider this method as private.
+  # Do not use unless you know what you are doing (ie. you're hacking misago).
+  # Use ActiveRecord_Base::create() instead.
+  # 
+  # @private
+  protected function _create()
+  {
+    if (!$this->is_valid()) {
+      return false;
+    }
+    
+    $this->before_save();
+    $this->before_create();
+    
+    # timestamps
+    if (array_key_exists('created_at', $this->columns) and empty($this->created_at)) {
+      $this->created_at = new Time(null, 'datetime');
+    }
+    if (array_key_exists('created_on', $this->columns) and empty($this->created_on)) {
+      $this->created_on = new Time(null, 'date');
+    }
+    
+    # create
+    $attributes = $this->attributes();
+    $id = $this->db->insert($this->table_name, $attributes, $this->primary_key);
+    if ($id)
+    {
+      $this->new_record = false;
+      $this->id = $id;
+      
+      $this->save_associated();
+      
+      $this->after_create();
+      $this->after_save();
+      
+      # dirty object:
+      $this->__original_attributes = $this->__attributes;
+      
+      return $id;
+    }
+    return false;
+  }
+  
   # Generic update record method.
   # 
   # You better consider this method as private.
@@ -648,9 +623,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     $this->before_update();
     
     # nothing changed?
-    #if (!$this->changed()) {
-    #  return true;
-    #}
+    if (!$this->changed) {
+      return true;
+    }
     
     # timestamps
     if (array_key_exists('updated_at', $this->columns) and empty($this->updated_at)) {
@@ -662,11 +637,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     
     # update
     $conditions = array($this->primary_key => $this->id);
-    $updates = $this->_parse_attributes($this->changes());
+    $updates = $this->changes();
     if (empty($updates)) {
       return true;
     }
-    
     $rs = $this->db->update($this->table_name, $updates, $conditions);
     
     if ($rs !== false)

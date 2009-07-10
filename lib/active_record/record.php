@@ -61,6 +61,12 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     }
   }
   
+  # Returns current attributes.
+  function attributes()
+  {
+    return $this->__attributes;
+  }
+  
   # List of attributes with unsaved changes.
   function & changed()
   {
