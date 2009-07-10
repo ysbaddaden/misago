@@ -3,17 +3,10 @@
 $_ENV['MISAGO_ENV'] = 'test';
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
-# TODO: Test ago() method
+# TODO: Test Time::ago() method.
 class Test_Time extends Unit_Test
 {
-  function test_object()
-  {
-    $time = time();
-    $obj  = new Time($time);
-    $this->assert_equal('type time', $obj->time, $time);
-  }
-  
-  function test_to_string()
+  function test_toString()
   {
     $obj = new Time('21:52:23', 'time');
     $this->assert_equal('type time', (string)$obj, '21:52:23');
@@ -23,8 +16,15 @@ class Test_Time extends Unit_Test
     
     $obj = new Time('2009-01-21 09:52:23', 'datetime');
     $this->assert_equal('type datetime', (string)$obj, '2009-01-21 09:52:23');
+    
+    $obj = new Time('', 'datetime');
+    $this->assert_equal('blank time', (string)$obj, '');
+    
+#    $obj = new Time(null, 'datetime');
+#    $this->assert_equal('null time is now', (string)$obj, '????'); # how to test this?
   }
   
+  /*
   function test_to_s()
   {
     $obj = new Time('21:52:23', 'time');
@@ -54,6 +54,7 @@ class Test_Time extends Unit_Test
     $obj = new Time('2009-01-21 09:52:23', 'datetime');
     $this->assert_equal('type datetime', $obj->to_query(), '2009-01-21 09:52:23');
   }
+  */
   
   function test_is_today()
   {

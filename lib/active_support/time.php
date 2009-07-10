@@ -2,90 +2,77 @@
 # @namespace ActiveSupport
 class Time extends Object
 {
-  protected $_time;
+  protected $raw_time;
+  protected $timestamp;
   protected $type;
   
   function __construct($time=null, $type='datetime')
   {
-    $this->time = ($time === null) ? time() : $time;
+    $this->raw_time  = $time;
+    $this->timestamp = is_string($time) ? strtotime($time) : $time;
     $this->type = $type;
   }
-  
-  function __get($var)
-  {
-    if ($var == 'time') {
-      return $this->_time;
-    }
-    throw new Exception("Unknown attribute $var");
-  }
-  
-  function __set($var, $value)
-  {
-    if ($var == 'time') {
-      return $this->_time = is_string($value) ? strtotime($value) : $value;
-    }
-    throw new Exception("Unknown attribute $var");
-  }
-  
-  function __isset($var)
-  {
-    $var = "_$var";
-    return isset($this->$var);
-  }
-  
   
   function is_past()
   {
     $today = strtotime(date('Y-m-d'));
-    return ($this->_time < $today);
+    return ($this->timestamp < $today);
   }
   
   function is_yesterday()
   {
     $yesterday = date('Y-m-d', strtotime('-1 day'));
-    $date      = date('Y-m-d', $this->_time);
+    $date      = date('Y-m-d', $this->timestamp);
     return ($date == $yesterday);
   }
   
   function is_today()
   {
     $today = date('Y-m-d');
-    $date  = date('Y-m-d', $this->_time);
+    $date  = date('Y-m-d', $this->timestamp);
     return ($date == $today);
   }
   
   function is_tomorrow()
   {
     $tomorrow = date('Y-m-d', strtotime('+1 day'));
-    $date     = date('Y-m-d', $this->_time);
+    $date     = date('Y-m-d', $this->timestamp);
     return ($date == $tomorrow);
   }
   
   function is_future()
   {
     $today = strtotime(date('Y-m-d'));
-    return ($this->_time > $today);
+    return ($this->timestamp > $today);
   }
   
   function is_this_year()
   {
-    return (date('Y', $this->_time) == date('Y'));
+    return (date('Y', $this->timestamp) == date('Y'));
   }
-  
   
   function __toString()
   {
+    if ($this->timestamp === false) {
+      return $this->raw_time;
+    }
+    switch($this->type)
+    {
+      case 'datetime': return date('Y-m-d H:i:s', $this->timestamp);
+      case 'date':     return date('Y-m-d', $this->timestamp);
+      case 'time':     return date('H:i:s', $this->timestamp);
+    }
     /*
     switch($this->type)
     {
-      case 'datetime': return strftime('%m/%d/%Y %I:%M:%S%P', $this->_time);
-      case 'date':     return strftime('%m/%d/%Y', $this->_time);
-      case 'time':     return strftime('%I:%M:%S%P', $this->_time);
+      case 'datetime': return strftime('%m/%d/%Y %I:%M:%S%P', $this->timestamp);
+      case 'date':     return strftime('%m/%d/%Y', $this->timestamp);
+      case 'time':     return strftime('%I:%M:%S%P', $this->timestamp);
     }
     */
-    return $this->to_query();
+#    return $this->to_query();
   }
-  
+  /*
   function to_query($type=null)
   {
     if ($type === null) {
@@ -93,9 +80,9 @@ class Time extends Object
     }
     switch($this->type)
     {
-      case 'datetime': return date('Y-m-d H:i:s', $this->_time);
-      case 'date':     return date('Y-m-d', $this->_time);
-      case 'time':     return date('H:i:s', $this->_time);
+      case 'datetime': return date('Y-m-d H:i:s', $this->timestamp);
+      case 'date':     return date('Y-m-d', $this->timestamp);
+      case 'time':     return date('H:i:s', $this->timestamp);
     }
   }
   
@@ -106,40 +93,33 @@ class Time extends Object
     }
     switch($type)
     {
-      case 'datetime': return strftime($this->is_this_year() ? '%b %e, %I:%M%P' : '%b %e %Y, %I:%M%P', $this->_time);
-      case 'date':     return strftime($this->is_this_year() ? '%b %e' : '%b %e %Y', $this->_time);
-      case 'time':     return strftime('%I:%M%P', $this->_time);
+      case 'datetime': return strftime($this->is_this_year() ? '%b %e, %I:%M%P' : '%b %e %Y, %I:%M%P', $this->timestamp);
+      case 'date':     return strftime($this->is_this_year() ? '%b %e' : '%b %e %Y', $this->timestamp);
+      case 'time':     return strftime('%I:%M%P', $this->timestamp);
       case 'db':       return $this->to_query();
     }
   }
-  
+  */
   function to_timestamp()
   {
-    return $this->_time;
+    return $this->timestamp;
   }
-  
-  # There is no XML format, but it's used by some to_xml() methods.
-  function to_xml()
-  {
-    return $this->to_query();
-  }
-  
   
   # RSS date format (RFC2822)
   function to_rfc2822()
   {
-    return date('r', $this->_time);
+    return date('r', $this->timestamp);
   }
   
   # ATOM date format (ISO8601)
   function to_iso8601()
   {
-    return date('c', $this->_time);
+    return date('c', $this->timestamp);
   }
   
   function ago()
   {
-    $diff     = time() - $this->_time;
+    $diff     = time() - $this->timestamp;
     $day_diff = round($diff / 86400);
     
     # in future
