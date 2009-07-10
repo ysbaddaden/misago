@@ -26,6 +26,13 @@ class ActiveRecord_Errors
     trigger_error("No such attribute ActiveRecord_Errors::$attribute.", E_USER_NOTICE);
   }
   
+  function __toString()
+  {
+    $str  = print_r($this->base_messages, true);
+    $str .= print_r($this->messages, true);
+    return $str;
+  }
+  
   # Adds an error message for the associated record's attribute.
   # The attribute is now marked as invalid.
   function add($attribute, $msg=':invalid')
