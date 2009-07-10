@@ -155,13 +155,13 @@ abstract class ActionController_Base extends Object
   protected function before_filters() {}
 #  protected function after_filters()  {}
   
-  # Redirects to another URL, passing a text message to the next page.
+  # Redirects to another URL, passing a text message to it.
   # 
   # Example:
   # 
   #   $this->flash("Post has been published.", show_post_path($this->post->id), 201);
   # 
-  # And in your template:
+  # And in your view:
   # 
   #   <?= Session::flash() ?\>
   #

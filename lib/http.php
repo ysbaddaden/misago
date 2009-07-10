@@ -97,10 +97,10 @@ class HTTP
     elseif ($code)
     {
       $status = self::$codes[$code];
-      echo "<p><a href=\"$url\">$url</a> [status: $code $status]</p>";
+      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $code $status]</p>";
     }
     else {
-      echo "<p><a href=\"$url\">$url</a> [status: 302 Found]</p>";
+      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: 302 Found]</p>";
     }
     exit;
   }
