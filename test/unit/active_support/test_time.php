@@ -24,6 +24,27 @@ class Test_Time extends Unit_Test
 #    $this->assert_equal('null time is now', (string)$obj, '????'); # how to test this?
   }
   
+  function test_magic_attributes()
+  {
+    $obj = new Time('2009-10-05');
+    $this->assert_equal('year', $obj->year, '2009');
+    $this->assert_equal('month', $obj->month, '10');
+    $this->assert_equal('day', $obj->day, '05');
+    
+    $obj = new Time('1985-06-30');
+    $this->assert_equal('year', $obj->year, '1985');
+    $this->assert_equal('month', $obj->month, '06');
+    $this->assert_equal('day', $obj->day, '30');
+    
+    $obj = new Time('1976-01-31 00:45:32');
+    $this->assert_equal('year', $obj->year, '1976');
+    $this->assert_equal('month', $obj->month, '01');
+    $this->assert_equal('day', $obj->day, '31');
+    $this->assert_equal('hour', $obj->hour, '00');
+    $this->assert_equal('min', $obj->min, '45');
+    $this->assert_equal('sec', $obj->sec, '32');
+  }
+  
   /*
   function test_to_s()
   {

@@ -51,6 +51,20 @@ class Time extends Object
     return (date('Y', $this->timestamp) == date('Y'));
   }
   
+  function __get($attr)
+  {
+    switch($attr)
+    {
+      case 'year':  return date('Y', $this->timestamp); break;
+      case 'month': return date('m', $this->timestamp); break;
+      case 'day':   return date('d', $this->timestamp); break;
+      case 'hour':  return date('H', $this->timestamp); break;
+      case 'min':   return date('i', $this->timestamp); break;
+      case 'sec':   return date('s', $this->timestamp); break;
+    }
+    trigger_error("Unknown attribute: Time::$attr", E_USER_WARNING);
+  }
+  
   function __toString()
   {
     if ($this->timestamp === false) {
