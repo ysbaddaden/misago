@@ -147,6 +147,20 @@ function select($object, $column, $options, $attributes=null)
 
 # Parses options for a select option field.
 # 
+# Render from a hash:
+# 
+#   $options = array(
+#     'Keyboard' => 45,
+#     'Mouse' => 72,
+#     'Scanner' => 59,
+#   );
+#   $html_options = options_for_select($options, 45);
+# 
+# Render from an ActiveRecord resultset:
+# 
+#   $products = $post->find(':values', array('select' => 'id,name'));
+#   $html_options = options_for_select($products, 59);
+# 
 # @namespace ActionView_Helpers_FormHelper
 # TODO: Move options_for_select() to FormOptionsHelper.
 function options_for_select($options, $selected=null)
