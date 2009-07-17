@@ -1,8 +1,6 @@
 <?php
 
 # A collection of helpful functions to render HTML content.
-# 
-# TODO: Move URL functions to UrlHelper.
 class ActionView_Helpers_TagHelper_NS
 {
   # Parses attributes for form input fields. Creates `id` from `name`;

@@ -121,6 +121,19 @@ function radio_button_tag($name, $value, $attributes=null)
 
 # Renders a select option field.
 # 
+# $options must be a string of OPTION tags. You may use options_for_select()
+# to build it.
+# 
+# Example:
+# 
+#   $options = array(
+#     'Keyboard' => 45,
+#     'Mouse' => 72,
+#     'Scanner' => 59,
+#   );
+#   $selected = 45;
+#   select_tag('type', options_for_select($options, $selected));
+# 
 # @namespace ActionView_Helpers_FormTagHelper
 function select_tag($name, $options=null, $attributes=null)
 {
