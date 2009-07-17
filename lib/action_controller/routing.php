@@ -13,9 +13,7 @@ class ActionController_Routing extends Object
   );
   private static $map;
   
-  /**
-   * Singleton
-   */
+  # Singleton
   static function draw()
   {
     if (self::$map === null) {
@@ -24,18 +22,37 @@ class ActionController_Routing extends Object
     return self::$map;
   }
   
-  /**
-   * Empties the routes.
-   */
+  # Empties the routes.
   function reset()
   {
     $this->routes = array();
   }
   
-  /**
-   * Connects a path to a mapping.
-   */
+  # Connects a path to a mapping.
   function connect($path, $mapping=array())
+  {
+    $this->connect_route(null, $path, $mapping);
+  }
+  
+  # Connects the homepage
+  function root(array $mapping)
+  {
+    foreach($this->routes as $i => $route)
+    {
+      if ($route['path'] == '') {
+        unset($this->routes[$i]);
+      }
+    }
+    $this->named('root', '', &$mapping);
+  }
+  
+  # Connects a path to a mapping, giving the route a name.
+  function named($name, $path, $mapping=array())
+  {
+    return $this->connect_route($name, $path, $mapping);
+  }
+  
+  private function connect_route($name, $path, $mapping)
   {
     $regexp = $path;
     
@@ -73,26 +90,11 @@ class ActionController_Routing extends Object
       'mapping' => &$mapping,
       'keys'    => &$keys,
       'default' => empty($mapping),
+      'name'    => $name,
     );
   }
   
-  /**
-   * Connects the homepage
-   */
-  function root(array $mapping)
-  {
-    foreach($this->routes as $i => $route)
-    {
-      if ($route['path'] == '') {
-        unset($this->routes[$i]);
-      }
-    }
-    $this->connect('', &$mapping);
-  }
-  
-  /**
-   * Builds RESTful connections
-   */
+  # Builds RESTful connections.
   function resource($name)
   {
     $this->connect("$name.:format",          array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
@@ -228,11 +230,22 @@ class ActionController_Routing extends Object
       
       foreach($this->routes as $route)
       {
+        /*
+        # root
         if (empty($route['path']))
         {
           $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
           $functions["root_path"] = $this->build_path_function('root', &$route, $route['mapping'][':controller'], $action, 'path');
           $functions["root_url"]  = $this->build_path_function('root', &$route, $route['mapping'][':controller'], $action, 'url');
+          continue;
+        }
+        */
+        # named route
+        if (isset($route['name']))
+        {
+          $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
+          $functions["{$route['name']}_path"] = $this->build_path_function($route['name'], &$route, $route['mapping'][':controller'], $action, 'path');
+          $functions["{$route['name']}_url"]  = $this->build_path_function($route['name'], &$route, $route['mapping'][':controller'], $action, 'url');
           continue;
         }
         

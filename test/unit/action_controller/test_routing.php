@@ -377,6 +377,34 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_equal('/', (string)root_path(), '/');
     $this->assert_equal('/', (string)root_url(), 'http://localhost:3009/');
   }
+  
+  function test_named_routes()
+  {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->named('about',    'about', array(':controller' => 'html', ':action' => 'about'));
+    $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
+    $map->build_path_and_url_helpers();
+    
+    $this->assert_equal('/about', $map->route('GET', 'about'), array(
+      ':method'     => 'GET',
+      ':controller' => 'html',
+      ':action'     => 'about',
+      ':format'     => null,
+    ));
+    $this->assert_true("about_path()", function_exists('about_path'));
+    $this->assert_true("about_url()", function_exists('about_url'));
+    
+    $this->assert_equal('/products/45/purchase', $map->route('GET', 'products/45/purchase'), array(
+      ':method'     => 'GET',
+      ':controller' => 'catalog',
+      ':action'     => 'purchase',
+      ':id'         => '45',
+      ':format'     => null,
+    ));
+    $this->assert_true("purchase_path()", function_exists('purchase_path'));
+    $this->assert_true("purchase_url()", function_exists('purchase_url'));
+  }
 }
 
 new Test_ActionController_Routing();
