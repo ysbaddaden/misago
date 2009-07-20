@@ -97,13 +97,16 @@ class ActionController_Routing extends Object
   # Builds RESTful connections.
   function resource($name)
   {
-    $this->connect("$name.:format",          array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
-    $this->connect("$name/new.:format",      array(':controller' => $name, ':action' => 'neo',    'conditions' => array('method' => 'GET')));
-    $this->connect("$name/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET')));
-    $this->connect("$name/:id/edit.:format", array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET')));
-    $this->connect("$name.:format",          array(':controller' => $name, ':action' => 'create', 'conditions' => array('method' => 'POST')));
-    $this->connect("$name/:id.:format",      array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT')));
-    $this->connect("$name/:id.:format",      array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE')));
+    $plural   = $name;
+    $singular = String::singularize($name);
+    
+    $this->named("$plural",          "$name.:format",          array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
+    $this->named("new_$singular",    "$name/new.:format",      array(':controller' => $name, ':action' => 'neo',    'conditions' => array('method' => 'GET')));
+    $this->named("show_$singular",   "$name/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET')));
+    $this->named("edit_$singular",   "$name/:id/edit.:format", array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET')));
+    $this->named("create_$singular", "$name.:format",          array(':controller' => $name, ':action' => 'create', 'conditions' => array('method' => 'POST')));
+    $this->named("update_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT')));
+    $this->named("delete_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE')));
   }
   
   /**
@@ -248,7 +251,7 @@ class ActionController_Routing extends Object
           $functions["{$route['name']}_url"]  = $this->build_path_function($route['name'], &$route, $route['mapping'][':controller'], $action, 'url');
           continue;
         }
-        
+        /*
         if (isset($route['mapping'][':controller']))
         {
           # explicit controller
@@ -291,6 +294,7 @@ class ActionController_Routing extends Object
             }
           }
         }
+        */
       }
       $contents = '<?php '.implode("\n\n", $functions).' ?>';
       file_put_contents(TMP.'/built_path_and_url_helpers.php', $contents);
@@ -324,7 +328,7 @@ class ActionController_Routing extends Object
     
     return $func;
   }
-  
+  /*
   private function & get_list_of_controllers()
   {
     $controllers = array();
@@ -357,22 +361,84 @@ class ActionController_Routing extends Object
     }
     return $methods;
   }
+  */
 }
 
-
-# Returns the path for a given mapping.
+# Resolves a path (reverse routing).
 # 
-#   $path = path_for(array(':controller' => 'products'));
-#   $path = path_for('product_index');
+# Example:
 # 
-# DEPRECATED: Is the 'path_for()' function necessary, or even useful?
-function path_for($mapping, array $keys=null)
+#   path_for(array(':controller' => 'products', ':action' => 'show', ':id' => '67'))
+#   # => /products/show/67
+# 
+# You may add an anchor:
+# 
+#   path_for(array(':controller' => 'about', 'anchor' => 'me'))
+#   # => /about#me
+#   
+# Unknown parameters will be added to the query string:
+# 
+#   path_for(array(':controller' => 'projects', 'order' => 'desc'))
+#   # => /projects?order=desc
+# 
+function path_for($options)
 {
+  $mapping = array_diff_key($options, array('anchor' => ''));
   $map = ActionController_Routing::draw();
-  if (is_array($mapping)) {
-    return $map->reverse($mapping);
+  $url = $map->reverse($mapping);
+  
+  $query_string = array();
+  foreach($mapping as $k => $v)
+  {
+    if (strpos($k, ':') !== 0) {
+      $query_string[] = "$k=".urlencode($v);
+    }
   }
-  return $map->named_reverse($name, $keys);
+  return $url.(empty($query_string) ? '' : '?'.implode('&', $query_string)).
+    (empty($options['anchor']) ? '' : "#{$options['anchor']}");
+}
+
+# Resolves an absolute URL (reverse routing).
+# 
+# Options:
+# 
+# - anchor
+# - protocol
+# - host
+# - port
+# - user
+# - password
+# 
+# Example:
+# 
+#   url_for(array(':controller' => 'products', ':action' => 'show', ':id' => '67'))
+#   # => http://www.domain.com/products/show/67
+# 
+# Any unknown option is added to the query string:
+# 
+#   url_for(array(':controller' => 'products', 'order' => 'asc'))
+#   # => http://www.domain.com/products?order=asc
+# 
+# You may also add an anchor:
+# 
+#   url_for(array(':controller' => 'about', 'anchor' => 'me'))
+#   # => http://www.domain.com/about#me
+# 
+# IMPROVE: url_for: handle specified options (host, protocol, etc.)
+function url_for($options)
+{
+  $default_options = array(
+    'protocol' => cfg::get('current_protocol'),
+    'host'     => cfg::get('current_host'),
+    'port'     => cfg::get('current_port'),
+    'user'     => null,
+    'password' => null,
+  );
+  $mapping = array_diff_key($options, $default_options);
+  $options = array_merge($default_options, $options);
+  
+  $url = path_for($mapping);
+  return cfg::get('base_url').$url;
 }
 
 # Transparently handles URL (with HTTP method and URI).

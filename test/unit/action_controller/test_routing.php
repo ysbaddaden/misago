@@ -285,41 +285,59 @@ class Test_ActionController_Routing extends Unit_Test
   
   function test_path_for()
   {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->connect(':controller/:action/:id.:format');
+    
     $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
-    $this->assert_equal("build route", path_for($mapping), '/page/toto.json');
+    $this->assert_equal("default route", path_for($mapping), '/pages/show/toto.json');
+    
+    $mapping = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc');
+    $this->assert_equal("with query string", path_for($mapping), '/pages.xml?order=asc');
   }
   
-  function test_build_url_and_path_helpers()
+  function test_named_routes()
   {
     $map = ActionController_Routing::draw();
     $map->reset();
-    $map->connect('product/:id.:format', array(':controller' => 'products', ':action' => 'show'));
-    $map->connect(':controller/:action/:id.:format');
+    $map->named('about',    'about', array(':controller' => 'html', ':action' => 'about'));
+    $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
     $map->build_path_and_url_helpers();
     
-    $this->assert_true('show_product_path()', function_exists('show_product_path'));
-    $this->assert_true('products_path()',     function_exists('products_path'));
+    $this->assert_equal('/about', $map->route('GET', 'about'), array(
+      ':method'     => 'GET',
+      ':controller' => 'html',
+      ':action'     => 'about',
+      ':format'     => null,
+    ));
+    $this->assert_true("about_path()", function_exists('about_path'));
+    $this->assert_true("about_url()", function_exists('about_url'));
     
-    $this->assert_true('show_product_url()', function_exists('show_product_url'));
-    $this->assert_true('products_url()',     function_exists('products_url'));
-    
-    $this->assert_equal('/products',    (string)products_path(), '/products/index');
-    $this->assert_equal('/product/123', (string)show_product_path(array(':id' => 123)), '/product/123');
-    $this->assert_equal('/product/123', (string)show_product_path(array(':id' => 123, ':format' => 'html')), '/product/123.html');
-    
-    $this->assert_equal('/products',    (string)products_url(), 'http://localhost:3009/products/index');
-    $this->assert_equal('/product/123', (string)show_product_url(array(':id' => 123)), 'http://localhost:3009/product/123');
-    $this->assert_equal('/product/123', (string)show_product_url(array(':id' => 456, ':format' => 'html')), 'http://localhost:3009/product/456.html');
-    
-    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_path(array(':id' => 'Julien')), '/say/hello_who/Julien');
-    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_path(array(':id' => 'Julien', ':format' => 'xml')), '/say/hello_who/Julien.xml');
-    
-    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_url(array(':id' => 'Julien')), 'http://localhost:3009/say/hello_who/Julien');
-    $this->assert_equal('/say/hello_who/Julien', (string)hello_who_say_url(array(':id' => 'Julien', ':format' => 'xml')), 'http://localhost:3009/say/hello_who/Julien.xml');
-
+    $this->assert_equal('/products/45/purchase', $map->route('GET', 'products/45/purchase'), array(
+      ':method'     => 'GET',
+      ':controller' => 'catalog',
+      ':action'     => 'purchase',
+      ':id'         => '45',
+      ':format'     => null,
+    ));
+    $this->assert_true("purchase_path()", function_exists('purchase_path'));
+    $this->assert_true("purchase_url()", function_exists('purchase_url'));
+  }
+  
+  function test_named_resource_path()
+  {
+    $map = ActionController_Routing::draw();
     $map->reset();
     $map->resource('users');
     $map->build_path_and_url_helpers();
+    
+    $this->assert_true('resources_path()',       function_exists('users_path'));
+    $this->assert_true('show_resource_path()',   function_exists('show_user_path'));
+    $this->assert_true('new_resource_path()',    function_exists('new_user_path'));
+    $this->assert_true('create_resource_path()', function_exists('create_user_path'));
+    $this->assert_true('edit_resource_path()',   function_exists('edit_user_path'));
+    $this->assert_true('update_resource_path()', function_exists('update_user_path'));
+    $this->assert_true('delete_resource_path()', function_exists('delete_user_path'));
     
     $expected = new ActionController_Path('GET', 'users');
     $this->assert_equal('GET /users', users_path(), $expected);
@@ -356,7 +374,6 @@ class Test_ActionController_Routing extends Unit_Test
     $expected = new ActionController_Url('DELETE', 'users/1');
     $this->assert_equal('DELETE /users/1', delete_user_url(array(':id' => 1)), $expected);
     
-    
     $expected = new ActionController_Path('GET', 'users/45/edit');
     $this->assert_equal('edit_user_path(:id)', edit_user_path(45), $expected);
     $expected = new ActionController_url('GET', 'users/45/edit');
@@ -366,7 +383,11 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_equal('show_user_path(:id)', show_user_path(72), $expected);
     $expected = new ActionController_Url('GET', 'users/72');
     $this->assert_equal('show_user_url(:id)', show_user_url(72), $expected);
-    
+  }
+  
+  function test_named_root_path()
+  {
+    $map = ActionController_Routing::draw();
     $map->reset();
     $map->root(array(':controller' => 'welcome'));
     $map->build_path_and_url_helpers();
@@ -376,34 +397,6 @@ class Test_ActionController_Routing extends Unit_Test
     
     $this->assert_equal('/', (string)root_path(), '/');
     $this->assert_equal('/', (string)root_url(), 'http://localhost:3009/');
-  }
-  
-  function test_named_routes()
-  {
-    $map = ActionController_Routing::draw();
-    $map->reset();
-    $map->named('about',    'about', array(':controller' => 'html', ':action' => 'about'));
-    $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
-    $map->build_path_and_url_helpers();
-    
-    $this->assert_equal('/about', $map->route('GET', 'about'), array(
-      ':method'     => 'GET',
-      ':controller' => 'html',
-      ':action'     => 'about',
-      ':format'     => null,
-    ));
-    $this->assert_true("about_path()", function_exists('about_path'));
-    $this->assert_true("about_url()", function_exists('about_url'));
-    
-    $this->assert_equal('/products/45/purchase', $map->route('GET', 'products/45/purchase'), array(
-      ':method'     => 'GET',
-      ':controller' => 'catalog',
-      ':action'     => 'purchase',
-      ':id'         => '45',
-      ':format'     => null,
-    ));
-    $this->assert_true("purchase_path()", function_exists('purchase_path'));
-    $this->assert_true("purchase_url()", function_exists('purchase_url'));
   }
 }
 
