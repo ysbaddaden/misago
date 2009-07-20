@@ -42,7 +42,7 @@ I18n::startup();
 
 require 'action_controller/functions.php';
 require ROOT.'/config/routes.php';
-ActionController_HostAnalyzer();
+ActionController_host_analyzer();
 
 
 function __autoload($class)

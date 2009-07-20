@@ -289,11 +289,14 @@ class Test_ActionController_Routing extends Unit_Test
     $map->reset();
     $map->connect(':controller/:action/:id.:format');
     
-    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
-    $this->assert_equal("default route", path_for($mapping), '/pages/show/toto.json');
+    $options = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
+    $this->assert_equal("default route", url_for($options), '/pages/show/toto.json');
     
-    $mapping = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc');
-    $this->assert_equal("with query string", path_for($mapping), '/pages.xml?order=asc');
+    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc');
+    $this->assert_equal("with query string", url_for($options), '/pages.xml?order=asc');
+    
+    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc', 'path_only' => false);
+    $this->assert_equal("with query string", url_for($options), 'http://localhost:3009/pages.xml?order=asc');
   }
   
   function test_named_routes()
@@ -395,8 +398,8 @@ class Test_ActionController_Routing extends Unit_Test
     $this->assert_true('root_path() exists', function_exists('root_path'));
     $this->assert_true('root_url() exists',  function_exists('root_url'));
     
-    $this->assert_equal('/', (string)root_path(), '/');
-    $this->assert_equal('/', (string)root_url(), 'http://localhost:3009/');
+    $this->assert_equal('root_path', (string)root_path(), '/');
+    $this->assert_equal('root_url', (string)root_url(), 'http://localhost:3009/');
   }
 }
 

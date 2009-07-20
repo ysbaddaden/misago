@@ -230,20 +230,8 @@ class ActionController_Routing extends Object
       or time() - strtotime('-24 hours') > filemtime(TMP.'/built_path_and_url_helpers.php'))
     {
       $functions = array();
-      
       foreach($this->routes as $route)
       {
-        /*
-        # root
-        if (empty($route['path']))
-        {
-          $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
-          $functions["root_path"] = $this->build_path_function('root', &$route, $route['mapping'][':controller'], $action, 'path');
-          $functions["root_url"]  = $this->build_path_function('root', &$route, $route['mapping'][':controller'], $action, 'url');
-          continue;
-        }
-        */
-        # named route
         if (isset($route['name']))
         {
           $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
@@ -251,55 +239,10 @@ class ActionController_Routing extends Object
           $functions["{$route['name']}_url"]  = $this->build_path_function($route['name'], &$route, $route['mapping'][':controller'], $action, 'url');
           continue;
         }
-        /*
-        if (isset($route['mapping'][':controller']))
-        {
-          # explicit controller
-          $controllers = array($route['mapping'][':controller']);
-        }
-        elseif (strpos($route['path'], ':controller') !== false)
-        {
-          # implicit controller
-          $controllers = $this->get_list_of_controllers();
-        }
-        
-        foreach($controllers as $controller)
-        {
-          if (isset($route['mapping'][':action']))
-          {
-            # explicit action
-            $actions = array($route['mapping'][':action']);
-          }
-          elseif (strpos($route['path'], ':action') !== false)
-          {
-            # implicit action
-            $actions = $this->extract_actions_from_controller($controller);
-          }
-          if (empty($actions)) {
-            continue;
-          }
-          
-          $model = String::singularize($controller);
-          
-          foreach($actions as $action)
-          {
-            $func_base_name = ($action == 'index') ? $controller :
-              (($action == 'neo') ? "new_{$model}" : "{$action}_{$model}");
-            
-            if (!isset($functions["{$func_base_name}_path"])) {
-              $functions["{$func_base_name}_path"] = $this->build_path_function($func_base_name, &$route, $controller, $action, 'path');
-            }
-            if (!isset($functions["{$func_base_name}_url"])) {
-              $functions["{$func_base_name}_url"] = $this->build_path_function($func_base_name, &$route, $controller, $action, 'url');
-            }
-          }
-        }
-        */
       }
       $contents = '<?php '.implode("\n\n", $functions).' ?>';
       file_put_contents(TMP.'/built_path_and_url_helpers.php', $contents);
     }
-    
     include TMP.'/built_path_and_url_helpers.php';
   }
   
@@ -328,96 +271,32 @@ class ActionController_Routing extends Object
     
     return $func;
   }
-  /*
-  private function & get_list_of_controllers()
-  {
-    $controllers = array();
-    
-    $dh = opendir(APP.'/controllers/');
-    if ($dh)
-    {
-      while(($file = readdir($dh)) !== false)
-      {
-        if (is_file(APP.'/controllers/'.$file)
-          and strpos($file, '_controller.php'))
-        {
-          $controller = str_replace('_controller.php', '', $file);
-          $controllers[] = $controller;
-        }
-      }
-      closedir($dh);
-    }
-    return $controllers;
-  }
-  
-  private function & extract_actions_from_controller($controller)
-  {
-    $methods = get_class_methods(String::camelize($controller.'_controller'));
-    if (!empty($methods))
-    {
-      $inherited_methods = get_class_methods(get_parent_class(String::camelize($controller.'_controller')));
-      $actions = array_diff($methods, $inherited_methods);
-      return $actions;
-    }
-    return $methods;
-  }
-  */
 }
 
-# Resolves a path (reverse routing).
-# 
-# Example:
-# 
-#   path_for(array(':controller' => 'products', ':action' => 'show', ':id' => '67'))
-#   # => /products/show/67
-# 
-# You may add an anchor:
-# 
-#   path_for(array(':controller' => 'about', 'anchor' => 'me'))
-#   # => /about#me
-#   
-# Unknown parameters will be added to the query string:
-# 
-#   path_for(array(':controller' => 'projects', 'order' => 'desc'))
-#   # => /projects?order=desc
-# 
-function path_for($options)
-{
-  $mapping = array_diff_key($options, array('anchor' => ''));
-  $map = ActionController_Routing::draw();
-  $url = $map->reverse($mapping);
-  
-  $query_string = array();
-  foreach($mapping as $k => $v)
-  {
-    if (strpos($k, ':') !== 0) {
-      $query_string[] = "$k=".urlencode($v);
-    }
-  }
-  return $url.(empty($query_string) ? '' : '?'.implode('&', $query_string)).
-    (empty($options['anchor']) ? '' : "#{$options['anchor']}");
-}
-
-# Resolves an absolute URL (reverse routing).
+# Resolves an URL (reverse routing).
 # 
 # Options:
 # 
-# - anchor
-# - protocol
-# - host
-# - port
-# - user
-# - password
+# - anchor: adds an anchor the the URL.
+# - path_only: false to return an absolute URI, true to return the path only (defaults to true).
+# - protocol: overwrites the current protocol.
+# - host: overwrites the current host.
+# - port: overwrites the current port.
+# - user: username for HTTP login.
+# - password: password for HTTP login.
 # 
 # Example:
 # 
 #   url_for(array(':controller' => 'products', ':action' => 'show', ':id' => '67'))
 #   # => http://www.domain.com/products/show/67
 # 
-# Any unknown option is added to the query string:
+# Any unknown option that isn't a symbol is added to the query string:
 # 
 #   url_for(array(':controller' => 'products', 'order' => 'asc'))
 #   # => http://www.domain.com/products?order=asc
+# 
+#   url_for(array(':controller' => 'products', ':action' => 'show', ':id' => 13, 'comments' => 'show'))
+#   # => http://www.domain.com/products/show/13?comments=show
 # 
 # You may also add an anchor:
 # 
@@ -428,17 +307,36 @@ function path_for($options)
 function url_for($options)
 {
   $default_options = array(
-    'protocol' => cfg::get('current_protocol'),
-    'host'     => cfg::get('current_host'),
-    'port'     => cfg::get('current_port'),
-    'user'     => null,
-    'password' => null,
+    'anchor'    => null,
+    'path_only' => true,
+    'protocol'  => cfg::get('current_protocol'),
+    'host'      => cfg::get('current_host'),
+    'port'      => cfg::get('current_port'),
+    'user'      => null,
+    'password'  => null,
   );
   $mapping = array_diff_key($options, $default_options);
   $options = array_merge($default_options, $options);
   
-  $url = path_for($mapping);
-  return cfg::get('base_url').$url;
+  $map  = ActionController_Routing::draw();
+  $path = $map->reverse($mapping);
+  
+  $query_string = array();
+  foreach($mapping as $k => $v)
+  {
+    if (strpos($k, ':') !== 0) {
+      $query_string[] = "$k=".urlencode($v);
+    }
+  }
+  
+  $path .= (empty($query_string) ? '' : '?'.implode('&', $query_string)).
+    (empty($options['anchor']) ? '' : "#{$options['anchor']}");
+  
+  if ($options['path_only'])
+  {
+    return $path;
+  }
+  return cfg::get('base_url').$path;
 }
 
 # Transparently handles URL (with HTTP method and URI).
@@ -468,7 +366,7 @@ class ActionController_Url
   function __construct($method, $uri)
   {
     $this->method = $method;
-    $this->uri    = cfg::get('base_url').$uri;
+    $this->uri    = cfg::get('base_url').'/'.$uri;
   }
   
   function __toString()
