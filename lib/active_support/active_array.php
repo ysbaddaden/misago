@@ -12,6 +12,16 @@ class ActiveArray extends ArrayObject
     $this->model = $model;
   }
   
+  function __get($attr)
+  {
+    if ($attr == 'klass')
+    {
+      $klass = $this->model;
+      return $this->klass = new $klass;
+    }
+    trigger_error('Unknown attribute: '.get_class($this).'::'.$attr.'.', E_USER_WARNING);
+  }
+  
   # Exports to a JSON string.
   function to_json()
   {

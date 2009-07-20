@@ -103,7 +103,6 @@ function link_to_unless_current($content, $url, $attributes=null)
 
 # Generates a form with a single button that submits to the given URL.
 # 
-# 
 # Special attributes:
 # 
 # - method: forces HTTP method
@@ -139,7 +138,7 @@ function button_to($name, $url, $attributes=null)
 
 # TODO: mail_to()
 # @namespace ActionView_Helpers_UrlHelper
-function mail_to()
+function mail_to($email, $name, $attributes=null)
 {
   
 }

@@ -1,6 +1,7 @@
 <?php
 
 # TODO: Tests!
+# IMPROVE: Check wether parent is a new_record or not.
 class ActiveRecord_Collection extends ActiveArray
 {
   protected $parent;
@@ -8,50 +9,139 @@ class ActiveRecord_Collection extends ActiveArray
   
   function __construct($parent, $childs, $options)
   {
-    $this->parent  = $parent;
+    $this->parent  =  $parent;
     $this->options =& $options;
     parent::__construct($childs, $this->options['class_name']);
   }
   
-  function build($attributes)
-  {
-    $class = $this->model;
-    $attributes[$this->options['foreign_key']] = $this->parent->{$this->options['foreign_key']};
-    return new $class($this->model);
-  }
-  
-  function create($attributes)
-  {
-    $class  = $this->model;
-    $record = new $class();
-    $attributes[$this->options['foreign_key']] = $this->parent->{$this->options['foreign_key']};
-    return $record->create(&$attributes);
-  }
-  
-  /*
   function find($args)
   {
-    $class = $this->model;
-    $args  = func_get_args();
-    return call_user_func_array(array(new $class(), 'find'), &$args);
+    $args = func_get_args();
+    
+    # extracts options
+    foreach(array_keys($args) as $i)
+    {
+      if (is_array($args[$i])
+      {
+        $options =& $args[$i];
+        break;
+      }
+    }
+    else
+    {
+      $options = array();
+      $args[] =& $options;
+    }
+    
+    # merges conditions
+    $conditions = array($this->options['foreign_key'] => $this->parent->id);
+    $options = $this->klass->merge_options($options, array('conditions' => $conditions));
+    
+    # finds
+    return call_user_func_array(array($this->klass, 'find'), &$args);
   }
   
+  # Adds a new record to the collection.
+  function build($attributes)
+  {
+    $attributes[$this->options['foreign_key']] = $this->parent->id;
+    
+    $class  = $this->model;
+    $record = new $class($attributes);
+    
+    $this->offsetSet(null, $record);
+    return $record;
+  }
+  
+  # Adds a new record to the collection, and saves it.
+  function create($attributes)
+  {
+    $record = $this->build($attributes);
+    if ($this->parent->new_record)
+    {
+      if (!$record->save()) {
+        return false;
+      }
+    }
+    return $record;
+  }
+  
+  # Deletes the given records. They are removed from the collection, too.
   function delete($record)
   {
-    $class = $this->model;
-    $args  = func_get_args();
-    foreach($args as $record) {
-      $record->delete();
+    $records = func_get_args();
+    $removed = array();
+    
+    # deletion from database
+    $this->klass->transaction('begin');
+    foreach($this as $i => $record)
+    {
+      if (in_array($record, $records))
+      {
+        if (!$record->delete())
+        {
+          $this->klass->transaction('rollback');
+          return false;
+        }
+        $removed[] = $i;
+      }
     }
+    $this->klass->transaction('commit');
+    
+    # removes from collection
+    foreach($removed as $i) {
+      $this->offsetUnset($i);
+    }
+    return true;
   }
   
+  # Deletes all records at once. Records are removed from the collection, too.
   function delete_all()
   {
-    foreach($this as $record) {
-      $record->delete();
+    # deletion from database
+    $this->klass->transaction('begin');
+    foreach($this as $record)
+    {
+      if (!$this->record)
+      {
+        $this->klass->transaction('rollback');
+        return false;
+      }
     }
+    $this->klass->transaction('commit');
+    
+    # clears collection
+    $this->clear();
+    return true;
   }
-  */
+  
+  # Destroys all records at once. Records are removed from the collection, too.
+  function destroy_all()
+  {
+    $records = func_get_args();
+    
+    # deletion from database
+    $this->klass->transaction('begin');
+    foreach($this as $i => $record)
+    {
+      if (!$record->destroy())
+      {
+        $this->klass->transaction('rollback');
+        return false;
+      }
+    }
+    $this->klass->transaction('end');
+    
+    # clears collection
+    $this->clear();
+    return true;
+  }
+  
+  # Clears the collection.
+  function clear()
+  {
+    $this->exchangeArray(array());
+  }
 }
 
 ?>
