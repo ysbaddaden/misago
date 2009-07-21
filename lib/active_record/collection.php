@@ -1,7 +1,7 @@
 <?php
 
-# TODO: Tests!
-# IMPROVE: Check wether parent is a new_record or not.
+# TODO: Write tests!
+# IMPROVE: Check wether parent is a new_record or not (before saving).
 class ActiveRecord_Collection extends ActiveArray
 {
   protected $parent;
@@ -18,7 +18,7 @@ class ActiveRecord_Collection extends ActiveArray
   {
     $args = func_get_args();
     
-    # extracts options
+    # extracts options from args
     foreach(array_keys($args) as $i)
     {
       if (is_array($args[$i]))
@@ -33,15 +33,12 @@ class ActiveRecord_Collection extends ActiveArray
       $args[] =& $options;
     }
     
-    # merges conditions
-    $conditions = array($this->options['foreign_key'] => $this->parent->id);
-    $options = $this->klass->merge_options($options, array('conditions' => $conditions));
-    
-    # finds
+    $options = $this->klass->merge_options($options,
+      array('conditions' => $this->options['find_options']));
     return call_user_func_array(array($this->klass, 'find'), &$args);
   }
   
-  # Adds a new record to the collection.
+  # Adds a new record to the collection, but doesn't save it.
   function build($attributes)
   {
     $attributes[$this->options['foreign_key']] = $this->parent->id;
@@ -95,7 +92,7 @@ class ActiveRecord_Collection extends ActiveArray
     return true;
   }
   
-  # Deletes all records at once. Records are removed from the collection, too.
+  # Deletes all records. They're removed from the collection, too.
   function delete_all()
   {
     # deletion from database
@@ -115,7 +112,7 @@ class ActiveRecord_Collection extends ActiveArray
     return true;
   }
   
-  # Destroys all records at once. Records are removed from the collection, too.
+  # Destroys all records. They're removed from the collection, too.
   function destroy_all()
   {
     $records = func_get_args();
