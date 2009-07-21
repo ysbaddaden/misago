@@ -3,7 +3,7 @@ require ROOT.'/config/initializers/inflections.php';
 
 function is_symbol($str)
 {
-  return (strpos($str, ':') === 0);
+  return (is_string($str) and strpos($str, ':') === 0);
 }
 
 /**

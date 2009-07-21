@@ -11,6 +11,11 @@ class Test_String extends Unit_Test
     $this->assert_true('', is_symbol(":all"));
     $this->assert_false('', is_symbol("all"));
     $this->assert_false('', is_symbol(" :all"));
+    
+    $this->assert_false('', is_symbol("all"));
+    $this->assert_false('', is_symbol(45));
+    $this->assert_false('', is_symbol(array()));
+    $this->assert_false('', is_symbol(new stdClass()));
   }
   
   function test_camelize()
