@@ -3,10 +3,18 @@
 # Generic object, to share methods between all misago's classes.
 abstract class Object
 {
+  protected $attr_read = array();
+  
+  function __get($attr)
+  {
+    if (in_array($attr, $this->attr_read)) {
+      return $this->$attr;
+    }
+    return null;
+  }
+  
   function to_s()
   {
-#    $class = get_class($this);
-#    throw new Exception("$class::to_s() is unimplemented.");
     return $this->__toString();
   }
   
