@@ -21,13 +21,13 @@ class ActiveRecord_Collection extends ActiveArray
     # extracts options
     foreach(array_keys($args) as $i)
     {
-      if (is_array($args[$i])
+      if (is_array($args[$i]))
       {
         $options =& $args[$i];
         break;
       }
     }
-    else
+    if (!isset($options))
     {
       $options = array();
       $args[] =& $options;
