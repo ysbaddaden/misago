@@ -363,8 +363,6 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       $ids[$id] = $record;
     }
     
-#    $includes = linearize_options_tree(array_collection($includes));
-#    foreach($includes as $include => $find_options)
     foreach(array_collection($includes) as $include)
     {
       $fk    = $this->associations[$include]['find_key'];

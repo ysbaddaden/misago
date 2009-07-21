@@ -1,7 +1,5 @@
 <?php
 
-# TODO: Write tests!
-# IMPROVE: Check wether parent is a new_record or not (before saving).
 class ActiveRecord_Collection extends ActiveArray
 {
   protected $parent;
@@ -14,7 +12,7 @@ class ActiveRecord_Collection extends ActiveArray
     parent::__construct($childs, $this->options['class_name']);
   }
   
-  function find($args)
+  function find()
   {
     $args = func_get_args();
     
@@ -33,8 +31,9 @@ class ActiveRecord_Collection extends ActiveArray
       $args[] =& $options;
     }
     
-    $options = $this->klass->merge_options($options,
-      array('conditions' => $this->options['find_options']));
+	  $_options = isset($assoc['find_options']) ? $this->options['find_options'] : array();
+	  $_options['conditions'] = array($this->options['find_key'] => $this->parent->id);
+    $options = $this->klass->merge_options($options, $_options);
     return call_user_func_array(array($this->klass, 'find'), &$args);
   }
   
@@ -54,11 +53,8 @@ class ActiveRecord_Collection extends ActiveArray
   function create($attributes)
   {
     $record = $this->build($attributes);
-    if ($this->parent->new_record)
-    {
-      if (!$record->save()) {
-        return false;
-      }
+    if (!$this->parent->new_record and !$record->save()) {
+      return false;
     }
     return $record;
   }
@@ -75,7 +71,7 @@ class ActiveRecord_Collection extends ActiveArray
     {
       if (in_array($record, $records))
       {
-        if (!$record->delete())
+        if (!$record->new_record and !$record->delete())
         {
           $this->klass->transaction('rollback');
           return false;
@@ -99,7 +95,7 @@ class ActiveRecord_Collection extends ActiveArray
     $this->klass->transaction('begin');
     foreach($this as $record)
     {
-      if (!$this->record)
+      if (!$record->new_record and !$record->delete())
       {
         $this->klass->transaction('rollback');
         return false;
@@ -121,7 +117,7 @@ class ActiveRecord_Collection extends ActiveArray
     $this->klass->transaction('begin');
     foreach($this as $i => $record)
     {
-      if (!$record->destroy())
+      if (!$record->new_record and !$record->destroy())
       {
         $this->klass->transaction('rollback');
         return false;

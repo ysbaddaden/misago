@@ -184,6 +184,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   protected $columns       = array();
   protected $default_scope = array();
   
+  protected $attr_read     = array('new_record', 'table_name');
+  
+  
   # IMPROVE: Check if columns do not conflict with object class attributes.
   function __construct($arg=null)
   {

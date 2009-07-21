@@ -43,6 +43,8 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   protected $__original_attributes = array();
   protected $new_record            = true;
   
+  protected $attr_read = array('new_record');
+  
   
   function __construct($attributes=null)
   {
@@ -122,9 +124,7 @@ abstract class ActiveRecord_Record extends Object implements Iterator
       $func = 'attribute_'.$match[2];
       return $this->$func($match[1]);
     }
-    
-    # return parent::__get($attribute);
-    return null;
+    return parent::__get($attribute);
   }
   
   function __set($attribute, $value)
