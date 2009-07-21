@@ -200,6 +200,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         $name = $i;
         $def  = $this->{$type}[$name];
       }
+      $def['name'] = $name;
       $def['type'] = $type;
       
       if (empty($def['class_name'])) {
