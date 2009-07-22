@@ -1,7 +1,7 @@
 <?php
 
 $location = dirname(__FILE__).'/../../..';
-$_ENV['MISAGO_ENV'] = 'test';
+$_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
@@ -163,7 +163,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal('collection has been reduced by 1', $order->baskets->count(), 2);
     
     $order = new Order(1);
-    $this->assert_equal('record must have been deleted from disk', $order->baskets->count(), 2);
+    $this->assert_equal('record must have been deleted from database', $order->baskets->count(), 2);
 
     $this->fixtures('baskets');
 
@@ -172,7 +172,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal('collection has been reduced by 2', $order->baskets->count(), 1);
 
     $order = new Order(1);
-    $this->assert_equal('the 2 records must have been deleted from disk', $order->baskets->count(), 1);
+    $this->assert_equal('the 2 records must have been deleted from database', $order->baskets->count(), 1);
   }
   
   function test_others_delete_all()
@@ -184,7 +184,19 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal('collection is now empty', $order->baskets->count(), 0);
     
     $order = new Order(1);
-    $this->assert_equal('records must have been deleted from disk', $order->baskets->count(), 0);
+    $this->assert_equal('records must have been deleted from database', $order->baskets->count(), 0);
+  }
+  
+  function test_others_destroy_all()
+  {
+    $this->fixtures('baskets');
+    
+    $order = new Order(1);
+    $order->baskets->destroy_all();
+    $this->assert_equal('collection is now empty', $order->baskets->count(), 0);
+    
+    $order = new Order(1);
+    $this->assert_equal('records must have been destroyed from database', $order->baskets->count(), 0);
   }
   
   function test_others_find()

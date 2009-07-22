@@ -63,25 +63,12 @@ class ActiveRecord_Collection extends ActiveArray
   function delete($record)
   {
     $records = func_get_args();
-    $removed = array();
-    
-    # deletion from database
-    $this->klass->transaction('begin');
-    foreach($this as $i => $record)
-    {
-      if (in_array($record, $records))
-      {
-        if (!$record->new_record and !$record->delete())
-        {
-          $this->klass->transaction('rollback');
-          return false;
-        }
-        $removed[] = $i;
-      }
+    $removed = $this->klass->transaction(array($this, '_block_delete'), $records);
+    if ($removed === false) {
+      return false;
     }
-    $this->klass->transaction('commit');
     
-    # removes from collection
+    # removes deleted records from collection
     foreach($removed as $i) {
       $this->offsetUnset($i);
     }
@@ -91,19 +78,7 @@ class ActiveRecord_Collection extends ActiveArray
   # Deletes all records. They're removed from the collection, too.
   function delete_all()
   {
-    # deletion from database
-    $this->klass->transaction('begin');
-    foreach($this as $record)
-    {
-      if (!$record->new_record and !$record->delete())
-      {
-        $this->klass->transaction('rollback');
-        return false;
-      }
-    }
-    $this->klass->transaction('commit');
-    
-    # clears collection
+    $this->klass->transaction(array($this, '_block_delete_all'));
     $this->clear();
     return true;
   }
@@ -111,21 +86,7 @@ class ActiveRecord_Collection extends ActiveArray
   # Destroys all records. They're removed from the collection, too.
   function destroy_all()
   {
-    $records = func_get_args();
-    
-    # deletion from database
-    $this->klass->transaction('begin');
-    foreach($this as $i => $record)
-    {
-      if (!$record->new_record and !$record->destroy())
-      {
-        $this->klass->transaction('rollback');
-        return false;
-      }
-    }
-    $this->klass->transaction('end');
-    
-    # clears collection
+    $this->klass->transaction(array($this, '_block_destroy_all'));
     $this->clear();
     return true;
   }
@@ -134,6 +95,48 @@ class ActiveRecord_Collection extends ActiveArray
   function clear()
   {
     $this->exchangeArray(array());
+  }
+  
+  
+  # @private
+  function _block_delete()
+  {
+    $records = func_get_args();
+    $removed = array();
+    foreach($this as $i => $record)
+    {
+      if (in_array($record, $records))
+      {
+        if (!$record->new_record)
+        {
+          $record->do_delete();
+          $removed[] = $i;
+        }
+      }
+    }
+    return $removed;
+  }
+  
+  # @private
+  function _block_delete_all()
+  {
+    foreach($this as $record)
+    {
+      if (!$record->new_record) {
+        $record->do_delete();
+      }
+    }
+  }
+  
+  # @private
+  function _block_destroy_all()
+  {
+    foreach($this as $record)
+    {
+      if (!$record->new_record) {
+        $record->do_destroy();
+      }
+    }
   }
 }
 

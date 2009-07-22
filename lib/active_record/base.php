@@ -427,6 +427,38 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
   }
   
+  # Shortcut for find(:all).
+  function all($options=null)
+  {
+    return $this->find(':all', $options);
+  }
+  
+  # Shortcut for find(:first).
+  function first($options=null)
+  {
+    return $this->find(':first', $options);
+  }
+  
+  # Shortcut for find(:values).
+  function values($options=null)
+  {
+    return $this->find(':values', $options);
+  }
+  
+  # Checks wether a given record exists or not.
+  function exists($id)
+  {
+    if (empty($id) and strlen($id) == 0) {
+      return false;
+    }
+    $options = array(
+      'conditions' => array($this->primary_key => $id),
+      'select'     => $this->primary_key,
+    );
+    $self = $this->find(':first', $options);
+    return (gettype($self) == 'object');
+  }
+  
   protected function build_sql_from_options($options)
   {
     # builds SQL
@@ -480,62 +512,44 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     return $c;
   }
-
-  function transaction($state='begin')
-  {
-    $this->db->transaction($state);
-  }
   
-  /**
-   * Shortcut for find(:all).
-   */
-  function all($options=null)
+  # Executes a function inside a database transaction.
+  # 
+  # Whenever an Exception is raised transacted
+  # queries will be rollbacked and false will be returned.
+  # 
+  # If no exception is raised transacted queries will be
+  # commited to the database, and the result of the executed
+  # function will be returned.
+  function transaction($func, array $args=null)
   {
-    return $this->find(':all', $options);
-  }
-  
-  /**
-   * Shortcut for find(:first).
-   */
-  function first($options=null)
-  {
-    return $this->find(':first', $options);
-  }
-  
-  /**
-   * Shortcut for find(:values).
-   */
-  function values($options=null)
-  {
-    return $this->find(':values', $options);
-  }
-  
-  /**
-   * Checks wether a given record exists or not.
-   */
-  function exists($id)
-  {
-    if (empty($id) and strlen($id) == 0) {
+    if (is_string($func)) {
+      $func = array($this, $func);
+    }
+    $this->db->transaction('begin');
+    
+    try
+    {
+      $rs = call_user_func_array($func, $args);
+    }
+    catch(Exception $e)
+    {
+      $this->db->transaction('rollback');
       return false;
     }
-    $options = array(
-      'conditions' => array($this->primary_key => $id),
-      'select'     => $this->primary_key,
-    );
-    $self = $this->find(':first', $options);
-    return (gettype($self) == 'object');
+    
+    $this->db->transaction('commit');
+    return $rs;
   }
   
-  /**
-   * Creates or updates the record.
-   */
+  # Creates or updates the record.
   function save()
   {
     $method = $this->new_record ? '_create' : '_update';
     return (bool)$this->$method();
   }
   
-  # TODO: Test save_associated().
+  # TODO: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
   private function save_associated()
   {
     $rs = true;
@@ -543,21 +557,13 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     {
       if (isset($this->$assoc))
       {
-        if ($this->associations[$assoc]['type'] == 'belongs_to'
-          or $this->associations[$assoc]['type'] == 'has_one')
+        $fk = $this->associations[$assoc]['foreign_key'];
+        switch($this->associations[$assoc]['type'])
         {
-          $fk = $this->associations[$assoc]['foreign_key'];
-          
-          switch($this->associations[$assoc]['type'])
-          {
-            case 'belongs_to': $this->$assoc->{$this->primary_key} = $this->$fk; break;
-            case 'has_one':    $this->$assoc->$fk = $this->id; break;
-          }
-        }
-        else
-        {
-          # TODO: Handle has_many & HABTM relationships too in save_associated().
-#          $this->$assoc->set_foreign_key($this->id);
+          case 'belongs_to': $this->$assoc->{$this->primary_key} = $this->$fk; break;
+          case 'has_one':    $this->$assoc->$fk = $this->$fk; break;
+#          case 'has_many': break;
+#          case 'has_and_belongs_to_many': break;
         }
         $rs &= $this->$assoc->save();
       }
@@ -684,26 +690,31 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     else
     {
-      $args    = func_get_args();
-      $records = array();
-      
-      $this->db->transaction('begin');
-      
-      foreach($args as $attributes)
-      {
-        $record = $this->create($attributes);
-        if ($record === false)
-        {
-          $this->db->transaction('rollback');
-          return false;
-        }
-        $records[] = $record;
-      }
-      
-      $this->db->transaction('commit');
-      return $records;
+      $args = func_get_args();
+      return $this->transaction('_block_create', &$args);
     }
     return false;
+  }
+  
+  # Same as +create+ but throws an exception on failure.
+  function do_create(array $attributes)
+  {
+    $args = func_get_args();
+    $rs   = call_user_func_array(array($this, 'create'), $args);
+    if ($rs === false) {
+      throw new ActiveRecord_RecordNotSaved;
+    }
+    return $rs;
+  }
+  
+  private function _block_create()
+  {
+    $args = func_get_args();
+    $records = array();
+    foreach($args as $attributes) {
+      $records[] = $this->do_create($attributes);
+    }
+    return $records;
   }
   
   /**
@@ -730,29 +741,30 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       
       return $record;
     }
-    else
-    {
-      $records = array();
-      $i = 0;
-      
-      $this->db->transaction('begin');
-      
-      foreach($id as $_id)
-      {
-        $rs = $this->update($_id, $attributes[$i]);
-        
-        if ($rs === false)
-        {
-          $this->db->transaction('rollback');
-          return false;
-        }
-        $records[] = $rs;
-        $i++;
-      }
-
-      $this->db->transaction('commit');
-      return $records;
+    else {
+      return $this->transaction('_block_update', array($id, $attributes));
     }
+  }
+  
+  # Same as +update+ but throws an exception on failure.
+  function do_update($id, $attributes)
+  {
+    $rs = $this->update($id, $attributes);
+    if ($rs === false) {
+      throw new ActiveRecord_RecordNotSaved;
+    }
+    return $rs;
+  }
+  
+  private function _block_update($ids, $attributes)
+  {
+    $records = array();
+    foreach($ids as $i => $id)
+    {
+      $records[] = $this->do_update($id, $attributes[$i]);
+      $i++;
+    }
+    return $records;
   }
   
   /**
@@ -846,6 +858,15 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
   }
   
+  # Same as +delete+ but raises an ActiveRecord_Exception on error.
+  function do_delete($id=null)
+  {
+    if (!$this->delete($id)) {
+      throw new ActiveRecord_Exception();
+    }
+    return true;
+  }
+  
   /**
    * Deletes many records at once.
    * 
@@ -884,6 +905,15 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     $conditions = array($this->primary_key => $id);
     return $this->db->delete($this->table_name, $conditions);
+  }
+  
+  # Same as +destroy+ but raises an ActiveRecord_Exception on error.
+  function do_destroy($id=null)
+  {
+    if (!$this->destroy($id)) {
+      throw new ActiveRecord_Exception();
+    }
+    return true;
   }
   
   # Destroys many records at once.
