@@ -1,7 +1,7 @@
 <?php
 
 define('DEBUG', 1);
-error_reporting(E_ALL);
+error_reporting(E_STRICT);
 
 if (isset($_SERVER['HTTP_HOST']))
 {

@@ -27,9 +27,9 @@ class Generator_Model extends Generator_Base
     $this->create_directory('test/fixtures');
     
     # files
-    $test = $this->create_file_from_template("app/models/{$filename}.php", 'model/model.php', &$vars);
-    $this->create_file_from_template("test/unit/test_{$filename}.php", 'model/test.php', &$vars);
-    $this->create_file_from_template("test/fixtures/{$table}.yml", 'model/fixture.yml', &$vars);
+    $test = $this->create_file_from_template("app/models/{$filename}.php", 'model/model.php', $vars);
+    $this->create_file_from_template("test/unit/test_{$filename}.php", 'model/test.php', $vars);
+    $this->create_file_from_template("test/fixtures/{$table}.yml", 'model/fixture.yml', $vars);
     
     # migrations
     $filename = gmdate('YmdHis').'_create_'.$table;
@@ -40,7 +40,7 @@ class Generator_Model extends Generator_Base
       'table'    => $table,
     );
     $this->create_directory('db/migrate');
-    $this->create_file_from_template("db/migrate/{$filename}.php", 'model/migration.php', &$vars);
+    $this->create_file_from_template("db/migrate/{$filename}.php", 'model/migration.php', $vars);
   }
 }
 

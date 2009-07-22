@@ -92,7 +92,7 @@ class ActiveRecord_Errors
   # Returns true if all attributes are valid and no error message was added.
   function is_empty()
   {
-    return (empty($this->messages) && empty($this->base_messages));
+    return (empty($this->messages) and empty($this->base_messages));
   }
   
   # Returns true if associated record attribute is invalid.

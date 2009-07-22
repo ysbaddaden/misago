@@ -284,7 +284,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 			  $options['conditions'] = array($assoc['find_key'] => $this->id);
 			
 			  $record = new $model();
-			  $found  = $record->find($assoc['find_scope'], &$options);
+			  $found  = $record->find($assoc['find_scope'], $options);
         
         if ($found)
         {

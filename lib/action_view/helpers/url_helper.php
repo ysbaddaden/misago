@@ -130,7 +130,7 @@ function button_to($name, $url, $attributes=null)
     unset($attributes['method']);
   }
   
-  $str  = form_tag($url, &$form_attributes);
+  $str  = form_tag($url, $form_attributes);
   $str .= '<div>'.submit_tag($name, $attributes).'</div>';
   $str .= '</form>';
   return $str;

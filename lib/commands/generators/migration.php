@@ -19,7 +19,7 @@ class Generator_Migration extends Generator_Base
     );
     
     $this->create_directory('db/migrate');
-    $this->create_file_from_template("db/migrate/{$filename}.php", 'migration/migration.php', &$vars);
+    $this->create_file_from_template("db/migrate/{$filename}.php", 'migration/migration.php', $vars);
   }
 }
 

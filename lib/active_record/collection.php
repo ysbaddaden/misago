@@ -34,7 +34,7 @@ class ActiveRecord_Collection extends ActiveArray
 	  $_options = isset($assoc['find_options']) ? $this->options['find_options'] : array();
 	  $_options['conditions'] = array($this->options['find_key'] => $this->parent->id);
     $options = $this->klass->merge_options($options, $_options);
-    return call_user_func_array(array($this->klass, 'find'), &$args);
+    return call_user_func_array(array($this->klass, 'find'), $args);
   }
   
   # Adds a new record to the collection, but doesn't save it.

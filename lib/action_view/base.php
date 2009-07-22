@@ -11,6 +11,7 @@ class ActionView_Base extends Object
   public    $view_path;
   public    $view_format;
   protected $controller;
+  protected $params;
   
   protected $yields = array(
     'title' => ''
@@ -27,7 +28,7 @@ class ActionView_Base extends Object
     
     if (!isset($helpers) or $helpers == ':all')
     {
-      $helpers = apc_fetch(TMP.'/list_of_helpers', &$success);
+      $helpers = apc_fetch(TMP.'/list_of_helpers', $success);
       
       if ($success === false)
       {
@@ -67,7 +68,7 @@ class ActionView_Base extends Object
   # = Generic option(s):
   # 
   # - format: which format to use? defaults to 'html'
-  #
+  # 
   # = Render a view:
   # 
   #   render(array('action' => 'index'));

@@ -145,7 +145,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
       return;
     }
     $action = "_$action";
-    $this->$action($attribute, &$options);
+    $this->$action($attribute, $options);
   }
   
   private function _validate_presence_of($attribute, $options=null)

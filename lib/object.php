@@ -10,7 +10,6 @@ abstract class Object
     if (in_array($attr, $this->attr_read)) {
       return $this->$attr;
     }
-    return null;
   }
   
   function to_s()

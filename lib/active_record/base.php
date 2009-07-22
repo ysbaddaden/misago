@@ -383,7 +383,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     }
     
     # queries then creates objects
-    $sql = $this->build_sql_from_options(&$options);
+    $sql = $this->build_sql_from_options($options);
     
     $model = get_class($this);
     switch($method)
@@ -521,7 +521,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   # If no exception is raised transacted queries will be
   # commited to the database, and the result of the executed
   # function will be returned.
-  function transaction($func, array $args=null)
+  function transaction($func, array $args=array())
   {
     if (is_string($func)) {
       $func = array($this, $func);
@@ -691,7 +691,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     else
     {
       $args = func_get_args();
-      return $this->transaction('_block_create', &$args);
+      return $this->transaction('_block_create', $args);
     }
     return false;
   }
@@ -780,7 +780,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
   {
     $value   = (func_num_args() > 1) ? $value : $this->$attribute;
     $updates = array($attribute => $value);
-    return $this->update_attributes(&$updates);
+    return $this->update_attributes($updates);
   }
   
   /**
@@ -812,7 +812,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     foreach($updates as $attribute) {
       $_updates[$attribute] = $this->$attribute;
     }
-    return $this->_update(&$_updates);
+    return $this->_update($_updates);
   }
   
   /**
