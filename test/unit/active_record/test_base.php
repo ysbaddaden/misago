@@ -1,7 +1,7 @@
 <?php
 
 $location = dirname(__FILE__).'/../../..';
-$_ENV['MISAGO_ENV'] = 'test';
+$_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
@@ -237,7 +237,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_save()
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->execute('TRUNCATE products ;');
     
     # save: create
@@ -263,7 +263,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_delete_all()
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->execute('TRUNCATE products ;');
     
     $data1   = array('name' => "qwerty", 'price' =>  5.98);
@@ -299,7 +299,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_destroy()
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->execute('TRUNCATE products ;');
     
     $data1   = array('name' => "qwerty", 'price' =>  5.98);
@@ -317,7 +317,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_destroy_all()
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->execute('TRUNCATE products ;');
     
     $data1   = array('name' => "qwerty", 'price' =>  5.98);

@@ -8,17 +8,17 @@ class Unit_TestCase extends Unit_Test
     $location = ROOT;
     
     # db cleanup (just in case)
-    exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/drop");
+    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/drop");
     
     # db ignition
-    exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/create");
-    exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/migrate");
+    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/create");
+    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/migrate");
     
     # runs tests
     parent::__construct();
     
     # db cleanup
-    exec("MISAGO_ENV={$_ENV['MISAGO_ENV']} $location/script/db/drop");
+    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/drop");
   }
   
   # Loads one or many fixtures into the database.
@@ -26,7 +26,7 @@ class Unit_TestCase extends Unit_Test
   #   $this->fixtures('chapters,pages');
   function fixtures($fixtures)
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     
     if (!empty($fixtures)) {
       $fixtures = array_collection($fixtures);
@@ -50,7 +50,7 @@ class Unit_TestCase extends Unit_Test
   #   $this->truncate('chapters,pages');
   function truncate($tables)
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     
     if (!empty($tables)) {
       $tables = array_collection($tables);
@@ -95,7 +95,7 @@ class Unit_TestCase extends Unit_Test
     # requests a page
     $ch = curl_init();
     
-    curl_setopt($ch, CURLOPT_URL, $_ENV['MISAGO_URL'].$uri);
+    curl_setopt($ch, CURLOPT_URL, $_SERVER['MISAGO_URL'].$uri);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);

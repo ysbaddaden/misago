@@ -1,5 +1,5 @@
 <?php
-$_ENV['MISAGO_ENV'] = 'test';
+$_SERVER['MISAGO_ENV'] = 'test';
 
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 require_once dirname(__FILE__)."/../../lib/unit/test_case.php";
@@ -9,7 +9,7 @@ class Test_Unit_TestCase extends Unit_TestCase
 {
   function test_load_fixtures()
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     
     $data = $db->select_values('select id from products order by id asc;');
     $this->assert_equal("products must be empty", $data, array());

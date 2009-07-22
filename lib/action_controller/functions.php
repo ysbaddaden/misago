@@ -29,7 +29,7 @@ function ActionController_dispatch($method, $uri)
         and strpos($mapping[':action'], '__') !== 0
         and is_callable(array($controller, $mapping[':action'])))
       {
-        $controller->execute(&$mapping);
+        $controller->execute($mapping);
       }
       else {
         throw new MisagoException("Tried to call a private/protected method as a public action: {$mapping[':action']}", 400);

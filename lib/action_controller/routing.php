@@ -43,7 +43,7 @@ class ActionController_Routing extends Object
         unset($this->routes[$i]);
       }
     }
-    $this->named('root', '', &$mapping);
+    $this->named('root', '', $mapping);
   }
   
   # Connects a path to a mapping, giving the route a name.
@@ -176,7 +176,7 @@ class ActionController_Routing extends Object
           or strpos($route['path'], ':action') !== false)
         {
           # has keys?
-          if ($this->has_keys(&$route, &$_mapping))
+          if ($this->has_keys($route, $_mapping))
           {
             $path   = strtr($route['path'], $_mapping);
             $path   = str_replace(array('/:format', '.:format', '?:format'), '', $path);
@@ -235,8 +235,8 @@ class ActionController_Routing extends Object
         if (isset($route['name']))
         {
           $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
-          $functions["{$route['name']}_path"] = $this->build_path_function($route['name'], &$route, $route['mapping'][':controller'], $action, 'path');
-          $functions["{$route['name']}_url"]  = $this->build_path_function($route['name'], &$route, $route['mapping'][':controller'], $action, 'url');
+          $functions["{$route['name']}_path"] = $this->build_path_function($route['name'], $route, $route['mapping'][':controller'], $action, 'path');
+          $functions["{$route['name']}_url"]  = $this->build_path_function($route['name'], $route, $route['mapping'][':controller'], $action, 'url');
           continue;
         }
       }

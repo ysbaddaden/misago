@@ -1,6 +1,6 @@
 <?php
 
-$_ENV['MISAGO_ENV'] = 'test';
+$_SERVER['MISAGO_ENV'] = 'test';
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
 class Test_ActiveSupport_Array extends Unit_Test

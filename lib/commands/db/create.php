@@ -1,6 +1,6 @@
 <?php
 
-$db = ActiveRecord_Connection::create($_ENV['MISAGO_ENV']);
+$db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
 
 $database = $db->config('database');
 if ($db->create_database($database, array('charset' => 'utf8'))) {

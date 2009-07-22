@@ -37,7 +37,7 @@ class ActiveRecord_Connection
     }
     
     $class = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
-    return new $class(&$config);
+    return new $class($config);
   }
   
 	# Returns the connection object for the given configuration.

@@ -194,7 +194,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
     if (empty($this->table_name)) {
       $this->table_name = String::underscore(String::pluralize(get_class($this)));
     }
-    $this->db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $this->db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     
     # columns' definition
     $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;

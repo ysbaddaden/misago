@@ -4,7 +4,6 @@
 $direction = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 'up';
 $from_version = ActiveRecord_Migration::get_version();
 
-
 $migration_files = glob(ROOT.'/db/migrate/*.php');
 sort($migration_files);
 
@@ -22,7 +21,7 @@ foreach($migration_files as $file)
     
     require ROOT.'/db/migrate/'.$file;
     $class = String::singularize(String::camelize($match[2]));
-    $migration = new $class($ts, $_ENV['MISAGO_ENV']);
+    $migration = new $class($ts, $_SERVER['MISAGO_ENV']);
     $result = $migration->migrate($direction);
     
     if ($result) {

@@ -213,10 +213,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function sanitize_sql_for_conditions($conditions)
   {
     if (is_hash($conditions)) {
-      return $this->sanitize_sql_hash_for_conditions(&$conditions);
+      return $this->sanitize_sql_hash_for_conditions($conditions);
     }
     elseif (is_array($conditions)) {
-      return $this->sanitize_sql_array(&$conditions);
+      return $this->sanitize_sql_array($conditions);
     }
     return $conditions;
   }
@@ -277,7 +277,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   function sanitize_sql_hash_for_assignment(array $assignments)
   {
-    $assignments = $this->sanitize_sql_hash(&$assignments);
+    $assignments = $this->sanitize_sql_hash($assignments);
     return implode(', ', $assignments);
   }
   
@@ -287,7 +287,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    */
   function sanitize_sql_hash_for_conditions(array $conditions)
   {
-    $conditions = $this->sanitize_sql_hash(&$conditions);
+    $conditions = $this->sanitize_sql_hash($conditions);
     return implode(' AND ', $conditions);
   }
   

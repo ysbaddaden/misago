@@ -1,7 +1,7 @@
 <?php
 
-if (!isset($_ENV['MISAGO_ENV'])) {
-  $_ENV['MISAGO_ENV'] = 'test';
+if (!isset($_SERVER['MISAGO_ENV'])) {
+  $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../config/boot.php';
 

@@ -13,7 +13,7 @@ function t($str, $options=null)
   if (!is_array($options) and !empty($options)) {
     $options = array('context' => $options);
   }
-  return I18n::translate($str, &$options);
+  return I18n::translate($str, $options);
 }
 
 # Handles translations of strings.

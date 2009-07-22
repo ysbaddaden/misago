@@ -21,7 +21,7 @@ class ActiveRecord_Migration
    */
   static private function information_schema_exists()
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->select_database();
     
     try
@@ -41,7 +41,7 @@ class ActiveRecord_Migration
   {
     if (self::information_schema_exists())
     {
-      $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+      $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
       $db->select_database();
       
       return $db->select_value("SELECT version
@@ -57,7 +57,7 @@ class ActiveRecord_Migration
    */
   static function save_version($version)
   {
-    $db = ActiveRecord_Connection::get($_ENV['MISAGO_ENV']);
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->select_database();
     
     if (self::information_schema_exists()) {

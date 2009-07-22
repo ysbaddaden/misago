@@ -1,7 +1,7 @@
 <?php
 
 $location = dirname(__FILE__).'/../../../..';
-$_ENV['MISAGO_ENV'] = 'test';
+$_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 require_once 'active_record/exception.php';
@@ -23,7 +23,7 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   function execute($sql)
   {
-    if (isset($_ENV['MISAGO_DEBUG']) and $_ENV['MISAGO_DEBUG'] >= 2) {
+    if (isset($_SERVER['MISAGO_DEBUG']) and $_SERVER['MISAGO_DEBUG'] >= 2) {
       echo "\n$sql";
     }
     return preg_replace('/\s{2,}/', ' ', $sql);

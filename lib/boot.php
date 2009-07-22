@@ -11,11 +11,11 @@ ini_set('include_path',
 	ini_get('include_path').PATH_SEPARATOR
 );
 
-if (!isset($_ENV['MISAGO_DEBUG'])) {
-  $_ENV['MISAGO_DEBUG'] = 0;
+if (!isset($_SERVER['MISAGO_DEBUG'])) {
+  $_SERVER['MISAGO_DEBUG'] = 0;
 }
-if (!isset($_ENV['MISAGO_ENV'])) {
-  $_ENV['MISAGO_ENV'] = 'development';
+if (!isset($_SERVER['MISAGO_ENV'])) {
+  $_SERVER['MISAGO_ENV'] = 'development';
 }
 
 #require 'object.php';
@@ -34,7 +34,7 @@ require 'misago_log.php';
 require 'http.php';
 require 'application.php';
 
-require ROOT."/config/environments/{$_ENV['MISAGO_ENV']}.php";
+require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
 
 require 'i18n.php';
