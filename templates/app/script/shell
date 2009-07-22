@@ -1,0 +1,13 @@
+#! /bin/sh
+
+shell=`which phpsh`
+
+if [ -z "$shell" ] ; then
+  echo "Error: can't find phpsh."
+  echo "Please download and install phpsh from http://www.phpsh.com/"
+  exit
+fi
+
+root=$(dirname `dirname $0`)
+phpsh $root/config/boot.php
+
