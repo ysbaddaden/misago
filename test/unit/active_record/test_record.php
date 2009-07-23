@@ -5,7 +5,13 @@ $_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
-class FakeRecord extends ActiveRecord_Record { }
+class FakeRecord extends ActiveRecord_Record
+{
+  protected $columns = array(
+    'id'    => array(),
+    'title' => array()
+  );
+}
 
 # TODO: Test dirty objects.
 # TODO: Test attributes().
