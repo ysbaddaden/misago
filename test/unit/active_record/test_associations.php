@@ -50,8 +50,20 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   function test_loading_association_when_association_is_missing()
   {
     $order = new Order(3);
-    $this->assert_instance_of('must return the associated object', $order->invoice, 'Invoice');
-    $this->assert_null('association must be a fresh object', $order->invoice->id);
+    $this->assert_instance_of('has_one: must return the associated object', $order->invoice, 'Invoice');
+    $this->assert_null('has_one: association must be a fresh object', $order->invoice->id);
+
+    $tag = new Tag();
+    $this->assert_instance_of("belongs_to: relationship", $tag->post, 'Post');
+    $this->assert_null('belongs_to: fresh object', $tag->post->id);
+    
+    $post = new Post();
+    $this->assert_instance_of("has_many: relationship", $post->tags, 'ActiveRecord_Collection');
+    $this->assert_equal('has_one: association must be a fresh object', $post->tags->count(), 0);
+    
+    $programmer = new Programmer();
+    $this->assert_instance_of("HABTM: relationship", $programmer->projects, 'ActiveRecord_Collection');
+    $this->assert_equal('HABTM: association must be a fresh object', $programmer->projects->count(), 0);
   }
   
   
@@ -122,7 +134,6 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal('relation id', $order->invoice->order_id, 3);
     $this->assert_equal('passed attributes', $order->invoice->name, 'brice');
   }
-  
   
   function test_others_build()
   {

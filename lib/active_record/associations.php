@@ -295,7 +295,10 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       }
       
       # association doesn't exists
-      return $this->$attribute = new $model;
+      if ($assoc['type'] == 'belongs_to' or $assoc['type'] == 'has_one') {
+        return $this->$attribute = new $model;
+      }
+      return $this->$attribute = new ActiveRecord_Collection($this, array(), $assoc);
 		}
   	
     # another kind of attribute
