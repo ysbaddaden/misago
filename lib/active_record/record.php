@@ -39,6 +39,7 @@
 #   $product->title_change     # => null
 abstract class ActiveRecord_Record extends Object implements Iterator
 {
+  protected $columns               = array();
   protected $__attributes          = array();
   protected $__original_attributes = array();
   protected $new_record            = true;
@@ -111,8 +112,8 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   
   function __get($attribute)
   {
-    if (isset($this->__attributes[$attribute])) {
-      return $this->__attributes[$attribute];
+    if (isset($this->columns[$attribute])) {
+      return isset($this->__attributes[$attribute]) ? $this->__attributes[$attribute] : null;
     }
     elseif ($attribute == 'changed')
     {
@@ -129,7 +130,10 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   
   function __set($attribute, $value)
   {
-    return $this->__attributes[$attribute] = $value;
+    if (isset($this->columns[$attribute])) {
+      return $this->__attributes[$attribute] = $value;
+    }
+    return parent::__set($attribute, $value);
   }
   
   function __isset($attribute) {
@@ -139,13 +143,13 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   function __unset($attribute) {
     unset($this->__attributes[$attribute]);
   }
-  
+  /*
   function __call($func, $args)
   {
     $class = get_class($this);
     trigger_error("No such method: $class::$func().", E_USER_ERROR);
   }
-  
+  */
   
   function rewind() {
     return reset($this->__attributes);

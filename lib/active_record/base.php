@@ -176,15 +176,15 @@
 # TODO: Named scopes.
 # IMPROVE: Test callbacks.
 # 
-abstract class ActiveRecord_Base extends ActiveRecord_Validations
+abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
 {
   protected $db;
   protected $table_name;
   protected $primary_key   = 'id';
-  protected $columns       = array();
   protected $default_scope = array();
   
-  protected $attr_read     = array('new_record', 'table_name');
+  protected $attr_read = array('new_record', 'table_name');
+  protected $behaviors = array();
   
   
   # IMPROVE: Check if columns do not conflict with object class attributes.
@@ -215,8 +215,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       }
     }
     
-    # relationships
+    # parents
     ActiveRecord_Associations::__construct();
+    ActiveRecord_Behaviors::__construct();
     
     # args
     if ($arg !== null)
@@ -228,6 +229,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
       }
       ActiveRecord_Record::__construct($arg);
     }
+  }
+  
+  function __get($attribute)
+  {
+    if ($attribute == 'id' and !isset($this->columns['id'])) {
+      $attribute = $this->primary_key;
+    }
+    return parent::__get($attribute);
   }
   
   function __set($attribute, $value)
@@ -250,22 +259,22 @@ abstract class ActiveRecord_Base extends ActiveRecord_Validations
           break;
         }
       }
-      return parent::__set($attribute, $value);
+#      return parent::__set($attribute, $value);
     }
     elseif ($attribute == 'id') {
       return $this->id = parent::__set($this->primary_key, $value);
     }
-    else {
-      return $this->$attribute = $value;
-    }
+#    else {
+#      return $this->$attribute = $value;
+#    }
+    return parent::__set($attribute, $value);
   }
   
-  function __get($attribute)
+  # Returns an array of column names.
+  function & column_names()
   {
-    if ($attribute == 'id' and !isset($this->columns['id'])) {
-      $attribute = $this->primary_key;
-    }
-    return parent::__get($attribute);
+    $column_names = array_keys($this->columns);
+    return $column_names;
   }
   
   # Returns the I18n translation of model name

@@ -21,6 +21,17 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_true("Must throw an ActiveRecord_StatementInvalid exception (no such table)", $test);
   }
   
+  function test_column_names()
+  {
+    $product = new Product();
+    $column_names = $product->column_names(); sort($column_names);
+    $this->assert_equal('', $column_names, array('created_at', 'description', 'id', 'in_stock', 'name', 'price', 'updated_at'));
+    
+    $basket = new Basket();
+    $column_names = $basket->column_names(); sort($column_names);
+    $this->assert_equal('', $column_names, array('created_at', 'id', 'order_id', 'product_id', 'updated_at'));
+  }
+  
   function test_new()
   {
     $product = new Product();
