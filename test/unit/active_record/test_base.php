@@ -5,13 +5,17 @@ $_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 
+class Orphan extends ActiveRecord_Base {
+  
+}
+
 class Test_ActiveRecord_Base extends Unit_TestCase
 {
   function test_no_such_table()
   {
     try
     {
-      new Post();
+      new Orphan();
       $test = false;
     }
     catch(ActiveRecord_StatementInvalid $e) {
