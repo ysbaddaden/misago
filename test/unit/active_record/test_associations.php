@@ -12,22 +12,25 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->fixtures("products, orders, baskets, invoices");
     
     $invoice = new Invoice(1);
-    $this->assert_instance_of('invoice->order', $invoice->order, 'Order');
-    $this->assert_equal('invoice->order->id', $invoice->order->id, 1);
+    $this->assert_instance_of('relation is the association', $invoice->order, 'Order');
+    $this->assert_equal('must have loaded the right entry', $invoice->order->id, 1);
   }
   
   function test_has_one_relationship()
   {
     $order = new Order(2);
-    $this->assert_instance_of('order->invoice', $order->invoice, 'Invoice');
-    $this->assert_equal('order->invoice->id', $order->invoice->id, 2);
+    $this->assert_instance_of('relation is the association', $order->invoice, 'Invoice');
+    $this->assert_equal('must have loaded the right entry', $order->invoice->id, 2);
   }
   
   function test_has_many_relationship()
   {
     $order = new Order(1);
-    $this->assert_instance_of('order->baskets', $order->baskets, 'ActiveRecord_Collection');
-    $this->assert_equal('count', count($order->baskets), 3);
+    $this->assert_instance_of('relation is a collection', $order->baskets, 'ActiveRecord_Collection');
+    $this->assert_equal('must have loaded associated entries', count($order->baskets), 3);
+    
+    $basket = $order->baskets->build();
+    $this->assert_instance_of('collection must be related to the relation', $basket, 'Basket');
   }
   
   function test_has_and_belongs_to_many_relationship()
@@ -36,18 +39,13 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     
     $programmer = new Programmer(1);
     $this->assert_instance_of('', $programmer->projects, 'ActiveRecord_Collection');
-    $this->assert_equal('count', count($programmer->projects), 2);
+    $this->assert_equal('must have loaded associated entries', count($programmer->projects), 2);
+    
+    $project = $programmer->projects->build();
+    $this->assert_instance_of('collection must be related to the relation', $project, 'Project');
   }
   
-  
-  function test_loading_association_on_non_saved_parent()
-  {
-    $order = new Order();
-    $this->assert_instance_of('must return the associated object', $order->invoice, 'Invoice');
-    $this->assert_null('association must be a fresh object', $order->invoice->id);
-  }
-  
-  function test_loading_association_when_association_is_missing()
+  function test_loading_association_when_parent_is_a_new_record()
   {
     $order = new Order(3);
     $this->assert_instance_of('has_one: must return the associated object', $order->invoice, 'Invoice');
@@ -58,12 +56,16 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_null('belongs_to: fresh object', $tag->post->id);
     
     $post = new Post();
-    $this->assert_instance_of("has_many: relationship", $post->tags, 'ActiveRecord_Collection');
-    $this->assert_equal('has_one: association must be a fresh object', $post->tags->count(), 0);
+    $this->assert_instance_of("has_many: collection", $post->tags, 'ActiveRecord_Collection');
+    $this->assert_equal('has_one: collection must be empty', $post->tags->count(), 0);
+    $tag = $post->tags->build(array('tag' => 'aaa'));
+    $this->assert_instance_of('has_one: collection must be related to the relation', $tag, 'Tag');
     
     $programmer = new Programmer();
-    $this->assert_instance_of("HABTM: relationship", $programmer->projects, 'ActiveRecord_Collection');
-    $this->assert_equal('HABTM: association must be a fresh object', $programmer->projects->count(), 0);
+    $this->assert_instance_of("HABTM: collection", $programmer->projects, 'ActiveRecord_Collection');
+    $this->assert_equal('HABTM: collection must be empty', $programmer->projects->count(), 0);
+    $project = $programmer->projects->build(array('name' => 'aaa'));
+    $this->assert_instance_of('HABTM: collection must be related to the relation', $project, 'Project');
   }
   
   
@@ -228,31 +230,31 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal("record exists, but doesn't belongs to this parent, thus null", $basket, null);
   }
   
-  # TODO: test_others_build_when_parent_is_new_record()
+  # TEST: test_others_build_when_parent_is_new_record()
   function test_others_build_when_parent_is_new_record()
   {
     
   }
   
-  # TODO: test_others_create_when_parent_is_new_record()
+  # TEST: test_others_create_when_parent_is_new_record()
   function test_others_create_when_parent_is_new_record()
   {
     
   }
   
-  # TODO: test_others_delete_when_parent_is_new_record()
+  # TEST: test_others_delete_when_parent_is_new_record()
   function test_others_delete_when_parent_is_new_record()
   {
     
   }
   
-  # TODO: test_others_delete_all_when_parent_is_new_record()
+  # TEST: test_others_delete_all_when_parent_is_new_record()
   function test_others_delete_all_when_parent_is_new_record()
   {
     
   }
   
-  # TODO: test_others_find_when_parent_is_new_record()
+  # TEST: test_others_find_when_parent_is_new_record()
   function test_others_find_when_parent_is_new_record()
   {
     

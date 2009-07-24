@@ -157,9 +157,9 @@
 # TODO: Implement belongs_to :polymorphic association.
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
-  protected $belongs_to   = array();
-  protected $has_one      = array();
-  protected $has_many     = array();
+  protected $belongs_to = array();
+  protected $has_one    = array();
+  protected $has_many   = array();
   protected $has_and_belongs_to_many = array();
   
   protected $associations = array();
