@@ -23,7 +23,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   function find($tags, $options=null)
   {
     $options = $this->find_options($tags, $options);
-    return $this->collection->find(':all', &$options);
+    return $this->collection->find(':all', $options);
   }
   
   function save()
@@ -99,7 +99,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     
     $options['select']     = "{$this->parent->table_name}.*";
     $options['join']       = $this->tag_association;
-    $options['conditions'] = $this->parent->merge_conditions($options, &$conditions);
+    $options['conditions'] = $this->parent->merge_conditions($options, $conditions);
   }
   
   # IMPROVE: implement option 'match_all = true'.
