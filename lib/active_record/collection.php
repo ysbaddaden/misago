@@ -109,11 +109,10 @@ class ActiveRecord_Collection extends ActiveArray
     {
       if (in_array($record, $records))
       {
-        if (!$record->new_record)
-        {
+        if (!$record->new_record) {
           $record->do_delete();
-          $removed[] = $i;
         }
+        $removed[] = $i;
       }
     }
     return $removed;
