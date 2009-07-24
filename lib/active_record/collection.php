@@ -1,5 +1,7 @@
 <?php
 
+# Contains a collection of records.
+# Used by has many and HABTM relationships.
 class ActiveRecord_Collection extends ActiveArray
 {
   protected $parent;
@@ -38,7 +40,7 @@ class ActiveRecord_Collection extends ActiveArray
   }
   
   # Adds a new record to the collection, but doesn't save it.
-  function build($attributes)
+  function build($attributes=array())
   {
     $attributes[$this->options['foreign_key']] = $this->parent->id;
     
@@ -107,11 +109,10 @@ class ActiveRecord_Collection extends ActiveArray
     {
       if (in_array($record, $records))
       {
-        if (!$record->new_record)
-        {
+        if (!$record->new_record) {
           $record->do_delete();
-          $removed[] = $i;
         }
+        $removed[] = $i;
       }
     }
     return $removed;

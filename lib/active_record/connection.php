@@ -8,12 +8,16 @@ class ActiveRecord_Connection
   private static $adapters = array();
   
   # Loads configurations from config/database.yml.
-  # 
-  # OPTIMIZE: Cache decoded YAML database configuration in memory (using APC for instance).
   static function load_configuration()
   {
-    $configurations = file_get_contents(ROOT.'/config/database.yml');
-    self::$configurations = Yaml::decode($configurations);
+    $apc_key = TMP.'/cache/database.serialized.php';
+    self::$configurations = apc_fetch($apc_key, $success);
+    if ($success === false)
+    {
+      $configurations = file_get_contents(ROOT.'/config/database.yml');
+      self::$configurations = Yaml::decode($configurations);
+      apc_store($apc_key, self::$configurations);
+    }
   }
   
   # Creates a singleton (one single connection object per configuration entry).

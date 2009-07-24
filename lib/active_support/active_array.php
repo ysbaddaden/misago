@@ -1,6 +1,6 @@
 <?php
 
-# TODO: Tests!
+# TEST: Write tests!
 # @namespace ActiveSupport
 class ActiveArray extends ArrayObject
 {

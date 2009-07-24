@@ -157,9 +157,9 @@
 # TODO: Implement belongs_to :polymorphic association.
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
-  protected $belongs_to   = array();
-  protected $has_one      = array();
-  protected $has_many     = array();
+  protected $belongs_to = array();
+  protected $has_one    = array();
+  protected $has_many   = array();
   protected $has_and_belongs_to_many = array();
   
   protected $associations = array();
@@ -295,7 +295,10 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       }
       
       # association doesn't exists
-      return $this->$attribute = new $model;
+      if ($assoc['type'] == 'belongs_to' or $assoc['type'] == 'has_one') {
+        return $this->$attribute = new $model;
+      }
+      return $this->$attribute = new ActiveRecord_Collection($this, array(), $assoc);
 		}
   	
     # another kind of attribute

@@ -3,7 +3,7 @@
 $_SERVER['MISAGO_ENV'] = 'test';
 require_once __DIR__."/../../test_app/config/boot.php";
 
-# TODO: Test Time::ago() method.
+# TEST: Test Time::ago() method.
 class Test_Time extends Unit_Test
 {
   function test_toString()

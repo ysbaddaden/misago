@@ -7,7 +7,6 @@ require_once "$location/test/test_app/config/boot.php";
 require_once ROOT."/app/controllers/application.php";
 
 
-# TODO: Test rendering a collection of partials {:collection => @products}.
 class Test_ActionView_Base extends Unit_Test
 {
   function test_render_view()
