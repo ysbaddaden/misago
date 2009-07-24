@@ -1,18 +1,17 @@
 <?php
-/**
- * 
- */
+
+# TODO: after_filters().
 abstract class ActionController_Base extends Object
 {
-  public    $name;
-  public    $action;
-  public    $params;
+  public $name;
+  public $action;
+  public $params;
+  public $helpers = ':all';
 	
-  protected $mapping = array();
+  protected $mapping          = array();
   protected $already_rendered = false;
-  protected $skip_view = false;
+  protected $skip_view        = false;
   
-  public    $helpers   = ':all';
   
   function __construct()
   {
@@ -22,6 +21,8 @@ abstract class ActionController_Base extends Object
     if (get_magic_quotes_gpc()) {
       sanitize_magic_quotes($this->params);
     }
+    
+    $this->flash = new ActionController_Flash();
   }
   
   function execute($mapping)
@@ -152,24 +153,36 @@ abstract class ActionController_Base extends Object
     return ob_get_clean();
   }
   
+  # Redirects to another page.
+  # 
+  #   redirect_to('/path');
+  #   redirect_to(articles_path());
+  #   redirect_to(show_article_url($account->id));
+  # 
+  # By default a '302 Moved' header status in sent, but you may customize it:
+  # 
+  #   redirect_to('/posts/45.xml', 301); # found
+  #   redirect_to('/posts/45.xml', 201); # created
+  # 
+  protected function redirect_to($options, $status=302)
+  {
+    if (is_array($options))
+    {
+      $options['path_only'] = false;
+      $url = url_for($options);
+    }
+    else
+    {
+      $url = (string)$options;
+      if (!strpos($url, '://')) {
+        $url = cfg::get('base_path').$url;
+      }
+    }
+    HTTP::redirect($url, 302);
+  }
+    
   protected function before_filters() {}
 #  protected function after_filters()  {}
-  
-  # Redirects to another URL, passing a text message to it.
-  # 
-  # Example:
-  # 
-  #   $this->flash("Post has been published.", show_post_path($this->post->id), 201);
-  # 
-  # And in your view:
-  # 
-  #   <?= Session::flash() ?\>
-  #
-  protected function flash($message, $url, $code=302)
-  {
-    Session::flash($message);
-    HTTP::redirect($url, $code);
-  }
 }
 
 ?>

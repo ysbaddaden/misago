@@ -47,22 +47,6 @@ class Session
     session_unset();
     setcookie(session_name(), '', time() - 42000, '/');
   }
-  
-  static function flash($message=null)
-  {
-    if ($message === null)
-    {
-      if (isset($_SESSION['misago_flash_message']))
-      {
-        $message = $_SESSION['misago_flash_message'];
-        unset($_SESSION['misago_flash_message']);
-        return '<p id="flash-message">'.$message.'</p>';
-      }
-    }
-    else {
-      $_SESSION['misago_flash_message'] = $message;
-    }
-  }
 }
 
 ?>
