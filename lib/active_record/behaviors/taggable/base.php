@@ -61,7 +61,7 @@ class ActiveRecord_Behaviors_Taggable_Base
       $this->tag_list->set($value);
       return $value;
     }
-    $this->$attr = $value;
+    return $this->$attr = $value;
   }
   
   function find_tagged_with($tags, $options=null)

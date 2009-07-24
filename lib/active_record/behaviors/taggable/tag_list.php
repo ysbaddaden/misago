@@ -4,7 +4,7 @@
 class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
 {
   private $parent;
-  private $record;
+  private $collection;
   private $assoc;
   private $tag_column;
   
@@ -12,7 +12,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   {
     $this->parent     = $parent;
     $this->assoc      = $assoc;
-    $this->record     = $parent->{$this->assoc['name']};
+    $this->collection = $parent->{$this->assoc['name']};
     $this->tag_column = String::singularize($this->assoc['name']);
     
     parent::__construct(array());
@@ -23,7 +23,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   function find($tags, $options=null)
   {
     $options = $this->find_options($tags, $options);
-    return $this->record->find(':all', &$options);
+    return $this->collection->find(':all', &$options);
   }
   
   function save()
@@ -50,7 +50,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   function set($tags='')
   {
     if (empty($tags)) {
-      $this->record->delete_all();
+      $this->collection->delete_all();
     }
     else
     {
@@ -60,22 +60,20 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
       $new_tags = array_diff($tags, $old_tags);
       $del_tags = array_diff($old_tags, $tags);
       
-#      print_r($old_tags);
-#      print_r($new_tags);
-#      print_r($del_tags);
-      
-      # creates the new tags
+      # creates new tags
       foreach($new_tags as $tag_name) {
-        $r = $this->record->create(array($this->tag_column => $tag_name));
+        $r = $this->collection->create(array($this->tag_column => $tag_name));
       }
       
       # deletes removed tags
-      foreach($del_tags as $tag_name)
+      if (!empty($del_tags))
       {
-        foreach($this as $i => $tag)
+        # since the collection is going to be modified, we need to cast it
+        # to a static array, otherwise the foreach sequence would break.
+        foreach((array)$this->collection as $record)
         {
-          if ($tag->tag == $tag_name) {
-            $this->record->delete($tag);
+          if (in_array($record->{$this->tag_column}, $del_tags)) {
+            $this->collection->delete($record);
           }
         }
       }
@@ -86,8 +84,8 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   private function resetArray()
   {
     $tags = array();
-    foreach($this->record as $tag) {
-      $tags[] = $tag->tag;
+    foreach($this->collection as $record) {
+      $tags[] = $record->{$this->tag_column};
     }
     sort($tags);
     $this->exchangeArray($tags);
