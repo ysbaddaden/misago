@@ -31,13 +31,25 @@ class #{Controller}Controller extends ApplicationController
     $this->render('new');
   }
   
+  function edit()
+  {
+    $this->#{model} = new #{Model}($this->params[':id']);
+  }
+  
   function create()
   {
-    $#{model} = new #{Model}();
-    $this->#{model} = $#{model}->create($this->params['#{model}']);
+    $this->#{model} = new #{Model}($this->params['#{model}']);
     
-    if ($this->#{model}->errors->is_empty()) {
-      HTTP::redirect(show_#{model}_path($this->#{model}->id), 201);
+    if ($this->#{model}->save())
+    {
+      $this->flash['notice'] = '#{Model} was successfully created.';
+      $url = show_#{model}_path($this->#{model}->id);
+      
+      switch($this->format)
+      {
+        case 'html': $this->redirect_to($url); break;
+        case 'xml':  $this->render(array('xml' => $this->#{model}, 'status' => 201, 'location' => $url)); break;
+      }
     }
     else
     {
@@ -49,18 +61,20 @@ class #{Controller}Controller extends ApplicationController
     }
   }
   
-  function edit()
-  {
-    $this->#{model} = new #{Model}($this->params[':id']);
-  }
-  
   function update()
   {
-    $#{model} = new #{Model}();
-    $this->#{model} = $#{model}->update($this->params[':id'], $this->params['#{model}']);
+    $this->#{model} = new #{Model}();
+    $this->#{model} = $#{model}->find($this->params[':id']);
     
-    if ($this->#{model}->errors->is_empty()) {
-      HTTP::redirect(show_#{model}_path($this->#{model}->id), 200);
+    if ($this->#{model}->update_attributes($this->params['#{model}']))
+    {
+      $this->flash['notice'] = '#{Model} was successfully updated.';
+      
+      switch($this->format)
+      {
+        case 'html': $this->redirect_to(show_#{model}_path($this->#{model}->id)); break;
+        case 'xml':  $this->render(array('xml' => $this->#{model}, 'status' => 200)); break;
+      }
     }
     else
     {
@@ -75,8 +89,14 @@ class #{Controller}Controller extends ApplicationController
   function delete()
   {
     $#{model} = new #{Model}();
-    if ($#{model}->delete($this->params[':id'])) {
-      HTTP::redirect(#{model}s_path(), 410);
+    if ($#{model}->delete($this->params[':id']))
+    {
+      $this->flash['notice'] = '#{Model} was successfully deleted.';
+      switch($this->format)
+      {
+        case 'html': $this->redirect_to(#{model}s_path()); break;
+        case 'xml': HTTP::status(410); break;
+      }
     }
     else {
       HTTP::status(500);

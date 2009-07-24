@@ -3,7 +3,7 @@
  * Helper to create new tables. Generally used in migrations,
  * but permits to create temporary tables too.
  * 
- * TODO: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
+ * IMPROVE: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
  */
 class ActiveRecord_Table
 {

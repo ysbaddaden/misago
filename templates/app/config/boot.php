@@ -1,20 +1,19 @@
 <?php
 
-# PATHS
-define('ROOT',   dirname(__DIR__));
-define('PUBLIC', ROOT.'/public');
-define('TMP',    ROOT.'/tmp');
-
-# MISAGO
-define('MISAGO', ROOT.'/lib/misago');
-#define('MISAGO', 'phar://misago.phar/');
-#include ROOT.'/lib/misago.phar';
-
-# APP
+define('ROOT', dirname(__DIR__));
 define('APP', ROOT.'/app');
-#define('APP', 'phar://app.phar/');
-#include ROOT.'/lib/app.phar';
+define('MISAGO', ROOT.'/lib/misago');
+define('PUBLIC', ROOT.'/public');
+define('TMP', ROOT.'/tmp');
+ 
+# or if you are using PHAR:
+#define('ROOT', dirname(__DIR__));
+#define('APP', ROOT.'/app');
+#define('MISAGO', 'phar://misago.phar');
+#define('PUBLIC', ROOT.'/public');
+#define('TMP', ROOT.'/tmp');
 
+#require ROOT.'/lib/misago.phar';
 require MISAGO.'/lib/boot.php';
 
 ?>

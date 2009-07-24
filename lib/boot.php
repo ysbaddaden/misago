@@ -52,6 +52,7 @@ function __autoload($class)
   
   if (!include "$path.php")
   {
+    echo "\nError: an error occured while loading $path.php\n";
     debug_print_backtrace();
     exit;
   }

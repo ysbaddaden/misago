@@ -57,7 +57,7 @@ class Generator_Resource extends Generator_Base
     $this->create_file_from_template("db/migrate/{$migration_filename}.php", 'resource/migration.php', $vars);
     
     # views
-    # TODO: Generate views for 'script/generate resource'
+    # IMPROVE: Generate views for 'script/generate resource'
     
     # routes
     $routes_contents = file_get_contents(ROOT.'/config/routes.php');
