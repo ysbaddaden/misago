@@ -3,14 +3,15 @@
 
 parse_dir(__DIR__.'/../lib', $files);
 parse_dir(__DIR__.'/../vendor', $files);
+parse_dir(__DIR__.'/../templates', $files);
 sort($files);
 
 $phar = new Phar(__DIR__.'/misago.phar', 0, 'misago.phar');
 foreach($files as $file)
 {
   $local_file = str_replace(__DIR__.'/../', "", $file);
-  echo "$local_file\n";
   $phar->addFile($file, $local_file);
+#  echo "$local_file\n";
 }
 $phar->setStub('<?php __HALT_COMPILER(); ?>');
 $phar->stopBuffering();
