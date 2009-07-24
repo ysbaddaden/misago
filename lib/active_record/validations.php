@@ -2,9 +2,8 @@
 
 # Validation methods for ActiveRecords.
 # 
-# TODO: Test validates_associated.
+# TEST: Test validates_associated.
 # IMPROVE: Add possibility to validate a date/time.
-#
 abstract class ActiveRecord_Validations extends ActiveRecord_Associations
 {
   protected $validates_associated = array();

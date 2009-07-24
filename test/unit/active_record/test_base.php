@@ -185,7 +185,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal("virtual field", $product->name, 'swerty2');
   }
   
-  # FIXME: Test failures when updating many records.
+  # TEST: Test failures when updating many records.
   function test_update_many()
   {
     $product = new Product();

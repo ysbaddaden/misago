@@ -174,7 +174,7 @@
 # 
 # TODO: Implement calculations.
 # TODO: Named scopes.
-# IMPROVE: Test callbacks.
+# TEST: Test callbacks.
 # 
 abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
 {
@@ -358,7 +358,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
    * 
    * See ActiveRecord_Associations.
    * 
-   * TODO: Test option 'group'.
+   * TEST: Test option 'group'.
    */
   function find($method_or_id=':all', $options=null)
   {
@@ -558,7 +558,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     return (bool)$this->$method();
   }
   
-  # TODO: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
+  # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
   private function save_associated()
   {
     $rs = true;

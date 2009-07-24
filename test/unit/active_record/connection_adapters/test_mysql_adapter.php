@@ -86,7 +86,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $this->assert_true("database exists", $rs);
   }
   
-  # TODO: Test missing table case.
+  # TEST: Test missing table case.
   function test_columns()
   {
     $columns = $this->db->columns('products');
