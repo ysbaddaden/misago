@@ -1,6 +1,6 @@
 <?php
 
-define('ROOT',   dirname(dirname(__FILE__)));
+define('ROOT',   dirname(__DIR__));
 define('APP',    ROOT.'/app');
 define('MISAGO', ROOT.'/../..');
 define('PUBLIC', ROOT.'/public');

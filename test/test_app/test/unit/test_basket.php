@@ -1,6 +1,6 @@
 <?php
 
-$location = dirname(__FILE__).'/../..';
+$location = __DIR__.'/../..';
 require_once "$location/lib/misago/lib/unit_test.php";
 require_once "$location/config/boot.php";
 

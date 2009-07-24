@@ -3,7 +3,7 @@
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-$location = dirname(__FILE__).'/../..';
+$location = __DIR__.'/../..';
 require_once "$location/app/controllers/#{filename}_controller.php";
 
 class Test_#{Class}Controller extends Unit_TestCase
