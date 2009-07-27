@@ -1,21 +1,21 @@
 <?php
 
 /*
-Passes temporary variables to the very next request.
+ Passes temporary variables to the very next request.
+ 
+ For instance in your controller:
 
-For instance in your controller:
+   if ($this->article->save())
+   {
+     $this->flash['notice'] = 'Article was successfully created.';
+     redirect_to(show_article_path($this->article->id));
+   }
 
-  if ($this->article->save())
-  {
-    $this->flash['notice'] = 'Article was successfully created.';
-    redirect_to(show_article_path($this->article->id));
-  }
+ Then in your view:
 
-Then in your view:
-
-  <? if (isset($this->flash['notice'])): ?>
-    <div class="notice"><?= $this->flash['notice'] ?></div>
-  <? endif; ?>
+   <? if (isset($this->flash['notice'])): ?>
+     <div class="notice"><?= $this->flash['notice'] ?></div>
+   <? endif; ?>
 */
 class ActionController_Flash extends ArrayObject
 {
