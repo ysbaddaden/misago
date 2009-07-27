@@ -1,6 +1,6 @@
 <?php
 
-$location = __DIR__.'/../../../..';
+$location = dirname(__FILE__).'/../../../..';
 $_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";

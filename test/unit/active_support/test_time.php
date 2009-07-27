@@ -1,7 +1,7 @@
 <?php
 
 $_SERVER['MISAGO_ENV'] = 'test';
-require_once __DIR__."/../../test_app/config/boot.php";
+require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
 # TEST: Test Time::ago() method.
 class Test_Time extends Unit_Test

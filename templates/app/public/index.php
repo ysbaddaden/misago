@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../config/boot.php';
+require dirname(__FILE__).'/../config/boot.php';
 
 try
 {

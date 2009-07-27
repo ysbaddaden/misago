@@ -1,7 +1,7 @@
 <?php
 
 $_SERVER['MISAGO_ENV'] = 'test';
-require_once __DIR__."/../test_app/config/boot.php";
+require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
 class Test_I18n extends Unit_Test
 {

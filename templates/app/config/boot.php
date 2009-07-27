@@ -1,13 +1,13 @@
 <?php
 
-define('ROOT', dirname(__DIR__));
+define('ROOT', dirname(dirname(__FILE__)));
 define('APP', ROOT.'/app');
 define('MISAGO', ROOT.'/lib/misago');
 define('PUBLIC', ROOT.'/public');
 define('TMP', ROOT.'/tmp');
  
 # or if you are using PHAR:
-#define('ROOT', dirname(__DIR__));
+#define('ROOT', dirname(dirname(__FILE__)));
 #define('APP', ROOT.'/app');
 #define('MISAGO', 'phar://misago.phar');
 #define('PUBLIC', ROOT.'/public');

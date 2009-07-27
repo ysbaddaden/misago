@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__."/../test_app/config/boot.php";
+require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
 class FakeClass  { }
 class FakeClass2 { }
