@@ -238,17 +238,12 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $success;
   }
   
-  function insert($table, array $data, $returning=null)
+  function insert($table, array $data, $primary_key=null)
   {
     $success = parent::insert($table, $data);
-    
-    if ($success and $returning !== null)
-    {
-      $returning = $this->quote_column($returning);
-      $table     = $this->quote_table($table);
-      return $this->select_value("SELECT MAX($returning) FROM $table LIMIT 1 ;");
+    if ($success and $primary_key !== null) {
+      return mysql_insert_id($this->link);
     }
-    
     return $success;
   }
   

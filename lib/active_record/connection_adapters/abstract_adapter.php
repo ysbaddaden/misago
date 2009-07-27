@@ -482,7 +482,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   /**
    * Inserts a row in a table.
    */
-  function insert($table, array $data, $returning=null)
+  function insert($table, array $data, $primary_key=null)
   {
     $table  = $this->quote_table($table);
     $fields = array();
