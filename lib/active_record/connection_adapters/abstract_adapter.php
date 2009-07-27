@@ -19,83 +19,55 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $this->connect();
   }
   
-  /**
-   * Returns value of a configuration setting.
-   */
+  # Returns the value of a configuration setting.
   function config($name)
   {
     return $this->config[$name];
   }
   
-  /**
-   * Connects to the database.
-   */
+  # Connects to the database.
   abstract function connect();
   
-  /**
-   * Disconnects from the database.
-   */
+  # Disconnects from the database.
   abstract function disconnect();
   
-  /**
-   * Checks wether the connection to the database is active or not.
-   */
+  # Checks wether the connection to the database is active or not.
   abstract function is_active();
   
   
-  /**
-   * Executes an SQL query.
-   */
+  # Executes an SQL query.
   abstract function execute($sql);
   
-  /**
-   * Returns an array of hashes of columns => values.
-   */
+  # Returns an array of hashes of columns => values.
   abstract function & select_all($sql);
   
-  /**
-   * Returns an array of values from the first column.
-   */
+  # Returns an array of values from the first column.
   abstract function & select_values($sql);
   
-  /**
-   * Returns the columns' definition of a table.
-   */
+  # Returns the columns' definition of a table.
   abstract function & columns($sql);
   
   
-  /**
-   * Creates a database.
-   */
+  # Creates a database.
   abstract function create_database($database, array $options=null);
   
-  /**
-   * Destroys a database (and everything inside).
-   */
+  # Destroys a database (and everything inside).
   abstract function drop_database($database);
   
-  /**
-   * Selects a default database to use.
-   */
+  # Selects a default database to use.
   abstract function select_database($database=null);
   
   
-  /**
-   * Escapes a value to be used in a SQL query.
-   */
+  # Escapes a value to be used in a SQL query.
   abstract function escape_value($value);
   
-  /**
-   * Quotes a table name for use in a SQL query.
-   */
+  # Quotes a table name for use in a SQL query.
   function quote_table($table)
   {
     return $this->quote_column($table);
   }
   
-  /**
-   * Quotes a column name for use in a SQL query.
-   */
+  # Quotes a column name for use in a SQL query.
   function quote_column($column)
   {
     $column = trim($column);
@@ -113,9 +85,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->COLUMN_QUOTE.$column.$this->COLUMN_QUOTE;
   }
   
-  /**
-   * Quotes a series of columns for use in a SQL query.
-   */
+  # Quotes a series of columns for use in a SQL query.
   function quote_columns($columns)
   {
     if (!is_array($columns)) {
@@ -125,9 +95,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return implode(', ', $columns);
   }
   
-  /**
-   * Quotes and escapes a table name for use in a SQL query.
-   */
+  # Quotes and escapes a table name for use in a SQL query.
   function quote_value($value)
   {
     if($value === true) {
@@ -147,6 +115,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->VALUE_QUOTE.$this->escape_value($value).$this->VALUE_QUOTE;
   }
   
+  # Quotes a list of ORDER/GROUP BY columns.
   function sanitize_order($columns)
   {
     if (!is_array($columns)) {
@@ -170,9 +139,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return implode(', ', $columns);
   }
   
-  /**
-   * Creates a LIMIt+OFFSET statement.
-   */
+  # Creates a LIMIT + OFFSET SQL fragment.
   function sanitize_limit($limit=null, $page=null)
   {
     if(!$limit) {
@@ -189,10 +156,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $str;
   }
   
-  /**
-   * Accepts an array, hash, or string of SQL assignments and
-   * sanitizes them into a valid SQL fragment for a SET clause.
-   */
+  # Accepts an array, hash, or string of SQL assignments and
+  # sanitizes them into a valid SQL fragment for a SET clause.
   function sanitize_sql_for_assignment($assignments)
   {
     if (is_hash($assignments)) {
@@ -204,12 +169,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $assignments;
   }
 
-  /**
-   * Accepts an array, hash, or string of SQL conditions and
-   * sanitizes them into a valid SQL fragment for a WHERE clause.
-   * 
-   * See sanitize_sql_array() and sanitize_sql_hash() for examples.
-   */
+  # Accepts an array, hash, or string of SQL conditions and
+  # sanitizes them into a valid SQL fragment for a WHERE clause.
+  # 
+  # See sanitize_sql_array() and sanitize_sql_hash() for examples.
+  # 
   function sanitize_sql_for_conditions($conditions)
   {
     if (is_hash($conditions)) {
@@ -221,13 +185,16 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $conditions;
   }
   
-  /**
-   * Accepts an array of conditions. The array has each value
-   * sanitized and interpolated into the SQL statement.
-   * 
-   *   array("name = :name", array('name' => 'toto'));
-   *   array("name = '%s' AND group_id = %d", 'toto', 123);
-   */ 
+  # Accepts an array of conditions. The array has each value
+  # sanitized and interpolated into the SQL statement.
+  # 
+  #   sanitize_sql_array(array("name = :name AND post_id = :id",
+  #     array('name' => 'toto', post_id => 59)));
+  #   # => "name = 'toto'"
+  #   
+  #   sanitize_sql_array(array("name = '%s' AND group_id = %d", 'toto', 123));
+  #   # => "name = 'toto' AND group_id = 123"
+  # 
   function sanitize_sql_array($ary)
   {
     if (!isset($ary[1])) {
@@ -253,12 +220,12 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $sql;
   }
   
-  /**
-   * Sanitizes a hash of attribute/value pairs for use in
-   * SQL conditions or assignments.
-   *
-   *   array("a" => 'b', "c" => 'd')
-   */
+  # Sanitizes a hash of attribute/value pairs for use in
+  # SQL conditions or assignments.
+  #
+  #   sanitize_sql_hash(array("a" => 'b', "c" => 'd'));
+  #   # => array("\"a\" = 'b'", "\"c\" = 'd'")
+  # 
   function & sanitize_sql_hash(array $hash)
   {
     $sanitized = array();
@@ -271,20 +238,16 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $sanitized;
   }
   
-  /**
-   * Sanitizes a hash of attribute/value pairs into SQL conditions
-   * for a SET clause.
-   */
+  # Sanitizes a hash of attribute/value pairs into SQL
+  # assignments for a SET clause.
   function sanitize_sql_hash_for_assignment(array $assignments)
   {
     $assignments = $this->sanitize_sql_hash($assignments);
     return implode(', ', $assignments);
   }
   
-  /**
-   * Sanitizes a hash of attribute/value pairs into SQL conditions
-   * for a WHERE clause.
-   */
+  # Sanitizes a hash of attribute/value pairs into SQL
+  # conditions for a WHERE clause.
   function sanitize_sql_hash_for_conditions(array $conditions)
   {
     $conditions = $this->sanitize_sql_hash($conditions);
@@ -292,15 +255,14 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   }
   
   
-  /**
-   * Returns a helper to create a new table.
-   *
-   * Available options:
-   * 
-   * - temporary (bool), true to create a temporary table
-   * - id        (bool), true to automatically add an auto incrementing id column
-   * - options   (string), eg: "engine = innodb"
-   */
+  # Returns a helper to create a new table.
+  #
+  # Available options:
+  # 
+  # - temporary (bool), true to create a temporary table
+  # - id        (bool), true to automatically add an auto incrementing id column
+  # - options   (string), eg: "engine = innodb"
+  # 
   function new_table($table, array $options=null)
   {
     return new ActiveRecord_Table($table, $options, $this);
@@ -350,19 +312,19 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("$sql ;");
   }
   
-  /**
-   * Drops a table.
-   * 
-   * Options:
-   * 
-   * - temporary (bool), true if table to drop is a temporary table.
-   */
+  # Drops a table.
+  # 
+  # Options:
+  # 
+  # - temporary (bool), true if table to drop is a temporary table.
+  # 
   function drop_table($table, array $options=null)
   {
     $table = $this->quote_table($table);
     $tmp   = (isset($options['temporary']) and $options['temporary']);
     return $this->execute("DROP ".($tmp ? "TEMPORARY" : '')." TABLE $table ;");
   }
+  
   
   private function build_column_definition($name, array $column=null)
   {
@@ -396,9 +358,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return "$name $def";
   }
   
-  /**
-   * Adds a column to a table.
-   */
+  # Adds a column to a table.
   function add_column($table, $column, $type, array $options=null)
   {
     $definition = array(
@@ -413,9 +373,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("ALTER TABLE $table ADD $column ;");
   }
   
-  /**
-   * Removes a column from a table.
-   */
+  # Removes a column from a table.
   function drop_column($table, $column)
   {
     $table  = $this->quote_table($table);
@@ -423,19 +381,17 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("ALTER TABLE $table DROP $column ;");
   }
   
-  /**
-   * Adds an index to a table column.
-   * 
-   * By default the index is named "$table_$column_idx" or "$table_$column_uniq".
-   * 
-   * Available options:
-   * 
-   * - type: null or unique
-   * - name: manual naming of the index
-   * - size: specified size of the index, in case of a blob/text. 
-   * 
-   * IMPROVE: Support indices on multiple columns.
-   */
+  # Adds an index to a table column.
+  # 
+  # By default the index is named "$table_$column_idx" or "$table_$column_uniq".
+  # 
+  # Available options:
+  # 
+  # - type: null or unique
+  # - name: manual naming of the index
+  # - size: specified size of the index, in case of a blob/text. 
+  # 
+  # IMPROVE: Support indices on multiple columns.
   function add_index($table, $column, $options=null)
   {
     $type = isset($options['type']) ? $options['type'] : '';
@@ -450,9 +406,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("CREATE $type INDEX $name ON $table($column$size) ;");
   }
   
-  /**
-   * Drops an index from a table.
-   */
+  # Drops an index from a table.
   function drop_index($table, $name)
   {
     $table = $this->quote_table($table);
@@ -460,9 +414,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("DROP INDEX $name ON $table ;");
   }
   
-  /**
-   * Returns a single hash of columns => values.
-   */ 
+  # Returns a single hash of columns => values.
   function & select_one($sql)
   {
     $rs = $this->select_all($sql);
@@ -470,18 +422,14 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $rs;
   }
   
-  /**
-   * Returns a single value.
-   */
+  # Returns a single value.
   function select_value($sql)
   {
     $rs = $this->select_one($sql);
     return (count($rs) > 0) ? array_shift($rs) : null;
   }
   
-  /**
-   * Inserts a row in a table.
-   */
+  # Inserts a row in a table.
   function insert($table, array $data, $primary_key=null)
   {
     $table  = $this->quote_table($table);
@@ -499,9 +447,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("INSERT INTO $table ( $fields ) VALUES ( $values ) ;");
   }
   
-  /**
-   * Updates rows in a table.
-   */
+  # Updates rows in a table.
   function update($table, $data, $conditions=null, $options=null)
   {
     $table = $this->quote_table($table);
@@ -512,9 +458,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("UPDATE $table SET $sets $where $order $limit ;");
   }
   
-  /**
-   * Deletes rows from a table.
-   */
+  # Deletes rows from a table.
   function delete($table, $conditions=null, $options=null)
   {
     $table = $this->quote_table($table);
@@ -524,15 +468,14 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return $this->execute("DELETE FROM $table $where $order $limit ;");
   }
   
-  /**
-   * Handles database transactions.
-   * 
-   * Available actions:
-   * 
-   * - begin: starts a transaction
-   * - commit: ends a transaction and commits statements to the database.
-   * - rollback: ends a transaction and drops statements (nothing is recorded in the database).
-   */
+  # Declares transaction state.
+  # 
+  # Available actions:
+  # 
+  # - begin: starts a transaction
+  # - commit: ends a transaction and commits statements to the database.
+  # - rollback: ends a transaction and drops statements (nothing is recorded in the database).
+  # 
   function transaction($action)
   {
     switch(strtolower($action))
@@ -541,6 +484,34 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       case 'commit':   return $this->execute("COMMIT ;");
       case 'rollback': return $this->execute("ROLLBACK ;");
       default: trigger_error("Unknown transaction : $action.", E_USER_WARNING);
+    }
+  }
+  
+  protected function report_error($sql, $message)
+  {
+    if (DEBUG > 1) {
+      echo "\n$message\n$sql\n";
+    }
+    elseif (DEBUG) {
+      misago_log("$message\n$sql\n");
+    }
+    else
+    {
+      # IMPROVE: Add some error logging for 'production' environment.
+      
+    }
+  }
+  
+  protected function log_query($sql, $affected_rows, $time)
+  {
+    $message = sprintf("%s\nAffected rows: %d ; Elapsed time: %.02fms\n",
+      $sql, $affected_rows, $time);
+    
+    if (DEBUG > 2) {
+      echo "\n$message\n";
+    }
+    else {
+      misago_log($message);
     }
   }
 }

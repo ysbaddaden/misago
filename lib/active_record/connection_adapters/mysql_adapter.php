@@ -1,7 +1,7 @@
 <?php
-/**
- * Mysql adapter.
- */
+# Mysql adapter.
+# 
+# See ActiveRecord_ConnectionAdapters_AbstractAdapter for documentation.
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '`';
@@ -65,31 +65,13 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     
     if (!$rs)
     {
-      $message = "MySQL error [".mysql_errno($this->link)."] ".mysql_error($this->link)."\n$sql";
-      if (DEBUG > 1) {
-        echo "\n$message\n";
-      }
-      elseif (DEBUG) {
-        misago_log("$message\n");
-      }
-      else
-      {
-        # IMPROVE: Add some error logging for 'production' environment.
-        
-      }
+      $message = "MySQL error [".mysql_errno($this->link)."] ".mysql_error($this->link);
+      $this->report_error($sql, $message);
     }
-    else
-    {
-      $message = sprintf("%s\nAffected rows: %d ; Elapsed time: %.02fms\n",
-        $sql, mysql_affected_rows($this->link), $time);
-      
-      if (DEBUG > 1) {
-        echo "\n$message\n";
-      }
-      elseif (DEBUG) {
-        misago_log($message);
-      }
+    elseif (DEBUG) {
+      $this->log_query($sql, mysql_affected_rows($this->link), $time);
     }
+    
     return $rs;
   }
   
@@ -98,23 +80,13 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     $results = $this->execute($sql);
     $data    = array();
     
-		if ($results and mysql_num_rows($results) > 0)
+		if ($results)
 		{
-      while ($row = mysql_fetch_row($results))
-      {
-        $result = array();
-        foreach ($row as $idx => $value)
-        {
-#          $table  = mysql_field_table($results, $idx);
-          $column = mysql_field_name($results, $idx);
-#          $result[$table][$column] = $value;
-          $result[$column] = $value;
-        }
-        $data[] = $result;
+      while ($row = mysql_fetch_assoc($results)) {
+        $data[] = $row;
       }
+      mysql_free_result($results);
     }
-    
-    mysql_free_result($results);
     return $data;
   }
   
