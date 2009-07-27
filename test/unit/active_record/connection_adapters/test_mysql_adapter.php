@@ -162,7 +162,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
   function test_insert_returning()
   {
     $id = $this->db->insert('products', array('title' => 'qwerty'), 'id');
-    $this->assert_equal("", $id, '3');
+    $this->assert_equal("", $id, 3);
   }
   
   function test_drop_table()
