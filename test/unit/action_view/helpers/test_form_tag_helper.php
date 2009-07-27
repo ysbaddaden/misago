@@ -168,6 +168,21 @@ class Test_ActionView_Helpers_FormTagHelper extends Unit_Test
     $test = submit_tag('Create', 'edit', array('disabled' => true));
     $this->assert_equal('', $test, '<input disabled="disabled" name="edit" type="submit" value="Create"/>');
   }
+  
+  function test_autofocus()
+  {
+    $test = text_field_tag('user_name', '', array('disabled' => true, 'autofocus' => true, 'required' => false));
+    $this->assert_equal('', $test, '<input disabled="disabled" autofocus="autofocus" type="text" id="user_name" name="user_name" value=""/>');
+    
+    $test = text_field_tag('user_name', '', array('autofocus' => false, 'required' => true));
+    $this->assert_equal('', $test, '<input required="required" type="text" id="user_name" name="user_name" value=""/>');
+    
+    $test = text_area_tag('about', '', array('autofocus' => true, 'required' => true));
+    $this->assert_equal('', $test, '<textarea autofocus="autofocus" required="required" id="about" name="about"></textarea>');
+    
+    $test = select_tag('category', '', array('autofocus' => true, 'required' => false));
+    $this->assert_equal('', $test, '<select autofocus="autofocus" id="category" name="category"></select>');
+  }
 }
 
 new Test_ActionView_Helpers_FormTagHelper();

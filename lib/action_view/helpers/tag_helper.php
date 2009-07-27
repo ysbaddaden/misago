@@ -26,6 +26,20 @@ class ActionView_Helpers_TagHelper_NS
       $attributes['value'] = htmlspecialchars($value);
     }
     
+    # special name => bool attributes
+    foreach(array('disabled', 'autofocus', 'required') as $attr)
+    {
+      if (isset($attributes[$attr]))
+      {
+        if ($attributes[$attr]) {
+          $attributes[$attr] = $attr;
+        }
+        else {
+          unset($attributes[$attr]);
+        }
+      }
+    }
+    /*
     if (isset($attributes['disabled']))
     {
       if ($attributes['disabled']) {
@@ -35,6 +49,7 @@ class ActionView_Helpers_TagHelper_NS
         unset($attributes['disabled']);
       }
     }
+    */
     
     if ($type == 'radio' or $type == 'checkbox')
     {
