@@ -9,7 +9,7 @@ class Test_Session extends Unit_Test
 {
   function test_flash()
   {
-    $this->assert_true(true);
+    $this->assert_true('', true);
   }
 }
 

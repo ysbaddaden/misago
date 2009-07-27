@@ -1,11 +1,10 @@
 <?php
 
-$location = dirname(__FILE__).'/../../..';
 $_SERVER['MISAGO_ENV'] = 'test';
-
+$location = dirname(__FILE__).'/../../..';
 require_once "$location/test/test_app/config/boot.php";
 
-class Test_ActiveRecord_Connection extends Unit_Test
+class Test_ActiveRecord_Connection extends Unit_TestCase
 {
   function test_load_configuration()
   {
@@ -22,7 +21,7 @@ class Test_ActiveRecord_Connection extends Unit_Test
       'production' =>  array(
         'adapter'  => 'mysql',
         'host'     => 'localhost',
-        'database' => 'test_app_production',
+        'database' => 'test_app',
         'username' => 'root',
         'password' => null,
       ),
@@ -49,14 +48,6 @@ class Test_ActiveRecord_Connection extends Unit_Test
   }
 }
 
-
-exec("MISAGO_ENV=test $location/test/test_app/script/db/drop");
-exec("MISAGO_ENV=test $location/test/test_app/script/db/create");
-exec("MISAGO_ENV=production $location/test/test_app/script/db/drop");
-exec("MISAGO_ENV=production $location/test/test_app/script/db/create");
-
 new Test_ActiveRecord_Connection();
 
-exec("MISAGO_ENV=test $location/test/test_app/script/db/drop");
-exec("MISAGO_ENV=production $location/test/test_app/script/db/drop");
 ?>

@@ -21,17 +21,15 @@ foreach($migration_files as $file)
     
     require ROOT.'/db/migrate/'.$file;
     $class = String::singularize(String::camelize($match[2]));
+    
     $migration = new $class($ts, $_SERVER['MISAGO_ENV']);
     $result = $migration->migrate($direction);
     
     if ($result) {
-       ActiveRecord_Migration::save_version($ts);
+      ActiveRecord_Migration::save_version($ts);
     }
-    else
-    {
-      echo Terminal::colorize("An error occured.\n", 'RED');
-      die();
-#      die("An error occured.\n");
+    else {
+      throw new Exception("An error occured.");
     }
   }
 }

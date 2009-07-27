@@ -11,7 +11,7 @@ class MisagoException extends Exception
     
     $message = $this->getMessage();
     $code    = $this->getCode();
-    $trace   = $this->getTraceAsHtml();
+    $trace   = debug_render_backtrace($this->getTrace());
     
     echo <<<END_CSS
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
@@ -37,54 +37,6 @@ class MisagoException extends Exception
 </body>
 </html>
 END_CSS;
-  }
-  /*
-  function getTraceAsHtml()
-  {
-    $str = '';
-    
-    foreach($this->getTrace() as $i => $trace)
-    {
-      $file    = str_replace(ROOT, '', $trace['file']);
-      
-      $callee  = isset($trace['class']) ? $trace['class'].$trace['type'] : '';
-      $callee .= $trace['function'];
-      
-      foreach($trace['args'] as $k => $v) {
-        $trace['args'][$k] = var_export($v, true);
-      }
-      $args = implode(", ", $trace['args']);
-      
-      $str .= <<<END_TRACE
-<dt>{$file} at line {$trace['line']}</dt>
-<dd>$callee($args)</dd>
-END_TRACE;
-    }
-    return "<dl>$str</dl>";
-  }
-  */
-  
-  function getTraceAsHtml()
-  {
-    $str = '';
-    
-    foreach($this->getTrace() as $i => $trace)
-    {
-      $file    = str_replace(ROOT, '', $trace['file']);
-      
-      $callee  = isset($trace['class']) ? $trace['class'].$trace['type'] : '';
-      $callee .= $trace['function'];
-      
-      foreach($trace['args'] as $k => $v) {
-        $trace['args'][$k] = var_export($v, true);
-      }
-      $args = implode(", ", $trace['args']);
-      
-      $str .= "<tr>".
-          "<td title=\"{$file} (line {$trace['line']})\">$callee($args)</td>".
-        "</tr>";
-    }
-    return "<table class=\"trace\"><caption>Trace callback:</caption>$str</table>";
   }
 }
 

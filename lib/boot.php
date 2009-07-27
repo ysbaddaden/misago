@@ -18,7 +18,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'development';
 }
 
-#require 'object.php';
+require 'error_handlers.php';
 require 'active_support/additions.php';
 require 'active_support/string.php';
 require 'active_support/array.php';
