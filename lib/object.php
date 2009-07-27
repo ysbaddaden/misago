@@ -31,7 +31,7 @@ abstract class Object
   function __call($func, $args)
   {
     if (isset($this->__mapped_methods[$func])) {
-      call_user_func_array($this->__mapped_methods[$func], &$args);
+      call_user_func_array($this->__mapped_methods[$func], $args);
     }
     trigger_error("No such method ".get_class($this)."::$func().", E_USER_ERROR);
   }
