@@ -95,7 +95,7 @@ class Unit_TestCase extends Unit_Test
     # requests a page
     $ch = curl_init();
     
-    curl_setopt($ch, CURLOPT_URL, $_SERVER['MISAGO_URL'].$uri);
+    curl_setopt($ch, CURLOPT_URL, "http://localhost:3009/$uri");
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
     curl_setopt($ch, CURLOPT_HEADER, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
