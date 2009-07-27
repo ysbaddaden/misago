@@ -41,6 +41,8 @@
 #   $post = $post->find(':first', array('conditions' => 'id = 1'));
 #   $post = $post->find_by_id(1);
 # 
+# If no post is found, returns null.
+# 
 # ===Find all
 # 
 # The following methods will return a collection of posts:
@@ -52,10 +54,22 @@
 #   $posts = $post->find_all_by_category('aaa');
 #   $posts = $post->find_all_by_category('aaa', array('order' => 'title asc'));
 # 
+# If no posts are found, returns an empty ActiveArray.
+# 
+# ===Find values
+# 
+# Data won't be processed into objects, and it shall return a simple hash
+# of key => value pairs. It's especially useful for collecting data for a
+# HTML select. for instance
+# 
+#   $post   = new Post();
+#   $values = $post->find(':first', array('select' => 'id, title'));
+#   # => array('id' => '1', 'title' => 'my post')
+# 
+# 
 # ===Scopes
 # 
 # Scopes are predefined options for find requests.
-# 
 # 
 # ====Default scope
 # 
@@ -69,7 +83,7 @@
 # 
 # Attention:
 # 
-# - once a default scope has been defined all find requests will be affected. This could be troublesome, sometimes.
+# - once a default scope has been defined all find requests will be affected. This can be troublesome sometimes.
 # - the default scope also affects the 'include' option, which shall be pretty convenient.
 # 
 # 
@@ -159,7 +173,7 @@
 # 
 # As you can see, there is a lot of callbacks, which permits you to
 # interact with the creation process at every step of it. Same goes
-# for update, which as the same lifecycle, but uses particular
+# for update, which has the same lifecycle, but uses particular
 # `on_update` callbacks instead of `on_create`.
 # 
 # Delete has callbacks too. But the lifecycle is simplier:
@@ -259,14 +273,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
           break;
         }
       }
-#      return parent::__set($attribute, $value);
     }
     elseif ($attribute == 'id') {
       return $this->id = parent::__set($this->primary_key, $value);
     }
-#    else {
-#      return $this->$attribute = $value;
-#    }
     return parent::__set($attribute, $value);
   }
   
@@ -341,7 +351,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
    * Methods:
    * 
    * - :all    Returns all found records.
-   * - :first  Returns the first found record.
+   * - :first  Returns the first found record (null if nothing is found).
    * - :values Returns bare values (uninstanciated).
    * 
    * Options:
@@ -524,12 +534,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   
   # Executes a function inside a database transaction.
   # 
-  # Whenever an Exception is raised transacted
-  # queries will be rollbacked and false will be returned.
+  # Whenever an exception is raised, transacted queries
+  # will be rollbacked and it returns false.
   # 
-  # If no exception is raised transacted queries will be
-  # commited to the database, and the result of the executed
-  # function will be returned.
+  # If no exception is raised, transacted queries will be
+  # commited to the database, and it returns the executed
+  # function's result.
   function transaction($func, array $args=array())
   {
     if (is_string($func)) {
@@ -537,8 +547,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     }
     $this->db->transaction('begin');
     
-    try
-    {
+    try {
       $rs = call_user_func_array($func, $args);
     }
     catch(Exception $e)
@@ -853,16 +862,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     
     if ($this->exists($id))
     {
-      $class = get_class($this);
-      $self  = new $class($id);
-      $self->before_delete();
+      $class  = get_class($this);
+      $record = new $class($id);
+      $record->before_delete();
       
       $conditions = array($this->primary_key => $id);
       if (!$this->db->delete($this->table_name, $conditions)) {
         return false;
       }
-
-      $self->after_delete();
+      
+      $record->after_delete();
       return true;
     }
   }
