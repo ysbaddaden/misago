@@ -22,9 +22,13 @@
 # @namespace ActionView_Helpers_UrlHelper
 function current_page($url)
 {
-  if (!is_string($url)) {
-    $url = (string)url_for($url);
+  if (!$url instanceof ActionController_URL
+    and !$url instanceof ActionController_Path
+    and !is_string($url))
+  {
+    $url = url_for($url);
   }
+  $url = (string)$url;
   
   # URL has no query string? let's compare the path only:
   if (strpos($url, '?') === false)
