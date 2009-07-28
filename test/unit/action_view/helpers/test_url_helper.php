@@ -43,9 +43,10 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
     $this->assert_true('',  current_page(array(':controller' => 'archives')));
     $this->assert_false('', current_page(array(':controller' => 'accounts')));
     $this->assert_false('', current_page(array(':controller' => 'archives', ':action' => 'categories')));
-#    $this->assert_true('ActionController_URL',  current_page(new ActionController_URL('GET', 'archives')));
     $this->assert_true('ActionController_Path',  current_page(new ActionController_PATH('GET', 'archives')));
     $this->assert_false('ActionController_Path', current_page(new ActionController_PATH('GET', 'articles')));
+#    $this->assert_true('ActionController_URL',  current_page(new ActionController_URL('GET', 'archives')));
+#    $this->assert_false('ActionController_URL',  current_page(new ActionController_URL('GET', 'archives/mine')));
     
     $_SERVER['REQUEST_URI'] = '/articles/show/45';
     $this->assert_false('with params: failure', current_page(array(':controller' => 'archives', ':action' => 'show', ':id' => 45)));

@@ -8,6 +8,8 @@ class Session
     if (isset($_SESSION)) {
       return;
     }
+    
+    # config
     ini_set('session.name', 'session_id');
     ini_set('session.use_cookies',   true);
     ini_set('session.use_trans_sid', false);

@@ -35,8 +35,17 @@ class ActionController_Flash extends ArrayObject
   
   function __destruct()
   {
-    if (!empty($this->hash)) {
-      $_SESSION['flash'] = $this->hash;
+    if (isset($_SESSION))
+    {
+      if (!empty($this->hash)) {
+        $_SESSION['flash'] = $this->hash;
+      }
+      else {
+        unset($_SESSION['flash']);
+      }
+    }
+    elseif (!empty($this->hash)) {
+      trigger_error("Warning: flash variables were not saved, because session wasn't started.", E_USER_WARNING);
     }
   }
   

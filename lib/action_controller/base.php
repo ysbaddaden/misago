@@ -3,10 +3,12 @@
 # TODO: after_filters().
 abstract class ActionController_Base extends Object
 {
+  public $helpers = ':all';
+  
   public $name;
   public $action;
   public $params;
-  public $helpers = ':all';
+  public $flash;
 	
   protected $mapping          = array();
   protected $already_rendered = false;
@@ -83,25 +85,45 @@ abstract class ActionController_Base extends Object
   
   # Renders a view or exports a resource.
   # 
-  # Renders a view:
+  # Render a view:
   # 
   #   $this->render();
   #   $this->render('edit');
+  #   # => renders edit.html.tpl
+  #   
   #   $this->render(array('action' => 'edit', 'format' => 'xml'));
+  #   # => renders edit.xml.tpl
   # 
-  # Exports a resource in a particular file format:
+  # Render a view inside a layout:
+  # 
+  #   $this->render(array('action' => 'create', 'layout' => 'admin'));
+  #   # => renders create.html.tpl inside admin.html.tpl
+  # 
+  # Export a resource in a particular file format:
   # 
   #   $this->render(array('xml' => $this->user));
+  #   # => exports $this->user as XML
+  #   
   #   $this->render(array('json' => $this->products));
+  #   # => exports $this->user as JSON
+  # 
+  # Advanced uses (eg. webservices):
+  # 
+  #   $this->render(array('xml' => $this->product, 'status' => '201',
+  #     'location' => show_product_url($this->product->id)));
+  #   $this->render(array('json' => $this->products->errors, 'status' => '412'));
   # 
   # Available options:
   # 
-  # - status: HTTP status to send.
-  # - format: use this particular format.
   # - action: render the view associated to this action.
+  # - format: use this particular format.
+  # - json: export resource as JSON.
   # - layout: use a particular layout.
   # - locals: pass some variables to be available in template's scope.
-  # - text:   render some text, with no processing --useful for pushing cached html.
+  # - location: set HTTP location header.
+  # - status: set HTTP status header.
+  # - text: render some text, with no processing --useful for pushing cached html.
+  # - xml: export resource as XML.
   # 
   function render($options=null)
   {
@@ -112,6 +134,9 @@ abstract class ActionController_Base extends Object
       $options['format'] = empty($this->format) ? 'html' : $this->format;
     }
     
+    if (isset($options['location'])) {
+      HTTP::redirect($options['location']);
+    }
     if (isset($options['status'])) {
       HTTP::status($options['status']);
     }

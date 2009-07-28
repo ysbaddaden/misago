@@ -48,14 +48,14 @@ function error_handler($errno, $errstr, $errfile=null, $errline=null, array $err
   unset($backtrace[0]);
   $trace = debug_render_backtrace($backtrace);
   
-#  if ($_SERVER['MISAGO_ENV'] == 'production') {
+  if ($_SERVER['MISAGO_ENV'] == 'production') {
     error_log("$errstr [$errno] in $errfile (line $errline)\n$trace\n", 0);
-#  }
-#  else
-#  {
-#    echo "\n".Terminal::colorize($errstr, 'RED')."\n  in $errfile(line $errline)\n";
-##    echo Terminal::colorize($trace, 'LIGHT_GRAY')."\n";
-#  }
+  }
+  else
+  {
+    echo "\n".Terminal::colorize($errstr, 'RED')."\n  in $errfile(line $errline)\n";
+    echo Terminal::colorize($trace, 'LIGHT_GRAY')."\n";
+  }
 }
 
 function exception_handler($e)
@@ -74,9 +74,9 @@ function exception_handler($e)
   }
 }
 
-if ($_SERVER['MISAGO_ENV'] == 'production') {
+#if ($_SERVER['MISAGO_ENV'] == 'production') {
   set_error_handler('error_handler');
-}
+#}
 set_exception_handler('exception_handler');
 
 ?>
