@@ -17,15 +17,20 @@ class Session
     if ($force_new_id) {
       session_regenerate_id();
     }
-    elseif (isset($session_id)) {
-      session_id($session_id);
+    else
+    {
+      if ($session_id === null and !empty($_REQUEST['session_id'])) {
+        $session_id = $_REQUEST['session_id'];
+      }
+      if (!empty($session_id)) {
+        session_id($session_id);
+      }
     }
-    
     session_start();
     
     # Tries to protect against session highjacking
-    #   1. session must already exist ;
-    #   2. a session_id cannot move from one browser to another!
+    #   1. session must already exist;
+    #   2. a session_id cannot move from one browser to another.
     if (!isset($_SESSION['initialized'])
       or $_SESSION['user-agent'] != $_SERVER['HTTP_USER_AGENT'])
     {
