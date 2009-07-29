@@ -62,22 +62,15 @@ class ActiveRecord_Table
     switch($type)
     {
       case 'date':
-        $type = $this->db->NATIVE_DATABASE_TYPES['date'];
-        $this->add_column('created_on', $type['name']);
-        $this->add_column('updated_on', $type['name']);
+        $this->add_column('created_on', $type);
+        $this->add_column('updated_on', $type);
       break;
       
       case 'time':
-        $type = $this->db->NATIVE_DATABASE_TYPES['time'];
-        $this->add_column('created_at', $type['name']);
-        $this->add_column('updated_at', $type['name']);
-      break;
-      
       case 'datetime':
       default:
-        $type = $this->db->NATIVE_DATABASE_TYPES['datetime'];
-        $this->add_column('created_at', $type['name']);
-        $this->add_column('updated_at', $type['name']);
+        $this->add_column('created_at', $type);
+        $this->add_column('updated_at', $type);
     }
   }
   

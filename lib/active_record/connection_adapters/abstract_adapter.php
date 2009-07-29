@@ -19,6 +19,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     $this->connect();
   }
   
+  function __destruct()
+  {
+    $this->disconnect();
+  }
+  
   # Returns the value of a configuration setting.
   function config($name)
   {

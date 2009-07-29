@@ -1,21 +1,19 @@
 <?php
 
 # PostgreSQL adapter.
-# 
-# TEST: PostgreSQL adapter.
 class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(
-    'primary_key' => "INTEGER AUTO_INCREMENT PRIMARY KEY",
+    'primary_key' => "SERIAL",
     'string'      => array('name' => 'VARCHAR', 'limit' => 255),
     'text'        => array('name' => 'TEXT'),
-    'integer'     => array('name' => 'INT',   'limit' => 4),
-    'double'      => array('name' => 'FLOAT', 'limit' => 4),
+    'integer'     => array('name' => 'INTEGER'),
+    'double'      => array('name' => 'FLOAT'),
     'date'        => array('name' => 'DATE'),
     'time'        => array('name' => 'TIME'),
-    'datetime'    => array('name' => 'DATETIME'),
+    'datetime'    => array('name' => 'TIMESTAMP'),
     'bool'        => array('name' => 'BOOLEAN'),
-    'binary'      => array('name' => 'BLOB'),
+    'binary'      => array('name' => 'BYTEA'),
   );
   private $link;
   
@@ -47,7 +45,7 @@ class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_Con
     if (!empty($this->config['database'])) {
       $options[] = 'dbname='.$this->config['database'];
     }
-    $this->link = $callback(implode(' ', $options), true);
+    $this->link = $callback(implode(' ', $options), PGSQL_CONNECT_FORCE_NEW);
     
     if ($this->link === false) {
       throw new ActiveRecord_ConnectionNotEstablished("Unable to connect to PostgreSQL server.");
@@ -75,7 +73,7 @@ class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_Con
       $this->report_error($sql, $message);
     }
     elseif (DEBUG) {
-      $this->log_query($sql, pg_affected_rows($this->link), $time);
+      $this->log_query($sql, pg_affected_rows($rs), $time);
     }
     
     return $rs;
@@ -99,25 +97,43 @@ class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_Con
     $results = $this->execute($sql);
     $data    = array();
     
-		if ($results and mysql_num_rows($results) > 0)
+		if ($results and pg_num_rows($results) > 0)
 		{
-      while ($row = mysql_fetch_row($results)) {
+      while ($row = pg_fetch_row($results)) {
         $data[] = $row[0];
       }
     }
     
-    mysql_free_result($results);
+    pg_free_result($results);
     return $data;
   }
   
   # TODO: Extract columns definition from database.
   function & columns($table)
   {
-    $_table  = $this->quote_table($table);
+    $_table  = $this->quote_value($table);
     $columns = array();
     
-    // ...
+    $results = $this->select_all("SELECT
+      column_name, column_default, is_nullable, data_type, udt_name
+      FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
     
+    $is_pk = 
+    print_r($results);
+    
+    foreach($results as $rs)
+    {
+      $column = array(
+        'primary_key' => ($rs['column_default'] == "nextval('{$table}_{$rs['column_name']}_seq'::regclass)"),
+        'type' => $rs['udt_name'],
+#        'limit' => '',
+        'null' => (bool)$rs['is_nullable'],
+      );
+      
+      // ...
+      
+      $columns[$rs['column_name']] = $column;
+    }
     return $columns;
   }
   
@@ -161,15 +177,24 @@ class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_Con
     $fields = implode(', ', $fields);
     $values = implode(', ', $values);
     
-    $rs = $this->execute("INSERT INTO $table ( $fields ) VALUES ( $values ) RETURNING $primary_key ;");
+    $sql = "INSERT INTO $table ( $fields ) VALUES ( $values )";
+    if (!empty($primary_key))
+    {
+      $primary_key = $this->quote_column($primary_key);
+      $sql .= " RETURNING $primary_key";
+    }
+    $rs = $this->execute("$sql ;");
     
-    if (!$rs) {
-      return false;
+    if (!$rs or empty($primary_key)) {
+      return $rs ? true : false;
     }
     
-    // ...
-    
-    return $id;
+    if (pg_num_rows($rs))
+    {
+      $row = pg_fetch_row($rs);
+      return (int)$row[0];
+    }
+    return false;
   }
   
   function update($table, $data, $conditions=null, $options=null)
