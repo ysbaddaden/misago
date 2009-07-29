@@ -28,11 +28,13 @@ class Session
     }
     session_start();
     
+    $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+    
     # Tries to protect against session highjacking
     #   1. session must already exist;
     #   2. a session_id cannot move from one browser to another.
     if (!isset($_SESSION['initialized'])
-      or $_SESSION['user-agent'] != $_SERVER['HTTP_USER_AGENT'])
+      or $_SESSION['user-agent'] != $user_agent)
     {
       session_destroy();
       session_regenerate_id();
@@ -40,7 +42,7 @@ class Session
     }
     
     $_SESSION['initialized'] = true;
-    $_SESSION['user-agent']  = $_SERVER['HTTP_USER_AGENT'];
+    $_SESSION['user-agent']  = $user_agent;
     
     return session_id();
   }
