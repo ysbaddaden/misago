@@ -68,14 +68,6 @@ class ActionView_Helpers_RecordHelper_NS
     return '</form>';
   }
   
-  /*
-  # Displays a submit button.
-  function submit($value=null, $name=null, $attributes=null)
-  {
-    return submit_tag($value, $name, $attributes);
-  }
-  */
-  
   # Displays errors related to a column.
   # Shows only the first error by default.
   function errors_on($column, $all=false)
