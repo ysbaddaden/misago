@@ -18,6 +18,7 @@ function t($str, $options=null)
 
 # Handles translations of strings.
 # 
+# FIXME: Missing interpolation when translation isn't found. eg: t('this is my {{name}}', array('name' => $name)).
 # TODO: Implement pluralization.
 # IMPROVE: Possibility to separate translations in a directory structure (ie. following the context).
 # 
