@@ -259,6 +259,17 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   {
     
   }
+  
+  function test_build_join_for()
+  {
+    $order = new Order();
+    $this->assert_equal('join with has_one relationship', $order->build_join_for('invoice'),
+      "inner join `invoices` on `invoices`.`order_id` = `orders`.`id`");
+    
+    $basket = new Basket();
+    $this->assert_equal('join with belongs_to relationship', $basket->build_join_for('product'),
+      "inner join `products` on `products`.`id` = `baskets`.`product_id`");
+  }
 }
 
 new Test_ActiveRecord_Associations();

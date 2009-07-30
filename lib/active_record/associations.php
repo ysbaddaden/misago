@@ -209,6 +209,9 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       if (empty($def['table_name'])) {
         $def['table_name'] = String::pluralize(String::singularize(String::underscore($name)));
       }
+      if (empty($def['primary_key'])) {
+        $def['primary_key'] = 'id';
+      }
       if (empty($def['foreign_key']))
       {
         $def['foreign_key'] = ($type == 'belongs_to') ?
@@ -412,6 +415,34 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
           }
         break;
       }
+    }
+  }
+
+  # Creates a SQL join fragment for a given association (related to this).
+  # 
+  # - $association: the association to build the SQL join fragment with.
+  # - $type: inner, outer, left, left outer, etc.
+  # 
+  function build_join_for($association, $type="inner")
+  {
+    $assoc = $this->associations[$association];
+    
+    switch($assoc['type'])
+    {
+      case 'belongs_to':
+        return "$type join ".$this->db->quote_table($assoc['table_name']).
+          " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
+          " = ".$this->db->quote_column("{$this->table_name}.{$assoc['foreign_key']}");
+      
+      case 'has_one':
+      case 'has_many':
+        return "$type join ".$this->db->quote_table($assoc['table_name']).
+          " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
+          " = ".$this->db->quote_column("{$this->table_name}.{$this->primary_key}");
+      
+      case 'has_and_belongs_to_many':
+        return "$type join ".$this->db->quote_table($assoc['table_name']).
+          " on ";
     }
   }
 }
