@@ -1,6 +1,9 @@
 <?php
 
 # PostgreSQL adapter.
+#
+# Help on information_schema: http://www.alberton.info/postgresql_meta_info.html
+# 
 class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(
@@ -115,8 +118,11 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     $_table  = $this->quote_value($table);
     $columns = array();
     
-    $results = $this->select_all("SELECT
-      column_name, column_default, is_nullable, data_type, udt_name
+#    $results = $this->select_all("SELECT
+#      column_name, column_default, is_nullable, data_type, character_maximum_length
+#      FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
+    $results = $this->select_all("SELECT ordinal_position, column_name, data_type,
+      column_default, is_nullable, character_maximum_length, numeric_precision
       FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
     
     print_r($results);
@@ -125,7 +131,7 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     {
       $column = array(
         'primary_key' => ($rs['column_default'] == "nextval('{$table}_{$rs['column_name']}_seq'::regclass)"),
-        'type' => $rs['udt_name'],
+        'type' => $rs['data_type'],
 #        'limit' => '',
         'null' => ($rs['is_nullable'] == 'YES'),
       );
