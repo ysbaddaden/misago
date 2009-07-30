@@ -426,7 +426,6 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   function build_join_for($association, $type="inner")
   {
     $assoc = $this->associations[$association];
-    
     switch($assoc['type'])
     {
       case 'belongs_to':
@@ -441,8 +440,12 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
           " = ".$this->db->quote_column("{$this->table_name}.{$this->primary_key}");
       
       case 'has_and_belongs_to_many':
-        return "$type join ".$this->db->quote_table($assoc['table_name']).
-          " on ";
+        return "$type join ".$this->db->quote_table($assoc['join_table']).
+          " on ".$this->db->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
+          " = ".$this->db->quote_column("{$this->table_name}.{$this->primary_key}").
+          " $type join ".$this->db->quote_table($assoc['table_name']).
+          " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
+          " = ".$this->db->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
     }
   }
 }
