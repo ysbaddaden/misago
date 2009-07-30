@@ -408,7 +408,6 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map->reset();
     $map->resource('products');
     $map->build_path_and_url_helpers();
-    
     $this->fixtures('products');
     
     $this->assert_equal('', (string)show_product_path(new Product(1)), '/products/1');
@@ -420,7 +419,8 @@ class Test_ActionController_Routing extends Unit_TestCase
   
   function test_url_for_activerecord()
   {
-    
+    $this->assert_equal('', (string)url_for(new Product(2)), 'http://localhost:3009/products/2');
+    $this->assert_equal('', (string)url_for(new Product(3)), 'http://localhost:3009/products/3');
   }
 }
 

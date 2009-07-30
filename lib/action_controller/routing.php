@@ -336,6 +336,12 @@ class ActionController_Routing extends Object
 # IMPROVE: url_for: handle specified options (host, protocol, etc.)
 function url_for($options)
 {
+  if ($options instanceof ActiveRecord_Record)
+  {
+    $named_route = 'show_'.String::underscore(get_class($options)).'_url';
+    return $named_route($options);
+  }
+  
   $default_options = array(
     'anchor'    => null,
     'path_only' => true,
