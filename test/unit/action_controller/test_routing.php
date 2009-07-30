@@ -414,8 +414,8 @@ class Test_ActionController_Routing extends Unit_TestCase
     $this->assert_equal('', (string)show_product_path(new Product(1)), '/products/1');
     $this->assert_equal('', (string)edit_product_path(new Product(3)), '/products/3/edit');
     
-    $this->assert_equal('', (string)show_product_url(new Product(2)), 'http://localhost:3009/products/1');
-    $this->assert_equal('', (string)edit_product_url(new Product(3)), 'http://localhost:3009/products/3/edit');
+    $this->assert_equal('', (string)show_product_url(new Product(2)), 'http://localhost:3009/products/2');
+    $this->assert_equal('', (string)edit_product_url(new Product(1)), 'http://localhost:3009/products/1/edit');
   }
   
   function test_url_for_activerecord()
