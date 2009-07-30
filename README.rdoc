@@ -2,34 +2,39 @@
 
 Misago is yet another framework for PHP that is inspired on Rails. 
 
-In fact it steals most of the API that is somehow translatable to PHP. Since Ruby is a far more elaborated language than PHP will ever be, there are features that can't be used the same way (eg. whatever uses modules). Untranslatable features are thus transformed a bit to mark the difference with Rails' API.
-
 
 == Why another framework for PHP?
 
-I couldn't find a PHP framework as simple as Rails can be.
+I wanted to learn more about the insides of a framework. I was eager to know how the least bit thing did work. I thus started hacking some frameworks. For fun and for real use in the end (ie. http://webcomics.fr).
 
-I'm not saying Rails is easy, I'm just saying PHP frameworks I gave a look at were far too complicated. Reading throught the tutorial, I didn't understand anything. Why do I have to do so many complicated things just to create a stupid model and start using it?
+I also couldn't find a PHP framework as simple as Rails can be. I'm not saying Rails is easy, I'm just saying PHP frameworks that I gave a look at were far too complicated or outdated (ie. made for PHP 4). Reading throught the tutorials, I didn't understand anything: why do I have to do so many complicated things just to create a stupid model and start using it?
 
-In the end I just wanted the Rails API.
+In the end I just wanted the Rails API. I thus decided in early 2009 to study the API, and reproduce it somehow in PHP, to learn more about it and understand why they chosed this idea and not another. 
+
+Finally I'm strating to use Misago in real projects. I also feel quite confident about using Rails directly (since I learned a lot).
 
 
-== Why not use Ruby?
+=== Why not use Ruby?
 
-I've been using PHP for years, and I like it. It's a challenge to create an object oriented framework for PHP too. Trying to get over the limitations, etc.
+I've been using PHP for years, and I like it. It's a challenge to create an object oriented framework for PHP too. Trying to get over the limitations, etc. PHP 5 introduced a usable model object, and PHP 5.3 introduces new features quite interesting (LSB, closures, etc.) which shall leverage the problematics, and boost overall performances. 
 
-You may also use Misago as a transition from PHP to Rails. Why not?
+One may also use Misago as a transition from PHP to Rails. Why not?
 
 
 == Requirements
 
-Misago requires PHP 5 (only PHP 5.2.x has been tested). The CLI version is required (for scripts and tests).
+Misago requires PHP 5.2 (any previous 5.x version may work but is unsupported). PHP 5.3 shall be required when it's easily installable on Debian servers. The CLI version of PHP is also required (for scripts and tests).
 
-MySQL is the only supported database engine right now, thus the MySQL extension is required. The cURL extension isn't required right now, but shall be soon (ie. whenever work is started on ActiveResource), so you better install it.
+The CURL and mb_string extensions are required. APC and Memcache are optional but recommended, since they're both used to boost caching performances. Depending on your database of choice, the mysql or pgsql extension is required, too.
 
-Misago may start a webserver for you (using script/server). You must have LightTPD and the CGI version of PHP installed. nginx shall come someday as an alternative. Apache isn't supported, but may work.
+Misago may start a webserver for you (using script/server). You must have LightTPD and the CGI version of PHP installed. nginx shall come someday as an alternative. Apache isn't supported, but may work (you will have to write the configuration).
 
-Misago has only been tested on Linux systems. It should work on any *nix and Mac OS X, but may not work on win32 (unless cygwin, bash and GNU tools are installed?).
+
+== Operating Systems
+
+Misago has only been tested on Linux systems. It should work on any *nix and Mac OS X systems thought, but Microsoft Windows ones may require a few modifications to most scripts (you may some success using cygwin for the shell and GNU tools).
+
+Of course patches are welcome!
 
 
 == Documentation
@@ -41,4 +46,4 @@ Check out 'pdoc' from http://github.com/ysbaddaden/pdoc and run inside misago's 
 
 == Authors
 
-Misago is developed by Julien Portalier, aka JMG, and you can reach him at <ysbaddaden@gmail.com>.
+Misago is developed by Julien Portalier <ysbaddaden@gmail.com>.
