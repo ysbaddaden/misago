@@ -264,9 +264,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
           case 'integer': $value = (int)$value;    break;
           case 'float':   $value = (double)$value; break;
           case 'boolean': $value = (bool)$value;   break;
-          case 'date':
-          case 'datetime':
-          case 'time':
+          case 'date': case 'datetime': case 'time':
             if (!($value instanceof Time)) {
               $value = new Time($value, $this->columns[$attribute]['type']);
             }

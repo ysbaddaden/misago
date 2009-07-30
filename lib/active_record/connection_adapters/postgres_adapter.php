@@ -112,15 +112,13 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     return $data;
   }
   
-  # TODO: Extract columns definition from database.
+  # TODO: Extract string limit, numeric limit and default value from column definition.
+  # TODO: Determine which column is the primary key.
   function & columns($table)
   {
     $_table  = $this->quote_value($table);
     $columns = array();
     
-#    $results = $this->select_all("SELECT
-#      column_name, column_default, is_nullable, data_type, character_maximum_length
-#      FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
     $results = $this->select_all("SELECT ordinal_position, column_name, data_type,
       column_default, is_nullable, character_maximum_length, numeric_precision
       FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
@@ -130,11 +128,20 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     foreach($results as $rs)
     {
       $column = array(
-        'primary_key' => ($rs['column_default'] == "nextval('{$table}_{$rs['column_name']}_seq'::regclass)"),
-        'type' => $rs['data_type'],
+#        'primary_key' => ($rs['column_default'] == "nextval('{$table}_{$rs['column_name']}_seq'::regclass)"),
+#        'type' => $rs['data_type'],
 #        'limit' => '',
         'null' => ($rs['is_nullable'] == 'YES'),
       );
+      
+      foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
+      {
+        if ($def['name'] == $column['type'])
+        {
+          $column['type'] = $type;
+          break;
+        }
+      }
       
       // ...
       
