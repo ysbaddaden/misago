@@ -293,7 +293,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $this->assert_equal("with printf markers", $test, "a = 'b', c = 4");
     
     $test = $db->sanitize_sql_array(array("a = '%s', c = %f", 'b', 3.2));
-    $this->assert_equal("with printf markers (doubles)", $test, "a = 'b', c = 3.200000");
+    $this->assert_equal("with printf markers (floats)", $test, "a = 'b', c = 3.200000");
   }
   
   function test_sanitize_sql_hash()
@@ -346,7 +346,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $this->assert_equal("array with printf markers", $test, "a = 'b', c = 4");
     
     $test = $db->sanitize_sql_for_assignment(array("a = '%s', c = %f", 'b', 3.2));
-    $this->assert_equal("array with printf markers (doubles)", $test, "a = 'b', c = 3.200000");
+    $this->assert_equal("array with printf markers (floats)", $test, "a = 'b', c = 3.200000");
   }
   
   function test_insert()

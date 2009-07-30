@@ -4,7 +4,7 @@ class AddingNullableFieldToProduct extends ActiveRecord_Migration
 {
   function up()
   {
-    $this->db->add_column('products', 'in_stock',    'bool');
+    $this->db->add_column('products', 'in_stock',    'boolean');
     $this->db->add_column('products', 'description', 'text');
     return true;
   }

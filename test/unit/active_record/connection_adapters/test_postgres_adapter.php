@@ -68,7 +68,7 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
     
     $t = $this->db->new_table("products", $options);
     $t->add_column('title', "string", array('limit' => 100, 'null' => false));
-    $t->add_column('price', "double");
+    $t->add_column('price', "float");
     $t->add_timestamps();
     $rs = $t->create();
     
@@ -100,7 +100,7 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
     $this->assert_equal("", $columns, array(
       'id'         => array('primary_key' => true,  'type' => 'integer',  'limit' => 11,  'null' => false),
       'title'      => array('primary_key' => false, 'type' => 'string',   'limit' => 100, 'null' => false),
-      'price'      => array('primary_key' => false, 'type' => 'double',   'null' => true),
+      'price'      => array('primary_key' => false, 'type' => 'float',    'null' => true),
       'created_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
       'updated_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
     ));
@@ -109,16 +109,16 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
   /*
   function test_add_column()
   {
-    $this->db->add_column('products', 'in_stock', 'bool');
+    $this->db->add_column('products', 'in_stock', 'boolean');
     
     $columns = $this->db->columns('products');
     $this->assert_equal("", $columns, array(
-      'id'         => array('primary_key' => true,  'type' => 'integer', 'limit' => 11,  'null' => false),
-      'title'      => array('primary_key' => false, 'type' => 'string',  'limit' => 100, 'null' => false),
-      'price'      => array('primary_key' => false, 'type' => 'double',   'null' => true, 'signed' => false),
+      'id'         => array('primary_key' => true,  'type' => 'integer',  'limit' => 11,  'null' => false),
+      'title'      => array('primary_key' => false, 'type' => 'string',   'limit' => 100, 'null' => false),
+      'price'      => array('primary_key' => false, 'type' => 'float',    'null' => true, 'signed' => false),
       'created_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
       'updated_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
-      'in_stock'   => array('primary_key' => false, 'type' => 'bool',     'null' => true),
+      'in_stock'   => array('primary_key' => false, 'type' => 'boolean',  'null' => true),
     ));
   }
   */

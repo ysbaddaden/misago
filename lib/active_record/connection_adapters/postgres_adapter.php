@@ -4,16 +4,17 @@
 class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(
-    'primary_key' => "SERIAL",
-    'string'      => array('name' => 'VARCHAR', 'limit' => 255),
-    'text'        => array('name' => 'TEXT'),
-    'integer'     => array('name' => 'INTEGER'),
-    'double'      => array('name' => 'FLOAT'),
-    'date'        => array('name' => 'DATE'),
-    'time'        => array('name' => 'TIME'),
-    'datetime'    => array('name' => 'TIMESTAMP'),
-    'bool'        => array('name' => 'BOOLEAN'),
-    'binary'      => array('name' => 'BYTEA'),
+    'primary_key' => "serial primary key",
+    'string'      => array('name' => 'character varying', 'limit' => 255),
+    'text'        => array('name' => 'text'),
+    'integer'     => array('name' => 'integer'),
+    'float'       => array('name' => 'float'),
+    'decimal'     => array('name' => 'decimal'),
+    'date'        => array('name' => 'date'),
+    'time'        => array('name' => 'time'),
+    'datetime'    => array('name' => 'timestamp'),
+    'boolean'     => array('name' => 'boolean'),
+    'binary'      => array('name' => 'bytea'),
   );
   private $link;
   
@@ -118,7 +119,6 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
       column_name, column_default, is_nullable, data_type, udt_name
       FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
     
-    $is_pk = 
     print_r($results);
     
     foreach($results as $rs)
@@ -127,7 +127,7 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
         'primary_key' => ($rs['column_default'] == "nextval('{$table}_{$rs['column_name']}_seq'::regclass)"),
         'type' => $rs['udt_name'],
 #        'limit' => '',
-        'null' => (bool)$rs['is_nullable'],
+        'null' => ($rs['is_nullable'] == 'YES'),
       );
       
       // ...

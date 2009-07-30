@@ -262,8 +262,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
         switch($this->columns[$attribute]['type'])
         {
           case 'integer': $value = (int)$value;    break;
-          case 'double':  $value = (double)$value; break;
-          case 'bool':    $value = (bool)$value;   break;
+          case 'float':   $value = (double)$value; break;
+          case 'boolean': $value = (bool)$value;   break;
           case 'date':
           case 'datetime':
           case 'time':

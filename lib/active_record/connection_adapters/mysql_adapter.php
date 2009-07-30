@@ -6,16 +6,18 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
 {
   public  $COLUMN_QUOTE = '`';
   public  $NATIVE_DATABASE_TYPES = array(
-    'primary_key' => "INTEGER AUTO_INCREMENT PRIMARY KEY",
-    'string'      => array('name' => 'VARCHAR', 'limit' => 255),
-    'text'        => array('name' => 'TEXT'),
-    'integer'     => array('name' => 'INT',   'limit' => 4),
-    'double'      => array('name' => 'FLOAT', 'limit' => 4),
-    'date'        => array('name' => 'DATE'),
-    'time'        => array('name' => 'TIME'),
-    'datetime'    => array('name' => 'DATETIME'),
-    'bool'        => array('name' => 'BOOLEAN'),
-    'binary'      => array('name' => 'BLOB'),
+    'primary_key' => "int(11) auto_increment PRIMARY KEY",
+    'string'      => array('name' => 'varchar', 'limit' => 255),
+    'text'        => array('name' => 'text'),
+    'integer'     => array('name' => 'int',   'limit' => 4),
+    'float'       => array('name' => 'float'),
+    'decimal'     => array('name' => 'decimal'),
+    'date'        => array('name' => 'date'),
+    'time'        => array('name' => 'time'),
+    'datetime'    => array('name' => 'datetime'),
+#    'boolean'        => array('name' => 'tinyint', 'limit' => 1),
+    'boolean'        => array('name' => 'boolean'),
+    'binary'      => array('name' => 'blob'),
   );
   public  $VALUE_FALSE = '0';
   public  $VALUE_TRUE  = '1';
@@ -28,7 +30,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   
   function is_active()
   {
-    return (bool)$this->link;
+    return (boolean)$this->link;
   }
   
   function connect()
@@ -124,12 +126,12 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
         $column = array(
           'primary_key' => ($key === 'PRI'),
         );
-        $type   = strtoupper($type);
+        $type = strtolower($type);
         
-        if (stripos($type, 'UNSIGNED') !== false)
+        if (stripos($type, 'unsigned') !== false)
         {
           $signed = false;
-          $type = trim(str_ireplace('UNSIGNED', '', $type));
+          $type = trim(str_ireplace('unsigned', '', $type));
         }
         
         if (preg_match('/(\w+)\(([^\)]+)\)/', $type, $match))
@@ -137,7 +139,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
           $column['type']  = $match[1];
           $column['limit'] = (int)$match[2];
         }
-        elseif ($type == 'TINYTEXT')
+        elseif ($type == 'tinytext')
         {
           $column['type']  = 'string';
           $column['limit'] = 255;
@@ -146,11 +148,11 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
           $column['type'] = $type;
         }
         
-        if ($column['type'] == 'TINYINT'
+        if ($column['type'] == 'tinyint'
           and isset($column['limit'])
           and $column['limit'] == 1)
         {
-          $column['type'] = 'bool';
+          $column['type'] = 'boolean';
           unset($column['limit']);
         }
         else
