@@ -1,7 +1,7 @@
 <?php
 
 # PostgreSQL adapter.
-class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
+class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(
     'primary_key' => "SERIAL",
