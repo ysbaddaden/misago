@@ -333,6 +333,11 @@ class ActionController_Routing extends Object
 #   url_for(array(':controller' => 'about', 'anchor' => 'me'))
 #   # => http://www.domain.com/about#me
 # 
+# Using REST resources, you may pass an ActiveRecord directly. For instance:
+# 
+#   $product = new Product(43);
+#   $url = url_for(product);    # => http://www.domain.com/products/3
+# 
 # IMPROVE: url_for: handle specified options (host, protocol, etc.)
 function url_for($options)
 {
