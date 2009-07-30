@@ -5,7 +5,7 @@ $location = dirname(__FILE__).'/../../..';
 
 require_once "$location/test/test_app/config/boot.php";
 
-class Test_ActionController_Routing extends Unit_Test
+class Test_ActionController_Routing extends Unit_TestCase
 {
   function test_draw()
   {
@@ -314,7 +314,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':format'     => null,
     ));
     $this->assert_true("about_path()", function_exists('about_path'));
-    $this->assert_true("about_url()", function_exists('about_url'));
+    $this->assert_true("about_url()",  function_exists('about_url'));
     
     $this->assert_equal('/products/45/purchase', $map->route('GET', 'products/45/purchase'), array(
       ':method'     => 'GET',
@@ -400,6 +400,27 @@ class Test_ActionController_Routing extends Unit_Test
     
     $this->assert_equal('root_path', (string)root_path(), '/');
     $this->assert_equal('root_url', (string)root_url(), 'http://localhost:3009/');
+  }
+  
+  function test_named_routes_with_activerecord()
+  {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->resource('products');
+    $map->build_path_and_url_helpers();
+    $this->fixtures('products');
+    
+    $this->assert_equal('', (string)show_product_path(new Product(1)), '/products/1');
+    $this->assert_equal('', (string)edit_product_path(new Product(3)), '/products/3/edit');
+    
+    $this->assert_equal('', (string)show_product_url(new Product(2)), 'http://localhost:3009/products/2');
+    $this->assert_equal('', (string)edit_product_url(new Product(1)), 'http://localhost:3009/products/1/edit');
+  }
+  
+  function test_url_for_activerecord()
+  {
+    $this->assert_equal('', (string)url_for(new Product(2)), 'http://localhost:3009/products/2');
+    $this->assert_equal('', (string)url_for(new Product(3)), 'http://localhost:3009/products/3');
   }
 }
 
