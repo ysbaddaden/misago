@@ -275,8 +275,13 @@ class ActionController_Routing extends Object
   
   static private function named_function(&$route, $keys)
   {
-    if (is_object($keys) and $keys instanceof ActiveRecord_Record) {
-      $keys = $keys->attributes();
+    if (is_object($keys) and $keys instanceof ActiveRecord_Record)
+    {
+      $attributes = $keys->attributes();
+      $keys = array();
+      foreach($attributes as $k => $v) {
+        $keys[":$k"] = $v;
+      }
     }
     elseif (!is_array($keys)) {
       $keys = array(':id' => $keys);

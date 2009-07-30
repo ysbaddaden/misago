@@ -5,7 +5,7 @@ $location = dirname(__FILE__).'/../../..';
 
 require_once "$location/test/test_app/config/boot.php";
 
-class Test_ActionController_Routing extends Unit_Test
+class Test_ActionController_Routing extends Unit_TestCase
 {
   function test_draw()
   {
@@ -400,6 +400,24 @@ class Test_ActionController_Routing extends Unit_Test
     
     $this->assert_equal('root_path', (string)root_path(), '/');
     $this->assert_equal('root_url', (string)root_url(), 'http://localhost:3009/');
+  }
+  
+  function test_named_routes_with_activerecord()
+  {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->resource('products');
+    $map->build_path_and_url_helpers();
+    
+    $this->fixtures('products');
+    
+    $this->assert_equal('', (string)show_product_path(new Product(1)), '/products/1');
+    $this->assert_equal('', (string)edit_product_path(new Product(3)), '/products/3/edit');
+  }
+  
+  function test_url_for_activerecord()
+  {
+    
   }
 }
 
