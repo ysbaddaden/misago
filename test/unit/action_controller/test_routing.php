@@ -314,7 +314,7 @@ class Test_ActionController_Routing extends Unit_Test
       ':format'     => null,
     ));
     $this->assert_true("about_path()", function_exists('about_path'));
-    $this->assert_true("about_url()", function_exists('about_url'));
+    $this->assert_true("about_url()",  function_exists('about_url'));
     
     $this->assert_equal('/products/45/purchase', $map->route('GET', 'products/45/purchase'), array(
       ':method'     => 'GET',

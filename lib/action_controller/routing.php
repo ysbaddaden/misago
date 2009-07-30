@@ -234,10 +234,8 @@ class ActionController_Routing extends Object
       {
         if (isset($route['name']))
         {
-          $action = isset($route['mapping'][':action']) ? $route['mapping'][':action'] : 'index';
-          $functions["{$route['name']}_path"] = $this->build_path_function($route['name'], $route, $route['mapping'][':controller'], $action, 'path');
-          $functions["{$route['name']}_url"]  = $this->build_path_function($route['name'], $route, $route['mapping'][':controller'], $action, 'url');
-          continue;
+          $functions[] = $this->build_named_function('path', $route);
+          $functions[] = $this->build_named_function('url',  $route);
         }
       }
       $contents = '<?php '.implode("\n\n", $functions).' ?>';
@@ -246,30 +244,57 @@ class ActionController_Routing extends Object
     include TMP.'/built_path_and_url_helpers.php';
   }
   
-  private function build_path_function($func_base_name, $route, $controller, $action, $type='path')
+  private function build_named_function($type, &$route)
   {
-    $func = "function {$func_base_name}_{$type}(\$keys=array())\n{\n".
-      "  if (!is_array(\$keys)) {\n".
-      "    \$keys = array(':id' => \$keys);\n".
-      "  }\n";
-    
-    if (strpos($route['path'], ':controller') !== false) {
-      $func .= "  \$keys[':controller'] = '$controller';\n";
-    }
-    if (strpos($route['path'], ':action') !== false) {
-      $func .= "  \$keys[':action'] = '$action';\n";
-    }
-    $func .= "  \$path = strtr('{$route['path']}', \$keys);\n";
-    
-    $func .= $route['default'] ?
-      "  \$path = preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', \$path);\n" :
-      "  \$path = preg_replace('/[\\/\\.\\?]:format/', '', \$path);\n";
-    
-    $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
-    $func .= "  return new ActionController_".String::camelize($type)."('{$method}', \$path);\n";
-    $func .= "}";
-    
+    $exported_route = var_export($route, true);
+    $func = "function {$route['name']}_{$type}(\$keys=array())
+    {
+      \$route = $exported_route;
+      return ActionController_Routing::named_function_{$type}(\$route, \$keys);
+    }";
     return $func;
+  }
+  
+  # @private
+  static function named_function_path(&$route, $keys)
+  {
+    $method = isset($route['mapping']['conditions']['method']) ?
+      $route['mapping']['conditions']['method'] : 'GET';
+    $path = self::named_function($route, $keys);
+    return new ActionController_Path($method, $path);
+  }
+  
+  # @private
+  static function named_function_url(&$route, $keys)
+  {
+    $method = isset($route['mapping']['conditions']['method']) ?
+      $route['mapping']['conditions']['method'] : 'GET';
+    $path = self::named_function($route, $keys);
+    return new ActionController_Url($method, $path);
+  }
+  
+  static private function named_function(&$route, $keys)
+  {
+    if (is_object($keys) and $keys instanceof ActiveRecord_Record) {
+      $keys = $keys->attributes();
+    }
+    elseif (!is_array($keys)) {
+      $keys = array(':id' => $keys);
+    }
+    
+    foreach($route as $k => $v)
+    {
+      if (is_symbol($k)) {
+        $keys[$k] = $v;
+      }
+    }
+    
+    $path = strtr($route['path'], $keys);
+    $path = ($route['default']) ?
+      preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', $path) :
+      preg_replace('/[\\/\\.\\?]:format/', '', $path);
+    
+    return $path;
   }
 }
 
