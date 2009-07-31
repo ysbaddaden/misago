@@ -222,7 +222,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     # primary key
     foreach($this->columns as $attribute => $def)
     {
-      if ($def['primary_key'])
+      if (isset($def['primary_key']) and $def['primary_key'])
       {
         $this->primary_key = $attribute;
         break;

@@ -6,10 +6,10 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
 {
   public  $COLUMN_QUOTE = '`';
   public  $NATIVE_DATABASE_TYPES = array(
-    'primary_key' => "int(11) auto_increment PRIMARY KEY",
+    'primary_key' => "int(11) unsigned auto_increment primary key",
     'string'      => array('name' => 'varchar', 'limit' => 255),
     'text'        => array('name' => 'text'),
-    'integer'     => array('name' => 'int',   'limit' => 4),
+    'integer'     => array('name' => 'int', 'limit' => 4),
     'float'       => array('name' => 'float'),
     'decimal'     => array('name' => 'decimal'),
     'date'        => array('name' => 'date'),
@@ -120,8 +120,9 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     $columns = array();
 		if (mysql_num_rows($results) > 0)
 		{
-      while ($row = mysql_fetch_row($results))
+      while ($row = mysql_fetch_assoc($results))
       {
+      /*
         list($name, $type, $is_null, $key, $default,) = $row;
         $column = array(
           'primary_key' => ($key === 'PRI'),
@@ -173,7 +174,80 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
           $column['signed'] = $signed;
           unset($signed);
         }
-        $columns[$name] = $column;
+      */
+        $column = array(
+          'null' => ($row['Null'] == 'NO') ? false : true,
+        );
+        
+        # type
+        $type = strtolower($row['Type']);
+        if (stripos($type, 'unsigned') !== false)
+        {
+          $column['signed'] = false;
+          $type = trim(str_ireplace('unsigned', '', $type));
+        }
+        if (preg_match('/(\w+)\(([^\)]+)\)/', $type, $match))
+        {
+          $type  = $match[1];
+          $limit = (int)$match[2];
+        }
+        
+        # primary_key
+        if ($row['Key'] == 'PRI') {
+          $column['primary_key'] = true;
+        }
+        
+        # type
+        switch($type)
+        {
+          case 'tinyint':
+            if ($limit == 1) {
+              $column['type'] = 'boolean';
+            }
+            else
+            {
+              $column['type']  = 'integer';
+              $column['limit'] = 2;
+            }
+            break;
+          case 'smallint':  $column['type'] = 'integer'; $column['limit'] = 2; break;
+          case 'mediumint': $column['type'] = 'integer'; $column['limit'] = 3; break;
+          case 'int':       $column['type'] = 'integer'; $column['limit'] = 4; break;
+          case 'bigint':    $column['type'] = 'integer'; $column['limit'] = 8; break;
+          
+          case 'decimal': $column['type'] = 'decimal'; break;
+          
+          case 'float':
+          case 'real':
+          case 'double':
+            $column['type'] = 'float';
+            break;
+          
+          case 'char': case 'varchar':
+            $column['type'] = 'string';
+            $column['limit'] = $limit;
+            break;
+          
+          case 'tinytext':
+          case 'text':
+          case 'mediumtext':
+          case 'longtext':
+            $column['type'] = 'string';
+            break;
+          
+          case 'datetime': $column['type'] = 'datetime'; break;
+          case 'date':     $column['type'] = 'date'; break;
+          case 'time':     $column['type'] = 'time'; break;
+          
+          case 'tinyblob':
+          case 'blob':
+          case 'mediumblob':
+          case 'longblob':
+          case 'binary': case 'varbinary':
+            $column['type'] = 'binary';
+          break;
+        }
+        $columns[$row['Field']] = $column;
       }
     }
     

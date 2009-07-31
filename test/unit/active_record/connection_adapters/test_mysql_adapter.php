@@ -91,11 +91,11 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
   {
     $columns = $this->db->columns('products');
     $this->assert_equal("", $columns, array(
-      'id'         => array('primary_key' => true,  'type' => 'integer',  'limit' => 11,  'null' => false),
-      'title'      => array('primary_key' => false, 'type' => 'string',   'limit' => 100, 'null' => false),
-      'price'      => array('primary_key' => false, 'type' => 'float',    'null' => true, 'signed' => false),
-      'created_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
-      'updated_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
+      'id'         => array('primary_key' => true, 'type' => 'integer', 'limit' => 4, 'null' => false, 'signed' => false),
+      'title'      => array('type' => 'string',   'limit' => 100, 'null' => false),
+      'price'      => array('type' => 'float',    'null' => true, 'signed' => false),
+      'created_at' => array('type' => 'datetime', 'null' => true),
+      'updated_at' => array('type' => 'datetime', 'null' => true),
     ));
   }
   
@@ -105,12 +105,12 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     
     $columns = $this->db->columns('products');
     $this->assert_equal("", $columns, array(
-      'id'         => array('primary_key' => true,  'type' => 'integer',  'limit' => 11,  'null' => false),
-      'title'      => array('primary_key' => false, 'type' => 'string',   'limit' => 100, 'null' => false),
-      'price'      => array('primary_key' => false, 'type' => 'float',    'null' => true, 'signed' => false),
-      'created_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
-      'updated_at' => array('primary_key' => false, 'type' => 'datetime', 'null' => true),
-      'in_stock'   => array('primary_key' => false, 'type' => 'boolean',  'null' => true),
+      'id'         => array('primary_key' => true, 'type' => 'integer', 'limit' => 4, 'null' => false, 'signed' => false),
+      'title'      => array('type' => 'string',   'null' => false, 'limit' => 100),
+      'price'      => array('type' => 'float',    'null' => true,  'signed' => false),
+      'created_at' => array('type' => 'datetime', 'null' => true),
+      'updated_at' => array('type' => 'datetime', 'null' => true),
+      'in_stock'   => array('type' => 'boolean',  'null' => true),
     ));
   }
   
