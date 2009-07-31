@@ -112,38 +112,62 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     return $data;
   }
   
-  # TODO: Extract string limit, numeric limit and default value from column definition.
   # TODO: Determine which column is the primary key.
   function & columns($table)
   {
     $_table  = $this->quote_value($table);
     $columns = array();
     
-    $results = $this->select_all("SELECT ordinal_position, column_name, data_type,
-      column_default, is_nullable, character_maximum_length, numeric_precision
-      FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = {$_table} ;");
-    
-    print_r($results);
+    $results = $this->select_all("SELECT column_name, udt_name, is_nullable, character_maximum_length
+      FROM information_schema.columns
+      WHERE table_name = {$_table} ;");
+    $pk_results = $this->select_values("SELECT column_name
+      FROM information_schema.constraint_column_usage
+      WHERE table_name = {$_table} AND constraint_name = ".$this->quote_value("{$table}_pkey")." ;");
     
     foreach($results as $rs)
     {
       $column = array(
-#        'primary_key' => ($rs['column_default'] == "nextval('{$table}_{$rs['column_name']}_seq'::regclass)"),
-#        'type' => $rs['data_type'],
-#        'limit' => '',
         'null' => ($rs['is_nullable'] == 'YES'),
       );
       
-      foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
-      {
-        if ($def['name'] == $column['type'])
-        {
-          $column['type'] = $type;
-          break;
-        }
+      # primary_key?
+      if (in_array($rs['column_name'], $pk_results)) {
+        $column['primary_key'] = true;
       }
       
-      // ...
+      # type
+      switch($rs['udt_name'])
+      {
+        case 'int2': $column['limit'] = 2;
+        case 'int4': $column['limit'] = 4;
+        case 'int8': $column['limit'] = 8;
+        case 'int':  $column['type'] = 'integer'; break;
+        
+        case 'decimal': $column['type'] = 'decimal'; break;
+        
+        case 'float4': #$column['limit'] = 4;
+        case 'float8': #$column['limit'] = 8;
+        case 'float':  $column['type'] = 'float'; break;
+        
+        case 'char':  case 'varchar': case 'text':
+        case 'point': case 'line': case 'lseg': case 'box': case 'polygon': case 'circle': case 'path':
+        case 'cidr':  case 'inet': case 'macaddr':
+        case 'bit':   case 'varbit':
+        case 'xml':
+          $column['type'] = 'string';
+          if (isset($rs['character_maximum_length'])) {
+            $column['limit'] = $rs['character_maximum_length'];
+          }
+          break;
+        
+        case 'timestamp': $column['type'] = 'datetime'; break;
+        case 'date':      $column['type'] = 'date';     break;
+        case 'time':      $column['type'] = 'time';     break;
+        
+        case 'boolean':   $column['type'] = 'boolean';  break;
+        case 'bytea':     $column['type'] = 'binary';   break;
+      }
       
       $columns[$rs['column_name']] = $column;
     }
