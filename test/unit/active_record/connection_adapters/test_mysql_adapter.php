@@ -46,6 +46,7 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
       'username' => 'root',
       'password' => '',
     ));
+    $this->db->connect();
     
     $rs = $this->db->execute("SHOW DATABASES ;");
     $this->assert_true("must return a resource", is_resource($rs));

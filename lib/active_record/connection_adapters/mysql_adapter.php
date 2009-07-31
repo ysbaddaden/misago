@@ -276,6 +276,10 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   
   function select_database($database=null)
   {
+    if (!$this->link) {
+      $this->connect();
+    }
+    
     if (empty($database)) {
       $database = $this->config('database');
     }

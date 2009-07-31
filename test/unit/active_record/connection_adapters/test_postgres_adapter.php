@@ -32,15 +32,13 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
       'username' => 'postgres',
       'password' => '',
     ));
-    $this->assert_true("connected by default", $db->is_active());
+    $this->assert_false("not connected by default", $db->is_active());
     
-    $db->disconnect();
-    $this->assert_false("disconnect", $db->is_active());
-
     $db->connect();
     $this->assert_true("connect", $db->is_active());
     
     $db->disconnect();
+    $this->assert_false("disconnect", $db->is_active());
   }
   
   function test_execute()
@@ -50,6 +48,7 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
       'username' => 'postgres',
       'password' => '',
     ));
+    $this->db->connect();
     
     $rs = $this->db->execute("SELECT version() ;");
     $this->assert_true("must return a resource", is_resource($rs));

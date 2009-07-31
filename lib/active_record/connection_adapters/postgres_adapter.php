@@ -33,6 +33,12 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   
   function connect()
   {
+    $database = empty($this->config['database']) ? null : 'dbname='.$this->config['database'];
+    $this->pg_connect($database);
+  }
+  
+  function pg_connect($database=null)
+  {
     $callback = (isset($this->config['permanent']) and $this->config['permanent']) ?
       'pg_pconnect' : 'pg_connect';
     
@@ -46,14 +52,25 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     if (!empty($this->config['password'])) {
       $options[] = 'user='.$this->config['password'];
     }
-    if (!empty($this->config['database'])) {
-      $options[] = 'dbname='.$this->config['database'];
+    if (!empty($database)) {
+      $options[] = 'dbname='.$database;
     }
+    
     $this->link = $callback(implode(' ', $options), PGSQL_CONNECT_FORCE_NEW);
     
     if ($this->link === false) {
       throw new ActiveRecord_ConnectionNotEstablished("Unable to connect to PostgreSQL server.");
     }
+  }
+  
+  function select_database($database=null)
+  {
+    $this->disconnect();
+    
+    if (empty($database)) {
+      $database = $this->config('database');
+    }
+    return $this->pg_connect($database);
   }
   
   function disconnect()
@@ -191,12 +208,6 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   {
     $database = $this->quote_table($database);
     return $this->execute("DROP DATABASE $database ;");
-  }
-  
-  # NOTE: is there a way to select a database with postgresql?
-  function select_database($database=null)
-  {
-    return true;
   }
   
   # FIXME: INSERT INTO x +RETURNING y+.

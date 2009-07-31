@@ -16,7 +16,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function __construct(array $config)
   {
     $this->config = $config;
-    $this->connect();
+#    $this->connect();
   }
   
   function __destruct()

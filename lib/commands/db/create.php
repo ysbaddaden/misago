@@ -1,6 +1,7 @@
 <?php
 
 $db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
+$db->connect();
 
 # database name
 $database = $db->config('database');
