@@ -266,17 +266,30 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal('join with has_one relationship', $order->build_join_for('invoice'),
       "inner join `invoices` on `invoices`.`order_id` = `orders`.`id`");
     
+    $this->assert_equal('left outer join', $order->build_join_for('invoice', 'left outer'),
+      "left outer join `invoices` on `invoices`.`order_id` = `orders`.`id`");
+    
     $this->assert_equal('join with has_many relationship', $order->build_join_for('baskets'),
       "inner join `baskets` on `baskets`.`order_id` = `orders`.`id`");
     
+    $this->assert_equal('left join', $order->build_join_for('baskets', 'left'),
+      "left join `baskets` on `baskets`.`order_id` = `orders`.`id`");
+    
     $basket = new Basket();
     $this->assert_equal('join with belongs_to relationship', $basket->build_join_for('product'),
+      "inner join `products` on `products`.`id` = `baskets`.`product_id`");
+    
+    $this->assert_equal('inner join', $basket->build_join_for('product', 'inner'),
       "inner join `products` on `products`.`id` = `baskets`.`product_id`");
     
     $programmer = new Programmer();
     $this->assert_equal('join with HATBM relationship', $programmer->build_join_for('projects'),
       "inner join `programmers_projects` on `programmers_projects`.`programmer_id` = `programmers`.`id` ".
       "inner join `projects` on `projects`.`id` = `programmers_projects`.`project_id`");
+    
+    $this->assert_equal('outer join', $programmer->build_join_for('projects', 'outer'),
+      "outer join `programmers_projects` on `programmers_projects`.`programmer_id` = `programmers`.`id` ".
+      "outer join `projects` on `projects`.`id` = `programmers_projects`.`project_id`");
   }
 }
 

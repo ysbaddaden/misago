@@ -153,6 +153,7 @@
 #     print_r($post->authors);
 #   }
 # 
+# FIXME: handle others.build, etc. methods for HABTM relationships.
 # TODO: Implement has_many :through association.
 # TODO: Implement belongs_to :polymorphic association.
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
@@ -262,8 +263,9 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
             'limit'  => '',
             'page'   => '',
           ));
-          $def['find_options']['joins'] = "INNER JOIN {$def['join_table']} ".
-            "ON {$def['join_table']}.{$def['association_foreign_key']} = {$def['table_name']}.{$def['association_primary_key']}";
+          $def['find_options']['joins'] = "inner join ".$this->db->quote_table($def['join_table']).
+            " on ".$this->db->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
+            " = ".$this->db->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
           $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
           $def['find_scope'] = ':all';
         break;
