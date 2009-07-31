@@ -23,15 +23,7 @@ class ActiveRecord_Migration
   {
     $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $db->select_database();
-    
-    try
-    {
-      $db->columns('misago_information_schema');
-      return true;
-    }
-    catch(ActiveRecord_Exception $e) {
-      return false;
-    }
+    return $db->table_exists('misago_information_schema');
   }
   
   /**
