@@ -165,8 +165,8 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
         case 'date':      $column['type'] = 'date';     break;
         case 'time':      $column['type'] = 'time';     break;
         
-        case 'boolean':   $column['type'] = 'boolean';  break;
-        case 'bytea':     $column['type'] = 'binary';   break;
+        case 'bool':  $column['type'] = 'boolean'; break;
+        case 'bytea': $column['type'] = 'binary';  break;
       }
       
       $columns[$rs['column_name']] = $column;

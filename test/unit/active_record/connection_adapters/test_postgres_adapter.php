@@ -106,22 +106,20 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
     ));
   }
   
-  /*
   function test_add_column()
   {
     $this->db->add_column('products', 'in_stock', 'boolean');
     
     $columns = $this->db->columns('products');
     $this->assert_equal("", $columns, array(
-      'id'         => array('type' => 'integer',  'limit' => 11,  'null' => false),
+      'id'         => array('primary_key' => true, 'type' => 'integer', 'limit' => 8, 'null' => false),
       'title'      => array('type' => 'string',   'limit' => 100, 'null' => false),
-      'price'      => array('type' => 'float',    'null' => true, 'signed' => false),
+      'price'      => array('type' => 'float',    'null' => true),
       'created_at' => array('type' => 'datetime', 'null' => true),
       'updated_at' => array('type' => 'datetime', 'null' => true),
       'in_stock'   => array('type' => 'boolean',  'null' => true),
     ));
   }
-  */
   
   function test_insert()
   {
