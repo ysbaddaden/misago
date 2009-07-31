@@ -414,9 +414,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
 	
   function test_find_with_joins()
   {
-  	$this->truncate('products');
     $this->fixtures("products, orders, baskets, invoices");
-  	
   	
     $product = new product();
     $products = $product->find(':all', array(
@@ -437,6 +435,15 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     ));
     $this->assert_equal('multiple joins', count($products), 3);
     $this->assert_equal('multiple joins', array($products[0]->id, $products[1]->id, $products[2]->id), array(1, 2, 3));
+    
+    $basket = new Basket();
+    $baskets = $basket->find(':values', array(
+      'select'     => 'baskets.id',
+      'joins'      => 'order',
+      'conditions' => 'orders.id = 1',
+    ));
+    $this->assert_equal('multiple joins', count($baskets), 3);
+    $this->assert_equal('multiple joins', array($baskets[0][0], $baskets[1][0], $baskets[2][0]), array(1, 2, 3));
   }
   
   function test_exists()

@@ -487,8 +487,16 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     $limit  = '';
     $joins  = '';
     
-    if (!empty($options['joins'])) {
-      $joins = is_array($options['joins']) ? implode(' ', $options['joins']) : $options['joins'];
+    if (!empty($options['joins']))
+    {
+      $joins = is_array($options['joins']) ? $options['joins'] : array($options['joins']);
+      foreach($joins as $i => $join)
+      {
+        if (isset($this->associations[$join])) {
+          $joins[$i] = $this->build_join_for($join);
+        }
+      }
+      $joins = implode(' ', $joins);
     }
     if (!empty($options['conditions'])) {
       $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
