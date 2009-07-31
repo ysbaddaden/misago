@@ -4,6 +4,8 @@
 #
 # Help on information_schema: http://www.alberton.info/postgresql_meta_info.html
 # 
+# Note: PostgreSQL client library isn't capable to switch between
+#       databases. You need to reconnect to achieve this.
 class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(
@@ -33,11 +35,12 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   
   function connect()
   {
-    $database = empty($this->config['database']) ? null : 'dbname='.$this->config['database'];
-    $this->pg_connect($database);
+#    $database = empty($this->config['database']) ? null : 'dbname='.$this->config['database'];
+#    $this->pg_connect($database);
+    $this->pg_connect();
   }
   
-  function pg_connect($database=null)
+  private function pg_connect($database=null)
   {
     $callback = (isset($this->config['permanent']) and $this->config['permanent']) ?
       'pg_pconnect' : 'pg_connect';
@@ -208,6 +211,12 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   {
     $database = $this->quote_table($database);
     return $this->execute("DROP DATABASE $database ;");
+  }
+  
+  # TODO: PostgresAdapter::table_exists().
+  function table_exists($table_name)
+  {
+    
   }
   
   # FIXME: INSERT INTO x +RETURNING y+.

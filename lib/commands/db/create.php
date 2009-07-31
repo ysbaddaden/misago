@@ -4,13 +4,13 @@ $db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
 $db->connect();
 
 # database name
-$database = $db->config('database');
+$dbname = $db->config('database');
 
-if ($db->create_database($database, array('charset' => 'utf8'))) {
-  echo "Created database $database.\n";
+if ($db->create_database($dbname, array('charset' => 'utf8'))) {
+  echo "Created database $dbname.\n";
 }
 else {
-  throw new Exception("Database $database wasn't created.");
+  throw new Exception("Database $dbname wasn't created.");
 }
 
 ?>

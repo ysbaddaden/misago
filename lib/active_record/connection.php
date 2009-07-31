@@ -29,7 +29,6 @@ class ActiveRecord_Connection
     if (!isset(self::$configurations)) {
       self::load_configuration();
     }
-    
     if (!isset(self::$configurations[$environment])) {
       throw new ActiveRecord_ConfigurationError("No such configuration: $environment.");
     }
@@ -51,7 +50,9 @@ class ActiveRecord_Connection
     if (!isset(self::$adapters[$environment]))
     {
       self::$adapters[$environment] = self::create($environment);
-      self::$adapters[$environment]->select_database();
+      if (!self::$adapters[$environment]->is_active()) {
+        self::$adapters[$environment]->select_database();
+      }
     }
     return self::$adapters[$environment];
   }

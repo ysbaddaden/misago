@@ -290,6 +290,13 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     return $success;
   }
   
+  # TODO: MysqlAdapter::table_exists().
+  function table_exists($table_name)
+  {
+    
+  }
+  
+  
   function insert($table, array $data, $primary_key=null)
   {
     $success = parent::insert($table, $data);

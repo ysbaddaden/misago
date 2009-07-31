@@ -63,6 +63,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   abstract function select_database($database=null);
   
   
+  # Checks wether the given table exists, or not.
+  abstract function table_exists($table_name);
+  
+  
   # Escapes a value to be used in a SQL query.
   abstract function escape_value($value);
   
