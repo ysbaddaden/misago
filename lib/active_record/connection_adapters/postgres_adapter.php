@@ -259,13 +259,13 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   function update($table, $data, $conditions=null, $options=null)
   {
     $success = parent::update($table, $data, $conditions, $options);
-    return $success ? pg_affected_rows($this->link) : $success;
+    return $success ? pg_affected_rows($success) : $success;
   }
   
   function delete($table, $conditions=null, $options=null)
   {
     $success = parent::delete($table, $conditions, $options);
-    return $success ? pg_affected_rows($this->link) : $success;
+    return $success ? pg_affected_rows($success) : $success;
   }
 }
 
