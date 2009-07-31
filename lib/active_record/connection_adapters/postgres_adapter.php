@@ -213,10 +213,12 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     return $this->execute("DROP DATABASE $database ;");
   }
   
-  # TODO: PostgresAdapter::table_exists().
   function table_exists($table_name)
   {
-    
+    $rs = $this->select_value("SELECT COUNT(*)
+      FROM information_schema.tables
+      WHERE table_name = ".$this->quote_value($table_name)." ;");
+    return ($rs > 0);
   }
   
   # FIXME: INSERT INTO x +RETURNING y+.

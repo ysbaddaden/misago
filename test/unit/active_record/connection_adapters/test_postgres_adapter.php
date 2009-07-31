@@ -172,6 +172,12 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
     $this->assert_equal("", $id, 3);
   }
   
+  function test_table_exists()
+  {
+    $this->assert_true("table exists", $this->db->table_exists('products'));
+    $this->assert_false("table doesn't exists", $this->db->table_exists('unknown_table'));
+  }
+  
   function test_drop_table()
   {
     $rs = $this->db->drop_table('products');

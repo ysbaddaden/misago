@@ -292,7 +292,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
   
   function table_exists($table_name)
   {
-    $rs = $this->select_value("SHOW TABLES LIKE '$table_name' ;");
+    $rs = $this->select_value("SHOW TABLES LIKE ".$this->quote_value($table_name)." ;");
     return ($rs === $table_name);
   }
   
