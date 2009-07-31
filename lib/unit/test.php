@@ -3,6 +3,7 @@ error_reporting(E_ALL | E_STRICT);
 
 class Unit_Test
 {
+  private $count_assertions = 0;
   private $count_tests    = 0;
   private $count_success  = 0;
   private $count_failures = 0;
