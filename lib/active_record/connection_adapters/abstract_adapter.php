@@ -435,7 +435,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function select_value($sql)
   {
     $rs = $this->select_one($sql);
-    return (count($rs) > 0) ? array_shift($rs) : null;
+    return (is_array($rs) and count($rs) > 0) ? array_shift($rs) : null;
   }
   
   # Inserts a row in a table.

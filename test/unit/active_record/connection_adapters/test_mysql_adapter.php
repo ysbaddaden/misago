@@ -166,6 +166,12 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $this->assert_equal("", $id, 3);
   }
   
+  function test_table_exists()
+  {
+    $this->assert_true("table exists", $this->db->table_exists('products'));
+    $this->assert_false("table doesn't exists", $this->db->table_exists('unknown_table'));
+  }
+  
   function test_drop_table()
   {
     $rs = $this->db->drop_table('misago_test.products');
@@ -177,8 +183,6 @@ class Test_ConnectionAdapter_MysqlAdapter extends Unit_Test
     $rs = $this->db->drop_database('misago_test');
     $this->assert_true("", $rs ? true : false);
   }
-
-  
 }
 
 new Test_ConnectionAdapter_MysqlAdapter();
