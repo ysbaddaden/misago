@@ -6,7 +6,7 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
 {
   public  $COLUMN_QUOTE = '`';
   public  $NATIVE_DATABASE_TYPES = array(
-    'primary_key' => "int(11) unsigned auto_increment primary key",
+    'primary_key' => "int(11) auto_increment primary key",
     'string'      => array('name' => 'varchar', 'limit' => 255),
     'text'        => array('name' => 'text'),
     'integer'     => array('name' => 'int', 'limit' => 4),

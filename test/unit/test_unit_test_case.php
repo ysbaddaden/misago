@@ -1,5 +1,7 @@
 <?php
-$_SERVER['MISAGO_ENV'] = 'test';
+if (!isset($_SERVER['MISAGO_ENV'])) {
+  $_SERVER['MISAGO_ENV'] = 'test';
+}
 
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 require_once dirname(__FILE__)."/../../lib/unit/test_case.php";

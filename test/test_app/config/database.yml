@@ -20,3 +20,17 @@ test:
   username: postgres
   password: 
 
+mysql:
+  adapter: mysql
+  host: localhost
+  database: test_app_test
+  username: root
+  password: 
+
+postgresql:
+  adapter: postgresql
+  host: localhost
+  database: test_app_test
+  username: postgres
+  password: 
+

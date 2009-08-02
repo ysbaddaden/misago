@@ -1,7 +1,9 @@
 <?php
 
 $location = dirname(__FILE__).'/../../../..';
-$_SERVER['MISAGO_ENV'] = 'test';
+if (!isset($_SERVER['MISAGO_ENV'])) {
+  $_SERVER['MISAGO_ENV'] = 'test';
+}
 
 require_once "$location/test/test_app/config/boot.php";
 require_once "$location/lib/active_record/exception.php";
@@ -94,7 +96,7 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     $t = $this->db->new_table("objects", $options);
     $t->add_column('title',       "string", array('limit' => 100, 'null' => false));
     $t->add_column('price',       "decimal");
-    $t->add_column('a_float',     "float");
+    $t->add_column('a_float',     "float"/*, array('limit' => 8)*/);
     $t->add_column('released_on', "date");
     $t->add_column('last_visit',  "time");
     $t->add_column('image',       "binary");
@@ -122,10 +124,10 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     $columns = $this->db->columns('objects');
     
     $this->assert_equal("", $columns, array(
-      'id'          => array('primary_key' => true, 'type' => 'integer', 'null' => false, 'limit' => 8),
+      'id'          => array('primary_key' => true, 'type' => 'integer', 'null' => false, 'limit' => 4),
       'title'       => array('type' => 'string',   'null' => false, 'limit' => 100),
       'price'       => array('type' => 'decimal',  'null' => true),
-      'a_float'     => array('type' => 'float',    'null' => true),
+      'a_float'     => array('type' => 'float',    'null' => true/*, 'limit' => 8*/),
       'released_on' => array('type' => 'date',     'null' => true),
       'last_visit'  => array('type' => 'time',     'null' => true),
       'image'       => array('type' => 'binary',   'null' => true),
@@ -140,10 +142,10 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     
     $columns = $this->db->columns('objects');
     $this->assert_equal("", $columns, array(
-      'id'          => array('primary_key' => true, 'type' => 'integer', 'limit' => 8, 'null' => false),
+      'id'          => array('primary_key' => true, 'type' => 'integer', 'null' => false, 'limit' => 4),
       'title'       => array('type' => 'string',   'limit' => 100, 'null' => false),
       'price'       => array('type' => 'decimal',  'null' => true),
-      'a_float'     => array('type' => 'float',    'null' => true),
+      'a_float'     => array('type' => 'float',    'null' => true/*, 'limit' => 8*/),
       'released_on' => array('type' => 'date',     'null' => true),
       'last_visit'  => array('type' => 'time',     'null' => true),
       'image'       => array('type' => 'binary',   'null' => true),

@@ -181,16 +181,14 @@ class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_Con
       # type
       switch($rs['udt_name'])
       {
-        case 'int2': $column['limit'] = 2;
-        case 'int4': $column['limit'] = 4;
-        case 'int8': $column['limit'] = 8;
-        case 'int':  $column['type'] = 'integer'; break;
+        case 'int2': $column['type'] = 'integer'; $column['limit'] = 2; break;
+        case 'int4': $column['type'] = 'integer'; $column['limit'] = 4; break;
+        case 'int8': $column['type'] = 'integer'; $column['limit'] = 8; break;
         
         case 'numeric': $column['type'] = 'decimal'; break;
         
-        case 'float4': #$column['limit'] = 4;
-        case 'float8': #$column['limit'] = 8;
-        case 'float':  $column['type'] = 'float'; break;
+        case 'float4': $column['type'] = 'float'; /*$column['limit'] = 4;*/ break;
+        case 'float8': $column['type'] = 'float'; /*$column['limit'] = 8;*/ break;
         
         case 'char':  case 'varchar': case 'text':
         case 'point': case 'line': case 'lseg': case 'box': case 'polygon': case 'circle': case 'path':
