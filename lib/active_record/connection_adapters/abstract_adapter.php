@@ -16,7 +16,6 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function __construct(array $config)
   {
     $this->config = $config;
-#    $this->connect();
   }
   
   function __destruct()
@@ -65,6 +64,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   # Checks wether the given table exists, or not.
   abstract function table_exists($table_name);
+  
+  # Checks wether the given table exists, or not.
+  abstract function database_exists($database);
   
   
   # Escapes a value to be used in a SQL query.
@@ -522,6 +524,26 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     else {
       misago_log($message);
     }
+  }
+  
+  # Truncates a table.
+  function truncate($table_name)
+  {
+    return $this->execute("TRUNCATE ".$this->quote_table($table_name)." ;");
+  }
+  
+  # Merges conditions together.
+  function merge_conditions($a, $b)
+  {
+    if (!empty($a) and empty($b)) {
+      return $a;
+    }
+    if (empty($a) and !empty($b)) {
+      return $b;
+    }
+    $a = $this->sanitize_sql_for_conditions($a);
+    $b = $this->sanitize_sql_for_conditions($b);
+    return "($a) AND ($b)";
   }
 }
 

@@ -11,7 +11,7 @@ class CreateMonitoring extends ActiveRecord_Migration
     $t->add_column('description', 'string');
     
     # validates_format_of
-    $t->add_column('email',  'string', array('null' => false));
+    $t->add_column('email',  'string');
     $t->add_column('email2', 'string');
     
     # validates_length_of

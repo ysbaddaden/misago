@@ -59,6 +59,18 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
     }
   }
   
+  function table_exists($table_name)
+  {
+    $rs = $this->select_value("SHOW TABLES LIKE ".$this->quote_value($table_name)." ;");
+    return ($rs === $table_name);
+  }
+  
+  function database_exists($database)
+  {
+    $rs = $this->select_value("SHOW DATABASES LIKE ".$this->quote_value($database)." ;");
+    return ($rs === $database);
+  }
+  
   function execute($sql)
   {
     $time = microtime(true);
@@ -122,59 +134,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
 		{
       while ($row = mysql_fetch_assoc($results))
       {
-      /*
-        list($name, $type, $is_null, $key, $default,) = $row;
-        $column = array(
-          'primary_key' => ($key === 'PRI'),
-        );
-        $type = strtolower($type);
-        
-        if (stripos($type, 'unsigned') !== false)
-        {
-          $signed = false;
-          $type = trim(str_ireplace('unsigned', '', $type));
-        }
-        
-        if (preg_match('/(\w+)\(([^\)]+)\)/', $type, $match))
-        {
-          $column['type']  = $match[1];
-          $column['limit'] = (int)$match[2];
-        }
-        elseif ($type == 'tinytext')
-        {
-          $column['type']  = 'string';
-          $column['limit'] = 255;
-        }
-        else {
-          $column['type'] = $type;
-        }
-        
-        if ($column['type'] == 'tinyint'
-          and isset($column['limit'])
-          and $column['limit'] == 1)
-        {
-          $column['type'] = 'boolean';
-          unset($column['limit']);
-        }
-        else
-        {
-          foreach($this->NATIVE_DATABASE_TYPES as $type => $def)
-          {
-            if ($def['name'] == $column['type'])
-            {
-              $column['type'] = $type;
-              break;
-            }
-          }
-        }
-        
-        $column['null'] = ($is_null == 'NO') ? false : true;
-        if (isset($signed))
-        {
-          $column['signed'] = $signed;
-          unset($signed);
-        }
-      */
         $column = array(
           'null' => ($row['Null'] == 'NO') ? false : true,
         );
@@ -288,12 +247,6 @@ class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_Connecti
       throw new ActiveRecord_StatementInvalid("Can't select database $database.");
     }
     return $success;
-  }
-  
-  function table_exists($table_name)
-  {
-    $rs = $this->select_value("SHOW TABLES LIKE ".$this->quote_value($table_name)." ;");
-    return ($rs === $table_name);
   }
   
   function insert($table, array $data, $primary_key=null)

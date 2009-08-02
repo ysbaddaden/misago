@@ -14,9 +14,9 @@ production:
   password: 
 
 test:
-  adapter: mysql
+  adapter: postgres
   host: localhost
   database: test_app_test
-  username: root
+  username: postgres
   password: 
 

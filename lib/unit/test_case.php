@@ -1,24 +1,68 @@
 <?php
+$_SERVER['migrate_debug'] = 0;
 
+# TODO: Load all fixtures on construct.
+# TODO: Limit initial loading of fixtures to a given set ($this->fixtures).
 # IMPROVE: start and stop a test server (script/server -p 3009 -e test -d 0)
 class Unit_TestCase extends Unit_Test
 {
+  static public  $batch_run = false;
+  static private $_db;
+  
+  protected $fixtures = array();
+  
+  
   function __construct()
   {
-    $location = ROOT;
+    self::create_database();
+#    $this->load_fixtures();
     
-    # db cleanup (just in case)
-    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/drop");
-    
-    # db ignition
-    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/create");
-    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/migrate");
-    
-    # runs tests
     parent::__construct();
     
-    # db cleanup
-    exec("MISAGO_ENV={$_SERVER['MISAGO_ENV']} $location/script/db/drop");
+    $this->truncate_fixtures();
+    self::drop_database();
+  }
+  
+#  function load_fixtures()
+#  {
+#    
+#  }
+  
+  function truncate_fixtures()
+  {
+    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    foreach(array_unique($this->fixtures) as $table_name) {
+      $db->truncate($table_name);
+    }
+  }
+  
+  static function create_database($force=false)
+  {
+    if (!self::$batch_run or $force)
+    {
+      self::$_db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
+      self::$_db->connect();
+
+      $dbname = self::$_db->config('database');
+
+      # drops database (just in case)
+      if (self::$_db->database_exists($dbname)) {
+        self::$_db->drop_database($dbname);
+      }
+      
+      # creates database & tables
+      self::$_db->create_database($dbname);
+      require MISAGO."/lib/commands/db/migrate.php";
+    }
+  }
+  
+  static function drop_database($force=false)
+  {
+    if (!self::$batch_run or $force)
+    {
+      ActiveRecord_Connection::get($_SERVER['MISAGO_ENV'])->disconnect();
+      self::$_db->drop_database(self::$_db->config('database'));
+    }
   }
   
   # Loads one or many fixtures into the database.
@@ -31,7 +75,6 @@ class Unit_TestCase extends Unit_Test
     if (!empty($fixtures)) {
       $fixtures = array_collection($fixtures);
     }
-    
     $this->truncate($fixtures);
     
     foreach($fixtures as $fixture)
@@ -42,6 +85,8 @@ class Unit_TestCase extends Unit_Test
       foreach($entries as $entry) {
         $db->insert($fixture, $entry);
       }
+      
+      $this->fixtures[] = $fixture;
     }
   }
   
@@ -55,11 +100,8 @@ class Unit_TestCase extends Unit_Test
     if (!empty($tables)) {
       $tables = array_collection($tables);
     }
-    
-    foreach($tables as $table)
-    {
-      $table = $db->quote_table($table);
-      $db->execute("TRUNCATE $table");
+    foreach($tables as $table_name) {
+      $db->truncate($table_name);
     }
   }
   

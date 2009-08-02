@@ -1,0 +1,45 @@
+#! /usr/bin/php
+<?php
+$_SERVER['MISAGO_ENV'] = 'test';
+require dirname(__FILE__).'/test_app/config/boot.php';
+
+class RunAllTests
+{
+  function __construct()
+  {
+    $this->find(dirname(__FILE__).'/unit', $test_files);
+    #$this->find(dirname(__FILE__).'/functional', $test_files);
+    
+    Unit_TestCase::$batch_run = true;
+    Unit_TestCase::create_database(true);
+    
+    foreach($test_files as $test_file) {
+      include $test_file;
+    }
+    
+    Unit_TestCase::drop_database(true);
+  }
+  
+  function find($path, &$files)
+  {
+    $dh = opendir($path);
+    while(($file = readdir($dh)) !== false)
+    {
+      if ($file[0] == '.') {
+        continue;
+      }
+      $file = "$path/$file";
+      
+      if (is_file($file) and preg_match('/\.php$/', $file)) {
+        $files[] = $file;
+      }
+      elseif (is_dir($file)) {
+        $this->find($file, $files);
+      }
+    }
+    closedir($dh);
+  }
+}
+new RunAllTests();
+
+?>

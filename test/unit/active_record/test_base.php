@@ -49,6 +49,8 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_create()
   {
+    $this->truncate('products');
+    
     $product = new Product();
     $product = $product->create(array('name' => 'azerty', 'price' => 9.95));
     
@@ -73,6 +75,8 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_find_all()
   {
+    $this->fixtures('products');
+    
     $product = new Product();
     
     $products = $product->find();
@@ -94,7 +98,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_instance_of("instance of product", $product, 'Product');
     $this->assert_equal("product's name", $product->name, 'qwerty');
     $this->assert_type("product's price must be a float", $product->price, 'double');
-    $this->assert_equal("product's price", $product->price, 5.98);
+    $this->assert_equal("product's price", $product->price, 4.98);
   }
   
   function test_find_all_with_limit()
@@ -148,7 +152,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product = $product->find(3);
     $this->assert_equal("", $product->id, 3);
-    $this->assert_equal("", $product->name, 'bepo');
+    $this->assert_equal("", $product->name, 'azerty');
     
     $product = new Product(2);
     $this->assert_equal("", $product->id, 2);
@@ -208,32 +212,32 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product->update_all($updates);
     $products = $product->all();
     $this->assert_equal("update_all",
-      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array(new Time('2008-12-21 00:01:00'), new Time('2008-12-21 00:01:00'), new Time('2008-12-21 00:01:00'))
+      array((string)$products[0]->updated_at, (string)$products[1]->updated_at, (string)$products[2]->updated_at),
+      array('2008-12-21 00:01:00', '2008-12-21 00:01:00', '2008-12-21 00:01:00')
     );
     
     $updates = array('updated_at' => '2008-12-21 00:02:00');
     $product->update_all($updates, 'id = 1');
     $products = $product->all();
     $this->assert_equal("update_all with conditions",
-      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array(new Time('2008-12-21 00:02:00'), new Time('2008-12-21 00:01:00'), new Time('2008-12-21 00:01:00'))
-    );
-    
-    $updates = array('updated_at' => '2008-12-21 00:03:00');
-    $product->update_all($updates, null, array('limit' => 2));
-    $products = $product->all();
-    $this->assert_equal("update_all with limit",
-      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array(new Time('2008-12-21 00:03:00'), new Time('2008-12-21 00:03:00'), new Time('2008-12-21 00:01:00'))
+      array((string)$products[0]->updated_at, (string)$products[1]->updated_at, (string)$products[2]->updated_at),
+      array('2008-12-21 00:02:00', '2008-12-21 00:01:00', '2008-12-21 00:01:00')
     );
     
     $updates = array('updated_at' => '2008-12-21 00:04:00');
     $product->update_all($updates, null, array('limit' => 2, 'order' => 'id desc'));
     $products = $product->all();
     $this->assert_equal("update_all with limit+order",
-      array($products[0]->updated_at, $products[1]->updated_at, $products[2]->updated_at),
-      array(new Time('2008-12-21 00:03:00'), new Time('2008-12-21 00:04:00'), new Time('2008-12-21 00:04:00'))
+      array((string)$products[0]->updated_at, (string)$products[1]->updated_at, (string)$products[2]->updated_at),
+      array('2008-12-21 00:02:00', '2008-12-21 00:04:00', '2008-12-21 00:04:00')
+    );
+    
+    $updates = array('updated_at' => '2008-12-21 00:03:00');
+    $product->update_all($updates, null, array('limit' => 1, 'order' => 'id asc'));
+    $products = $product->all();
+    $this->assert_equal("update_all with limit+order",
+      array((string)$products[0]->updated_at, (string)$products[1]->updated_at, (string)$products[2]->updated_at),
+      array('2008-12-21 00:03:00', '2008-12-21 00:04:00', '2008-12-21 00:04:00')
     );
   }
   
@@ -251,8 +255,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_save()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    $db->execute('TRUNCATE products ;');
+    $this->truncate('products');
     
     # save: create
     $product = new Product(array('name' => 'mwerty', 'price' => 6));
@@ -267,6 +270,8 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_delete()
   {
+    $this->fixtures('products');
+    
     $product = new Product(1);
     $product->delete();
     $this->assert_equal("", $product->find(1), null);
@@ -277,49 +282,36 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_delete_all()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    $db->execute('TRUNCATE products ;');
-    
-    $data1   = array('name' => "qwerty", 'price' =>  5.98);
-    $data2   = array('name' => "bepo",   'price' => 10.55);
+    $this->fixtures('products');
     $product = new Product();
     
     $product->delete_all();
     $products = $product->all();
     $this->assert_equal("delete_all", count($products), 0);
     
-    $product->create($data1, $data2);
+    $this->fixtures('products');
     
     $product->delete_all('id = 1');
-    $product = $product->first();
-    $this->assert_equal("delete_all with conditions", $product->name, 'bepo');
+    $product = $product->first(array('order' => 'id asc'));
+    $this->assert_equal("delete_all with conditions", $product->name, 'qwerty');
     
-    $product->delete_all();
-    $product->create($data1, $data2);
+    $this->fixtures('products');
     
     $product->delete_all(null, array('limit' => 1));
-    
     $products = $product->all();
-    $this->assert_equal("delete_all with limit", count($products), 1);
+    $this->assert_equal("delete_all with limit", count($products), 2);
     
-    $product->delete_all();
-    $product->create($data1, $data2);
+    $this->fixtures('products');
     
-    $product->delete_all(null, array('limit' => 1, 'order' => 'id desc'));
+    $product->delete_all(null, array('limit' => 2, 'order' => 'id desc'));
     $product = $product->first();
-    $this->assert_equal("delete_all with limit+order", count($products), 1);
-    $this->assert_equal("delete_all with limit+order", $product->name, 'qwerty');
+    $this->assert_equal("delete_all with limit+order", $product->name, 'bepo');
   }
   
   function test_destroy()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    $db->execute('TRUNCATE products ;');
-    
-    $data1   = array('name' => "qwerty", 'price' =>  5.98);
-    $data2   = array('name' => "bepo",   'price' => 10.55);
+    $this->fixtures('products');
     $product = new Product();
-    $product->create($data1, $data2);
     
     $product = new Product(1);
     $product->destroy();
@@ -331,44 +323,38 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_destroy_all()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    $db->execute('TRUNCATE products ;');
-    
-    $data1   = array('name' => "qwerty", 'price' =>  5.98);
-    $data2   = array('name' => "bepo",   'price' => 10.55);
+    $this->fixtures('products');
     $product = new Product();
     
     $product->destroy_all();
     $products = $product->all();
     $this->assert_equal("destroy_all", count($products), 0);
     
-    $product->create($data1, $data2);
+    $this->fixtures('products');
     
     $product->destroy_all('id = 1');
-    $product = $product->first();
-    $this->assert_equal("destroy_all with conditions", $product->name, 'bepo');
+    $product = $product->first(array('order' => 'id asc'));
+    $this->assert_equal("destroy_all with conditions", $product->name, 'qwerty');
     
-    $product->destroy_all();
-    $product->create($data1, $data2);
+    $this->fixtures('products');
     
     $product->destroy_all(null, array('limit' => 1));
     
     $products = $product->all();
-    $this->assert_equal("destroy_all with limit", count($products), 1);
+    $this->assert_equal("destroy_all with limit", count($products), 2);
     
-    $product->destroy_all();
-    $product->create($data1, $data2);
+    $this->fixtures('products');
     
-    $product->destroy_all(null, array('limit' => 1, 'order' => 'id desc'));
+    $product->destroy_all(null, array('limit' => 2, 'order' => 'id desc'));
     $product = $product->first();
-    $this->assert_equal("destroy_all with limit+order", count($products), 1);
-    $this->assert_equal("destroy_all with limit+order", $product->name, 'qwerty');
+    $this->assert_equal("destroy_all with limit+order", $product->name, 'bepo');
   }
   
   function test_update_attributes()
   {
+    $this->truncate('products');
+    
     $product = new Product();
-    $product->delete_all();
     $product = $product->create(array('id' => 1, 'name' => 'bepo', 'price' => 9.99));
     
     $product->update_attributes(array('price' => 10.95, 'name' => 'Bepo'));
@@ -548,7 +534,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_eager_loading_with_default_scope()
   {
-    $this->truncate('baskets,orders');
     $this->fixtures('baskets,orders');
     
     $order  = new Order();

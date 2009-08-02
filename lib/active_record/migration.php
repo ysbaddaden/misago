@@ -1,7 +1,6 @@
 <?php
-/**
- * Handles database migrations.
- */
+
+# Handles database migrations.
 class ActiveRecord_Migration
 {
   protected $db;
@@ -10,31 +9,23 @@ class ActiveRecord_Migration
   function __construct($version, $environment)
   {
     $this->db = ActiveRecord_Connection::get($environment);
-    $this->db->select_database();
-    
     $this->version = $version;
   }
   
-  /**
-   * Checks wether the information_schema table exists in the current database.
-   * It's used to store the latest migration timestamps.
-   */
+  # Checks wether the information_schema table exists in the current database.
+  # It's used to store the latest migration timestamps.
   static private function information_schema_exists()
   {
     $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    $db->select_database();
     return $db->table_exists('misago_information_schema');
   }
   
-  /**
-   * Returns the timestamp of the last migration runned.
-   */
+  # Returns the timestamp of the last migration runned.
   static function get_version()
   {
     if (self::information_schema_exists())
     {
       $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-      $db->select_database();
       
       return $db->select_value("SELECT version
         FROM misago_information_schema
@@ -44,13 +35,10 @@ class ActiveRecord_Migration
     return 0;
   }
   
-  /**
-   * Saves a timestamp as last runned migration.
-   */
+  # Saves a timestamp as last runned migration.
   static function save_version($version)
   {
     $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    $db->select_database();
     
     if (self::information_schema_exists()) {
       $db->update('misago_information_schema', array('version' => $version));
@@ -67,9 +55,7 @@ class ActiveRecord_Migration
     }
   }
   
-  /**
-   * Migrate database in the given direction (either up or down).
-   */
+  # Migrate database in the given direction (either up or down).
   function migrate($direction)
   {
     $time   = microtime(true);
@@ -96,13 +82,14 @@ class ActiveRecord_Migration
     return $result;
   }
   
-  /**
-   * Displays a message to the end-user.
-   */
+  # Displays a message to the end-user.
   function announce($message)
   {
-    $class = get_class($this);
-    echo "{$this->version} {$class}: $message\n";
+    if (!isset($_SERVER['migrate_debug']) or $_SERVER['migrate_debug'])
+    {
+      $class = get_class($this);
+      echo "{$this->version} {$class}: $message\n";
+    }
   }
 }
 

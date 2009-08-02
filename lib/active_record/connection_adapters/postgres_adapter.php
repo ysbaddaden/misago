@@ -21,6 +21,8 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     'boolean'     => array('name' => 'boolean'),
     'binary'      => array('name' => 'bytea'),
   );
+  public  $VALUE_FALSE  = "FALSE";
+  public  $VALUE_TRUE   = "TRUE";
   private $link;
   
   function escape_value($value)
@@ -35,8 +37,6 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   
   function connect()
   {
-#    $database = empty($this->config['database']) ? null : 'dbname='.$this->config['database'];
-#    $this->pg_connect($database);
     $this->pg_connect();
   }
   
@@ -66,6 +66,15 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     }
   }
   
+  function disconnect()
+  {
+    if ($this->link)
+    {
+      pg_close($this->link);
+      $this->link = null;
+    }
+  }
+  
   function select_database($database=null)
   {
     $this->disconnect();
@@ -76,13 +85,20 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     return $this->pg_connect($database);
   }
   
-  function disconnect()
+  function table_exists($table_name)
   {
-    if ($this->link)
-    {
-      pg_close($this->link);
-      $this->link = null;
-    }
+    $rs = $this->select_value("SELECT COUNT(*)
+      FROM information_schema.tables
+      WHERE table_name = ".$this->quote_value($table_name)." ;");
+    return ($rs > 0);
+  }
+  
+  function database_exists($database)
+  {
+    $rs = $this->select_value("SELECT COUNT(*)
+      FROM pg_catalog.pg_database
+      WHERE datname = ".$this->quote_value($database)." ;");
+    return ($rs > 0);
   }
   
   function execute($sql)
@@ -106,11 +122,13 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   function & select_all($sql)
   {
     $results = $this->execute($sql);
-    $data    = array();
+    $data = array();
     
 		if ($results)
 		{
-      $data = pg_fetch_all($results);
+		  if (pg_num_rows($results) > 0) {
+        $data = pg_fetch_all($results);
+      }
       pg_free_result($results);
     }
     return $data;
@@ -141,6 +159,11 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     $results = $this->select_all("SELECT column_name, udt_name, is_nullable, character_maximum_length
       FROM information_schema.columns
       WHERE table_name = {$_table} ;");
+    
+    if (!$results) {
+      throw new ActiveRecord_StatementInvalid("No such table: $table");
+    }
+    
     $pk_results = $this->select_values("SELECT column_name
       FROM information_schema.constraint_column_usage
       WHERE table_name = {$_table} AND constraint_name = ".$this->quote_value("{$table}_pkey")." ;");
@@ -213,14 +236,6 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     return $this->execute("DROP DATABASE $database ;");
   }
   
-  function table_exists($table_name)
-  {
-    $rs = $this->select_value("SELECT COUNT(*)
-      FROM information_schema.tables
-      WHERE table_name = ".$this->quote_value($table_name)." ;");
-    return ($rs > 0);
-  }
-  
   # FIXME: INSERT INTO x +RETURNING y+.
   function insert($table, array $data, $primary_key=null)
   {
@@ -258,14 +273,29 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
   
   function update($table, $data, $conditions=null, $options=null)
   {
-    $success = parent::update($table, $data, $conditions, $options);
+    if (!empty($options['order']) or !empty($options['limit'])) {
+      $conditions = $this->build_order_limit_subselect($table, $conditions, $options);
+    }
+    $success = parent::update($table, $data, $conditions);
     return $success ? pg_affected_rows($success) : $success;
   }
   
   function delete($table, $conditions=null, $options=null)
   {
-    $success = parent::delete($table, $conditions, $options);
+    if (!empty($options['order']) or !empty($options['limit'])) {
+      $conditions = $this->build_order_limit_subselect($table, $conditions, $options);
+    }
+    $success = parent::delete($table, $conditions);
     return $success ? pg_affected_rows($success) : $success;
+  }
+  
+  private function build_order_limit_subselect($table, $conditions, $options)
+  {
+    $pk    = $this->quote_column($options['primary_key']);
+    $where = empty($conditions)       ? '' : 'WHERE '.$this->sanitize_sql_for_conditions($conditions);
+    $order = empty($options['order']) ? '' : "ORDER BY ".$this->sanitize_order($options['order']);
+    $limit = empty($options['limit']) ? '' : $this->sanitize_limit($options['limit']);
+    return "$pk IN (SELECT $pk FROM ".$this->quote_table($table)." $where $order $limit)";
   }
 }
 

@@ -198,9 +198,8 @@ class Test_ActiveRecord_Validations extends Unit_TestCase
   
   function test_validate_uniqueness_of()
   {
-		$monit = new Monitoring();
-    
-    $monit = $monit->create(array('title' => 'server456'));
+		$monit = new Monitoring(array('title' => 'server456'));
+    $monit->is_valid();
     $this->assert_false("no duplicate title", $monit->errors->is_invalid('title'));
     
     $monit = $monit->create(array('title' => 'server1'));

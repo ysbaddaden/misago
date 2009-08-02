@@ -130,7 +130,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   function test_create_other()
   {
     $order = new Order(3);
-    $order->create_invoice(array('name' => 'brice'));
+    $order->create_invoice(array('name' => 'brice', 'id' => 5));
     $this->assert_true('is created', property_exists($order, 'invoice'));
     $this->assert_instance_of('instance of relation', $order->invoice, 'Invoice');
     $this->assert_equal('relation id', $order->invoice->order_id, 3);
@@ -152,6 +152,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   {
     $order  = new Order(2);
     $basket = $order->baskets->create(array(
+      'id' => 7,
       'product_id' => 2,
       'created_at' => '2008-09-12 16:10:08',
     ));
@@ -263,33 +264,33 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   function test_build_join_for()
   {
     $order = new Order();
-    $this->assert_equal('join with has_one relationship', $order->build_join_for('invoice'),
-      "inner join `invoices` on `invoices`.`order_id` = `orders`.`id`");
+    $this->assert_equal('join with has_one relationship', str_replace('`', '"', $order->build_join_for('invoice')),
+      'inner join "invoices" on "invoices"."order_id" = "orders"."id"');
     
-    $this->assert_equal('left outer join', $order->build_join_for('invoice', 'left outer'),
-      "left outer join `invoices` on `invoices`.`order_id` = `orders`.`id`");
+    $this->assert_equal('left outer join', str_replace('`', '"', $order->build_join_for('invoice', 'left outer')),
+      'left outer join "invoices" on "invoices"."order_id" = "orders"."id"');
     
-    $this->assert_equal('join with has_many relationship', $order->build_join_for('baskets'),
-      "inner join `baskets` on `baskets`.`order_id` = `orders`.`id`");
+    $this->assert_equal('join with has_many relationship', str_replace('`', '"', $order->build_join_for('baskets')),
+      'inner join "baskets" on "baskets"."order_id" = "orders"."id"');
     
-    $this->assert_equal('left join', $order->build_join_for('baskets', 'left'),
-      "left join `baskets` on `baskets`.`order_id` = `orders`.`id`");
+    $this->assert_equal('left join', str_replace('`', '"', $order->build_join_for('baskets', 'left')),
+      'left join "baskets" on "baskets"."order_id" = "orders"."id"');
     
     $basket = new Basket();
-    $this->assert_equal('join with belongs_to relationship', $basket->build_join_for('product'),
-      "inner join `products` on `products`.`id` = `baskets`.`product_id`");
+    $this->assert_equal('join with belongs_to relationship', str_replace('`', '"', $basket->build_join_for('product')),
+      'inner join "products" on "products"."id" = "baskets"."product_id"');
     
-    $this->assert_equal('inner join', $basket->build_join_for('product', 'inner'),
-      "inner join `products` on `products`.`id` = `baskets`.`product_id`");
+    $this->assert_equal('inner join', str_replace('`', '"', $basket->build_join_for('product', 'inner')),
+      'inner join "products" on "products"."id" = "baskets"."product_id"');
     
     $programmer = new Programmer();
-    $this->assert_equal('join with HATBM relationship', $programmer->build_join_for('projects'),
-      "inner join `programmers_projects` on `programmers_projects`.`programmer_id` = `programmers`.`id` ".
-      "inner join `projects` on `projects`.`id` = `programmers_projects`.`project_id`");
+    $this->assert_equal('join with HATBM relationship', str_replace('`', '"', $programmer->build_join_for('projects')),
+      'inner join "programmers_projects" on "programmers_projects"."programmer_id" = "programmers"."id" '.
+      'inner join "projects" on "projects"."id" = "programmers_projects"."project_id"');
     
-    $this->assert_equal('outer join', $programmer->build_join_for('projects', 'outer'),
-      "outer join `programmers_projects` on `programmers_projects`.`programmer_id` = `programmers`.`id` ".
-      "outer join `projects` on `projects`.`id` = `programmers_projects`.`project_id`");
+    $this->assert_equal('outer join', str_replace('`', '"', $programmer->build_join_for('projects', 'outer')),
+      'outer join "programmers_projects" on "programmers_projects"."programmer_id" = "programmers"."id" '.
+      'outer join "projects" on "projects"."id" = "programmers_projects"."project_id"');
   }
 }
 

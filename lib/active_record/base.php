@@ -518,15 +518,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   
   function merge_conditions($a, $b)
   {
-    if (!empty($a) and empty($b)) {
-      return $a;
-    }
-    if (empty($a) and !empty($b)) {
-      return $b;
-    }
-    $a = $this->db->sanitize_sql_for_conditions($a);
-    $b = $this->db->sanitize_sql_for_conditions($b);
-    return "($a) AND ($b)";
+    return $this->db->merge_conditions($a, $b);
   }
   
   function & merge_options($a, $b)
@@ -849,6 +841,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
    */
   function update_all($updates, $conditions=null, $options=null)
   {
+    $options['primary_key'] = $this->primary_key;
     return $this->db->update($this->table_name, $updates, $conditions, $options);
   }
   
@@ -945,6 +938,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   # Records aren't instanciated, and deletion callbacks aren't run.
   function destroy_all($conditions=null, $options=null)
   {
+    $options['primary_key'] = $this->primary_key;
     return $this->db->delete($this->table_name, $conditions, $options);
   }
   
