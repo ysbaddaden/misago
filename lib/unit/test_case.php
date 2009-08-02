@@ -1,8 +1,6 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-# TODO: Load all fixtures on construct.
-# TODO: Limit initial loading of fixtures to a given set ($this->fixtures).
 # IMPROVE: start and stop a test server (script/server -p 3009 -e test -d 0)
 class Unit_TestCase extends Unit_Test
 {

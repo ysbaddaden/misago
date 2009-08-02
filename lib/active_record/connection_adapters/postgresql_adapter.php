@@ -233,7 +233,6 @@ class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_Con
     return $this->execute("DROP DATABASE $database ;");
   }
   
-  # FIXME: INSERT INTO x +RETURNING y+.
   function insert($table, array $data, $primary_key=null)
   {
     $table  = $this->quote_table($table);
