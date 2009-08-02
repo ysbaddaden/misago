@@ -6,40 +6,8 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 $location = dirname(__FILE__).'/../../..';
 require_once "$location/test/test_app/config/boot.php";
 
-# FIXME: enable test_load_configuration().
 class Test_ActiveRecord_Connection extends Unit_TestCase
 {
-  /*
-  function test_load_configuration()
-  {
-    ActiveRecord_Connection::load_configuration();
-    
-    $this->assert_equal("", ActiveRecord_Connection::$configurations, array (
-      'development' => array(
-        'adapter'  => 'mysql',
-        'host'     => 'localhost',
-        'database' => 'test_app_development',
-        'username' => 'root',
-        'password' => null,
-      ),
-      'production' =>  array(
-        'adapter'  => 'mysql',
-        'host'     => 'localhost',
-        'database' => 'test_app',
-        'username' => 'root',
-        'password' => null,
-      ),
-      'test' => array(
-        'adapter'  => 'mysql',
-        'host'     => 'localhost',
-        'database' => 'test_app_test',
-        'username' => 'root',
-        'password' => null,
-      ),
-    ));
-  }
-  */
-  
   function test_create()
   {
     $db = ActiveRecord_Connection::create('production');
