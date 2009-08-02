@@ -5,14 +5,14 @@ $_SERVER['MISAGO_ENV'] = 'test';
 
 require_once "$location/test/test_app/config/boot.php";
 require_once "$location/lib/active_record/exception.php";
-require_once "$location/lib/active_record/connection_adapters/postgres_adapter.php";
+require_once "$location/lib/active_record/connection_adapters/postgresql_adapter.php";
 
-class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
+class Test_ConnectionAdapter_PostgresqlAdapter extends Unit_Test
 {
   function test_connect()
   {
   /*
-    $db = new ActiveRecord_ConnectionAdapters_PostgresAdapter(array(
+    $db = new ActiveRecord_ConnectionAdapters_PostgresqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'wrong_user',
       'password' => 'wrong_password',
@@ -27,7 +27,7 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
     }
     $this->assert_true("Connection failed.", $failed);
   */
-    $db = new ActiveRecord_ConnectionAdapters_PostgresAdapter(array(
+    $db = new ActiveRecord_ConnectionAdapters_PostgresqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'postgres',
       'password' => '',
@@ -43,7 +43,7 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
   
   function test_execute()
   {
-    $this->db = new ActiveRecord_ConnectionAdapters_PostgresAdapter(array(
+    $this->db = new ActiveRecord_ConnectionAdapters_PostgresqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'postgres',
       'password' => '',
@@ -191,6 +191,6 @@ class Test_ConnectionAdapter_PostgresAdapter extends Unit_Test
   }
 }
 
-new Test_ConnectionAdapter_PostgresAdapter();
+new Test_ConnectionAdapter_PostgresqlAdapter();
 
 ?>

@@ -6,7 +6,7 @@
 # 
 # Note: PostgreSQL client library isn't capable to switch between
 #       databases. You need to reconnect to achieve this.
-class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
+class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(
     'primary_key' => "serial primary key",
@@ -150,7 +150,6 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
     return $data;
   }
   
-  # TODO: Determine which column is the primary key.
   function & columns($table)
   {
     $_table  = $this->quote_value($table);
@@ -187,7 +186,7 @@ class ActiveRecord_ConnectionAdapters_PostgresAdapter extends ActiveRecord_Conne
         case 'int8': $column['limit'] = 8;
         case 'int':  $column['type'] = 'integer'; break;
         
-        case 'decimal': $column['type'] = 'decimal'; break;
+        case 'numeric': $column['type'] = 'decimal'; break;
         
         case 'float4': #$column['limit'] = 4;
         case 'float8': #$column['limit'] = 8;
