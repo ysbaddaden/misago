@@ -116,6 +116,17 @@ class Test_ActionView_Base extends Unit_Test
     # rendering a shared partial
     $html = $view->render(array('partial' => 'ads/ad'));
     $this->assert_equal('shared partial', trim($html), '<ad></ad>');
+    
+    # rendering a collection of shared partials
+#    $view = new ActionView_Base();
+    $view->view_path = 'ads';
+    
+    $html = $view->render(array(
+      'partial'    => 'collection',
+      'collection' => array('aaa', 'bbb', 'ddd'),
+    ));
+    $html = str_replace(array("\r", "\n"), '', trim($html));
+    $this->assert_equal('collection of partials', $html, '<li>1: aaa</li><li>2: bbb</li><li>3: ddd</li>');
   }
 }
 

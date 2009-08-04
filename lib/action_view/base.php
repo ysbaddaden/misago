@@ -193,7 +193,7 @@ class ActionView_Base extends Object
         else
         {
           # collection of partials
-          $__partial_var      = $options['partial'];
+          $__partial_var      = basename($options['partial']);
           $__partial_counter  = "{$__partial_var}_counter";
           $$__partial_counter = 0;
           
