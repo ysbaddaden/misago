@@ -21,8 +21,6 @@ class Contact extends ActiveRecord_Ephemeral
     $this->validate_length_of('from_name');
     $this->validate_length_of('from_email');
     $this->validate_length_of('empty');
-    
-    $this->validate_format_of('from_email', '/^$/');
   }
 }
 

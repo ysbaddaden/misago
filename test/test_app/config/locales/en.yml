@@ -8,6 +8,9 @@ en:
         length_string2: "My length"
       product:
         price: "Price of product"
+      contact:
+        from_name: "Your name"
+        from_email: "Your email"
     
     errors:
       messages:
