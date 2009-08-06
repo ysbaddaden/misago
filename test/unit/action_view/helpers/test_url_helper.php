@@ -26,15 +26,29 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
       '<a href="/archives/categories">categories</a>');
     $this->assert_equal("resolved URL + query string", link_to('products (desc)', array(':controller' => 'products', 'order' => 'desc')),
       '<a href="/products?order=desc">products (desc)</a>');
-    
+  }
+  
+  function test_link_to_with_non_get_methods()
+  {
     $html_link = link_to('delete me', new ActionController_Path('DELETE', 'page/123'));
-    $this->assert_equal("Generated path", $html_link, '<a class="request_method:delete" href="/page/123">delete me</a>');
+    $this->assert_equal("generated path", $html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">delete me</a>');
     
-    $html_link = link_to('destroy me', new ActionController_Path('DELETE', 'page/123'), array('class' => 'destroy'));
-    $this->assert_equal("Generated path + attribute", $html_link, '<a class="destroy request_method:delete" href="/page/123">destroy me</a>');
+    $html_link = link_to('destroy me', new ActionController_Path('DELETE', 'page/459'), array('class' => 'destroy'));
+    $this->assert_equal("generated path + attributes", $html_link, '<a class="destroy" onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/page/459">destroy me</a>');
     
     $html_link = link_to('update me', new ActionController_URL('PUT', 'page/456'));
-    $this->assert_equal("Generated URL", $html_link, '<a class="request_method:put" href="http://localhost:3009/page/456">update me</a>');
+    $this->assert_equal("generated URL", $html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="http://localhost:3009/page/456">update me</a>');
+    
+    $html_link = link_to('update me', '/page/123', array('method' => 'put'));
+    $this->assert_equal("method passed as an attribute", $html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">update me</a>');
+    
+    $html_link = link_to('delete', new ActionController_Path('DELETE', 'posts/2'), array('method' => 'put'));
+    $this->assert_equal("method passed as an attribute overrides generated url method", $html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/posts/2">delete</a>');
+  }
+  
+  function test_link_to_with_javascript_confirm()
+  {
+    
   }
   
   function test_current_page()

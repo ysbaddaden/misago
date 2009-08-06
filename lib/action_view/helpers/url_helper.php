@@ -66,6 +66,10 @@ function current_page($url)
 #   link_to("posts' comments", array(':controller' => 'posts', 'anchor' => 'comments', 'year' => 2008))
 #   # => <a href="/posts?year=2008#comments">posts' comments</a>
 # 
+# Options:
+# 
+# - confirm: adds a JavaScript confirm dialog.
+# 
 # @namespace ActionView_Helpers_UrlHelper
 function link_to($content, $url, $attributes=null)
 {
@@ -75,18 +79,44 @@ function link_to($content, $url, $attributes=null)
   }
   
   # URL is URI+method
-  if (is_object($url) and isset($url->method))
+  if (is_object($url) and isset($url->method)) {
+    $method = $url->method;
+  }
+  if (isset($attributes['method']))
   {
-    if ($url->method != 'GET')
+    $method = $attributes['method'];
+    unset($attributes['method']);
+  }
+  if (isset($method))
+  {
+    $method = strtoupper($method);
+    if ($method != 'GET')
     {
-      $method = strtolower($url->method);
-      if (isset($attributes['class'])) {
-        $attributes['class'] .= ' request_method:'.$method;
-      }
-      else {
-        $attributes['class'] = 'request_method:'.$method;
-      }
+      $onclick = "var f = document.createElement('form'); ".
+        "f.action = this.href; ".
+        "f.method = 'POST'; ".
+        "var m = document.createElement('input'); ".
+        "m.setAttribute('type', 'hidden'); ".
+        "m.setAttribute('name', '_method'); ".
+        "m.setAttribute('value', '$method'); ".
+        "f.appendChild(m); ".
+        "f.style.display='none'; ".
+        "this.parentNode.appendChild(f); ".
+        "f.submit()";
     }
+  }
+  
+  if (isset($attributes['confirm']))
+  {
+    $confirm = str_replace(array('"', "'"), array('\"', "\'"), $attributes['confirm']);
+    unset($attributes['confirm']);
+    
+    $attributes['onclick'] = isset($onclick) ?
+      "if (confirm('$confirm')) { $onclick; } return false;" :
+      $attributes['onclick'] = "return confirm('$confirm');";
+  }
+  elseif (isset($onclick)) {
+    $attributes['onclick'] = "$onclick; return false;";
   }
   
   $attributes['href'] = $url;
