@@ -108,7 +108,7 @@ function link_to($content, $url, $attributes=null)
   
   if (isset($attributes['confirm']))
   {
-    $confirm = str_replace(array('"', "'"), array('\"', "\'"), $attributes['confirm']);
+    $confirm = addslashes($attributes['confirm']);
     unset($attributes['confirm']);
     
     $attributes['onclick'] = isset($onclick) ?

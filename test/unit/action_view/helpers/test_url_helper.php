@@ -48,7 +48,17 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
   
   function test_link_to_with_javascript_confirm()
   {
+    $html_link = link_to('read me', '/posts/1', array('confirm' => 'Are you sure?'));
+    $this->assert_equal("simple confirm", $html_link, '<a onclick="return confirm(\'Are you sure?\');" href="/posts/1">read me</a>');
     
+    $html_link = link_to('delete', new ActionController_Path('DELETE', 'posts/1'), array('confirm' => 'Are you sure?'));
+    $this->assert_equal("confirm with non GET method", $html_link, '<a onclick="if (confirm(\'Are you sure?\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
+    
+    $html_link = link_to('delete', '/posts/2', array('confirm' => 'sample text with "quotes" and \'single quotes\''));
+    $this->assert_equal("confirmation message has quotes", $html_link, '<a onclick="return confirm(\'sample text with \\\"quotes\\\" and \\\'single quotes\\\'\');" href="/posts/2">delete</a>');
+    
+    $html_link = link_to('delete', new ActionController_Path('DELETE', 'posts/1'), array('confirm' => 'sample text with \'single quotes\' and "double quotes"'));
+    $this->assert_equal("confirmation message has quotes with non GET method", $html_link, '<a onclick="if (confirm(\'sample text with \\\'single quotes\\\' and \\\"double quotes\\\"\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
   }
   
   function test_current_page()
