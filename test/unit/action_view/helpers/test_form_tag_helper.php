@@ -25,7 +25,10 @@ class Test_ActionView_Helpers_FormTagHelper extends Unit_Test
       '<form action="/accounts" method="post"><input type="hidden" name="_method" value="delete"/>');
     $this->assert_equal('', form_tag('/profiles', array('method' => 'put', 'multipart' => true)),
       '<form action="/profiles" method="post" enctype="multipart/form-data"><input type="hidden" name="_method" value="put"/>');
-
+  }
+  
+  function test_form_tag_with_named_routes()
+  {
     $this->assert_equal('', form_tag(new ActionController_Path('POST', 'accounts'), array('multipart' => true)),
       '<form action="/accounts" method="post" enctype="multipart/form-data">');
     $this->assert_equal('', form_tag(new ActionController_Path('GET', 'accounts')),

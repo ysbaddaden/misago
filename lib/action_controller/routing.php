@@ -339,6 +339,7 @@ class ActionController_Routing extends Object
 #   $url = url_for(product);    # => http://www.domain.com/products/3
 # 
 # IMPROVE: url_for: handle specified options (host, protocol, etc.)
+# IMPROVE: url_for: permit for simplified calls, like url_for(array(':action' => 'index')), which shall use the current controller.
 function url_for($options)
 {
   if ($options instanceof ActiveRecord_Record)

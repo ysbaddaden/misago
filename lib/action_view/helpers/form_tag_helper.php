@@ -12,6 +12,10 @@
 # @namespace ActionView_Helpers_FormTagHelper
 function form_tag($url, $attributes=null)
 {
+  if (is_array($url)) {
+    $url = url_for($url);
+  }
+  
   if (isset($attributes['method']))
   {
     $method = strtolower($attributes['method']);
@@ -23,6 +27,7 @@ function form_tag($url, $attributes=null)
   else {
     $method = 'post';
   }
+  
   if (isset($attributes['multipart']) and $attributes['multipart'])
   {
     $attributes['enctype'] = "multipart/form-data";
