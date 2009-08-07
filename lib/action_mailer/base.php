@@ -52,13 +52,17 @@
 # You may set the following configuration options (using cfg::set()).
 # 
 # - mailer_perform_deliveries: set to false to prevent all email from being sent. Set to true otherwise (default).
-# - mailer_delivery_method: defines a delivery method. Only 'sendmail' is supported right now.
+# - mailer_delivery_method: defines a delivery method, either 'sendmail' or 'test'.
 # - mailer_return_path: you may define a default return-path for all your emails.
 # 
 class ActionMailer_Base extends Object
 {
   public $helpers = ':all';
   public $params  = array();
+  
+  # Populated only when delivery_method = 'test'.
+  static public $deliveries = array();
+  
   
   function __call($func, $args)
   {
@@ -81,7 +85,28 @@ class ActionMailer_Base extends Object
     foreach($mail->headers() as $k => $v) {
       $headers .= "$k: $v\r\n";
     }
-    return mb_send_mail($mail->recipients(), $mail->subject, $contents, $headers);
+    
+    switch(cfg::get('delivery_method'))
+    {
+      case 'test':
+        self::$deliveries[] = array(
+          'mailer'     => get_class($this),
+          'action'     => $mail->action,
+          'recipients' => $mail->recipients(),
+          'subject'    => $mail->subject,
+          'contents'   => $contents,
+          'headers'    => $headers,
+        );
+        return true;
+      break;
+      
+      case 'sendmail':
+        return mb_send_mail($mail->recipients(), $mail->subject, $contents, $headers);
+      break;
+      
+      default:
+        throw new MisagoException("Mailer error: unknown delivery method '".cfg::get('delivery_method')."'.", 500);
+    }
   }
   
   protected function render($mail)
