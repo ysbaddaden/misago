@@ -54,7 +54,7 @@ function ActionController_host_analyzer()
     $protocol  = isset($_SERVER['HTTPS']) ? 'https' : 'http';
     $host      = $_SERVER['HTTP_HOST'];
     $base_path = isset($_SERVER['REDIRECT_URI']) ? dirname($_SERVER['REDIRECT_URI']) : '';
-    cfg::set('base_url', "{$protocol}://{$host}{$base_path}");
+    cfg::set('base_url', "{$protocol}://{$host}".(($base_path == '/') ? '' : $base_path));
   }
 }
 

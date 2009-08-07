@@ -183,6 +183,7 @@ abstract class ActionController_Base extends Object
   #   redirect_to('/path');
   #   redirect_to(articles_path());
   #   redirect_to(show_article_url($account->id));
+  #   redirect_to(array(':controller' => 'contact', ':action' => 'thanks'));
   # 
   # By default a '302 Moved' header status in sent, but you may customize it:
   # 
