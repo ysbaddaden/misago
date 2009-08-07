@@ -617,7 +617,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     if ($id)
     {
       $this->new_record = false;
-      $this->id = $id;
+      if ($this->id === null) {
+        $this->id = $id;
+      }
       
       $this->save_associated();
       
