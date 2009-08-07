@@ -129,33 +129,6 @@ class Unit_TestCase extends Unit_Test
     $this->assert_false($comment, isset($rs['headers']['cookies'][$cookie]));
   }
   
-  # TODO: Move flatten_postfields() to HTTP.
-  # TODO: Distinguish between arrays and hashes.
-  private function & flatten_postfields($ary, $key=null)
-  {
-    $a = array();
-    foreach($ary as $k => $v)
-    {
-      if (is_array($v))
-      {
-        if ($key === null) {
-          $b = array_to_postfields($v, $k);
-        }
-        else {
-          $b = array_to_postfields($v, "{$key}[$k]");
-        }
-        $a = array_merge($a, $b);
-      }
-      elseif ($key === null) {
-        $a[] = urlencode($k).'='.urlencode($v);
-      }
-      else {
-        $a[] = urlencode("{$key}[$k]").'='.urlencode($v);
-      }
-    }
-    return $a;
-  }
-  
   protected function run_action($method, $uri, $post=null)
   {
     # requests a page
@@ -177,9 +150,8 @@ class Unit_TestCase extends Unit_Test
         curl_setopt($ch, CURLOPT_POST, true);
         if (!empty($post))
         {
-          $postfields = $this->flatten_postfields($post);
+          $postfields = HTTP::flatten_postfields($post);
           curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $postfields));
-#          curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
         }
         break;
       
@@ -189,9 +161,8 @@ class Unit_TestCase extends Unit_Test
         curl_setopt($ch, CURLOPT_POST, true);
         if (!empty($post))
         {
-          $postfields = $this->flatten_postfields($post);
+          $postfields = HTTP::flatten_postfields($post);
           curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $postfields));
-#          curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
         }
         break;
     }
