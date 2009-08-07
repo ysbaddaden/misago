@@ -60,6 +60,11 @@ abstract class Object
   {
     return $this->to_s();
   }
+  
+  function to_yaml()
+  {
+    return $this->to_s();
+  }
 }
 
 ?>

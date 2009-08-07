@@ -212,6 +212,17 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     }
   	return json_encode($data);
   }
+  
+  # Exports the record as YAML.
+  function to_yaml()
+  {
+    $attributes = $this->__sleep();
+    $data = array();
+    foreach($attributes as $k) {
+    	$data[$k] = is_object($this->$k) ? $this->$k->to_yaml() : $this->$k;
+    }
+    return Yaml::encode($data);
+  }
 }
 
 ?>
