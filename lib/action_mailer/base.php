@@ -61,7 +61,7 @@ class ActionMailer_Base extends Object
   public $params  = array();
   
   # Populated only when delivery_method = 'test'.
-  static public $deliveries = array();
+  public $deliveries = array();
   
   
   function __call($func, $args)
@@ -89,7 +89,7 @@ class ActionMailer_Base extends Object
     switch(cfg::get('delivery_method'))
     {
       case 'test':
-        self::$deliveries[] = array(
+        $this->deliveries[] = array(
           'mailer'     => get_class($this),
           'action'     => $mail->action,
           'recipients' => $mail->recipients(),
