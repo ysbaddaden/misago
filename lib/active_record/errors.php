@@ -1,7 +1,8 @@
 <?php
-/**
- * Handles errors for a given record.
- */
+# Handles errors for a given record.
+# 
+# FIXME: Base error messages should be translated.
+# 
 class ActiveRecord_Errors
 {
   private $model;
@@ -80,13 +81,23 @@ class ActiveRecord_Errors
   }
   
   # Returns the full list of error messages.
-  function full_messages()
+  function & full_messages()
   {
-    $messages = $this->base_messages;
-    foreach($this->messages as $_messages) {
-      $messages = array_merge($messages, $_messages);
+    $ary = $this->base_messages;
+    
+    foreach(array_keys($this->messages) as $attribute)
+    {
+      $messages = $this->on($attribute);
+      
+      if (is_array($messages)) {
+        $ary = array_merge($ary, $messages);
+      }
+      else {
+        $ary[] = $messages;
+      }
     }
-    return $messages;
+    
+    return $ary;
   }
   
   # Returns true if all attributes are valid and no error message was added.
@@ -123,7 +134,6 @@ class ActiveRecord_Errors
             'value'     => $this->model->$attribute,
             'context'   => "active_record.errors.models.{$this->model_name}.attributes.$attribute",
           );
-#          $options['context'] = "active_record.errors.models.{$this->model_name}.attributes.$attribute";
           $translation = I18n::do_translate($msg, $options);
           if ($translation === null)
           {
@@ -142,7 +152,6 @@ class ActiveRecord_Errors
             'attribute' => String::humanize($attribute),
             'context'   => 'active_record.errors.messages',
           );
-#          $options['context'] = 'active_record.errors.messages';
           $translation = I18n::translate($msg, $options);
         }
         $this->messages[$attribute][$i] = $translation;

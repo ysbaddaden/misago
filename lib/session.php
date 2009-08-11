@@ -17,14 +17,8 @@ class Session
     if ($force_new_id) {
       session_regenerate_id();
     }
-    else
-    {
-      if ($session_id === null and !empty($_REQUEST['session_id'])) {
-        $session_id = $_REQUEST['session_id'];
-      }
-      if (!empty($session_id)) {
-        session_id($session_id);
-      }
+    elseif (!empty($session_id)) {
+      session_id($session_id);
     }
     session_start();
     
