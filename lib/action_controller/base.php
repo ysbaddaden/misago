@@ -135,9 +135,9 @@ abstract class ActionController_Base extends Object
     }
     
     if (isset($options['location'])) {
-      HTTP::redirect($options['location']);
+      HTTP::redirect($options['location'], isset($options['status']) ? $options['status'] : 302);
     }
-    if (isset($options['status'])) {
+    elseif (isset($options['status'])) {
       HTTP::status($options['status']);
     }
     
