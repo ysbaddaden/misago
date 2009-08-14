@@ -12,6 +12,7 @@ class ActionController_Routing extends Object
     'requirements' => array(),
   );
   private static $map;
+  private static $current_format = null;
   
   # Singleton
   static function draw()
@@ -109,9 +110,8 @@ class ActionController_Routing extends Object
     $this->named("delete_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE')));
   }
   
-  /**
-   * Returns a mapping for a given method+path.
-   */
+  
+  # Returns a mapping for a given method+path.
   function & route($method, $uri)
   {
     $uri = trim($uri, '/');
@@ -146,6 +146,8 @@ class ActionController_Routing extends Object
       throw new MisagoException("No route for '$method /$uri'", 404);
     }
     
+    self::$current_format = $mapping[':format'];
+    
     unset($mapping['conditions']);
     unset($mapping['requirements']);
     
@@ -153,11 +155,9 @@ class ActionController_Routing extends Object
     return $mapping;
   }
   
-  /**
-   * Returns a path for a given mapping.
-   * 
-   * FIXME: Handle special requirements for keys to select the route.
-   */
+  # Returns a path for a given mapping.
+  # 
+  # FIXME: Handle special requirements for keys to select the route.
   function reverse(array $mapping)
   {
     $_mapping = array_merge(array(
@@ -285,6 +285,10 @@ class ActionController_Routing extends Object
     }
     elseif (!is_array($keys)) {
       $keys = array(':id' => $keys);
+    }
+    
+    if (!isset($keys[':format']) and isset(self::$current_format)) {
+      $keys[':format'] = self::$current_format;
     }
     
     foreach($route as $k => $v)

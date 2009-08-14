@@ -424,6 +424,23 @@ class Test_ActionController_Routing extends Unit_TestCase
     $this->assert_equal('', (string)url_for(new Product(2)), 'http://localhost:3009/products/2');
     $this->assert_equal('', (string)url_for(new Product(3)), 'http://localhost:3009/products/3');
   }
+  
+  function test_named_routes_with_current_request_format()
+  {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->resource('articles');
+    $map->build_path_and_url_helpers();
+    
+    $map->route('GET', '/articles/create.xml');
+    $this->assert_equal('', (string)show_article_path(4), '/articles/4.xml');
+    
+    $map->route('PUT', '/articles/update.html');
+    $this->assert_equal('', (string)show_article_path(3), '/articles/3.html');
+    
+    $map->route('GET', '/articles/5/edit');
+    $this->assert_equal('', (string)show_article_path(5), '/articles/5');
+  }
 }
 
 new Test_ActionController_Routing();
