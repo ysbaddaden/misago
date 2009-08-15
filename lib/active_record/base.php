@@ -558,11 +558,13 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     return $rs;
   }
   
-  # Creates or updates the record.
-  function save()
+  # Saves the record.
+  function save($perform_validation=true)
   {
-    $method = $this->new_record ? '_create' : '_update';
-    return (bool)$this->$method();
+    if ($perform_validation) {
+      return $this->save_with_validation();
+    }
+    return $this->save_without_validation();
   }
   
   # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
@@ -596,10 +598,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   # @private
   protected function _create()
   {
-    if (!$this->is_valid()) {
-      return false;
-    }
-    
     $this->before_save();
     $this->before_create();
     
@@ -641,16 +639,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   # Use ActiveRecord_Base::update() or ActiveRecord_Base::update_attributes() instead.
   # 
   # @private
-  protected function _update($attributes=null)
+  protected function _update()
   {
-    if ($attributes !== null) {
-      $this->set_attributes($attributes);
-    }
-    
-    if (!$this->is_valid()) {
-      return false;
-    }
-    
     $this->before_save();
     $this->before_update();
     
@@ -702,8 +692,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     {
       $class  = get_class($this);
       $record = new $class($attributes);
-      $record->_create();
-      
+      $record->save();
       return $record;
     }
     else
@@ -753,10 +742,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     if (!is_array($id))
     {
       $class = get_class($this);
-      
       $record = new $class($id);
-      $record->_update($attributes);
-      
+      $record->set_attributes($attributes);
+      $record->save();
       return $record;
     }
     else {
@@ -786,19 +774,15 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   }
   
   /**
-   * Updates one attribute of record.
+   * Updates a single attribute of record, without going throught
+   * the validation process.
    * 
-   *   $post = new Post(1);
-   *   $post->name = 'my first post [update]';
-   *   $post->update_attribute('name');
-   *   
-   *   $post->update_attribute('name', 'my first post [update 2]');
+   *   $post->update_attribute('name', 'my first post [update]');
    */
-  function update_attribute($attribute, $value=null)
+  function update_attribute($attribute, $value)
   {
-    $value   = (func_num_args() > 1) ? $value : $this->$attribute;
-    $updates = array($attribute => $value);
-    return $this->update_attributes($updates);
+    $this->$attribute = $value;
+    $this->save(false);
   }
   
   /**
@@ -817,20 +801,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
    */
   function update_attributes($updates)
   {
-    # hash of fields => values
-    if (is_hash($updates)) {
-      return $this->_update($updates);
-    }
-    
-    # list of fields
-    if (is_string($updates)) {
-      $updates = explode(',', str_replace(' ', '', $updates));
-    }
-    $_updates = array();
-    foreach($updates as $attribute) {
-      $_updates[$attribute] = $this->$attribute;
-    }
-    return $this->_update($_updates);
+    $this->set_attributes($updates);
+    return $this->save();
   }
   
   /**

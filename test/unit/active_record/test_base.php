@@ -370,18 +370,6 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product = new Product(1);
     $this->assert_type("null field must have been recorded", $product->in_stock, 'NULL');
-    
-    $product->price = 10.99;
-    $product->name  = 'bepo';
-    $product->update_attributes('name, price');
-    $product = new Product(1);
-    $this->assert_equal("update a list of fields (as string)", array($product->name, $product->price), array('bepo', 10.99));
-    
-    $product->price = 8.95;
-    $product->name  = 'Bepo';
-    $product->update_attributes(array('name', 'price'));
-    $product = new Product(1);
-    $this->assert_equal("update a list of fields (as array)", array($product->name, $product->price), array('Bepo', 8.95));
   }
   
   function test_update_attribute()

@@ -17,6 +17,20 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     return parent::__get($attribute);
   }
   
+  function save_with_validation($perform_validation=true)
+  {
+    if (($perform_validation and $this->is_valid()) or !$perform_validation) {
+      return $this->save_without_validation();
+    }
+    return false;
+  }
+  
+  function save_without_validation()
+  {
+    $method = $this->new_record ? '_create' : '_update';
+    return (bool)$this->$method();
+  }
+  
   # Runs validation tests. Returns true if tests were successfull, false otherwise.
   function is_valid()
   {
