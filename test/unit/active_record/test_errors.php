@@ -178,6 +178,17 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
     $this->assert_equal('model has its own translation', $errors->on('title3'), 'Title3 in monitoring cannot be blank');
   }
   
+  function test_translated_full_messages()
+  {
+    $errors = new ActiveRecord_Errors(new Monitoring());
+    
+    $errors->add('title2', ':required');
+    $errors->add('title3', ':required');
+    
+    $test = $errors->full_messages();
+    $this->assert_equal('', $test, array('please fill this', 'Title3 in monitoring cannot be blank'));
+  }
+  
   function test_translated_error_messages_with_interpolation()
   {
     $error = new Error();

@@ -1,13 +1,17 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-# IMPROVE: start and stop a test server (script/server -p 3009 -e test -d 0)
+# IMPROVE: Start and stop a test server (script/server -p 3009 -e test -d 0).
+# IMPROVE: Write assert_template().
+# IMPROVE: Write assert_dom_equal() & assert_dom_not_equal().
+# IMPROVE: Write assert_tag() & assert_tag().
 class Unit_TestCase extends Unit_Test
 {
   static public  $batch_run = false;
   static private $_db;
   
-  protected $fixtures = array();
+  protected $fixtures    = array();
+  protected $last_action;
   
   
   function __construct()
@@ -104,32 +108,37 @@ class Unit_TestCase extends Unit_Test
   }
   
   
-  protected function assert_redirect($comment, $rs, $url)
+  protected function assert_redirected_to($comment, $url)
   {
-    $this->assert_equal($comment, $rs['headers']['location'], $url);
+    $location = isset($this->last_action['headers']['location']) ?
+      $this->last_action['headers']['location'] : false;
+    $this->assert_equal($comment, $location, $url);
   }
   
-  protected function assert_no_redirect($comment, $rs)
+  protected function assert_response($comment, $status)
   {
-    $this->assert_false($comment, isset($rs['headers']['location']));
+    $this->assert_equal($comment, $this->last_action['status'], $status);
   }
   
-  protected function assert_status($comment, $rs, $status)
+  protected function assert_cookie_presence($comment, $cookie)
   {
-    $this->assert_equal($comment, $rs['status'], $status);
+    $this->assert_true($comment, isset($this->last_action['headers']['cookies'][$cookie]));
   }
   
-  protected function assert_cookie($comment, $rs, $cookie)
+  protected function assert_cookie_not_present($comment, $cookie)
   {
-    $this->assert_true($comment, isset($rs['headers']['cookies'][$cookie]));
+    $this->assert_false($comment, isset($this->last_action['headers']['cookies'][$cookie]));
   }
   
-  protected function assert_no_cookie($comment, $rs, $cookie)
+  protected function assert_cookie_equal($comment, $cookie, $expected)
   {
-    $this->assert_false($comment, isset($rs['headers']['cookies'][$cookie]));
+    $value = isset($this->last_action['headers']['cookies'][$cookie]) ?
+      $this->last_action['headers']['cookies'][$cookie] : null;
+    $this->assert_equal($comment, $value, $expected);
   }
   
-  protected function run_action($method, $uri, $post=null)
+  
+  protected function & run_action($method, $uri, $post=null)
   {
     # requests a page
     $ch = curl_init();
@@ -170,7 +179,9 @@ class Unit_TestCase extends Unit_Test
     # executes the request
     $output = curl_exec($ch);
     
-    if ($output === false) {
+    if ($output === false)
+    {
+      echo curl_error($ch)."\n";
       die("\nERROR: please start a test server:\nMISAGO_DEBUG=0 script/server -e test -p 3009\n\n");
     }
     
@@ -192,7 +203,7 @@ class Unit_TestCase extends Unit_Test
     }
     
     # gets additional informations
-    $infos  = array(
+    $this->last_action = array(
       'url'     => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
       'status'  => curl_getinfo($ch, CURLINFO_HTTP_CODE),
       'headers' => $headers,
@@ -200,7 +211,8 @@ class Unit_TestCase extends Unit_Test
     );
     
     curl_close($ch);
-    return $infos;
+    
+    return $this->last_action;
   }
 }
 
