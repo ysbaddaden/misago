@@ -9,7 +9,8 @@ class Time extends Object
   function __construct($time=null, $type='datetime')
   {
     $this->raw_time  = $time;
-    $this->timestamp = is_string($time) ? strtotime($time) : $time;
+    $this->timestamp = is_string($time) ? strtotime($time) :
+      ($time === null ? time() : $time);
     $this->type = $type;
   }
   
