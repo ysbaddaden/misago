@@ -87,7 +87,7 @@ class HTTP
   # Redirects current request.
   static function redirect($url, $code=null)
   {
-    if (!DEBUG)
+    if (DEBUG < 2)
     {
       if ($code) {
         self::status($code);
@@ -118,7 +118,7 @@ class HTTP
       else
       {
         $_k = ($key === null) ? $k : "{$key}[$k]";
-        $postfields = array_merge($postfields, HTTP::flatten_postfields($v, $_k));
+        $postfields = array_merge($postfields, self::flatten_postfields($v, $_k));
       }
     }
     return $postfields;

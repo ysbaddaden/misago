@@ -515,7 +515,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   protected function log_query($sql, $affected_rows, $time)
   {
-    $message = sprintf("%s\nAffected rows: %d ; Elapsed time: %.02fms\n",
+    $message = sprintf("%s\nAffected rows: %d; Elapsed time: %.02fms\n",
       $sql, $affected_rows, $time);
     
     if (DEBUG > 2) {

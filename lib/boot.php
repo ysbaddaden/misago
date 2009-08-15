@@ -11,9 +11,9 @@ ini_set('include_path',
 	ini_get('include_path').PATH_SEPARATOR
 );
 
-if (!isset($_SERVER['MISAGO_DEBUG'])) {
-  $_SERVER['MISAGO_DEBUG'] = 0;
-}
+#if (!isset($_SERVER['MISAGO_DEBUG'])) {
+#  $_SERVER['MISAGO_DEBUG'] = 0;
+#}
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'development';
 }
