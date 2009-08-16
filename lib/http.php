@@ -104,25 +104,6 @@ class HTTP
     }
     exit;
   }
-  
-  static function & flatten_postfields($data, $key=null)
-  {
-    $postfields = array();
-    foreach($data as $k => $v)
-    {
-      if (!is_array($v))
-      {
-        $_k = ($key === null) ? urlencode($k) : urlencode("{$key}[$k]");
-        $postfields[] = $_k.'='.urlencode($v);
-      }
-      else
-      {
-        $_k = ($key === null) ? $k : "{$key}[$k]";
-        $postfields = array_merge($postfields, self::flatten_postfields($v, $_k));
-      }
-    }
-    return $postfields;
-  }
 }
 
 ?>

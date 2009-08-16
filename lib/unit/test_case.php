@@ -157,22 +157,16 @@ class Unit_TestCase extends Unit_Test
       
       case 'POST':
         curl_setopt($ch, CURLOPT_POST, true);
-        if (!empty($post))
-        {
-          $postfields = HTTP::flatten_postfields($post);
-          curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $postfields));
+        if (!empty($post)) {
+          curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
         }
         break;
       
       case 'PUT':
       case 'DELETE':
-        $params['_method'] = $method;
         curl_setopt($ch, CURLOPT_POST, true);
-        if (!empty($post))
-        {
-          $postfields = HTTP::flatten_postfields($post);
-          curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $postfields));
-        }
+        $post['_method'] = $method;
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
         break;
     }
     
