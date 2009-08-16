@@ -441,6 +441,14 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map->route('GET', '/articles/5/edit');
     $this->assert_equal('', (string)show_article_path(5), '/articles/5');
   }
+  
+  function test_named_routes_with_query_string()
+  {
+    $this->assert_equal('', (string)show_article_path(array(':id' => 1, 'session_id' => 'abcd')),
+      '/articles/1?session_id=abcd');
+    $this->assert_equal('', (string)update_article_path(array(':id' => 43, 'edit' => '1', 'action' => 'first')),
+      '/articles/43?edit=1&action=first');
+  }
 }
 
 new Test_ActionController_Routing();

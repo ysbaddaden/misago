@@ -286,6 +286,19 @@ class ActionController_Routing extends Object
     elseif (!is_array($keys)) {
       $keys = array(':id' => $keys);
     }
+    else
+    {
+      $query = array();
+      foreach($keys as $k => $v)
+      {
+        if (!is_symbol($k))
+        {
+          $query[$k] = $v;
+          unset($keys[$v]);
+        }
+      }
+      $query_string = http_build_query($query);
+    }
     
     if (!isset($keys[':format']) and isset(self::$current_format)) {
       $keys[':format'] = self::$current_format;
@@ -303,7 +316,7 @@ class ActionController_Routing extends Object
       preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', $path) :
       preg_replace('/[\\/\\.\\?]:format/', '', $path);
     
-    return $path;
+    return $path.(empty($query_string) ? '' : "?{$query_string}");
   }
 }
 
