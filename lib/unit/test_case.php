@@ -1,7 +1,7 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-# IMPROVE: Start and stop a test server (script/server -p 3009 -e test -d 0).
+# IMPROVE: Start and stop a test server (script/server -p 3009 -e test).
 # IMPROVE: Write assert_template().
 # IMPROVE: Write assert_dom_equal() & assert_dom_not_equal().
 # IMPROVE: Write assert_tag() & assert_tag().
@@ -182,7 +182,7 @@ class Unit_TestCase extends Unit_Test
     if ($output === false)
     {
       echo curl_error($ch)."\n";
-      die("\nERROR: please start a test server:\nMISAGO_DEBUG=0 script/server -e test -p 3009\n\n");
+      die("\nERROR: please start a test server:\nscript/server -e test -p 3009\n\n");
     }
     
     # parses headers

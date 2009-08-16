@@ -207,6 +207,28 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
     $errors->add('domain', ':reserved');
     $this->assert_equal('model', $errors->on('domain'), "Already reserved in Error");
   }
+  
+  function test_to_xml()
+  {
+    $error = new Error();
+    $error = $error->create(array(
+      'title' => 'my title',
+      'domain' => '',
+    ));
+    $errors = new ActiveRecord_Errors($error);
+    
+    $errors->add_to_base('Error on record');
+    $errors->add('title', ':taken');
+    $errors->add('domain', ':reserved');
+    
+    $this->assert_equal('', $errors->to_xml(), '<?xml version="1.0" encoding="UTF-8"?>'.
+      '<errors>'.
+      "<error>Error on record</error>".
+      "<error>Title 'my title' is already taken</error>".
+      '<error>Already reserved in Error</error>'.
+      '</errors>'
+    );
+  }
 }
 
 new Test_ActiveRecord_Errors();

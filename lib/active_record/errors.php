@@ -172,6 +172,22 @@ class ActiveRecord_Errors
     }
     return null;
   }
+  
+  function to_xml()
+  {
+    $str  = '<?xml version="1.0" encoding="UTF-8"?>';
+    $str .= '<errors>';
+    foreach($this->full_messages() as $message) {
+      $str .= "<error>$message</error>";
+    }
+    $str .= '</errors>';
+    return $str;
+  }
+  
+  function to_json()
+  {
+    
+  }
 }
 
 ?>
