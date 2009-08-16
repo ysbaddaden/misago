@@ -782,7 +782,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   function update_attribute($attribute, $value)
   {
     $this->$attribute = $value;
-    $this->save(false);
+    return $this->save(false);
   }
   
   /**
