@@ -138,7 +138,7 @@ class Unit_TestCase extends Unit_Test
   }
   
   
-  protected function & run_action($method, $uri, $post=null)
+  protected function & run_action($method, $uri, $postfields=null)
   {
     # requests a page
     $ch = curl_init();
@@ -153,20 +153,23 @@ class Unit_TestCase extends Unit_Test
     {
       case 'GET':
         curl_setopt($ch, CURLOPT_HTTPGET, true);
+        $curl_method = 'GET';
         break;
       
       case 'POST':
         curl_setopt($ch, CURLOPT_POST, true);
-        if (!empty($post)) {
-          curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+        if (!empty($postfields)) {
+          curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
         }
+        $curl_method = 'POST';
         break;
       
       case 'PUT':
       case 'DELETE':
+        $postfields['_method'] = $method;
         curl_setopt($ch, CURLOPT_POST, true);
-        $post['_method'] = $method;
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+        $curl_method = 'POST';
         break;
     }
     
@@ -198,10 +201,12 @@ class Unit_TestCase extends Unit_Test
     
     # gets additional informations
     $this->last_action = array(
-      'url'     => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
-      'status'  => curl_getinfo($ch, CURLINFO_HTTP_CODE),
-      'headers' => $headers,
-      'body'    => trim(substr($output, curl_getinfo($ch, CURLINFO_HEADER_SIZE))),
+      'url'        => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
+      'method'     => $curl_method,
+      'postfields' => $postfields,
+      'status'     => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+      'headers'    => $headers,
+      'body'       => trim(substr($output, curl_getinfo($ch, CURLINFO_HEADER_SIZE))),
     );
     
     curl_close($ch);
