@@ -22,8 +22,8 @@ class ActionView_Base extends Object
     if ($controller !== null)
     {
       $this->controller = $controller;
-      $this->view_path = String::underscore(str_replace('Controller', '', get_class($this->controller)));
-      $helpers         = $this->controller->helpers;
+      $this->view_path  = String::underscore(str_replace('Controller', '', get_class($this->controller)));
+      $helpers          = $this->controller->helpers;
     }
     
     if (!isset($helpers) or $helpers == ':all')

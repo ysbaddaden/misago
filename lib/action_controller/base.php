@@ -34,7 +34,7 @@ abstract class ActionController_Base extends Object
       $this->action  = $mapping;
       $this->mapping = array(
         ':method' => 'GET',
-        ':controller' => String::underscore($this->name),
+        ':controller' => str_replace('_controller', '', String::underscore($this->name)),
         ':action' => $mapping,
         ':format' => 'html',
       );
@@ -64,6 +64,10 @@ abstract class ActionController_Base extends Object
       misago_log(sprintf("\n\nHTTP REQUEST: {$this->mapping[':method']} ".
         get_class($this)."::".$this->action." [%s]\n", $date));
     }
+    
+    # some helpers
+    require_once(ROOT.'/app/helpers/application_helper.php');
+    require_once(ROOT."/app/helpers/{$this->mapping[':controller']}_helper.php");
     
     $this->before_filters();
     $this->{$this->action}();

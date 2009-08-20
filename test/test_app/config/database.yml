@@ -14,10 +14,10 @@ production:
   password: 
 
 test:
-  adapter: postgresql
+  adapter: mysql
   host: localhost
   database: test_app_test
-  username: postgres
+  username: root
   password: 
 
 mysql:
