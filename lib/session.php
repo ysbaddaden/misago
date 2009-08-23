@@ -4,7 +4,7 @@ class Session
 {
   static function start($session_id=null, $force_new_id=false)
   {
-    # session was already started.
+    # session has already been started.
     if (isset($_SESSION)) {
       return;
     }
@@ -22,11 +22,35 @@ class Session
     }
     session_start();
     
+    return Session::init();
+  }
+  
+  static function restart($session_id=null)
+  {
+    session_destroy();
+    ($session_id === null) ? session_regenerate_id() : session_id($session_id);
+    session_start();
+    return Session::init();
+  }
+  
+  static function destroy()
+  {
+    if (!isset($_SESSION)) {
+      return;
+    }
+    session_destroy();
+    session_unset();
+    setcookie(session_name(), '', time() - 42000, '/');
+  }
+  
+  # Tries to protect against session highjacking
+  # 
+  # 1. session must already exist;
+  # 2. a session_id cannot move from one browser to another.
+  private static function init()
+  {
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
     
-    # Tries to protect against session highjacking
-    #   1. session must already exist;
-    #   2. a session_id cannot move from one browser to another.
     if (!isset($_SESSION['initialized'])
       or $_SESSION['user-agent'] != $user_agent)
     {
@@ -39,16 +63,6 @@ class Session
     $_SESSION['user-agent']  = $user_agent;
     
     return session_id();
-  }
-  
-  static function destroy()
-  {
-    if (!isset($_SESSION)) {
-      return;
-    }
-    session_destroy();
-    session_unset();
-    setcookie(session_name(), '', time() - 42000, '/');
   }
 }
 
