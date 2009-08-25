@@ -137,6 +137,13 @@ class Unit_TestCase extends Unit_Test
     $this->assert_equal($comment, $value, $expected);
   }
   
+  protected function assert_cookie_not_equal($comment, $cookie, $expected)
+  {
+    $value = isset($this->last_action['headers']['cookies'][$cookie]) ?
+      $this->last_action['headers']['cookies'][$cookie] : null;
+    $this->assert_not_equal($comment, $value, $expected);
+  }
+  
   
   protected function & run_action($method, $uri, $postfields=null)
   {
