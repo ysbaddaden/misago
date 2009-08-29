@@ -43,12 +43,12 @@ class #{Controller}Controller extends ApplicationController
     if ($this->#{model}->save())
     {
       $this->flash['notice'] = '#{Model} was successfully created.';
-      $url = show_#{model}_path($this->#{model}->id);
       
       switch($this->format)
       {
-        case 'html': $this->redirect_to($url); break;
-        case 'xml':  $this->render(array('xml' => $this->#{model}, 'status' => 201, 'location' => $url)); break;
+        case 'html': $this->redirect_to(show_#{model}_path($this->#{model}->id)); break;
+        case 'xml':  $this->render(array('xml' => $this->#{model}, 'status' => 201,
+          'location' => show_#{model}_url($this->#{model}->id))); break;
       }
     }
     else
