@@ -63,7 +63,7 @@ class #{Controller}Controller extends ApplicationController
   
   function update()
   {
-    $this->#{model} = new #{Model}();
+    $#{model} = new #{Model}();
     $this->#{model} = $#{model}->find($this->params[':id']);
     
     if ($this->#{model}->update_attributes($this->params['#{model}']))
