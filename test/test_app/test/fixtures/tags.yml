@@ -1,0 +1,33 @@
+-
+  id: 1
+  post_id: 1
+  tag: php
+-
+  id: 2
+  post_id: 2
+  tag: php
+-
+  id: 3
+  post_id: 2
+  tag: tool
+-
+  id: 4
+  post_id: 1
+  tag: framework
+-
+  id: 5
+  post_id: 2
+  tag: documentation
+-
+  id: 6
+  post_id: 3
+  tag: javascript
+-
+  id: 7
+  post_id: 3
+  tag: library
+-
+  id: 8
+  post_id: 3
+  tag: emulation
+

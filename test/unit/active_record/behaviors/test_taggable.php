@@ -48,6 +48,25 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
     $this->assert_equal("the list must have been updated",
       (array)$post->tag_list, array('aaa', 'bbb', 'ddd'));
   }
+  
+  function test_find_with_tags()
+  {
+    $this->fixtures('posts,tags');
+    $post = new Post();
+    
+    $posts = $post->find_with_tags('php');
+    $this->assert_equal("we have a list of posts", $posts->count(), 2);
+    $this->assert_instance_of("must be Post objects", $posts[0], 'Post');
+    
+    $posts = $post->find_with_tags('javascript');
+    $this->assert_equal("we got one result", $posts->count(), 1);
+    
+    $posts = $post->find_with_tags('php,framework');
+    $this->assert_equal("we may have multiple tags (matching any)", $posts->count(), 2);
+    
+    $posts = $post->find_with_tags('php,framework', array('match_all' => true));
+    $this->assert_equal("we may have multiple tags (matching all)", $posts->count(), 1);
+  }
 }
 
 new Test_ActiveRecord_Behaviors_Taggable();

@@ -197,7 +197,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   protected $primary_key   = 'id';
   protected $default_scope = array();
   
-  protected $attr_read = array('new_record', 'table_name');
+  protected $attr_read = array('primary_key', 'new_record', 'table_name');
   protected $behaviors = array();
   
   
@@ -476,7 +476,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     return (gettype($self) == 'object');
   }
   
-  protected function build_sql_from_options($options)
+  function build_sql_from_options($options)
   {
     # builds SQL
     $table  = $this->db->quote_table($this->table_name);
@@ -513,7 +513,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-    return "SELECT $select FROM $table $joins $where $group $order $limit ;";
+#    return "SELECT $select FROM $table $joins $where $group $order $limit ;";
+    return "SELECT $select FROM $table $joins $where $group $order $limit";
   } 
   
   function merge_conditions($a, $b)

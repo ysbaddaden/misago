@@ -36,7 +36,7 @@ class ActiveRecord_Behaviors_Taggable_Base
       "{$singular}_list" => "{$singular}_list"
     );
     $functions  = array(
-      "find_with_{$plural}" => 'find_with_tags',
+      "find_with_{$plural}" => 'find_tagged_with',
       "{$singular}_count"   => 'tag_counts',
     );
     $this->parent->map_module($this, $attributes, $functions);
@@ -64,9 +64,9 @@ class ActiveRecord_Behaviors_Taggable_Base
     return $this->$attr = $value;
   }
   
-  function find_tagged_with($tags, $options=null)
+  function find_tagged_with($tags, $options=array())
   {
-    $options = $this->parent->merge_options($options, $this->tag_list->find_options($tags));
+    $options = $this->tag_list->find_options($tags, $options);
     return $this->parent->find(':all', $options);
   }
   

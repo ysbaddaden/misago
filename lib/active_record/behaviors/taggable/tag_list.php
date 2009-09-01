@@ -20,7 +20,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   }
   
   # Returns a list of records that match given tags.
-  function find($tags, $options=null)
+  function find($tags, $options=array())
   {
     $options = $this->find_options($tags, $options);
     return $this->collection->find(':all', $options);
@@ -92,27 +92,50 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   }
   
   # @private
-  function find_options($tags, $options)
+  function & find_options($tags, $options=array())
   {
     $match_all = isset($options['match_all']) ? $options['match_all'] : false;
-    $conditions = $this->find_conditions($tags, $match_all);
-    
-    $options['select']     = "{$this->parent->table_name}.*";
-    $options['join']       = $this->tag_association;
-    $options['conditions'] = $this->parent->merge_conditions($options, $conditions);
+    $_options['conditions'] = $this->find_conditions($tags, $match_all);
+    $_options['select'] = "{$this->parent->table_name}.*";
+    $_options['joins']  = $this->assoc['name'];
+    $_options['group']  = "{$this->parent->table_name}.{$this->parent->primary_key}";
+    return $this->parent->merge_options($options, $_options);
   }
   
   # IMPROVE: implement option 'match_all = true'.
   # @private
-  function find_conditions($tags, $match_all=false)
+  function & find_conditions($tags, $match_all=false)
   {
     $tags = array_collection($tags);
-    $conditions = array("{$this->assoc['table_name']}.{$this->tag_column}" => &$tags);
+    $conditions = array();
+    
+    if (count($tags) == 1) {
+      $conditions["{$this->assoc['table_name']}.{$this->tag_column}"] = $tags[0];
+    }
+    elseif ($match_all) {
+      $conditions = $this->recursive_find_conditions($tags);
+    }
+    else {
+      $conditions["{$this->assoc['table_name']}.{$this->tag_column}"] =& $tags;
+    }
     return $conditions;
   }
   
+  private function recursive_find_conditions($tags)
+  {
+    $tag = array_pop($tags);
+    
+    $options = empty($tags) ? array() :
+      array('conditions' => $this->recursive_find_conditions($tags));
+    $o = $this->find_options($tag, $options);
+    $o['select'] = "{$this->parent->table_name}.{$this->parent->primary_key}";
+    $conditions = $this->parent->build_sql_from_options($o);
+    
+    return "{$this->parent->table_name}.{$this->parent->primary_key} IN ( $conditions )";
+  }
+  
   # @private
-  function count_options($tags, $options)
+  function & count_options($tags, $options)
   {
     $options = $this->find_options($tags, $options);
     $options['select'] = "{$this->options['table_name']}.{$this->tag_column}, COUNT(*)";

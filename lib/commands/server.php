@@ -30,7 +30,7 @@ for ($i=0; $i<$_SERVER['argc']; $i++)
   }
 }
 
-$config_file = 'config/lighttpd.conf';
+$config_file = ROOT.'/config/lighttpd.conf';
 $config_data = file_get_contents($config_file);
 
 $vars = array(
@@ -43,10 +43,8 @@ $vars = array(
   "#{LOG}"         => ROOT.'/log',
 );
 $config_data = str_replace(array_keys($vars), array_values($vars), $config_data);
-
-$config_file .= '.tmp';
+$config_file = TMP.'/lighttpd.conf';
 file_put_contents($config_file, $config_data);
-
 
 # starts server
 echo "Starting lighttpd at http://$http_host:$http_port/\n";
