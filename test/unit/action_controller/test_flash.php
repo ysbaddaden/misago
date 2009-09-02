@@ -103,8 +103,8 @@ class Test_ActionController_Flash extends Unit_Test
   }
 }
 
-session_start();
+@session_start();
 new Test_ActionController_Flash();
-session_destroy();
+@session_destroy();
 
 ?>

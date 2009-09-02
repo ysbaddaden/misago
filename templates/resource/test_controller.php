@@ -3,10 +3,9 @@
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-$location = dirname(__FILE__).'/../..';
-require_once "$location/config/boot.php";
+require_once dirname(__FILE__).'/../../config/boot.php';
 
-class Test_#{Controller}Controller extends Unit_TestCase
+class Test_#{Controller}Controller extends Unit_FunctionalTest
 {
   function test_true()
   {
