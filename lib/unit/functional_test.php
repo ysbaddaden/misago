@@ -11,17 +11,17 @@ class Unit_FunctionalTest extends Unit_TestCase
   # IMPROVE: Start and stop a test server (script/server -p 3009 -e test).
   function __construct()
   {
-    parent::__construct();
-    
     $map = ActionController_Routing::draw();
     $map->build_path_and_url_helpers();
+    
+    parent::__construct();
   }
   
   protected function assert_redirected_to($comment, $url)
   {
     $location = isset($this->last_action['headers']['location']) ?
       $this->last_action['headers']['location'] : false;
-    $this->assert_equal($comment, $location, $url);
+    $this->assert_equal($comment, $location, ($url === false) ? false : (string)$url);
   }
   
   protected function assert_response($comment, $status)

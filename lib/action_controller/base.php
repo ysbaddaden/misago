@@ -208,7 +208,7 @@ abstract class ActionController_Base extends Object
         $url = cfg::get('base_path').$url;
       }
     }
-    HTTP::redirect($url, 302);
+    HTTP::redirect($url, $status);
   }
     
   protected function before_filters() {}
