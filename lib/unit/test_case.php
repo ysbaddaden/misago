@@ -4,7 +4,7 @@ $_SERVER['migrate_debug'] = 0;
 # IMPROVE: Start and stop a test server (script/server -p 3009 -e test).
 # IMPROVE: Write assert_template().
 # IMPROVE: Write assert_dom_equal() & assert_dom_not_equal().
-# IMPROVE: Write assert_tag() & assert_tag().
+# IMPROVE: Write assert_tag() & assert_not_tag().
 class Unit_TestCase extends Unit_Test
 {
   static public  $batch_run = false;
@@ -177,11 +177,14 @@ class Unit_TestCase extends Unit_Test
         break;
       
       case 'PUT':
-      case 'DELETE':
-        $postfields['_method'] = $method;
-        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
-        $curl_method = 'POST';
+        $curl_method = 'PUT';
+        break;
+      
+      case 'DELETE':
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+        $curl_method = 'DELETE';
         break;
     }
     
@@ -190,8 +193,8 @@ class Unit_TestCase extends Unit_Test
     
     if ($output === false)
     {
-      echo curl_error($ch)."\n";
-      die("\nERROR: please start a test server:\nscript/server -e test -p 3009\n\n");
+      echo "\n".Terminal::colorize('cURL error:', 'LIGHT_RED').' '.Terminal::colorize(curl_error($ch), 'RED ')."\n\n";
+      die("Maybe you didn't started a test server?\n\$ script/server -e test -p 3009\n\n");
     }
     
     # parses headers
