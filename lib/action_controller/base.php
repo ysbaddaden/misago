@@ -210,7 +210,7 @@ abstract class ActionController_Base extends Object
     }
     HTTP::redirect($url, $status);
   }
-    
+  
   protected function before_filters() {}
 #  protected function after_filters()  {}
 }

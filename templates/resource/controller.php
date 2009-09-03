@@ -10,7 +10,8 @@ class #{Controller}Controller extends ApplicationController
     switch($this->format)
     {
       case 'html': break; # index.html.tpl
-      case 'xml': $this->render(array('xml' => $this->#{model_plural})); break;
+      case 'xml':
+      case 'json': $this->render(array($this->format => $this->#{model_plural})); break;
     }
   }
   
@@ -21,7 +22,8 @@ class #{Controller}Controller extends ApplicationController
     switch($this->format)
     {
       case 'html': break; # show.html.tpl
-      case 'xml': $this->render(array('xml' => $this->#{model})); break;
+      case 'xml':
+      case 'json': $this->render(array($this->format => $this->#{model})); break;
     }
   }
   
@@ -46,9 +48,12 @@ class #{Controller}Controller extends ApplicationController
       
       switch($this->format)
       {
-        case 'html': $this->redirect_to(show_#{model}_path($this->#{model}->id)); break;
-        case 'xml':  $this->render(array('xml' => $this->#{model}, 'status' => 201,
-          'location' => show_#{model}_url($this->#{model}->id))); break;
+        case 'html': $this->redirect_to(show_#{model}_path($this->#{model})); break;
+        case 'xml':
+        case 'json':
+          $this->render(array('xml' => $this->#{model}, 'status' => 201,
+            'location' => show_#{model}_url($this->#{model})));
+        break;
       }
     }
     else
@@ -56,15 +61,15 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->render('new'); break;
-        case 'xml':  $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
+        case 'xml': 
+        case 'json': $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
       }
     }
   }
   
   function update()
   {
-    $#{model} = new #{Model}();
-    $this->#{model} = $#{model}->find($this->params[':id']);
+    $this->#{model} = new #{Model}($this->params[':id']);
     
     if ($this->#{model}->update_attributes($this->params['#{model}']))
     {
@@ -72,8 +77,9 @@ class #{Controller}Controller extends ApplicationController
       
       switch($this->format)
       {
-        case 'html': $this->redirect_to(show_#{model}_path($this->#{model}->id)); break;
-        case 'xml':  $this->render(array('xml' => $this->#{model}, 'status' => 200)); break;
+        case 'html': $this->redirect_to(show_#{model}_path($this->#{model})); break;
+        case 'xml':
+        case 'json': $this->render(array('xml' => $this->#{model}, 'status' => 200)); break;
       }
     }
     else
@@ -81,7 +87,8 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->render('edit'); break;
-        case 'xml':  $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
+        case 'xml':
+        case 'json': $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
       }
     }
   }
@@ -95,12 +102,14 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->redirect_to(#{model}s_path()); break;
-        case 'xml': HTTP::status(410); break;
+        case 'xml':
+        case 'json': HTTP::status(410); break;
       }
     }
     else {
       HTTP::status(500);
     }
+    exit;
   }
 }
 
