@@ -6,7 +6,7 @@ class Unit_TestCase extends Unit_Test
   static public  $batch_run = false;
   static private $_db;
   
-  protected $fixtures    = array();
+  protected $fixtures = array();
   
   
   function __construct()

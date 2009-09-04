@@ -53,9 +53,26 @@ class Unit_FunctionalTest extends Unit_TestCase
     $this->assert_not_equal($comment, $value, $expected);
   }
   
-  
-  protected function & run_action($method, $uri, $postfields=null)
+  # Executes an action on test server.
+  # 
+  # Examples:
+  # 
+  #   $this->run_action('GET', '/accounts');
+  #   $this->run_action('PUT', '/accounts', array('account' => array('user_name' => 'azeroth'));
+  #   
+  #   $this->run_action(new_account_path());
+  #   $this->run_action(delete_account_path(), array('account' => array('user_name' => 'azeroth'));
+  # 
+  protected function & run_action($method, $uri=null, $postfields=null)
   {
+    $args = func_get_args();
+    if (is_object($args[0]))
+    {
+      $uri        = (string)$args[0];
+      $method     = $args[0]->method;
+      $postfields = isset($args[1]) ? $args[1] : null;
+    }
+    
     # requests a page
     $ch = curl_init();
     
