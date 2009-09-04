@@ -70,7 +70,7 @@ class Unit_FunctionalTest extends Unit_TestCase
     {
       $uri        = (string)$args[0];
       $method     = $args[0]->method;
-      $postfields = $args[1];
+      $postfields = isset($args[1]) ? $args[1] : null;
     }
     
     # requests a page
