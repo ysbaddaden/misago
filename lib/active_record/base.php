@@ -524,7 +524,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   
   function & merge_options($a, $b)
   {
-    $c = array_merge_recursive($a, $b);
+#    $c = array_merge_recursive($a, $b);
+    $c = array_merge($a, $b);
     if (!empty($a['conditions']) and !empty($b['conditions'])) {
       $c['conditions'] = $this->merge_conditions($a['conditions'], $b['conditions']);
     }
