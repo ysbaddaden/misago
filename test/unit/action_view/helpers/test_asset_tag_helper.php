@@ -21,6 +21,9 @@ class Test_ActionView_Helper_AssetTagHelper extends Unit_Test
     
     $this->assert_equal('with added timestamp', image_path('timestamp.jpg'),
       '/img/timestamp.jpg?'.filemtime(ROOT.'/public/img/timestamp.jpg'));
+    
+    $this->assert_equal('with url_for', javascript_path(array(':controller' => 'stories', ':action' => 'avatar', ':format' => 'jpg')),
+      '/stories/avatar.jpg');
   }
   
   function test_javascript_path()
@@ -33,6 +36,9 @@ class Test_ActionView_Helper_AssetTagHelper extends Unit_Test
     
     $this->assert_equal('with added timestamp', javascript_path('timestamp.js'),
       '/js/timestamp.js?'.filemtime(ROOT.'/public/js/timestamp.js'));
+    
+    $this->assert_equal('with url_for', javascript_path(array(':controller' => 'stories', ':action' => 'widget', ':format' => 'js')),
+      '/stories/widget.js');
   }
   
   function test_stylesheet_path()
@@ -45,6 +51,9 @@ class Test_ActionView_Helper_AssetTagHelper extends Unit_Test
     
     $this->assert_equal('with added timestamp', stylesheet_path('timestamp.css'),
       '/css/timestamp.css?'.filemtime(ROOT.'/public/css/timestamp.css'));
+    
+    $this->assert_equal('with url_for', javascript_path(array(':controller' => 'stories', ':action' => 'custom_design', ':format' => 'css')),
+      '/stories/custom_design.css');
   }
   
   function test_image_tag()

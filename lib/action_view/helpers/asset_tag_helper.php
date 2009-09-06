@@ -15,6 +15,10 @@ class ActionView_Helpers_AssetTag_NS
   # @private
   static function linearize_path($base_path, $path)
   {
+    if (is_array($path)) {
+      return url_for($path);
+    }
+    
     $path = trim($path);
     if (strpos($path, 'http://') !== 0)
     {
