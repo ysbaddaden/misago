@@ -63,6 +63,10 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
   
   function test_current_page()
   {
+    $map = ActionController_Routing::draw();
+    $map->reset();
+    $map->connect(':controller/:action/:id.:format');
+    
     $_SERVER['REQUEST_URI'] = '/archives';
     $this->assert_true('',  current_page('/archives'));
     $this->assert_false('', current_page('/articles'));
@@ -86,10 +90,6 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
   
   function test_link_to_unless_current()
   {
-    $map = ActionController_Routing::draw();
-    $map->reset();
-    $map->connect(':controller/:action/:id.:format');
-    
     $_SERVER['REQUEST_URI'] = '/archives';
     $this->assert_equal('same page', link_to_unless_current('Archives', '/archives'),
       '<span>Archives</span>');
