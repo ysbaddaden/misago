@@ -130,6 +130,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map->reset();
     
     $map->resource('posts');
+    $map->connect(':controller/:action/:id.:format');
     
     $this->assert_equal('GET /posts', $map->route('GET', 'posts'), array(
       ':method'     => 'GET',
@@ -181,6 +182,13 @@ class Test_ActionController_Routing extends Unit_TestCase
       ':controller' => 'posts',
       ':action'     => 'delete',
       ':id'         => '1',
+      ':format'     => null,
+    ));
+    
+    $this->assert_equal('GET /posts/widget', $map->route('GET', 'posts/widget'), array(
+      ':method'     => 'GET',
+      ':controller' => 'posts',
+      ':action'     => 'widget',
       ':format'     => null,
     ));
   }
@@ -430,6 +438,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map = ActionController_Routing::draw();
     $map->reset();
     $map->resource('articles');
+    $map->connect(':controller/:action/:id.:format');
     $map->build_path_and_url_helpers();
     
     $map->route('GET', '/articles/create.xml');

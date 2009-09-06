@@ -103,7 +103,7 @@ class ActionController_Routing extends Object
     
     $this->named("$plural",          "$name.:format",          array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
     $this->named("new_$singular",    "$name/new.:format",      array(':controller' => $name, ':action' => 'neo',    'conditions' => array('method' => 'GET')));
-    $this->named("show_$singular",   "$name/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET')));
+    $this->named("show_$singular",   "$name/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')));
     $this->named("edit_$singular",   "$name/:id/edit.:format", array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET')));
     $this->named("create_$singular", "$name.:format",          array(':controller' => $name, ':action' => 'create', 'conditions' => array('method' => 'POST')));
     $this->named("update_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT')));
