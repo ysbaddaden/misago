@@ -61,6 +61,12 @@ class ActiveRecord_Collection extends ActiveArray
     return $record;
   }
   
+  # Saves the collection.
+  function save()
+  {
+    return $this->klass->transaction(array($this, '_block_save'));
+  }
+  
   # Deletes the given records. They are removed from the collection, too.
   function delete($record)
   {
@@ -99,6 +105,17 @@ class ActiveRecord_Collection extends ActiveArray
     $this->exchangeArray(array());
   }
   
+  
+  # @private
+  function _block_save()
+  {
+    $fk = $this->options['foreign_key'];
+    foreach($this as $record)
+    {
+      $record->{$fk} = $this->parent->id;
+      $record->do_save();
+    }
+  }
   
   # @private
   function _block_delete()

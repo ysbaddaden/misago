@@ -568,6 +568,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     return $this->save_without_validation();
   }
   
+  # Saves the record, but throws an exception on error.
+  function do_save($perform_validation=true)
+  {
+    if (!$this->save()) {
+      throw new ActiveRecord_RecordNotSaved('Record was not saved.');
+    }
+  }
+  
   # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
   private function save_associated()
   {
