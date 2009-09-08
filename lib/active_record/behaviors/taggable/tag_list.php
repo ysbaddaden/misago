@@ -1,6 +1,6 @@
 <?php
 
-# IMPROVE: Cache the list into parent's column 'cached_tags' (if column exists).
+# IMPROVE: Cache the list into parent's column 'tags_cached' (if column exists).
 class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
 {
   private $parent;
@@ -102,7 +102,6 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     return $this->parent->merge_options($options, $_options);
   }
   
-  # IMPROVE: implement option 'match_all = true'.
   # @private
   function & find_conditions($tags, $match_all=false)
   {
