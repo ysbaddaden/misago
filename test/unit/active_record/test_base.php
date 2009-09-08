@@ -489,28 +489,33 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $a = array();
     $b = array();
-    $c = $programmer->test_merge_options($a, $b);
+    $c = $programmer->merge_options($a, $b);
     $this->assert_equal("", $c, array());
     
     $a = array('limit' => 10, 'select' => 'a.*');
     $b = array();
-    $c = $programmer->test_merge_options($a, $b);
+    $c = $programmer->merge_options($a, $b);
     $this->assert_equal("", $c, array('limit' => 10, 'select' => 'a.*'));
     
     $a = array();
     $b = array('conditions' => 'a = 1', 'limit' => 100);
-    $c = $programmer->test_merge_options($a, $b);
+    $c = $programmer->merge_options($a, $b);
     $this->assert_equal("", $c, array('conditions' => 'a = 1', 'limit' => 100));
     
     $a = array('conditions' => "b <> 'aze'");
     $b = array('conditions' => 'a = 1', 'limit' => 100);
-    $c = $programmer->test_merge_options($a, $b);
+    $c = $programmer->merge_options($a, $b);
     $this->assert_equal("", $c, array('conditions' => "(b <> 'aze') AND (a = 1)", 'limit' => 100));
     
     $a = array('conditions' => "b <> 'aze'");
     $b = array('conditions' => array('a = :a', array('a' => 12)), 'limit' => 100);
-    $c = $programmer->test_merge_options($a, $b);
+    $c = $programmer->merge_options($a, $b);
     $this->assert_equal("", $c, array('conditions' => "(b <> 'aze') AND (a = '12')", 'limit' => 100));
+    
+    $a = array('order' => 'created_at asc');
+    $b = array('order' => 'created_at desc');
+    $c = $programmer->merge_options($a, $b);
+    $this->assert_equal("", $c, array('order' => 'created_at desc'));
   }
   
   function test_find_with_default_scope()

@@ -524,7 +524,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   
   function & merge_options($a, $b)
   {
-    $c = array_merge_recursive($a, $b);
+    $c = array_merge($a, $b);
     if (!empty($a['conditions']) and !empty($b['conditions'])) {
       $c['conditions'] = $this->merge_conditions($a['conditions'], $b['conditions']);
     }
@@ -566,6 +566,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
       return $this->save_with_validation();
     }
     return $this->save_without_validation();
+  }
+  
+  # Saves the record, but throws an exception on error.
+  function do_save($perform_validation=true)
+  {
+    if (!$this->save()) {
+      throw new ActiveRecord_RecordNotSaved('Record was not saved.');
+    }
   }
   
   # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.

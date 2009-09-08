@@ -33,7 +33,7 @@ class ActiveRecord_Behaviors_Taggable_Base
     $singular = String::singularize($plural);
     
     $attributes = array(
-      "{$singular}_list" => "{$singular}_list"
+      "{$singular}_list" => "tag_list"
     );
     $functions  = array(
       "find_with_{$plural}" => 'find_tagged_with',

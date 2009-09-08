@@ -49,6 +49,16 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
       (array)$post->tag_list, array('aaa', 'bbb', 'ddd'));
   }
   
+  function test_create_with_tags()
+  {
+    $post = new Post(array(
+      'title'    => 'some title',
+      'body'     => 'some body',
+      'tag_list' => 'ccc,ddd'
+    ));
+    $this->assert_true('creating parent creates associated tags', $post->save());
+  }
+  
   function test_find_with_tags()
   {
     $this->fixtures('posts,tags');
