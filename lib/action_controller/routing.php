@@ -221,7 +221,6 @@ class ActionController_Routing extends Object
    *   'product/:id' => {:controller => 'products', :action => 'show'}
    * 
    * IMPROVE: Recognize keys' special requirements (?)
-   * TODO: Handle :format if defined in route path or in mapping.
    */
   function build_path_and_url_helpers()
   {

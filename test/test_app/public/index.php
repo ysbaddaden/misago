@@ -1,8 +1,5 @@
 <?php
 
-# IMPROVE: Handle non 'application/x-www-form-urlencoded' mimetypes for POST/PUT input (ie. XML, JSON, etc).
-# FIXME: Handle 'multipart/form-data' for PUT requests.
-
 # Using LightTPD 404-handler, or using non GET/POST HTTP requests,
 # $_GET and $_POST aren't always populated by PHP. Let's fix that.
 if (empty($_SERVER['QUERY_STRING']))
