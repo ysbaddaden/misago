@@ -576,28 +576,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
     }
   }
   
-  # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
-  private function save_associated()
-  {
-    $rs = true;
-    foreach(array_keys($this->associations) as $assoc)
-    {
-      if (isset($this->$assoc))
-      {
-        $fk = $this->associations[$assoc]['foreign_key'];
-        switch($this->associations[$assoc]['type'])
-        {
-          case 'belongs_to': $this->$assoc->{$this->primary_key} = $this->$fk; break;
-          case 'has_one':    $this->$assoc->$fk = $this->$fk; break;
-#          case 'has_many': break;
-#          case 'has_and_belongs_to_many': break;
-        }
-        $rs &= $this->$assoc->save();
-      }
-    }
-    return $rs;
-  }
-  
   # Generic create record method.
   # 
   # You better consider this method as private.
@@ -841,12 +819,13 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
   function delete($id=null)
   {
     $id = isset($id) ? $id : $this->id;
+    $class  = get_class($this);
+    $record = new $class($id);
     
-    if ($this->exists($id))
+    if (!$record->new_record)
     {
-      $class  = get_class($this);
-      $record = new $class($id);
       $record->before_delete();
+      $record->delete_associated();
       
       $conditions = array($this->primary_key => $id);
       if (!$this->db->delete($this->table_name, $conditions)) {
@@ -854,8 +833,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
       }
       
       $record->after_delete();
-      return true;
     }
+    return true;
   }
   
   # Same as +delete+ but raises an ActiveRecord_Exception on error.

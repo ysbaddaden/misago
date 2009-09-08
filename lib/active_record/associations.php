@@ -220,6 +220,12 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
           String::underscore(get_class($this)).'_id';
       }
       
+      if ($type != 'has_and_belongs_to_many'
+        and !isset($def['dependent']))
+      {
+        $def['dependent'] = null;
+      }
+      
       switch($type)
       {
         case 'belongs_to':
@@ -449,6 +455,70 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
           " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
           " = ".$this->db->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
     }
+  }
+  
+  
+  # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
+  # @private
+  protected function save_associated()
+  {
+    $rs = true;
+    foreach(array_keys($this->associations) as $assoc)
+    {
+      if (isset($this->$assoc))
+      {
+        $fk = $this->associations[$assoc]['foreign_key'];
+        switch($this->associations[$assoc]['type'])
+        {
+          case 'belongs_to': $this->$assoc->{$this->primary_key} = $this->$fk; break;
+          case 'has_one':    $this->$assoc->$fk = $this->$fk; break;
+          case 'has_many':   break;
+#          case 'has_and_belongs_to_many': break;
+        }
+        $rs &= $this->$assoc->save();
+      }
+    }
+    return $rs;
+  }
+  
+  # TEST: Test delete_associated() with belongs_to, has_one & has_many relationships.
+  # @private
+  protected function delete_associated()
+  {
+    $rs = true;
+    foreach(array_keys($this->associations) as $assoc)
+    {
+      switch($this->associations[$assoc]['type'])
+      {
+        case 'belongs_to':
+          switch($this->associations[$assoc]['dependent'])
+          {
+            case 'destroy': break;
+            case 'delete':  break;
+          }
+        break;
+        
+        case 'has_many':
+          switch($this->associations[$assoc]['dependent'])
+          {
+            case 'destroy': break;
+            case 'delete_all': $this->$assoc->destroy_all(); break;
+            case 'nullify': break;
+          }
+        break;
+        
+        case 'has_one':
+          switch($this->associations[$assoc]['dependent'])
+          {
+            case 'destroy': break;
+            case 'delete':  break;
+            case 'nullify': break;
+          }
+        break;
+      }
+#      $rs &= $this->$assoc->delete_all();
+    }
+    return $rs;
   }
 }
 
