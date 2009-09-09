@@ -1,5 +1,6 @@
 <?php
 
+# FIXME: Do not select tags if parent ID is null or new_record!
 # IMPROVE: Cache the list into parent's column 'tags_cached' (if column exists).
 class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
 {
