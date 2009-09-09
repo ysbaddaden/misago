@@ -274,6 +274,12 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     
     $test = $db->sanitize_order('count(toto.titi)');
     $this->assert_equal('function', trim($test), 'count("toto"."titi")');
+    
+    $test = $db->sanitize_order('count(toto.story_id)');
+    $this->assert_equal('function', trim($test), 'count("toto"."story_id")');
+    
+#    $test = $db->sanitize_order('ADD_DATE(toto.created_at, toto.updated_at)');
+#    $this->assert_equal('function', trim($test), 'ADD_DATE("toto"."created_at", "toto"."updated_at")');
   }
   
   function test_sanitize_limit()
