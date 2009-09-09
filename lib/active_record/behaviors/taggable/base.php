@@ -66,8 +66,13 @@ class ActiveRecord_Behaviors_Taggable_Base
   
   function find_tagged_with($tags, $options=array())
   {
-    $options = $this->tag_list->find_options($tags, $options);
-    return $this->parent->find(':all', $options);
+    $tags = array_collection($tags);
+    if (!empty($tags))
+    {
+      $options = $this->tag_list->find_options($tags, $options);
+      return $this->parent->find(':all', $options);
+    }
+    return new ActiveArray(array(), get_class($this->parent));
   }
   
   function tag_counts()
