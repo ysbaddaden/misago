@@ -75,14 +75,29 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # Quotes a table name for use in a SQL query.
   function quote_table($table)
   {
-    return $this->quote_column($table);
+    $table = trim($table);
+    return $this->_quote_column($table);
   }
   
   # Quotes a column name for use in a SQL query.
   function quote_column($column)
   {
     $column = trim($column);
-    if (strpos($column, '.'))
+    
+    if (preg_match('/(\b[\w_]+)\((.*?)\)/i', $column, $match))
+    {
+      return empty($match[2]) ? "{$match[1]}()" :
+        "{$match[1]}(".$this->_quote_column($match[2]).")";
+    }
+    return $this->_quote_column($column);
+  }
+  
+  private function _quote_column($column)
+  {
+    if ($column == '*') {
+      return '*';
+    }
+    elseif (strpos($column, '.'))
     {
       $segments = explode('.', $column);
       foreach($segments as $i => $column)
@@ -132,7 +147,6 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     if (!is_array($columns)) {
       $columns = explode(',', $columns);
     }
-    
     foreach($columns as $i => $column)
     {
       $column = trim($column);
@@ -144,18 +158,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       else {
         $options = '';
       }
-      
-      if (preg_match('/(\b[\w_]+)\((.*?)\)/i', $column, $match))
-      {
-        $column = empty($match[2]) ? "{$match[1]}()" :
-          "{$match[1]}(".$this->quote_column($match[2]).")";
-      }
-      else {
-        $column = $this->quote_column($column);
-      }
-      $columns[$i] = $column.$options;
+      $columns[$i] = $this->quote_column($column).$options;
     }
-    
     return implode(', ', $columns);
   }
   

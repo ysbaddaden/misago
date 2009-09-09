@@ -74,6 +74,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
   {
     $db = new FakeAdapter(array());
     
+    $test = $db->sanitize_order('*');
+    $this->assert_equal('', trim($test), '*');
+    
     $test = $db->quote_column('products');
     $this->assert_equal("", $test, '"products"');
 
@@ -82,6 +85,15 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
 
     $test = $db->quote_column('products.*');
     $this->assert_equal("", $test, '"products".*');
+
+    $test = $db->quote_column('COUNT(story_id)');
+    $this->assert_equal("", $test, 'COUNT("story_id")');
+
+    $test = $db->quote_column('sum(paypal.montant)');
+    $this->assert_equal("", $test, 'sum("paypal"."montant")');
+
+    $test = $db->sanitize_order('COUNT(*)');
+    $this->assert_equal('', trim($test), 'COUNT(*)');
   }
   
   function test_quote_columns()
@@ -93,6 +105,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
 
     $test = $db->quote_columns('misago.orders, products, tags');
     $this->assert_equal("", $test, '"misago"."orders", "products", "tags"');
+
+    $test = $db->quote_columns('COUNT(paypal.id), paypal.date, sum(*)');
+    $this->assert_equal("", $test, 'COUNT("paypal"."id"), "paypal"."date", sum(*)');
   }
   
   function test_quote_value()
@@ -274,6 +289,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     
     $test = $db->sanitize_order('count(toto.titi)');
     $this->assert_equal('function', trim($test), 'count("toto"."titi")');
+    
+    $test = $db->sanitize_order('count(*)');
+    $this->assert_equal('function', trim($test), 'count(*)');
     
     $test = $db->sanitize_order('count(toto.story_id)');
     $this->assert_equal('function', trim($test), 'count("toto"."story_id")');
