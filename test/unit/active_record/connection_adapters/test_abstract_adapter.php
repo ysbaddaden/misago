@@ -271,6 +271,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     
     $test = $db->sanitize_order('rand()');
     $this->assert_equal('function', trim($test), 'rand()');
+    
+    $test = $db->sanitize_order('count(toto.titi)');
+    $this->assert_equal('function', trim($test), 'count("toto"."titi")');
   }
   
   function test_sanitize_limit()

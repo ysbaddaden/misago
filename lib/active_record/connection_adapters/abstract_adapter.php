@@ -145,7 +145,12 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
         $options = '';
       }
       
-      if (!preg_match('/\b\w+\(\)/i', $column)) {
+      if (preg_match('/(\b\w+)\(([\w\.]*)\)/i', $column, $match))
+      {
+        $column = empty($match[2]) ? "{$match[1]}()" :
+          "{$match[1]}(".$this->quote_column($match[2]).")";
+      }
+      else {
         $column = $this->quote_column($column);
       }
       $columns[$i] = $column.$options;
