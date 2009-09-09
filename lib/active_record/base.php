@@ -818,16 +818,21 @@ abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
    */
   function delete($id=null)
   {
-    $id = isset($id) ? $id : $this->id;
-    $class  = get_class($this);
-    $record = new $class($id);
+    if ($id === null) {
+      $record = $this;
+    }
+    else
+    {
+      $class  = get_class($this);
+      $record = new $class($id);
+    }
     
     if (!$record->new_record)
     {
       $record->before_delete();
       $record->delete_associated();
       
-      $conditions = array($this->primary_key => $id);
+      $conditions = array($this->primary_key => $record->id);
       if (!$this->db->delete($this->table_name, $conditions)) {
         return false;
       }

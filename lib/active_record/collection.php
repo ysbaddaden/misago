@@ -91,7 +91,7 @@ class ActiveRecord_Collection extends ActiveArray
     return true;
   }
   
-  # Destroys all records (callbacks aren't). They're removed from the collection, too.
+  # Destroys all records (object callbacks aren't). They're removed from the collection, too.
   function destroy_all()
   {
     $this->klass->transaction(array($this, '_block_destroy_all'));

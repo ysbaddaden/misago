@@ -294,7 +294,113 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
       'outer join "programmers_projects" on "programmers_projects"."programmer_id" = "programmers"."id" '.
       'outer join "projects" on "projects"."id" = "programmers_projects"."project_id"');
   }
+  
+  function test_dependent_nullifying()
+  {
+    $this->fixtures('orders,invoices,baskets');
+    
+    $order = new NullifyOrder(2);
+    $order->delete();
+    
+    $invoice = new Invoice(2);
+    $this->assert_null('has one foreign key has been nullified', $invoice->order_id);
+    
+    $invoice = new Invoice(1);
+    $this->assert_equal("must have nullified associated object only", $invoice->order_id, 1);
+    
+    $basket = new Basket(4);
+    $this->assert_null('has many foreign key has been nullified', $basket->order_id);
+    
+    $basket = new Basket(5);
+    $this->assert_equal("must have nullified associated objects only", $basket->order_id, 3);
+    
+    
+    $order = new NullifyOrder(1);
+    $order->destroy();
+
+    $invoice = new Invoice(1);
+    $this->assert_equal("has one foreign key isn't nullified on destroy", $invoice->order_id, 1);
+    
+    $basket = new Basket(2);
+    $this->assert_equal("has many foreign key isn't nullified on destroy", $basket->order_id, 1);
+  }
+  
+  function test_dependent_destroy()
+  {
+    $this->fixtures('orders,invoices,baskets');
+    
+    $order = new DestroyOrder(1);
+    $order->delete();
+    $this->assert_false('invoice was destroyed', $order->invoice->exists(1));
+    $this->assert_null('baskets were destroyed', $order->baskets->find(1));
+    
+    $order = new DestroyOrder(2);
+    $order->destroy();
+    $this->assert_true('invoice was not destroyed', $order->invoice->exists(2));
+    $this->assert_equal('baskets were not destroyed', $order->baskets->find(4)->id, 4);
+    
+    $this->fixtures('orders,invoices');
+    
+    $invoice = new DestroyInvoice(1);
+    $invoice->delete();
+    $this->assert_false('order was destroyed', $invoice->order->exists(1));
+  }
+  
+  function test_dependent_delete()
+  {
+    $this->fixtures('orders,invoices,baskets');
+    
+    $order = new DeleteOrder(1);
+    $order->delete();
+    $this->assert_false('invoice was deleted', $order->invoice->exists(1));
+    $this->assert_null('baskets were deleted', $order->baskets->find(1));
+    
+    $order = new DeleteOrder(2);
+    $order->destroy();
+    $this->assert_true('invoice was not destroyed', $order->invoice->exists(2));
+    $this->assert_equal('baskets were not destroyed', $order->baskets->find(4)->id, 4);
+
+    $this->fixtures('orders,invoices');
+    
+    $invoice = new DeleteInvoice(1);
+    $invoice->delete();
+    $this->assert_false('order was destroyed', $invoice->order->exists(1));
+  }
 }
+
+class NullifyOrder extends Order
+{
+  protected $table_name = "orders";
+  protected $has_one  = array('invoice' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+  protected $has_many = array('baskets' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+}
+
+class DeleteOrder extends Order
+{
+  protected $table_name = "orders";
+  protected $has_one  = array('invoice' => array('dependent' => 'delete', 'foreign_key' => 'order_id'));
+  protected $has_many = array('baskets' => array('dependent' => 'delete_all', 'foreign_key' => 'order_id'));
+}
+
+class DestroyOrder extends Order
+{
+  protected $table_name = "orders";
+  protected $has_one  = array('invoice' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+  protected $has_many = array('baskets' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+}
+
+class DeleteInvoice extends Invoice
+{
+  protected $table_name = "invoices";
+  protected $belongs_to = array('order' => array('dependent' => 'delete'));
+}
+
+class DestroyInvoice extends Invoice
+{
+  protected $table_name = "invoices";
+  protected $belongs_to = array('order' => array('dependent' => 'destroy'));
+}
+
 
 new Test_ActiveRecord_Associations();
 

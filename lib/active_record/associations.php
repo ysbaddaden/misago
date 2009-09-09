@@ -493,30 +493,44 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         case 'belongs_to':
           switch($this->associations[$assoc]['dependent'])
           {
-            case 'destroy': break;
-            case 'delete':  break;
+            case 'destroy': $this->$assoc->delete(); break;
+            case 'delete':
+              $obj = new $this->associations[$assoc]['class_name']();
+              $obj->destroy_all(array($this->associations[$assoc]['primary_key'] => $this->id));
+            break;
           }
         break;
         
         case 'has_many':
           switch($this->associations[$assoc]['dependent'])
           {
-            case 'destroy': break;
-            case 'delete_all': $this->$assoc->destroy_all(); break;
-            case 'nullify': break;
+            case 'destroy': $this->$assoc->delete_all(); break;
+            case 'delete_all':
+              $obj = new $this->associations[$assoc]['class_name']();
+              $obj->destroy_all(array($this->associations[$assoc]['foreign_key'] => $this->id));
+            break;
+            case 'nullify':
+              $obj = new $this->associations[$assoc]['class_name']();
+              $obj->update_all(array($this->associations[$assoc]['foreign_key'] => null), array($this->associations[$assoc]['foreign_key'] => $this->id));
+            break;
           }
         break;
         
         case 'has_one':
           switch($this->associations[$assoc]['dependent'])
           {
-            case 'destroy': break;
-            case 'delete':  break;
-            case 'nullify': break;
+            case 'destroy': $this->$assoc->delete(); break;
+            case 'delete':
+              $obj = new $this->associations[$assoc]['class_name']();
+              $obj->destroy_all(array($this->associations[$assoc]['foreign_key'] => $this->id));
+            break;
+            case 'nullify':
+              $obj = new $this->associations[$assoc]['class_name']();
+              $obj->update_all(array($this->associations[$assoc]['foreign_key'] => null), array($this->associations[$assoc]['foreign_key'] => $this->id));
+            break;
           }
         break;
       }
-#      $rs &= $this->$assoc->delete_all();
     }
     return $rs;
   }

@@ -2,6 +2,8 @@
 
 class Product extends ActiveRecord_Base
 {
+  protected $has_many = array('baskets' => array('dependent' => 'nullify'));
+  
   function new_record()
   {
     return $this->new_record;
