@@ -97,9 +97,8 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   {
     $match_all = isset($options['match_all']) ? $options['match_all'] : false;
     $_options['conditions'] = $this->find_conditions($tags, $match_all);
-    $_options['select'] = "{$this->parent->table_name}.*";
+    $_options['select'] = "distinct({$this->parent->table_name}.{$this->parent->primary_key}), {$this->parent->table_name}.*";
     $_options['joins']  = $this->assoc['name'];
-    $_options['group']  = "{$this->parent->table_name}.{$this->parent->primary_key}";
     return $this->parent->merge_options($options, $_options);
   }
   
@@ -128,7 +127,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     $options = empty($tags) ? array() :
       array('conditions' => $this->recursive_find_conditions($tags));
     $o = $this->find_options($tag, $options);
-    $o['select'] = "{$this->parent->table_name}.{$this->parent->primary_key}";
+    $o['select'] = "distinct({$this->parent->table_name}.{$this->parent->primary_key})";
     $conditions = $this->parent->build_sql_from_options($o);
     
     return "{$this->parent->table_name}.{$this->parent->primary_key} IN ( $conditions )";
