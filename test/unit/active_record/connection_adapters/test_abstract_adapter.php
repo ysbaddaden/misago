@@ -164,6 +164,10 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $definition = array('columns' => $columns, 'force' => true);
     $sql = $db->create_table('products', $definition);
     $this->assert_equal('', $sql, "CREATE TABLE \"products\" ( \"id\" INT(4) UNSIGNED, \"name\" VARCHAR(255) ) ;");
+    
+    $definition = array('columns' => array('id' => array('type' => 'string', 'limit' => 2, 'primary_key' => true)));
+    $sql = $db->create_table('products', $definition);
+    $this->assert_equal('', $sql, "CREATE TABLE \"products\" ( \"id\" VARCHAR(2) PRIMARY KEY ) ;");
   }
   
   function test_new_table()

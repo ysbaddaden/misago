@@ -1,37 +1,65 @@
 <?php
-/**
- * Helper to create new tables. Generally used in migrations,
- * but permits to create temporary tables too.
- * 
- * IMPROVE: Add support for foreign keys {:references => '', :on_update => '', :on_delete => ''}
- */
+# Helper to create new tables. Generally used in migrations,
+# but permits to create temporary tables on the fly too.
 class ActiveRecord_Table
 {
-  private  $db;
+  private $db;
   
-  public   $name;
-  public   $columns = array();
-  public   $definitions = array(
+  public $name;
+  public $columns = array();
+  public $definitions = array(
     'id'          => true,
     'primary_key' => 'id',
   );
   
-  function __construct($name, array $definitions=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $db)
+  # Constructor.
+  # 
+  # Options: 
+  # 
+  # - id: automatically create the 'id' column (primary_key)
+  # - options: addition to table creation (eg: 'engine=myisam')
+  function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $db)
   {
     $this->db   = $db;
     $this->name = $name;
     
-    if (!empty($definitions)) {
-      $this->definitions = array_merge($this->definitions, $definitions);
+    if (!empty($options)) {
+      $this->definitions = array_merge($this->definitions, $options);
     }
     if (isset($this->definitions['id']) and $this->definitions['id']) {
       $this->add_column($this->definitions['primary_key'], 'primary_key');
     }
   }
   
-  /**
-   * Adds a columns to table's definition.
-   */
+  # Adds a column to table's definition.
+  # 
+  # Types:
+  # 
+  # - primary_key (integer)
+  # - string
+  # - text
+  # - integer
+  # - float
+  # - decimal
+  # - date
+  # - time
+  # - datetime
+  # - boolean
+  # - binary
+  # 
+  # Options:
+  # 
+  # - primary_key (boolean): column is the primary key?
+  # - null (boolean): can the column be null?
+  # - limit (integer): maximum size
+  # - default: default value
+  # - signed (boolean): is the integer/float column signed?
+  # 
+  # Examples:
+  # 
+  #   $t->add_column('name',  'string',  array('limit' => 50));
+  #   $t->add_column('price', 'numeric');
+  # 
   function add_column($column, $type, array $options=null)
   {
     $definition = array(
@@ -48,15 +76,14 @@ class ActiveRecord_Table
     $this->columns[$column] = $definition;
   }
   
-  /**
-   * Adds timestamp columns to table's definition.
-   * 
-   * $type can be:
-   * 
-   * - date: will add created_on & updated_on.
-   * - time: will add created_at & updated_at.
-   * - datetime: will add created_at & updated_at.
-   */
+  # Adds timestamp columns to table's definition.
+  # 
+  # Types:
+  # 
+  # - date: will add created_on & updated_on.
+  # - time: will add created_at & updated_at.
+  # - datetime: will add created_at & updated_at.
+  # 
   function add_timestamps($type='datetime')
   {
     switch($type)
@@ -74,9 +101,7 @@ class ActiveRecord_Table
     }
   }
   
-  /**
-   * Actually creates the table in database.
-   */
+  # Actually creates the table in database.
   function create()
   {
     $this->definitions['columns'] =& $this->columns;

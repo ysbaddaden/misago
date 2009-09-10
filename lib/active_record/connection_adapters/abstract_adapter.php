@@ -298,9 +298,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
    * Definition:
    * 
    * - temporary (bool), true to create a temporary table
-   * - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed}}
+   * - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
    * - options   (string), eg: "engine = innodb"
-   * - force     (null, bool), true: drop table before create, false: create if not exists.
+   * - force     (null, bool), true: drop table before create, false: create if not exists
    */
   function create_table($table, array $definition)
   {
@@ -372,6 +372,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
       }
       if (isset($column['default'])) {
         $def .= " DEFAULT ".$this->quote_value($column['default']);
+      }
+      if (isset($column['primary_key']) and $column['primary_key']) {
+        $def .= " PRIMARY KEY ";
       }
     }
     else {
