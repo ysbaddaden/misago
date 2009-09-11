@@ -1,4 +1,3 @@
 *.php
 *.pid
-php.*
-.conf
+*.conf

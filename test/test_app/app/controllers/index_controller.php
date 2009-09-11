@@ -10,7 +10,14 @@ class IndexController extends ApplicationController
   
   function post()
   {
+    unset($_POST['_method']);
     print_r($_POST);
+    exit;
+  }
+  
+  function files()
+  {
+    print_r($_FILES);
     exit;
   }
 }

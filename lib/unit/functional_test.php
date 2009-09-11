@@ -63,7 +63,7 @@ class Unit_FunctionalTest extends Unit_TestCase
   #   $this->run_action(new_account_path());
   #   $this->run_action(delete_account_path(), array('account' => array('user_name' => 'azeroth'));
   # 
-  protected function & run_action($method, $uri=null, $postfields=null)
+  protected function & run_action($method, $uri=null, $postfields=null, $files=null)
   {
     $args = func_get_args();
     if (is_object($args[0]))
@@ -91,27 +91,32 @@ class Unit_FunctionalTest extends Unit_TestCase
     {
       case 'GET':
         curl_setopt($ch, CURLOPT_HTTPGET, true);
-        $curl_method = 'GET';
-        break;
+      break;
       
+      case 'PUT':
+        $method = 'POST';
+        $postfields['_method'] = 'PUT';
       case 'POST':
         curl_setopt($ch, CURLOPT_POST, true);
         if (!empty($postfields)) {
-          curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
+          curl_setopt($ch, CURLOPT_POSTFIELDS, $this->flatten_postfields($postfields));
         }
-        $curl_method = 'POST';
-        break;
-      
+      break;
+      /*
       case 'PUT':
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($postfields));
-        $curl_method = 'PUT';
-        break;
-      
+        if (!empty($postfields))
+        {
+          list($boundary, $data) = $this->build_multipart_form_data($postfields);
+          curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: multipart/form-data; boundary=$boundary"));
+          curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+          print_r($data);
+        }
+      break;
+      */
       case 'DELETE':
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-        $curl_method = 'DELETE';
-        break;
+      break;
     }
     
     # executes the request
@@ -143,7 +148,7 @@ class Unit_FunctionalTest extends Unit_TestCase
     # gets additional informations
     $this->last_action = array(
       'url'        => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
-      'method'     => $curl_method,
+      'method'     => $method,
       'postfields' => $postfields,
       'status'     => curl_getinfo($ch, CURLINFO_HTTP_CODE),
       'headers'    => $headers,
@@ -153,6 +158,43 @@ class Unit_FunctionalTest extends Unit_TestCase
     curl_close($ch);
     return $this->last_action;
   }
+  
+  private function & flatten_postfields(&$postfields)
+  {
+    $data = array();
+    foreach(explode('&', http_build_query($postfields)) as $v)
+    {
+      list($k, $v) = explode('=', $v, 2);
+      $data[urldecode($k)] = urldecode($v);
+    }
+    return $data;
+  }
+  /*
+  private function build_multipart_form_data(&$postfields)
+  {
+    $data = "";
+    $boundary = "---------------------".substr(md5(rand(0,32000)), 0, 10);
+    
+    foreach($postfields as $k => $v)
+    {
+      if (strpos(ltrim($v), '@') === 0)
+      {
+        $data .= "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$v}\"\n"; 
+        $data .= "Content-Type: ".mime_content_type($v)."\n"; 
+        $data .= "Content-Transfer-Encoding: binary\n\n"; 
+        $data .= file_get_contents($v)."\n"; 
+        $data .= "--$boundary--\n"; 
+      }
+      else
+      {
+        $data .= "--$boundary\n"; 
+        $data .= "Content-Disposition: form-data; name=\"".$k."\"\n\n".$v."\n"; 
+      }
+    }
+    $data .= "--$boundary\n"; 
+    return array($boundary, $data);
+  }
+  */
 }
 
 ?>
