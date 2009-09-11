@@ -163,10 +163,15 @@ class Unit_FunctionalTest extends Unit_TestCase
   private function & flatten_postfields(&$postfields)
   {
     $data = array();
-    foreach(explode('&', http_build_query($postfields)) as $v)
+    $fields = explode('&', http_build_query($postfields));
+    
+    foreach($fields as $v)
     {
-      list($k, $v) = explode('=', $v, 2);
-      $data[urldecode($k)] = urldecode($v);
+      if (!empty($v))
+      {
+        list($k, $v) = explode('=', $v, 2);
+        $data[urldecode($k)] = urldecode($v);
+      }
     }
     return $data;
   }
