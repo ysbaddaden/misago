@@ -216,7 +216,7 @@ class ActionView_Base extends Object
   function yield($name, $content=null)
   {
     if ($content === null) {
-      return $this->yields[$name];
+      return isset($this->yields[$name]) ? $this->yields[$name] : null;
     }
     $this->yields[$name] = $content;
   }

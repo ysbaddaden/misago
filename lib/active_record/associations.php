@@ -292,8 +292,14 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 		  {
 		    # parent already exists
 			  $options = isset($assoc['find_options']) ? $assoc['find_options'] : array();
-			  $options['conditions'] = array($assoc['find_key'] => $this->id);
-			
+			  
+			  if ($assoc['type'] == 'belongs_to') {
+			    $options['conditions'] = array($assoc['find_key'] => $this->{$assoc['foreign_key']});
+			  }
+			  else {
+			    $options['conditions'] = array($assoc['find_key'] => $this->id);
+			  }
+			  
 			  $record = new $model();
 			  $found  = $record->find($assoc['find_scope'], $options);
         
@@ -364,6 +370,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   	parent::__wakeup();
   }
   
+  # TODO: Recursive includes in eager loading.
   protected function eager_loading($records, $includes)
   {
     if (count($records) == 0) {

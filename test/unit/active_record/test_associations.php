@@ -16,6 +16,9 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $invoice = new Invoice(1);
     $this->assert_instance_of('relation is the association', $invoice->order, 'Order');
     $this->assert_equal('must have loaded the right entry', $invoice->order->id, 1);
+    
+    $basket = new Basket(5);
+    $this->assert_equal('must have loaded the right entry (bis)', $basket->product->id, 3);
   }
   
   function test_has_one_relationship()
