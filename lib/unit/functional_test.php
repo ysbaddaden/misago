@@ -96,6 +96,7 @@ class Unit_FunctionalTest extends Unit_TestCase
       case 'PUT':
         $method = 'POST';
         $postfields['_method'] = 'PUT';
+      
       case 'POST':
         curl_setopt($ch, CURLOPT_POST, true);
         if (!empty($postfields)) {
