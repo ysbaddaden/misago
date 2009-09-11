@@ -62,7 +62,7 @@ function t($str, $options=null)
 # 
 class I18n
 {
-  static private $locale       = 'en';
+  static public  $locale       = 'en';
   static private $translations = array();
   
   # Starts the I18n translator.
