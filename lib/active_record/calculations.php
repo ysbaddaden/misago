@@ -16,7 +16,7 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
       case 'minimum': $options['select'] = "min($select)";   break;
       case 'maximum': $options['select'] = "max($select)";   break;
       case 'sum':     $options['select'] = "sum($select)";   break;
-      case 'avg':     $options['select'] = "avg($select)";   break;
+      case 'average': $options['select'] = "avg($select)";   break;
     }
     
     if (isset($options['group'])) {
@@ -72,43 +72,20 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
     $sql     = $this->build_sql_from_options($options);
     $results = $this->db->select_all($options);
     
-    $data = array();
+    $values = array();
     foreach($results as $rs)
     {
       $rs = array_values($rs);
-      $data[$rs[0]] = $this->cast_calculation_value($operation, $column, $rs[1]);
+      $values[$rs[0]] = $rs[1];
     }
-    return $data;
+    return $values;
   }
   
   private function execute_simple_calculation($operation, $column, &$options)
   {
     $sql = $this->build_sql_from_options($options);
-    $value = $this->db->select_value($sql);
-    return $this->cast_calculation_value($operation, $column, $value);
+    return $this->db->select_value($sql);
   }
-  
-  private function cast_calculation_value($operation, $column, $value)
-  {
-    switch($operation)
-    {
-      case 'count': return (int)$value;
-      case 'avg':   return (float)$value;
-      case 'sum':
-        if ($column == '*') {
-          return (int)$value;
-        }
-      case 'minimum':
-      case 'maximum':
-        switch($this->columns[$column]['type'])
-        {
-          case 'float':
-          case 'numeric': return (float)$value;
-          default: return (int)$value;
-        }
-    }
-  }
-  
 }
 
 ?>
