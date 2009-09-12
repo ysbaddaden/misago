@@ -108,6 +108,9 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
 
     $test = $db->quote_columns('COUNT(paypal.id), paypal.date, sum(*)');
     $this->assert_equal("", $test, 'COUNT("paypal"."id"), "paypal"."date", sum(*)');
+
+    $test = $db->quote_columns('COUNT(distinct(id))');
+    $this->assert_equal("", $test, 'COUNT(distinct("id"))');
   }
   
   function test_quote_value()

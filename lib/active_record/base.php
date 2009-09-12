@@ -186,11 +186,10 @@
 # Remember that only delete has callbacks, destroy has no such methods.
 # 
 # 
-# TODO: Implement calculations.
 # TODO: Named scopes.
 # TEST: Test callbacks.
 # 
-abstract class ActiveRecord_Base extends ActiveRecord_Behaviors
+abstract class ActiveRecord_Base extends ActiveRecord_Calculations
 {
   protected $db;
   protected $table_name;

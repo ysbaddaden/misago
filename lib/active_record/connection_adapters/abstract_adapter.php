@@ -84,10 +84,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   {
     $column = trim($column);
     
-    if (preg_match('/(\b[\w_]+)\((.*?)\)/i', $column, $match))
+    if (preg_match('/^(.*)(\b[\w_]+)\(([^\(\)]*)\)(.*)$/i', $column, $match))
     {
-      return empty($match[2]) ? "{$match[1]}()" :
-        "{$match[1]}(".$this->_quote_column($match[2]).")";
+      $rs = empty($match[3]) ? "{$match[2]}()" :
+        "{$match[2]}(".$this->_quote_column($match[3]).")";
+      return "{$match[1]}$rs{$match[4]}";
     }
     return $this->_quote_column($column);
   }
