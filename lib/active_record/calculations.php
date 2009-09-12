@@ -70,7 +70,7 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
   {
     $options['select'] = "{$options['group']}, {$options['select']}";
     $sql     = $this->build_sql_from_options($options);
-    $results = $this->db->select_all($options);
+    $results = $this->db->select_all($sql);
     
     $values = array();
     foreach($results as $rs)

@@ -134,10 +134,16 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   }
   
   # @private
-  function & count_options($tags, $options)
+  function & count_options($options)
   {
-    $options = $this->find_options($tags, $options);
-    $options['select'] = "{$this->options['table_name']}.{$this->tag_column}, COUNT(*)";
+    $_options = array(
+      'select' => "{$this->parent->table_name}.{$this->parent->primary_key}",
+      'group'  => "{$this->assoc['table_name']}.{$this->tag_column}",
+      'joins'  => $this->assoc['name'],
+      'order'  => "count(distinct({$this->parent->table_name}.{$this->parent->primary_key})) desc",
+      'unique' => true,
+    );
+    return $this->parent->merge_options($_options, $options);
   }
 }
 
