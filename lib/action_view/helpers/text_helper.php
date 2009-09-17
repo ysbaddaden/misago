@@ -63,6 +63,8 @@ function pluralize($count, $singular, $plural=null)
   return $singular;
 }
 
+# Simple formatting of text. Two linefeeds make for a paragraph,
+# and a single linefeed makes for line break.
 function simple_format($text)
 {
   $text = str_replace("\r", "", trim($text));
@@ -71,12 +73,25 @@ function simple_format($text)
   return "<p>$text</p>";
 }
 
+# Truncates a string if it's longer than length, and appends a truncate string to it.
 function truncate($text, $length=30, $truncate_string='...')
 {
   if (strlen($text) > $length) {
     return substr($text, 0, $length - strlen($truncate_string)).$truncate_string;
   }
   return $text;
+}
+
+# TODO: markdown()
+function markdown($text)
+{
+  
+}
+
+# TODO: textilize()
+function textilize($text)
+{
+  
 }
 
 ?>
