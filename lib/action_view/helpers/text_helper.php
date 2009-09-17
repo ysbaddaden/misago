@@ -36,4 +36,34 @@ function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
   return $text;
 }
 
+# Extracts an excerpt from from text that matches the first instance of phrase.
+# TODO: excerpt()
+function excerpt($text, $phrase, $radius=100, $excerpt_string='...')
+{
+  
+}
+
+function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
+{
+  if (is_array($phrases))
+  {
+    foreach($phrases as $i => $phrase) {
+      $phrase[$i] = preg_quote($phrase);
+    }
+    $phrases = implode('|', $phrases);
+  }
+  return preg_replace('/('.$phrases.')/', $highlighter, $text);
+}
+
+# TODO: pluralize()
+function pluralize($count, $singular, $plural=null)
+{
+  if ($count != 1) {
+    return ($plural === null) ? String::pluralize($singular) : $plural;
+  }
+  return $singular;
+}
+
+
+
 ?>
