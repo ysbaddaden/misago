@@ -176,12 +176,21 @@ function button_to($name, $url, $attributes=null)
   return $str;
 }
 
-# TODO: mail_to()
+# Generates a mailto link.
+# 
+#   mail_to('me@domain.com');
+#   # => <a href="mailto:me@domain.com">me@domain.com</a>
+#   
+#   mail_to('me@domain.com', 'myself');
+#   # => <a href="mailto:me@domain.com">myself</a>
+#   
+#   mail_to('me@domain.com', 'another', array('class' => 'email'));
+#   # => <a class="email" href="mailto:me@domain.com">another</a>
+# 
 # @namespace ActionView_Helpers_UrlHelper
-function mail_to($email, $name, $attributes=null)
+function mail_to($email, $name=null, $options=null)
 {
-  
+  return link_to($name === null ? $email : $name, "mailto:$email", $options);
 }
-
 
 ?>

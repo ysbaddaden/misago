@@ -135,7 +135,14 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
   
   function test_mail_to()
   {
+    $html = mail_to('me@webcomics.fr');
+    $this->assert_equal('simple email', $html, '<a href="mailto:me@webcomics.fr">me@webcomics.fr</a>');
     
+    $html = mail_to('me@webcomics.fr', 'julien');
+    $this->assert_equal('email with name', $html, '<a href="mailto:me@webcomics.fr">julien</a>');
+    
+    $html = mail_to('another@bd-en-ligne.fr', 'sabrina', array('class' => 'email'));
+    $this->assert_equal('email with name', $html, '<a class="email" href="mailto:another@bd-en-ligne.fr">sabrina</a>');
   }
 }
 
