@@ -55,7 +55,6 @@ function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
   return preg_replace('/('.$phrases.')/', $highlighter, $text);
 }
 
-# TODO: pluralize()
 function pluralize($count, $singular, $plural=null)
 {
   if ($count != 1) {
@@ -64,6 +63,20 @@ function pluralize($count, $singular, $plural=null)
   return $singular;
 }
 
+function simple_format($text)
+{
+  $text = str_replace("\r", "", trim($text));
+  $text = preg_replace("/\n\n+/", "</p><p>", $text);
+  $text = preg_replace("/\n/", "<br/>", $text);
+  return "<p>$text</p>";
+}
 
+function truncate($text, $length=30, $truncate_string='...')
+{
+  if (strlen($text) > $length) {
+    return substr($text, 0, $length - strlen($truncate_string)).$truncate_string;
+  }
+  return $text;
+}
 
 ?>

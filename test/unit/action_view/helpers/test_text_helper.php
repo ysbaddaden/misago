@@ -53,6 +53,28 @@ class TestTextHelper extends Unit_Test
     $this->assert_equal('', pluralize(2, 'post'), 'posts');
     $this->assert_equal('', pluralize(2, 'person', 'users'), 'users');
   }
+  
+  function test_simple_format()
+  {
+    $this->assert_equal('single paragraph with linebreak', simple_format("some\nparagraph"),
+      "<p>some<br/>paragraph</p>");
+    
+    $this->assert_equal('two paragraphs', simple_format("some paragraph\n\nsome other\nparagraph"),
+      "<p>some paragraph</p><p>some other<br/>paragraph</p>");
+    
+    $this->assert_equal('more than two linefeeds', simple_format("some paragraph\n\n\nsome other\nparagraph"),
+      "<p>some paragraph</p><p>some other<br/>paragraph</p>");
+    
+    $this->assert_equal('trim', simple_format("   some\nparagraph   "),
+      "<p>some<br/>paragraph</p>");
+  }
+  
+  function test_truncate()
+  {
+    $this->assert_equal('', truncate(str_repeat('a', 40)), str_repeat('a', 27).'...');
+    $this->assert_equal('', truncate(str_repeat('z', 40), 20, '<chop>'), str_repeat('z', 14).'<chop>');
+    $this->assert_equal('', truncate(str_repeat('j', 20)), str_repeat('j', 20));
+  }
 }
 new TestTextHelper();
 
