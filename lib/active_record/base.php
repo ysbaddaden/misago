@@ -471,8 +471,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       'conditions' => array($this->primary_key => $id),
       'select'     => $this->primary_key,
     );
-    $self = $this->find(':first', $options);
-    return (gettype($self) == 'object');
+    return (bool)$this->count($options);
+#    return (gettype($self) == 'object');
   }
   
   function build_sql_from_options($options)
