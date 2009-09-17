@@ -71,38 +71,44 @@ function current_page($url)
 # - confirm: adds a JavaScript confirm dialog.
 # 
 # @namespace ActionView_Helpers_UrlHelper
-function link_to($content, $url, $attributes=null)
+function link_to($content, $url=null, $attributes=null)
 {
-  # resolves URL
-  if(is_array($url)) {
-    $url = url_for($url);
+  if ($url === null) {
+    $url = $content;
   }
-  
-  # URL is URI+method
-  if (is_object($url) and isset($url->method)) {
-    $method = $url->method;
-  }
-  if (isset($attributes['method']))
+  else
   {
-    $method = $attributes['method'];
-    unset($attributes['method']);
-  }
-  if (isset($method))
-  {
-    $method = strtoupper($method);
-    if ($method != 'GET')
+    # resolves URL
+    if(is_array($url)) {
+      $url = url_for($url);
+    }
+    
+    # URL is URI+method
+    if (is_object($url) and isset($url->method)) {
+      $method = $url->method;
+    }
+    if (isset($attributes['method']))
     {
-      $onclick = "var f = document.createElement('form'); ".
-        "f.action = this.href; ".
-        "f.method = 'POST'; ".
-        "var m = document.createElement('input'); ".
-        "m.setAttribute('type', 'hidden'); ".
-        "m.setAttribute('name', '_method'); ".
-        "m.setAttribute('value', '$method'); ".
-        "f.appendChild(m); ".
-        "f.style.display='none'; ".
-        "this.parentNode.appendChild(f); ".
-        "f.submit()";
+      $method = $attributes['method'];
+      unset($attributes['method']);
+    }
+    if (isset($method))
+    {
+      $method = strtoupper($method);
+      if ($method != 'GET')
+      {
+        $onclick = "var f = document.createElement('form'); ".
+          "f.action = this.href; ".
+          "f.method = 'POST'; ".
+          "var m = document.createElement('input'); ".
+          "m.setAttribute('type', 'hidden'); ".
+          "m.setAttribute('name', '_method'); ".
+          "m.setAttribute('value', '$method'); ".
+          "f.appendChild(m); ".
+          "f.style.display='none'; ".
+          "this.parentNode.appendChild(f); ".
+          "f.submit()";
+      }
     }
   }
   

@@ -26,6 +26,8 @@ class Test_ActionView_Helpers_UrlHelper extends Unit_Test
       '<a href="/archives/categories">categories</a>');
     $this->assert_equal("resolved URL + query string", link_to('products (desc)', array(':controller' => 'products', 'order' => 'desc')),
       '<a href="/products?order=desc">products (desc)</a>');
+    
+    $this->assert_equal("single parameter", link_to('http://toto.com/'), '<a href="http://toto.com/">http://toto.com/</a>');
   }
   
   function test_link_to_with_non_get_methods()
