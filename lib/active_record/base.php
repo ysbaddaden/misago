@@ -467,12 +467,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     if (empty($id) and strlen($id) == 0) {
       return false;
     }
-    $options = array(
-      'conditions' => array($this->primary_key => $id),
-      'select'     => $this->primary_key,
-    );
+    $options = array('conditions' => array($this->primary_key => $id));
     return (bool)$this->count($options);
-#    return (gettype($self) == 'object');
   }
   
   function build_sql_from_options($options)
