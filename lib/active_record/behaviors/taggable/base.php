@@ -75,10 +75,12 @@ class ActiveRecord_Behaviors_Taggable_Base
     return new ActiveArray(array(), get_class($this->parent));
   }
   
-  function tag_count($options=array())
+  function & tag_count($options=array())
   {
     $options = $this->tag_list->count_options($options);
-    return $this->parent->count($options);
+    $tags = $this->parent->count($options);
+    ksort($tags);
+    return $tags;
   }
 }
 
