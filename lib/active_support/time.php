@@ -6,6 +6,8 @@ class Time extends Object
   protected $timestamp;
   protected $type;
   
+  protected $attr_read = array('type');
+  
   function __construct($time=null, $type='datetime')
   {
     $this->raw_time  = $time;
@@ -63,7 +65,8 @@ class Time extends Object
       case 'min':   return date('i', $this->timestamp); break;
       case 'sec':   return date('s', $this->timestamp); break;
     }
-    trigger_error("Unknown attribute: Time::$attr", E_USER_WARNING);
+    return parent::__get($attr);
+#    trigger_error("Unknown attribute: Time::$attr", E_USER_WARNING);
   }
   
   function __toString()
@@ -77,44 +80,8 @@ class Time extends Object
       case 'date':     return date('Y-m-d', $this->timestamp);
       case 'time':     return date('H:i:s', $this->timestamp);
     }
-    /*
-    switch($this->type)
-    {
-      case 'datetime': return strftime('%m/%d/%Y %I:%M:%S%P', $this->timestamp);
-      case 'date':     return strftime('%m/%d/%Y', $this->timestamp);
-      case 'time':     return strftime('%I:%M:%S%P', $this->timestamp);
-    }
-    */
-#    return $this->to_query();
-  }
-  /*
-  function to_query($type=null)
-  {
-    if ($type === null) {
-      $type = $this->type;
-    }
-    switch($this->type)
-    {
-      case 'datetime': return date('Y-m-d H:i:s', $this->timestamp);
-      case 'date':     return date('Y-m-d', $this->timestamp);
-      case 'time':     return date('H:i:s', $this->timestamp);
-    }
   }
   
-  function to_s($type=null)
-  {
-    if ($type === null) {
-      $type = $this->type;
-    }
-    switch($type)
-    {
-      case 'datetime': return strftime($this->is_this_year() ? '%b %e, %I:%M%P' : '%b %e %Y, %I:%M%P', $this->timestamp);
-      case 'date':     return strftime($this->is_this_year() ? '%b %e' : '%b %e %Y', $this->timestamp);
-      case 'time':     return strftime('%I:%M%P', $this->timestamp);
-      case 'db':       return $this->to_query();
-    }
-  }
-  */
   function to_timestamp()
   {
     return $this->timestamp;
@@ -216,6 +183,33 @@ class Time extends Object
     # too old / far
     return $this->to_nice();
   }
+  
+  function format($str)
+  {
+    return strftime($str, $this->timestamp);
+  }
 }
 
+/*
+class Date extends ActiveSupport_Time
+{
+  function __construct($date) {
+    parent::__construct($date, 'date');
+  }
+}
+
+class Datetime extends ActiveSupport_Time
+{
+  function __construct($date) {
+    parent::__construct($date, 'datetime');
+  }
+}
+
+class Time extends ActiveSupport_Time
+{
+  function __construct($date) {
+    parent::__construct($date, 'time');
+  }
+}
+*/
 ?>

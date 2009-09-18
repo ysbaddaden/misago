@@ -12,4 +12,8 @@ en:
         not_included: "{{attribute}} is not included in the list"
         reserved: "{{attribute}}'s value is reserved"
         taken: "{{attribute}} is already taken"
+  localize:
+    date: "%m/%d/%Y"
+    time: "%H:%M"
+    datetime: "%m/%d/%Y %H:%M"
 

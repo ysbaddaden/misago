@@ -62,6 +62,13 @@ class Test_I18n extends Unit_Test
     $this->assert_equal('interpolation', t('foo', array('context' => 'messages', 'bar' => 'baz')), "foo baz");
     $this->assert_equal('interpolation', t('messages.foo', array('bar' => 'bad')), "foo bad");
   }
+  
+  function test_l()
+  {
+    $this->assert_equal('date', l(new Time('2009-08-12', 'date')), '08/12/2009');
+    $this->assert_equal('time', l(new Time('13:45:36', 'time')), '13:45');
+    $this->assert_equal('datetime', l(new Time('2009-06-12 00:12:36', 'datetime')), '06/12/2009 00:12');
+  }
 }
 
 new Test_I18n();

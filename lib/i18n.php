@@ -16,6 +16,12 @@ function t($str, $options=null)
   return I18n::translate($str, $options);
 }
 
+# Localizes certain objects like dates.
+function l($obj)
+{
+  return I18n::localize($obj);
+}
+
 # Handles translations of strings.
 # 
 # FIXME: Missing interpolation when translation isn't found. eg: t('this is my {{name}}', array('name' => $name)).
@@ -125,6 +131,16 @@ class I18n
       return $translation;
     }
     return null;
+  }
+  
+  # Localizes certain objects like dates.
+  static function localize($obj)
+  {
+    switch(get_class($obj))
+    {
+      case 'Time': return $obj->format(self::translate($obj->type, array('context' => 'localize')));
+      default:     return (string)$obj;
+    }
   }
   
   static private function load_translations($locale)

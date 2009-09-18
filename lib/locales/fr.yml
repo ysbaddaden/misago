@@ -12,4 +12,8 @@ fr:
         not_included: "{{attribute}} n'est pas présent dans la liste'"
         reserved: "La valeur de {{attribute}} est réservée"
         taken: "{{attribute}} est déjà pris"
+  localize:
+    date: "%d/%m/%Y"
+    time: "%H:%M"
+    datetime: "%d/%m/%Y %H:%M"
 
