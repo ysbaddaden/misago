@@ -192,8 +192,8 @@ abstract class ActiveRecord_Record extends Object implements Iterator
     {
       switch(gettype($this->$k))
       {
-        case 'string': $v = "<![CDATA[".$this->$k."]>"; break;
-        case 'object': $v = $this->$k->to_xml();        break;
+        case 'string': $v = "<![CDATA[".$this->$k."]]>"; break;
+        case 'object': $v = $this->$k->to_xml(); break;
         default:       $v = $this->$k;
       }
       $xml .= "<$k>$v</$k>";
