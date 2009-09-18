@@ -82,16 +82,30 @@ function truncate($text, $length=30, $truncate_string='...')
   return $text;
 }
 
-# TODO: markdown()
+# Formats text using the Markdown syntax.
+# 
+# See http://daringfireball.net/projects/markdown/ for documentation.
+# 
+# Requires PHP Markdown or PHP Markdown Extra by Michel Fortin:
+# http://michelf.com/projects/php-markdown/
+# 
+# You must strip all functions from markdown.php, keep defines
+# and rename the Markdown_Parser class to Markdown. Eventually
+# save it as vendor/markdown.php
 function markdown($text)
 {
-  
+	$parser = new Markdown();
+	return $parser->transform($text);
 }
 
-# TODO: textilize()
+# Formats text using the Textile syntax.
+# 
+# Download Textile from http://textile.thresholdstate.com/
+# and copy classTextile.php to vendor/textile.php
 function textilize($text)
 {
-  
+  $parser = new Textile();
+  return $parser->TextileThis($text);  
 }
 
 ?>
