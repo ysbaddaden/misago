@@ -81,8 +81,6 @@ class I18n
   }
   
   # Returns the list of available locales.
-  # 
-  # TODO: I18n::available_locales();
   static function available_locales()
   {
     // ...
