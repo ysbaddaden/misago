@@ -33,17 +33,11 @@ class TestTextHelper extends Unit_Test
   
   function test_excerpt()
   {
-    
-  }
-  
-  function test_markdown()
-  {
-    
-  }
-  
-  function test_textilizer()
-  {
-    
+    $this->assert_null('',  excerpt('this is an example', 'not found', 5));
+    $this->assert_equal('', excerpt('this is an example', 'an', 5), '...s is an exam...');
+    $this->assert_equal('', excerpt('this is an example', 'is', 5), 'this is a...');
+    $this->assert_equal('', excerpt('this is an example', 'is'), 'this is an example');
+    $this->assert_equal('', excerpt('this is an example', 'is', 5, '::'), 'this is a::');
   }
   
   function test_pluralize()

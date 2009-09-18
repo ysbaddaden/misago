@@ -36,11 +36,21 @@ function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
   return $text;
 }
 
-# Extracts an excerpt from from text that matches the first instance of phrase.
+# Extracts an excerpt from text that matches the first instance of phrase.
 # TODO: excerpt()
-function excerpt($text, $phrase, $radius=100, $excerpt_string='...')
+function excerpt($text, $phrase, $radius=100, $omission='...')
 {
-  
+  $pos = strpos($text, $phrase);
+  if ($pos === false) {
+    return null;
+  }
+
+  $pos2 = $pos + strlen($phrase);
+  $str = ($pos - $radius <= 0) ? substr($text, 0, $pos2) :
+    $omission.substr($text, $pos - $radius, $radius + strlen($phrase));
+  $str .= ($pos2 + $radius < strlen($text)) ?
+    substr($text, $pos2, $radius).$omission : substr($text, $pos2);
+  return $str;
 }
 
 function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
