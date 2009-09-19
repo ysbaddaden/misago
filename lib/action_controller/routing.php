@@ -390,8 +390,7 @@ function url_for($options)
   $path .= (empty($query_string) ? '' : '?'.implode('&', $query_string)).
     (empty($options['anchor']) ? '' : "#{$options['anchor']}");
   
-  if ($options['path_only'])
-  {
+  if ($options['path_only']) {
     return $path;
   }
   return cfg::get('base_url').$path;
