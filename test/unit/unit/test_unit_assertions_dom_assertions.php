@@ -5,7 +5,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
-class Test_Unit_Assertions_SelectorAssertions extends Unit_Assertions_SelectorAssertions
+class Test_Unit_Assertions_DomAssertions extends Unit_Assertions_SelectorAssertions
 {
   function test_assert_select()
   {
@@ -22,8 +22,28 @@ class Test_Unit_Assertions_SelectorAssertions extends Unit_Assertions_SelectorAs
     $this->assert_select('text', 'title', 'Welcome');
     $this->assert_select('text', 'head title', 'Welcome');
   }
+  
+  function test_assert_tag()
+  {
+    
+  }
+  
+  function test_assert_no_tag()
+  {
+    
+  }
+  
+  function test_assert_dom_equal()
+  {
+    
+  }
+  
+  function test_assert_dom_equal()
+  {
+    
+  }
 }
 
-new Test_Unit_Assertions_SelectorAssertions();
+new Test_Unit_Assertions_DomAssertions();
 
 ?>

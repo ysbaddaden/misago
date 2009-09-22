@@ -1,6 +1,6 @@
 <?php
 
-class Unit_Assertions_DomAssertions extends Unit_TestCase
+class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
 {
   # HTML strings must be identical, up to attributes.
   function assert_dom_equal($comment, $dom, $expected)

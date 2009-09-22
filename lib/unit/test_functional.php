@@ -1,7 +1,7 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-class Unit_TestFunctional extends Unit_Assertions_ResponseAssertions
+class Unit_TestFunctional extends Unit_TestCase
 {
   # IMPROVE: Start and stop a test server (script/server -p 3009 -e test).
   function __construct()
