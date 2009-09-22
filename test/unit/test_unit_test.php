@@ -97,6 +97,12 @@ class Test_Unit_Test extends Unit_Test
   {
     $this->assert_instance_of('', new FakeClass(), 'FakeClass');
   }
+  
+  function test_match()
+  {
+    $this->assert_match('', '/toto/', 'toto wakes up');
+    $this->assert_no_match('', '/tata/', 'toto wakes up');
+  }
 }
 
 new Test_Unit_Test();

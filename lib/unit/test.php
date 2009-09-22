@@ -106,6 +106,15 @@ class Unit_Test
       array('got' => gettype($var), 'expected' => $type));
   }
   
+  protected function assert_match($comment, $pattern, $text)
+  {
+    $this->assert_true($comment, (bool)preg_match($pattern, $text));
+  }
+  
+  protected function assert_no_match($comment, $pattern, $text)
+  {
+    $this->assert_false($comment, (bool)preg_match($pattern, $text));
+  }
   
   private function return_assert($comment, $test, array $vars)
   {
