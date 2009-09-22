@@ -75,11 +75,11 @@ class Test_ActionController_Base extends Unit_TestCase
     
     $controller = new SayController();
     $html = $controller->render_string(array('xml' => new Product(3)));
-    $this->assert_equal("single resource", trim($html), "<?xml version=\"1.0\"?><product><id>3</id><name><![CDATA[azerty]></name><price>6.95</price><created_at></created_at><updated_at></updated_at><in_stock>1</in_stock><description></description></product>");
+    $this->assert_equal("single resource", trim($html), "<?xml version=\"1.0\"?><product><id>3</id><name><![CDATA[azerty]]></name><price>6.95</price><created_at></created_at><updated_at></updated_at><in_stock>1</in_stock><description></description></product>");
     
     $products = $product->find(':all', array('select' => 'id,name', 'order' => 'id asc', 'limit' => 3));
     $html = $controller->render_string(array('xml' => $products));
-    $this->assert_equal("multiple resources", trim($html), "<?xml version=\"1.0\"?><products><product><id>1</id><name><![CDATA[bepo]></name></product><product><id>2</id><name><![CDATA[qwerty]></name></product><product><id>3</id><name><![CDATA[azerty]></name></product></products>");
+    $this->assert_equal("multiple resources", trim($html), "<?xml version=\"1.0\"?><products><product><id>1</id><name><![CDATA[bepo]]></name></product><product><id>2</id><name><![CDATA[qwerty]]></name></product><product><id>3</id><name><![CDATA[azerty]]></name></product></products>");
   }
 }
 
