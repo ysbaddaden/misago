@@ -29,6 +29,16 @@ class Test_Unit_Assertions_DomAssertions extends Unit_TestCase
     $this->assert_select('', 'article', 1);
   }
   
+  function test_assert_select_with_classnames()
+  {
+    $this->response['body'] = '<html><body><article class="female"></article><article class="male"></article></body></html>';
+    $this->assert_select('', 'article.male', 1);
+    $this->assert_select('', 'article.female', 1);
+    
+    $this->response['body'] = '<html><body><article class="female"></article><article class="profile male"></article></body></html>';
+    $this->assert_select('', 'article.male', 1);
+  }
+  
   function test_assert_tag()
   {
     

@@ -128,9 +128,9 @@ class DOMSelector
     // #foo
     $selector = preg_replace('/\#([\w\-]+)/', '*[@id="\1"]', $selector);
     // div.foo
-    $selector = preg_replace('/([\w\-]+)\.([\w\-]+)/', '\1[contains(@class,"\2")]', $selector);
+    $selector = preg_replace('/([\w\-]+)\.([\w\-]+)/', '\1[contains(concat(" ",@class," ")," \2 ")]', $selector);
     // .foo
-    $selector = preg_replace('/\.([\w\-]+)/', '*[contains(@class,"\1")]', $selector);
+    $selector = preg_replace('/\.([\w\-]+)/', '*[contains(concat(" ",@class," ")," \1 ")]', $selector);
     // div:first-child
     $selector = preg_replace('/([\w\-]+):first-child/', '*/\1[position()=1]', $selector);
     // div:last-child
@@ -152,7 +152,17 @@ class DOMSelector
     // +
     $selector = preg_replace('/\s*\+\s*([\w\-]+)/', '/following-sibling::\1[position()=1]', $selector);
     // ' '
-    $selector = preg_replace('/\s+/', '/descendant::', $selector);
+    
+    $selector = preg_replace(
+      array('/\s+/', '/"\/descendant::"/', '/"\/descendant::/', '/\/descendant::"/'),
+      array('/descendant::', '" "', '" ', ' "'),
+      $selector
+    );
+#    $selector = preg_replace(, '/descendant::', $selector);
+#    $selector = preg_replace(, '" "', $selector);
+#    $selector = preg_replace(, '" ', $selector);
+#    $selector = preg_replace(, ' "', $selector);
+    
     $selector = str_replace(']*', ']', $selector);
     $selector = str_replace(']/*', ']', $selector);
     return $selector;
