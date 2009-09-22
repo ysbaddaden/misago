@@ -1,56 +1,14 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-# IMPROVE: Write assert_template().
-# IMPROVE: Write assert_dom_equal() & assert_dom_not_equal().
-# IMPROVE: Write assert_tag() & assert_not_tag().
-class Unit_FunctionalTest extends Unit_TestCase
+class Unit_TestFunctional extends Unit_Assertions_ResponseAssertions
 {
-  protected $last_action;
-  
   # IMPROVE: Start and stop a test server (script/server -p 3009 -e test).
   function __construct()
   {
     $map = ActionController_Routing::draw();
     $map->build_path_and_url_helpers();
-    
     parent::__construct();
-  }
-  
-  protected function assert_redirected_to($comment, $url)
-  {
-    $location = isset($this->last_action['headers']['location']) ?
-      $this->last_action['headers']['location'] : false;
-    $this->assert_equal($comment, $location, ($url === false) ? false : (string)$url);
-  }
-  
-  protected function assert_response($comment, $status)
-  {
-    $this->assert_equal($comment, $this->last_action['status'], $status);
-  }
-  
-  protected function assert_cookie_presence($comment, $cookie)
-  {
-    $this->assert_true($comment, isset($this->last_action['headers']['cookies'][$cookie]));
-  }
-  
-  protected function assert_cookie_not_present($comment, $cookie)
-  {
-    $this->assert_false($comment, isset($this->last_action['headers']['cookies'][$cookie]));
-  }
-  
-  protected function assert_cookie_equal($comment, $cookie, $expected)
-  {
-    $value = isset($this->last_action['headers']['cookies'][$cookie]) ?
-      $this->last_action['headers']['cookies'][$cookie] : null;
-    $this->assert_equal($comment, $value, $expected);
-  }
-  
-  protected function assert_cookie_not_equal($comment, $cookie, $expected)
-  {
-    $value = isset($this->last_action['headers']['cookies'][$cookie]) ?
-      $this->last_action['headers']['cookies'][$cookie] : null;
-    $this->assert_not_equal($comment, $value, $expected);
   }
   
   # Executes an action on test server.
@@ -147,7 +105,7 @@ class Unit_FunctionalTest extends Unit_TestCase
     }
     
     # gets additional informations
-    $this->last_action = array(
+    $this->response = array(
       'url'        => curl_getinfo($ch, CURLINFO_EFFECTIVE_URL),
       'method'     => $method,
       'postfields' => $postfields,
@@ -157,7 +115,7 @@ class Unit_FunctionalTest extends Unit_TestCase
     );
     
     curl_close($ch);
-    return $this->last_action;
+    return $this->response;
   }
   
   private function & flatten_postfields(&$postfields)

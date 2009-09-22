@@ -1,7 +1,7 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-class Unit_TestCase extends Unit_Test
+class Unit_TestCase extends Unit_Assertions_ModelAssertions
 {
   static public  $batch_run = false;
   static private $_db;

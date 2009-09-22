@@ -1,15 +1,36 @@
 <?php
 
-# Assertions by selecting elements in rendered HTML.
-class Unit_Assertions_SelectorAssertions extends Unit_TestCase
+class Unit_Assertions_DomAssertions extends Unit_TestCase
 {
+  # HTML strings must be identical, up to attributes.
+  function assert_dom_equal($comment, $dom, $expected)
+  {
+    
+  }
+  
+  # Negated form of assert_dom_equal().
+  function assert_dom_not_equal($comment, $dom, $expected)
+  {
+    
+  }
+  
+  function assert_tag($comment, $options=array())
+  {
+    
+  }
+  
+  function assert_no_tag($comment, $options=array())
+  {
+    
+  }
+  
   #   assert_select('on or more forms', 'form')
   #   assert_select('no forms', 'form', false)
   #   assert_select('must contain four articles', 'article', 4)
   #   assert_select('title element must contains "welcome" text', 'head title', 'welcome xxx')
   protected function assert_select($comment, $selector, $equality=true)
   {
-    $elements = $this->css_select($this->last_action['body'], $selector);
+    $elements = $this->css_select($this->response['body'], $selector);
     
     switch (gettype($equality))
     {
