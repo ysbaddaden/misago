@@ -3,13 +3,13 @@
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-require_once dirname(__FILE__)."/../test_app/config/boot.php";
+require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
-class Test_Unit_Assertions_DomAssertions extends Unit_Assertions_SelectorAssertions
+class Test_Unit_Assertions_DomAssertions extends Unit_TestCase
 {
   function test_assert_select()
   {
-    $this->last_action['body'] = '<html><head><title>Welcome</title></head><body><input type="password"/><input class="text"/></body></html>';
+    $this->response['body'] = '<html><head><title>Welcome</title></head><body><input type="password"/><input class="text"/></body></html>';
     
     $this->assert_select('true (implicit)', 'title');
     $this->assert_select('true (explicit)', 'input', true);
@@ -38,7 +38,7 @@ class Test_Unit_Assertions_DomAssertions extends Unit_Assertions_SelectorAsserti
     
   }
   
-  function test_assert_dom_equal()
+  function test_assert_dom_not_equal()
   {
     
   }
