@@ -112,11 +112,10 @@ class ActionView_Helpers_RecordHelper_NS
   
   # Renders a label for a column.
   # 
-  #   form::label('Product', 'in_stock');
-  #   form::label('Product', 'in_stock', 'In stock?');
-  #   form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
-  #   form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
-  #   form::label('Invoice', 'address', array('class' => 'invoice-address'));
+  #   $f->label('in_stock');
+  #   $f->label('in_stock', 'In stock?');
+  #   $f->label('in_stock', 'In stock?', array('class' => 'available'));
+  #   $f->label('address', array('class' => 'invoice-address'));
   function label($column, $text=null, $attributes=null)
   {
     $this->preparse_attributes($attributes);
