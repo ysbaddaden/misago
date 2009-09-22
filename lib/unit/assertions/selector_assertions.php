@@ -3,10 +3,10 @@
 # Assertions by selecting elements in rendered HTML.
 class Unit_Assertions_SelectorAssertions extends Unit_TestCase
 {
-  #   assert_select('at least one form', 'form')
+  #   assert_select('on or more forms', 'form')
   #   assert_select('no forms', 'form', false)
-  #   assert_select('there must be four articles', 'article', 4)
-  #   assert_select('title must contains text', 'head title', 'welcome xxx')
+  #   assert_select('must contain four articles', 'article', 4)
+  #   assert_select('title element must contains "welcome" text', 'head title', 'welcome xxx')
   protected function assert_select($comment, $selector, $equality=true)
   {
     $elements = $this->css_select($this->last_action['body'], $selector);
