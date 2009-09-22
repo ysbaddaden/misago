@@ -24,10 +24,15 @@ class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
     
   }
   
+  # Makes tests on DOM.
+  # 
+  # Attention: HTML/XML must be well formed.
+  # 
   #   assert_select('on or more forms', 'form')
   #   assert_select('no forms', 'form', false)
   #   assert_select('must contain four articles', 'article', 4)
-  #   assert_select('title element must contains "welcome" text', 'head title', 'welcome xxx')
+  #   assert_select('title element must contains "welcome" text', 'head title', 'welcome')
+  #
   protected function assert_select($comment, $selector, $equality=true)
   {
     $elements = $this->css_select($this->response['body'], $selector);
@@ -70,7 +75,7 @@ class DOMSelector
   function __construct($html)
   {
     $this->dom = new DOMDocument();
-    $this->dom->loadHTML($html);
+    $this->dom->loadXML(html_entity_decode($html, ENT_NOQUOTES, 'UTF-8'));
     $this->xpath = new DOMXpath($this->dom);
   }
   

@@ -23,6 +23,12 @@ class Test_Unit_Assertions_DomAssertions extends Unit_TestCase
     $this->assert_select('text', 'head title', 'Welcome');
   }
   
+  function test_assert_select_with_html5()
+  {
+    $this->response['body'] = '<!DOCTYPE html><html><body> <section><article>&nbsp;</article></section> <aside></aside></body></html>';
+    $this->assert_select('', 'article', 1);
+  }
+  
   function test_assert_tag()
   {
     
