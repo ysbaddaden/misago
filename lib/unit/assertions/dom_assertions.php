@@ -112,6 +112,7 @@ class DOMSelector
     return $ary;
   }
   
+  # http://plasmasturm.org/log/444/
   function selector_to_xpath($selector)
   {
     $selector = 'descendant-or-self::' . $selector;
@@ -152,17 +153,11 @@ class DOMSelector
     // +
     $selector = preg_replace('/\s*\+\s*([\w\-]+)/', '/following-sibling::\1[position()=1]', $selector);
     // ' '
-    
     $selector = preg_replace(
       array('/\s+/', '/"\/descendant::"/', '/"\/descendant::/', '/\/descendant::"/'),
       array('/descendant::', '" "', '" ', ' "'),
       $selector
     );
-#    $selector = preg_replace(, '/descendant::', $selector);
-#    $selector = preg_replace(, '" "', $selector);
-#    $selector = preg_replace(, '" ', $selector);
-#    $selector = preg_replace(, ' "', $selector);
-    
     $selector = str_replace(']*', ']', $selector);
     $selector = str_replace(']/*', ']', $selector);
     return $selector;
