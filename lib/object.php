@@ -65,6 +65,11 @@ abstract class Object
   {
     return $this->to_s();
   }
+  
+  function to_array()
+  {
+    return $this->to_s();
+  }
 }
 
 ?>

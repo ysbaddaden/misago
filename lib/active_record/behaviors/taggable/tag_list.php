@@ -99,6 +99,12 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     $_options['conditions'] = $this->find_conditions($tags, $match_all);
     $_options['select'] = "distinct({$this->parent->table_name}.{$this->parent->primary_key}), {$this->parent->table_name}.*";
     $_options['joins']  = $this->assoc['name'];
+    
+    $assoc_name = $this->assoc['class_name'];
+    $assoc = new $assoc_name();
+    if (!empty($assoc->taggable_scope)) {
+      $_options = $this->parent->merge_options($assoc->taggable_scope, $_options);
+    }
     return $this->parent->merge_options($options, $_options);
   }
   
@@ -143,7 +149,13 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
       'order'  => "count(distinct({$this->parent->table_name}.{$this->parent->primary_key})) desc",
       'unique' => true,
     );
-    return $this->parent->merge_options($_options, $options);
+    
+    $assoc_name = $this->assoc['class_name'];
+    $assoc = new $assoc_name();
+    if (!empty($assoc->taggable_scope)) {
+      $_options = $this->parent->merge_options($assoc->taggable_scope, $_options);
+    }
+    return $this->parent->merge_options($options, $_options);
   }
 }
 

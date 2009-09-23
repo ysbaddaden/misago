@@ -25,11 +25,7 @@ class ActiveArray extends ArrayObject
   # Exports to a JSON string.
   function to_json()
   {
-    $data = array();
-    foreach($this as $v) {
-      $data[] = $v->to_json();
-    }
-    return json_encode($data);
+    return json_encode($this->to_array());
   }
   
   # Exports to an XML string.
@@ -41,6 +37,16 @@ class ActiveArray extends ArrayObject
     }
     $plural = String::pluralize(String::underscore($this->model));
     return "<$plural>$xml</$plural>";
+  }
+  
+  # Exports as array.
+  function to_array()
+  {
+    $ary = array();
+    foreach($this as $v) {
+      $ary[] = $v->to_array();
+    }
+    return $ary;
   }
 }
 

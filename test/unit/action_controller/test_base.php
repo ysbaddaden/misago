@@ -74,12 +74,18 @@ class Test_ActionController_Base extends Unit_TestCase
     $product = new Product();
     
     $controller = new SayController();
-    $html = $controller->render_string(array('xml' => new Product(3)));
-    $this->assert_equal("single resource", trim($html), "<?xml version=\"1.0\"?><product><id>3</id><name><![CDATA[azerty]]></name><price>6.95</price><created_at></created_at><updated_at></updated_at><in_stock>1</in_stock><description></description></product>");
+    $xml = $controller->render_string(array('xml' => new Product(3)));
+    $this->assert_equal("single resource as XML", $xml, "<?xml version=\"1.0\"?><product><id>3</id><name><![CDATA[azerty]]></name><price>6.95</price><created_at></created_at><updated_at></updated_at><in_stock>1</in_stock><description></description></product>");
+    
+    $json = $controller->render_string(array('json' => new Product(3)));
+    $this->assert_equal("single resource as JSON", $json, '{"id":3,"name":"azerty","price":6.95,"created_at":null,"updated_at":null,"in_stock":true,"description":null}');
     
     $products = $product->find(':all', array('select' => 'id,name', 'order' => 'id asc', 'limit' => 3));
-    $html = $controller->render_string(array('xml' => $products));
-    $this->assert_equal("multiple resources", trim($html), "<?xml version=\"1.0\"?><products><product><id>1</id><name><![CDATA[bepo]]></name></product><product><id>2</id><name><![CDATA[qwerty]]></name></product><product><id>3</id><name><![CDATA[azerty]]></name></product></products>");
+    $xml = $controller->render_string(array('xml' => $products));
+    $this->assert_equal("multiple resources as XML", $xml, "<?xml version=\"1.0\"?><products><product><id>1</id><name><![CDATA[bepo]]></name></product><product><id>2</id><name><![CDATA[qwerty]]></name></product><product><id>3</id><name><![CDATA[azerty]]></name></product></products>");
+    
+    $json = $controller->render_string(array('json' => $products));
+    $this->assert_equal("multiple resources as JSON", $json, '[{"id":1,"name":"bepo"},{"id":2,"name":"qwerty"},{"id":3,"name":"azerty"}]');
   }
 }
 
