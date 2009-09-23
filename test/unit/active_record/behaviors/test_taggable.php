@@ -78,6 +78,23 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
     $this->assert_equal("we may have multiple tags (matching all)", $posts->count(), 1);
   }
   
+  function test_count_with_tags()
+  {
+    $post = new Post();
+    
+    $count = $post->count_with_tags('php');
+    $this->assert_equal('', $count, 2);
+    
+    $count = $post->count_with_tags('javascript');
+    $this->assert_equal("we got one result", $count, 1);
+    
+    $count = $post->count_with_tags('php,framework');
+    $this->assert_equal("we may have multiple tags (matching any)", $count, 2);
+    
+    $count = $post->count_with_tags('php,framework', array('match_all' => true));
+    $this->assert_equal("we may have multiple tags (matching all)", $count, 1);
+  }
+  
   function test_tag_count()
   {
     $post = new Post();

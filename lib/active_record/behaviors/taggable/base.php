@@ -37,6 +37,7 @@ class ActiveRecord_Behaviors_Taggable_Base
     );
     $functions  = array(
       "find_with_{$plural}" => 'find_tagged_with',
+      "count_with_{$plural}" => 'count_tagged_with',
       "{$singular}_count"   => 'tag_count',
     );
     $this->parent->map_module($this, $attributes, $functions);
@@ -75,9 +76,20 @@ class ActiveRecord_Behaviors_Taggable_Base
     return new ActiveArray(array(), get_class($this->parent));
   }
   
+  function count_tagged_with($tags, $options=array())
+  {
+    $tags = array_collection($tags);
+    if (!empty($tags))
+    {
+      $options = $this->tag_list->count_options($tags, $options);
+      return $this->parent->count($options);
+    }
+    return 0;
+  }
+  
   function & tag_count($options=array())
   {
-    $options = $this->tag_list->count_options($options);
+    $options = $this->tag_list->tag_count_options($options);
     $tags = $this->parent->count($options);
     ksort($tags);
     return $tags;

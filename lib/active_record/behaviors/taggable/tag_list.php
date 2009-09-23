@@ -140,7 +140,16 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   }
   
   # @private
-  function & count_options($options)
+  function & count_options($tags, $options)
+  {
+    $options = $this->find_options($tags, $options);
+    $options['select']   = "{$this->parent->table_name}.{$this->parent->primary_key}";
+    $options['distinct'] = true;
+    return $options;
+  }
+  
+  # @private
+  function & tag_count_options($options)
   {
     $_options = array(
       'select' => "{$this->parent->table_name}.{$this->parent->primary_key}",
