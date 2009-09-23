@@ -76,7 +76,7 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
     foreach($results as $rs)
     {
       $rs = array_values($rs);
-      $values[$rs[0]] = $rs[1];
+      $values[$rs[0]] = ($operation == 'count') ? (int)$rs[1] : $rs[1];
     }
     return $values;
   }
@@ -84,7 +84,8 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
   private function execute_simple_calculation($operation, $column, &$options)
   {
     $sql = $this->build_sql_from_options($options);
-    return $this->db->select_value($sql);
+    $rs  = $this->db->select_value($sql);
+    return ($operation == 'count') ? (int)$rs : $rs;
   }
 }
 

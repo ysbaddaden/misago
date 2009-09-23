@@ -11,21 +11,26 @@ class Test_ActiveRecord_Calculations extends Unit_TestCase
     $this->fixtures('posts,tags,products');
     
     $post = new Post();
-    $this->assert_equal('with data', $post->count(), '3');
-    $this->assert_equal('with column name', $post->count('id'), '3');
+    $this->assert_equal('with data', $post->count(), 3);
+    $this->assert_equal('with column name', $post->count('id'), 3);
     
     $value = $post->count(array(
       'joins'      => 'tags',
       'conditions' => array('tag' => array('php', 'framework')),
     ));
-    $this->assert_equal('with options', $value, '3');
+    $this->assert_equal('with options', $value, 3);
     
     $value = $post->count('posts.id', array(
       'joins'      => 'tags',
       'conditions' => array('tag' => array('php', 'framework')),
       'distinct'   => true,
     ));
-    $this->assert_equal('with options and distinct column name', $value, '2');
+    $this->assert_equal('with options and distinct column name', $value, 2);
+  }
+  
+  function test_grouped_count()
+  {
+    
   }
   
   function test_maximum()
