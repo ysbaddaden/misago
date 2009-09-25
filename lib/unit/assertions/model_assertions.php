@@ -3,7 +3,7 @@
 class Unit_Assertions_ModelAssertions extends Unit_Test
 {
   # Ensures ActiveRecord is valid, otherwise displays list of errors.
-  function assert_valid($comment, $record)
+  function assert_valid($record, $comment='')
   {
     $this->count_assertions += 1;
     

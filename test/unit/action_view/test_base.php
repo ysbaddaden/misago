@@ -1,13 +1,9 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 require_once ROOT."/app/controllers/application.php";
-
 
 class Test_ActionView_Base extends Unit_Test
 {
@@ -18,11 +14,11 @@ class Test_ActionView_Base extends Unit_Test
     
     $html = $view->render(array('action' => 'hello', 'format' => 'html'));
     $html = str_replace(array("\n", "\r"), '', trim($html));
-    $this->assert_equal('passing options', trim($html), '<p>Hello world!</p>');
+    $this->assert_equal(trim($html), '<p>Hello world!</p>');
     
     $html = $view->render(array('action' => 'hello'));
     $html = str_replace(array("\n", "\r"), '', trim($html));
-    $this->assert_equal('not passing format', trim($html), '<p>Hello world!</p>');
+    $this->assert_equal(trim($html), '<p>Hello world!</p>', 'format defaults to html');
   }
   
   function test_render_view_with_layout()
@@ -36,7 +32,7 @@ class Test_ActionView_Base extends Unit_Test
       'format' => 'xml',
     ));
     $xml = str_replace(array("\n", "\r"), '', trim($xml));
-    $this->assert_equal('', $xml, "<say><message>hello world</message></say>");
+    $this->assert_equal($xml, "<say><message>hello world</message></say>");
   }
   
   function test_template_not_found()
@@ -52,7 +48,7 @@ class Test_ActionView_Base extends Unit_Test
     catch(MisagoException $e) {
       $result = false;
     }
-    $this->assert_false('view template', $result);
+    $this->assert_false($result, 'rendered a view template');
     
     try
     {
@@ -62,7 +58,7 @@ class Test_ActionView_Base extends Unit_Test
     catch(MisagoException $e) {
       $result = false;
     }
-    $this->assert_false('partial template', $result);
+    $this->assert_false($result, 'rendered a partial template');
   }
   
   function test_copy_vars()
@@ -78,14 +74,14 @@ class Test_ActionView_Base extends Unit_Test
       'action' => 'hello_who',
       'format' => 'html',
     ));
-    $this->assert_equal('', $controller->who, $view->who);
+    $this->assert_equal($controller->who, $view->who);
   }
   
   function test_yield()
   {
     $view = new ActionView_Base();
     $view->yield('content', 'some content');
-    $this->assert_equal('', $view->yield('content'), 'some content');
+    $this->assert_equal($view->yield('content'), 'some content');
   }
   
   function test_render_partial()
@@ -96,14 +92,14 @@ class Test_ActionView_Base extends Unit_Test
     
     # rendering a partial
     $html = $view->render(array('partial' => 'form'));
-    $this->assert_equal('simple', trim($html), '<form></form>');
+    $this->assert_equal(trim($html), '<form></form>');
     
     # rendering a partial + passing some locals
     $html = $view->render(array(
       'partial' => 'form',
       'locals'  => array('var' => 'a string'),
     ));
-    $this->assert_equal('passing locals', trim($html), '<form>a string</form>');
+    $this->assert_equal(trim($html), '<form>a string</form>');
     
     # rendering a collection of partials
     $html = $view->render(array(
@@ -111,11 +107,11 @@ class Test_ActionView_Base extends Unit_Test
       'collection' => array('aaa', 'bbb', 'ccc'),
     ));
     $html = str_replace(array("\r", "\n"), '', trim($html));
-    $this->assert_equal('collection of partials', $html, '<li>1: aaa</li><li>2: bbb</li><li>3: ccc</li>');
+    $this->assert_equal($html, '<li>1: aaa</li><li>2: bbb</li><li>3: ccc</li>');
     
     # rendering a shared partial
     $html = $view->render(array('partial' => 'ads/ad'));
-    $this->assert_equal('shared partial', trim($html), '<ad></ad>');
+    $this->assert_equal(trim($html), '<ad></ad>');
     
     # rendering a collection of shared partials
 #    $view = new ActionView_Base();
@@ -126,7 +122,7 @@ class Test_ActionView_Base extends Unit_Test
       'collection' => array('aaa', 'bbb', 'ddd'),
     ));
     $html = str_replace(array("\r", "\n"), '', trim($html));
-    $this->assert_equal('collection of partials', $html, '<li>1: aaa</li><li>2: bbb</li><li>3: ddd</li>');
+    $this->assert_equal($html, '<li>1: aaa</li><li>2: bbb</li><li>3: ddd</li>');
   }
 }
 

@@ -62,22 +62,22 @@ class Unit_Test
     echo Terminal::colorize($text, ($this->count_failures + $this->count_errors) ? 'RED' : 'GREEN')."\n";
   }
   
-  protected function assert_true($comment, $arg)
+  protected function assert_true($arg, $comment='')
   {
     $this->return_assert($comment, $arg === true, array('got' => $arg, 'expected' => true));
   }
   
-  protected function assert_false($comment, $arg)
+  protected function assert_false($arg, $comment='')
   {
     $this->return_assert($comment, $arg === false, array('got' => $arg, 'expected' => false));
   }
   
-  protected function assert_null($comment, $arg)
+  protected function assert_null($arg, $comment='')
   {
     $this->return_assert($comment, $arg === null, array('got' => $arg, 'expected' => null));
   }
   
-  protected function assert_equal($comment, $test, $expect)
+  protected function assert_equal($test, $expect, $comment='')
   {
     if (is_array($test) and !is_hash($test))
     {
@@ -88,32 +88,32 @@ class Unit_Test
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
-  protected function assert_not_equal($comment, $test, $expect)
+  protected function assert_not_equal($test, $expect, $comment='')
   {
     $success = (is_array($test) or is_object($test)) ? ($test != $expect) : ($test !== $expect);
     $this->return_assert($comment, $success, array('got' => $test, 'expected' => $expect));
   }
   
-  protected function assert_instance_of($comment, $object, $classname)
+  protected function assert_instance_of($object, $classname, $comment='')
   {
     $this->return_assert($comment, $object instanceof $classname,
       array('got' => get_class($object), 'expected' => $classname));
   }
   
-  protected function assert_type($comment, $var, $type)
+  protected function assert_type($var, $type, $comment='')
   {
     $this->return_assert($comment, gettype($var) === $type,
       array('got' => gettype($var), 'expected' => $type));
   }
   
-  protected function assert_match($comment, $pattern, $text)
+  protected function assert_match($pattern, $text, $comment='')
   {
-    $this->assert_true($comment, (bool)preg_match($pattern, $text));
+    $this->assert_true((bool)preg_match($pattern, $text), $comment);
   }
   
-  protected function assert_no_match($comment, $pattern, $text)
+  protected function assert_no_match($pattern, $text, $comment='')
   {
-    $this->assert_false($comment, (bool)preg_match($pattern, $text));
+    $this->assert_false((bool)preg_match($pattern, $text), $comment);
   }
   
   private function return_assert($comment, $test, array $vars)
@@ -137,7 +137,7 @@ class Unit_Test
       
       # failure
       $this->count_failures += 1;
-      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment);
+      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment='');
       printf(Terminal::colorize("  expected:", 'BOLD')." %s\n", $str_expected);
       printf(Terminal::colorize("       got:", 'BOLD')." %s\n", $str_got);
     }

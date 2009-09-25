@@ -10,40 +10,39 @@ class Test_ActiveRecord_Ephemeral extends Unit_TestCase
   function test_construct()
   {
     $contact = new Contact();
-    $this->assert_equal('empty', $contact->attributes(), array());
+    $this->assert_equal($contact->attributes(), array());
     
     $contact->subject = 'some subject';
-    $this->assert_equal('added attribute', $contact->attributes(), array('subject' => "some subject"));
+    $this->assert_equal($contact->attributes(), array('subject' => "some subject"));
     
     $contact->message = 'an important message';
-    $this->assert_equal('added another attribute', $contact->attributes(),
-      array('subject' => "some subject", 'message' => 'an important message'));
+    $this->assert_equal($contact->attributes(), array('subject' => "some subject", 'message' => 'an important message'));
   }
   
   function test_human_name()
   {
     $contact = new Contact();
-    $this->assert_equal('', $contact->human_name(), "Contact");
+    $this->assert_equal($contact->human_name(), "Contact");
   }
   
   function test_human_attribute_name()
   {
     $contact = new Contact();
-    $this->assert_equal('', $contact->human_attribute_name('subject'), "Subject");
-    $this->assert_equal('', $contact->human_attribute_name('from_name'), "Your name");
+    $this->assert_equal($contact->human_attribute_name('subject'), "Subject");
+    $this->assert_equal($contact->human_attribute_name('from_name'), "Your name");
   }
   
   function test_validate()
   {
     $contact = new Contact();
-    $this->assert_false('missing required attributes', $contact->is_valid());
+    $this->assert_false($contact->is_valid(), 'missing required attributes');
     
     $contact = new Contact(array('subject' => 'aaa', 'message' => 'bbb', 'from_name' => 'ccc', 'from_email' => 'toto@domain.com'));
-    $this->assert_true('all required attributes are defined', $contact->is_valid());
+    $this->assert_true($contact->is_valid(), 'all required attributes are defined');
     
     $contact = new Contact(array('subject' => str_repeat('a', 150)));
     $contact->is_valid();
-    $this->assert_true('testing columns definition (limit)', $contact->errors->is_invalid('subject'));
+    $this->assert_true($contact->errors->is_invalid('subject'), 'testing columns definition (limit)');
   }
 }
 

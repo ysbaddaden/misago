@@ -9,12 +9,12 @@ class Test_Additions extends Unit_Test
 {
   function test_is_blank()
   {
-    $this->assert_true("empty string", is_blank(''));
-    $this->assert_true("space", is_blank(' '));
-    $this->assert_true("\\n\\t", is_blank("\n\t"));
-    $this->assert_false("", is_blank(" t "));
-    $this->assert_false("", is_blank("\nt \n\t"));
-    $this->assert_false("", is_blank(0));
+    $this->assert_true(is_blank(''));
+    $this->assert_true(is_blank(' '));
+    $this->assert_true(is_blank("\n\t"));
+    $this->assert_false(is_blank(" t "));
+    $this->assert_false(is_blank("\nt \n\t"));
+    $this->assert_false(is_blank(0));
   }
 }
 

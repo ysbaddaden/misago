@@ -3,23 +3,23 @@
 class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
 {
   # HTML strings must be identical, up to attributes.
-  function assert_dom_equal($comment, $dom, $expected)
+  function assert_dom_equal($dom, $expected, $comment='')
   {
     
   }
   
   # Negated form of assert_dom_equal().
-  function assert_dom_not_equal($comment, $dom, $expected)
+  function assert_dom_not_equal($dom, $expected, $comment='')
   {
     
   }
   
-  function assert_tag($comment, $options=array())
+  function assert_tag($options=array(), $comment='')
   {
     
   }
   
-  function assert_no_tag($comment, $options=array())
+  function assert_no_tag($options=array(), $comment='')
   {
     
   }
@@ -34,7 +34,7 @@ class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
   #   assert_select('2 articles with class foo', 'article.foo', 2)
   #   assert_select('title element must contains "welcome" text', 'head title', 'welcome')
   #
-  protected function assert_select($comment, $selector, $equality=true)
+  protected function assert_select($selector, $equality=true, $comment='')
   {
     $elements = $this->css_select($this->response['body'], $selector);
     
@@ -43,13 +43,13 @@ class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
       case 'boolean':
         switch($equality)
         {
-          case true:  $this->assert_true($comment, count($elements) > 0); break;
-          case false: $this->assert_equal($comment, count($elements), 0); break;
+          case true:  $this->assert_true(count($elements) > 0, $comment=''); break;
+          case false: $this->assert_equal(count($elements), 0, $comment=''); break;
         }
       break;
       
       case 'integer':
-        $this->assert_equal($comment, count($elements), $equality);
+        $this->assert_equal(count($elements), $equality, $comment='');
       break;
       
       case 'string':
@@ -57,7 +57,7 @@ class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
         foreach($elements as $elm) {
           $text .= $elm['text'];
         }
-        $this->assert_match($comment, '/'.preg_quote($equality).'/', $text);
+        $this->assert_match('/'.preg_quote($equality).'/', $text, $comment='');
       break;
     }
   }

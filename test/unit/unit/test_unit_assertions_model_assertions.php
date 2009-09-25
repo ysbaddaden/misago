@@ -10,7 +10,7 @@ class Test_Unit_Assertions_ModelAssertions extends Unit_TestCase
   function test_assert_valid()
   {
     $product = new Product(array('name' => 'keyboard', 'price' => 6.0));
-    $this->assert_valid('', $product);
+    $this->assert_valid($product);
   }
 }
 

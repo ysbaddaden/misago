@@ -23,18 +23,18 @@ class Test_ActiveRecord_Record extends Unit_TestCase
   {
     $record = new FakeRecord();
     
-    $this->assert_equal("__set", $record->id = 123, 123);
-    $this->assert_equal("__get", $record->id, 123);
+    $this->assert_equal($record->id = 123, 123);
+    $this->assert_equal($record->id, 123);
     
-    $this->assert_true("id is set", isset($record->id));
-    $this->assert_false("title isn't set", isset($record->title));
+    $this->assert_true(isset($record->id));
+    $this->assert_false(isset($record->title), "title isn't set yet");
     
     unset($record->id);
-    $this->assert_false("id has been unset", isset($record->id));
+    $this->assert_false(isset($record->id));
     
     $record->ary = array();
-    $this->assert_true("attribute set to empty array is set", isset($record->ary));
-    $this->assert_true("attribute set to empty array is empty", empty($record->ary));
+    $this->assert_true(isset($record->ary), "attribute set as empty array is set");
+    $this->assert_true(empty($record->ary), "attribute set as empty array is empty");
   }
   
   function test_iterates()
@@ -48,48 +48,47 @@ class Test_ActiveRecord_Record extends Unit_TestCase
       $data[$attribute] = $value;
     }
     
-    $this->assert_equal("must iterate throught virtual attributes only",
-      $data, array('id' => 123, 'title' => 'a'));
+    $this->assert_equal($data, array('id' => 123, 'title' => 'a'), "must iterate throught virtual attributes only");
   }
   
   function test_dirty_object()
   {
     $product = new Product();
-    $this->assert_false('new & empty: model', $product->changed);
-    $this->assert_false('new & empty: attribute', $product->name_changed);
+    $this->assert_false($product->changed);
+    $this->assert_false($product->name_changed);
     
     $product = new Product(array('name' => 'qwerty', 'price' => 50));
-    $this->assert_false('new: model', $product->changed);
-    $this->assert_false('new: attribute', $product->name_changed);
+    $this->assert_false($product->changed);
+    $this->assert_false($product->name_changed);
     
     $product->name = 'azerty';
-    $this->assert_true("model has changed", $product->changed);
-    $this->assert_true("attribute has changed", $product->name_changed);
-    $this->assert_false("unchanged attribute", $product->price_changed);
-    $this->assert_equal("original attribute value", $product->name_was, 'qwerty');
-    $this->assert_equal("original+new attribute value", $product->name_change, array('qwerty', 'azerty'));
+    $this->assert_true($product->changed, "model has changed");
+    $this->assert_true($product->name_changed, "attribute has changed");
+    $this->assert_false($product->price_changed, "unchanged attribute");
+    $this->assert_equal($product->name_was, 'qwerty', "original attribute value");
+    $this->assert_equal($product->name_change, array('qwerty', 'azerty'), "original+new attribute value");
     
     $product->name = 'swerty';
-    $this->assert_equal("other change: original is still the same", $product->name_was, 'qwerty');
-    $this->assert_equal("other change: new has changed", $product->name_change, array('qwerty', 'swerty'));
+    $this->assert_equal($product->name_was, 'qwerty', "other change: original is still the same");
+    $this->assert_equal($product->name_change, array('qwerty', 'swerty'), "other change: new has changed");
     
     $product->save();
-    $this->assert_false("saving resets state on model", $product->changed);
-    $this->assert_false("saving resets state on attributes", $product->name_changed);
+    $this->assert_false($product->changed, "saving resets state on model");
+    $this->assert_false($product->name_changed, "saving resets state on attributes");
     
     $product->name = 'swerty';
-    $this->assert_false("model didn't change (assigned same value)", $product->changed);
-    $this->assert_false("attribute state didn't change", $product->name_changed);
-    $this->assert_equal("attribute didn't change", $product->name_change, null);
+    $this->assert_false($product->changed, "model didn't change (assigned same value)");
+    $this->assert_false($product->name_changed, "attribute state didn't change");
+    $this->assert_equal($product->name_change, null, "attribute didn't change");
     
     $product->name = 'azerty';
     $product->name = 'swerty';
-    $this->assert_false("model previously changed, but came back to original", $product->changed);
-    $this->assert_false("attribute state still hasn't change", $product->name_changed);
+    $this->assert_false($product->changed, "model previously changed, but came back to original");
+    $this->assert_false($product->name_changed, "attribute state still hasn't change");
     
     $product->price = 16;
     $product->name  = 'swerty';
-    $this->assert_true("assigning same value, but another attribute has changed", $product->changed);
+    $this->assert_true($product->changed, "assigning same value, but another attribute has changed");
   }
   
   function test_changes_and_changed()
@@ -97,12 +96,12 @@ class Test_ActiveRecord_Record extends Unit_TestCase
     $product = new Product(array('name' => 'aze', 'price' => 15));
     
     $product->name = 'rty';
-    $this->assert_equal('', $product->changes(), array('name' => 'rty'));
-    $this->assert_equal('', $product->changed(), array('name'));
+    $this->assert_equal($product->changes(), array('name' => 'rty'));
+    $this->assert_equal($product->changed(), array('name'));
     
     $product->price = 99;
-    $this->assert_equal('', $product->changes(), array('name' => 'rty', 'price' => 99));
-    $this->assert_equal('', $product->changed(), array('name', 'price'));
+    $this->assert_equal($product->changes(), array('name' => 'rty', 'price' => 99));
+    $this->assert_equal($product->changed(), array('name', 'price'));
   }
 }
 

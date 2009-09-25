@@ -34,13 +34,13 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
       'username' => 'postgres',
       'password' => '',
     ));
-    $this->assert_false("not connected by default", $db->is_active());
+    $this->assert_false($db->is_active(), "not connected by default");
     
     $db->connect();
-    $this->assert_true("connect", $db->is_active());
+    $this->assert_true($db->is_active(), "connect");
     
     $db->disconnect();
-    $this->assert_false("disconnect", $db->is_active());
+    $this->assert_false($db->is_active(), "disconnect");
   }
   
   function test_select_database()
@@ -52,10 +52,10 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     catch(ActiveRecord_StatementInvalid $e) {
       $rs = false;
     }
-    $this->assert_false("database doesn't exists", $rs);
+    $this->assert_false($rs, "database doesn't exists");
     
     $rs = $this->db->select_database('misago_test');
-    $this->assert_true("database exists", $rs);
+    $this->assert_true($rs, "database exists");
   }
   */
   
@@ -67,26 +67,26 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
   function test_execute()
   {
     $rs = $this->db->execute("SELECT VERSION() ;");
-    $this->assert_true("must return a resource", is_resource($rs));
+    $this->assert_true(is_resource($rs));
   }
   
   function test_create_database()
   {
     $options = array("charset" => 'utf8');
     $rs = $this->db->create_database('misago_test', $options);
-    $this->assert_true("", $rs ? true : false);
+    $this->assert_true($rs ? true : false);
   }
   
   function test_database_exists()
   {
-    $this->assert_true("database exists", $this->db->database_exists('misago_test'));
-    $this->assert_false("database doesn't exists", $this->db->database_exists('some_unknown_database'));
+    $this->assert_true($this->db->database_exists('misago_test'));
+    $this->assert_false($this->db->database_exists('some_unknown_database'));
   }
   
   function test_drop_database()
   {
     $rs = $this->db->drop_database('misago_test');
-    $this->assert_true("", $rs ? true : false);
+    $this->assert_true($rs ? true : false);
   }
   
   function test_create_table()
@@ -103,7 +103,7 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     $t->add_timestamps();
     $rs = $t->create();
     
-    $this->assert_true("", $rs ? true : false);
+    $this->assert_true($rs ? true : false);
   }
   
   function test_columns_for_unknown_table()
@@ -116,14 +116,14 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     catch(ActiveRecord_StatementInvalid $e) {
       $failed = true;
     }
-    $this->assert_true('must have failed', $failed);
+    $this->assert_true($failed);
   }
   
   function test_columns()
   {
     $columns = $this->db->columns('objects');
     
-    $this->assert_equal("", $columns, array(
+    $this->assert_equal($columns, array(
       'id'          => array('primary_key' => true, 'type' => 'integer', 'null' => false, 'limit' => 4),
       'title'       => array('type' => 'string',   'null' => false, 'limit' => 100),
       'price'       => array('type' => 'decimal',  'null' => true),
@@ -141,7 +141,7 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     $this->db->add_column('objects', 'in_stock', 'boolean');
     
     $columns = $this->db->columns('objects');
-    $this->assert_equal("", $columns, array(
+    $this->assert_equal($columns, array(
       'id'          => array('primary_key' => true, 'type' => 'integer', 'null' => false, 'limit' => 4),
       'title'       => array('type' => 'string',   'limit' => 100, 'null' => false),
       'price'       => array('type' => 'decimal',  'null' => true),
@@ -158,23 +158,23 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
   function test_insert()
   {
     $rs = $this->db->insert('objects', array('title' => 'azerty'));
-    $this->assert_true("must succeed", $rs);
+    $this->assert_true($rs);
     
     # disabled, because pg_query() triggers an annoying warning that you can't catch
 #    $rs = $this->db->insert('objects', array('released_at' => date('Y-m-d')));
 #    $this->assert_false("must fail", $rs);
     
     $rs = $this->db->insert('objects', array('title' => 'qwerty'));
-    $this->assert_true("must succeed", $rs);
+    $this->assert_true($rs);
   }
   
   function test_select_all()
   {
     $rs = $this->db->select_all("SELECT title FROM objects WHERE id = 1 ;");
-    $this->assert_equal("", $rs, array(array('title' => 'azerty')));
+    $this->assert_equal($rs, array(array('title' => 'azerty')));
     
     $rs = $this->db->select_all("SELECT title FROM objects ;");
-    $this->assert_equal("", $rs, array(
+    $this->assert_equal($rs, array(
       array('title' => 'azerty'),
       array('title' => 'qwerty'),
     ));
@@ -183,40 +183,40 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
   function test_select_one()
   {
     $rs = $this->db->select_one("SELECT title FROM objects WHERE id = 1 ;");
-    $this->assert_equal("", $rs, array('title' => 'azerty'));
+    $this->assert_equal($rs, array('title' => 'azerty'));
     
     $rs = $this->db->select_one("SELECT title FROM objects LIMIT 1 OFFSET 1 ;");
-    $this->assert_equal("", $rs, array('title' => 'qwerty'));
+    $this->assert_equal($rs, array('title' => 'qwerty'));
   }
   
   function test_select_value()
   {
     $rs = $this->db->select_value("SELECT title FROM objects WHERE id = 1 ;");
-    $this->assert_equal("", $rs, 'azerty');
+    $this->assert_equal($rs, 'azerty');
   }
   
   function test_select_values()
   {
     $rs = $this->db->select_values("SELECT title FROM objects ;");
-    $this->assert_equal("", $rs, array('azerty', 'qwerty'));
+    $this->assert_equal($rs, array('azerty', 'qwerty'));
   }
   
   function test_insert_returning()
   {
     $id = $this->db->insert('objects', array('title' => 'qwerty'), 'id');
-    $this->assert_equal("", $id, 3);
+    $this->assert_equal($id, 3);
   }
   
   function test_table_exists()
   {
-    $this->assert_true("table exists", $this->db->table_exists('objects'));
-    $this->assert_false("table doesn't exists", $this->db->table_exists('unknown_table'));
+    $this->assert_true($this->db->table_exists('objects'));
+    $this->assert_false($this->db->table_exists('unknown_table'));
   }
   
   function test_drop_table()
   {
     $rs = $this->db->drop_table('objects');
-    $this->assert_true("", $rs ? true : false);
+    $this->assert_true($rs ? true : false);
   }
 }
 

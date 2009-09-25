@@ -15,14 +15,14 @@ class Test_ActionController_Flash extends Unit_Test
     $flash['notice']  = 'some message';
     $flash['message'] = array('toto' => 'data');
     
-    $this->assert_true('notice was set', isset($flash['notice']));
-    $this->assert_true('message was set', isset($flash['message']));
-    $this->assert_equal('must return notice value', $flash['notice'],  'some message');
-    $this->assert_equal('value can be whatever', $flash['message'], array('toto' => 'data'));
+    $this->assert_true(isset($flash['notice']));
+    $this->assert_true(isset($flash['message']));
+    $this->assert_equal($flash['notice'],  'some message', 'returns notice value');
+    $this->assert_equal($flash['message'], array('toto' => 'data'), 'value can be whatever');
     
     unset($flash['notice']);
-    $this->assert_false('notice was removed from hash', isset($flash['notice']));
-    $this->assert_true('message is still available', isset($flash['message']));
+    $this->assert_false(isset($flash['notice']), 'notice was removed from hash');
+    $this->assert_true(isset($flash['message']), 'message is still available');
     
     $flash->discard();
   }
@@ -36,9 +36,9 @@ class Test_ActionController_Flash extends Unit_Test
     unset($flash);
     
     $flash = new ActionController_Flash();
-    $this->assert_true('data persisted to the next query', isset($flash['notice']));
-    $this->assert_equal("data musn't have been modified", $flash['notice'], 'my message');
-    $this->assert_equal("you may pass anything remember?", $flash['ary'], array('hash'));
+    $this->assert_true(isset($flash['notice']), 'data persisted to the next query');
+    $this->assert_equal($flash['notice'], 'my message', "data musn't have been modified");
+    $this->assert_equal($flash['ary'], array('hash'), "you may pass anything, remember?");
     
     $flash->discard();
   }
@@ -51,12 +51,12 @@ class Test_ActionController_Flash extends Unit_Test
     
     $flash = new ActionController_Flash();
     $flash['message'] = 'another message';
-    $this->assert_true("data persisted to this 2nd request", isset($flash['notice']));
+    $this->assert_true(isset($flash['notice']), "data persisted to this 2nd request");
     unset($flash);
     
     $flash = new ActionController_Flash();
-    $this->assert_false("data persistance is limited to the next query only", isset($flash['notice']));
-    $this->assert_true("but I must be able to access the data from the previous request", isset($flash['message']));
+    $this->assert_false(isset($flash['notice']), "data persistance is limited to the next query only");
+    $this->assert_true(isset($flash['message']), "but I must be able to access the data from the previous request");
     
     $flash->discard();
   }
@@ -72,7 +72,7 @@ class Test_ActionController_Flash extends Unit_Test
     unset($flash);
     
     $flash = new ActionController_Flash();
-    $this->assert_true("data persisted to this 3rd request!", isset($flash['notice']));
+    $this->assert_true(isset($flash['notice']), "data persisted to this 3rd request!");
     
     $flash->discard();
   }
@@ -83,23 +83,23 @@ class Test_ActionController_Flash extends Unit_Test
     $flash['notice']  = 'aaa';
     $flash['error']   = 'bbb';
     $flash['message'] = 'ccc';
-    $this->assert_true('notice was set', isset($flash));
+    $this->assert_true(isset($flash));
 
     $flash->discard('notice');
-    $this->assert_false('notice was discarded', isset($flash['notice']));
+    $this->assert_false(isset($flash['notice']), 'notice was discarded');
     
     unset($flash);
     $flash = new ActionController_Flash();
-    $this->assert_false('notice is still discarded', isset($flash['notice']));
-    $this->assert_equal('there are 2 variables left', $flash->count(), 2);
+    $this->assert_false(isset($flash['notice']), 'notice is still discarded');
+    $this->assert_equal($flash->count(), 2, 'there are 2 variables left');
     
     $flash['variable'] = "let's add a third variable";
     $flash->discard();
-    $this->assert_equal('there are no variables left', $flash->count(), 0);
+    $this->assert_equal($flash->count(), 0, 'there are no variables left');
     
     unset($flash);
     $flash = new ActionController_Flash();
-    $this->assert_equal('there are still no variables left', $flash->count(), 0);
+    $this->assert_equal($flash->count(), 0, 'there are still no variables left');
   }
 }
 

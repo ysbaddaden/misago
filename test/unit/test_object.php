@@ -18,9 +18,9 @@ class TestObject extends Unit_Test
   function test_attr_read()
   {
     $o = new SomeObject();
-    $this->assert_false("", $o->new_record);
-    $this->assert_equal("", $o->table_name, 'some_objects');
-    $this->assert_null("",  $o->primary_key);
+    $this->assert_false($o->new_record);
+    $this->assert_equal($o->table_name, 'some_objects');
+    $this->assert_null($o->primary_key);
   }
 }
 

@@ -13,7 +13,7 @@ class Test_ActiveRecord_Connection extends Unit_TestCase
     $db = ActiveRecord_Connection::create('production');
     $adapter = $db->config('adapter');
     $klass = "ActiveRecord_ConnectionAdapters_".String::camelize($adapter)."Adapter";
-    $this->assert_true("", $db instanceof $klass);
+    $this->assert_true($db instanceof $klass);
   }
   
   function test_get()
@@ -21,7 +21,7 @@ class Test_ActiveRecord_Connection extends Unit_TestCase
     $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $adapter = $db->config('adapter');
     $klass = "ActiveRecord_ConnectionAdapters_".String::camelize($adapter)."Adapter";
-    $this->assert_true("", $db instanceof $klass);
+    $this->assert_true($db instanceof $klass);
   }
 }
 
