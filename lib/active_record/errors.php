@@ -186,7 +186,7 @@ class ActiveRecord_Errors
   
   function to_json()
   {
-    
+    return json_encode($this->full_messages());
   }
 }
 

@@ -216,7 +216,6 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
       'domain' => '',
     ));
     $errors = new ActiveRecord_Errors($error);
-    
     $errors->add_to_base('Error on record');
     $errors->add('title', ':taken');
     $errors->add('domain', ':reserved');
@@ -228,6 +227,22 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
       '<error>Already reserved in Error</error>'.
       '</errors>'
     );
+  }
+  
+  function test_to_json()
+  {
+    $error = new Error();
+    $error = $error->create(array(
+      'title' => 'my title',
+      'domain' => '',
+    ));
+    $errors = new ActiveRecord_Errors($error);
+    $errors->add_to_base('Error on record');
+    $errors->add('title', ':taken');
+    $errors->add('domain', ':reserved');
+    
+    $this->assert_equal('', $errors->to_json(), 
+      '["Error on record","Title \'my title\' is already taken","Already reserved in Error"]');
   }
 }
 

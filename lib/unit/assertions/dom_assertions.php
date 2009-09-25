@@ -24,13 +24,14 @@ class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
     
   }
   
-  # Makes tests on DOM.
+  # Makes tests on DOM using CSS selectors.
   # 
   # Attention: HTML/XML must be well formed.
   # 
-  #   assert_select('on or more forms', 'form')
+  #   assert_select('one or more forms', 'form')
   #   assert_select('no forms', 'form', false)
   #   assert_select('must contain four articles', 'article', 4)
+  #   assert_select('2 articles with class foo', 'article.foo', 2)
   #   assert_select('title element must contains "welcome" text', 'head title', 'welcome')
   #
   protected function assert_select($comment, $selector, $equality=true)
