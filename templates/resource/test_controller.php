@@ -1,5 +1,4 @@
 <?php
-
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
@@ -9,7 +8,7 @@ class Test_#{Controller}Controller extends Unit_FunctionalTest
 {
   function test_true()
   {
-    $this->assert_true('true', true);
+    $this->assert_true(true);
   }
 }
 
