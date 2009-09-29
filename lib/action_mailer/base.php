@@ -113,16 +113,17 @@ class ActionMailer_Base extends Object
   {
     $view = new ActionView_Base($this);
     
-    $mail->body_plain = $view->render(array(
-      'format' => 'plain',
-      'action' => $mail->action,
-      'locals' => $mail->data
-    ));
-    $mail->body_html  = $view->render(array(
-      'format' => 'html',
-      'action' => $mail->action,
-      'locals' => $mail->data
-    ));
+    $options = array(
+      'template' => String::underscore(get_class($this)).'/'.$mail->action,
+      'locals'   => $mail->data,
+      'layout'   => false,
+    );
+    
+    $options['format'] = 'plain';
+    $mail->body_plain = $view->render($options);
+    
+    $options['format'] = 'html';
+    $mail->body_html = $view->render($options);
     
     return $mail->contents();
   }

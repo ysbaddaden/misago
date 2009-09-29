@@ -22,7 +22,7 @@ class ActionView_Base extends Object
     if ($controller !== null)
     {
       $this->controller = $controller;
-      $this->view_path  = String::underscore(str_replace('Controller', '', get_class($this->controller)));
+      $this->view_path  = $controller->view_path;
       $helpers          = $this->controller->helpers;
     }
     
@@ -116,12 +116,12 @@ class ActionView_Base extends Object
     }
     
     # view (+layout)
-    if (isset($options['action']))
+    if (isset($options['template']))
     {
       $this->view_format = isset($options['format']) ? $options['format'] : 'html';
-      $__view_file = "{$this->view_path}/{$options['action']}.{$this->view_format}.tpl";
+      $__template_file = "{$options['template']}.{$this->view_format}.tpl";
       
-      if (file_exists(ROOT."/app/views/{$__view_file}"))
+      if (file_exists(ROOT."/app/views/{$__template_file}"))
       {
         if ($this->controller !== null) {
           $this->copy_controller_vars();
@@ -129,8 +129,13 @@ class ActionView_Base extends Object
         
         # view
         ob_start();
-        include ROOT."/app/views/{$__view_file}";
+        include ROOT."/app/views/{$__template_file}";
         $this->yield('content', ob_get_clean());
+        
+        # no layout
+        if (isset($options['layout']) and $options['layout'] === false) {
+          return $this->yield('content');
+        }
         
         # layout
         if (isset($options['layout']))
@@ -165,7 +170,7 @@ class ActionView_Base extends Object
         return $this->yield('content');
       }
       
-      throw new MisagoException("View template not found: '{$__view_file}'", 404);
+      throw new MisagoException("View template not found: '{$__template_file}'", 404);
     }
     
     # partial (or collection of partials)

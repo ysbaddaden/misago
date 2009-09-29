@@ -7,16 +7,16 @@ require_once ROOT."/app/controllers/application.php";
 
 class Test_ActionView_Base extends Unit_Test
 {
-  function test_render_view()
+  function test_render_template()
   {
     $view = new ActionView_Base();
     $view->view_path = 'say';
     
-    $html = $view->render(array('action' => 'hello', 'format' => 'html'));
+    $html = $view->render(array('template' => 'say/hello', 'format' => 'html', 'layout' => false));
     $html = str_replace(array("\n", "\r"), '', trim($html));
     $this->assert_equal(trim($html), '<p>Hello world!</p>');
     
-    $html = $view->render(array('action' => 'hello'));
+    $html = $view->render(array('template' => 'say/hello', 'layout' => false));
     $html = str_replace(array("\n", "\r"), '', trim($html));
     $this->assert_equal(trim($html), '<p>Hello world!</p>', 'format defaults to html');
   }
@@ -27,9 +27,9 @@ class Test_ActionView_Base extends Unit_Test
     $view->view_path = 'say';
     
     $xml = $view->render(array(
-      'action' => 'hello',
-      'layout' => 'say',
-      'format' => 'xml',
+      'template' => 'say/hello',
+      'layout'   => 'say',
+      'format'   => 'xml',
     ));
     $xml = str_replace(array("\n", "\r"), '', trim($xml));
     $this->assert_equal($xml, "<say><message>hello world</message></say>");
@@ -42,7 +42,7 @@ class Test_ActionView_Base extends Unit_Test
     
     try
     {
-      $view->render(array('action' => 'missing_action'));
+      $view->render(array('template' => 'say/missing_action'));
       $result = true;
     }
     catch(MisagoException $e) {
@@ -71,8 +71,8 @@ class Test_ActionView_Base extends Unit_Test
     
     $view = new ActionView_Base($controller);
     $view->render(array(
-      'action' => 'hello_who',
-      'format' => 'html',
+      'template' => 'say/hello_who',
+      'format'   => 'html',
     ));
     $this->assert_equal($controller->who, $view->who);
   }
@@ -88,7 +88,7 @@ class Test_ActionView_Base extends Unit_Test
   {
     $view = new ActionView_Base();
     $view->view_path = 'say';
-    $view->render(array('action' => 'hello'));
+    $view->render(array('template' => 'say/hello'));
     
     # rendering a partial
     $html = $view->render(array('partial' => 'form'));
@@ -114,7 +114,6 @@ class Test_ActionView_Base extends Unit_Test
     $this->assert_equal(trim($html), '<ad></ad>');
     
     # rendering a collection of shared partials
-#    $view = new ActionView_Base();
     $view->view_path = 'ads';
     
     $html = $view->render(array(

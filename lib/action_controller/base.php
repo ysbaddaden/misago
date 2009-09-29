@@ -13,12 +13,14 @@ abstract class ActionController_Base extends Object
   protected $mapping          = array();
   protected $already_rendered = false;
   protected $skip_view        = false;
+  public    $view_path;
   
   
   function __construct()
   {
-    $this->name   = get_class($this);
-    $this->params = array_merge($_GET, $_POST);
+    $this->name      = get_class($this);
+    $this->params    = array_merge($_GET, $_POST);
+    $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
     
     if (get_magic_quotes_gpc()) {
       sanitize_magic_quotes($this->params);
@@ -122,12 +124,16 @@ abstract class ActionController_Base extends Object
   # - action: render the view associated to this action.
   # - format: use this particular format.
   # - json: export resource as JSON.
-  # - layout: use a particular layout.
+  # - layout: use a particular layout (false for no layout).
   # - locals: pass some variables to be available in template's scope.
   # - location: set HTTP location header.
   # - status: set HTTP status header.
+  # - template: renders a template, from template root path (eg: 'errors/404').
   # - text: render some text, with no processing --useful for pushing cached html.
   # - xml: export resource as XML.
+  # 
+  # TODO: render(:partial => 'xx/yy')  => app/views/xx/_yy.html.tpl
+  # TODO: render(:file => '/xx/yy/zz.html.tpl') => /xx/yy/zz.html.tpl
   # 
   function render($options=null)
   {
@@ -164,9 +170,13 @@ abstract class ActionController_Base extends Object
       if ($options['format'] != 'html') {
         HTTP::content_type($options['format']);
       }
-      if (!isset($options['action'])) {
-        $options['action'] = $this->action;
+      
+      if (!isset($options['template']))
+      {
+        $action = isset($options['action']) ? $options['action'] : $this->action;
+        $options['template'] = $this->view_path.'/'.$action;
       }
+      
       $view = new ActionView_Base($this);
       echo $view->render($options);
     }
