@@ -1,6 +1,7 @@
 <?php
 
 # TODO: after_filters().
+# TODO: is_xml_http_request(), expires_in(), expires_now()
 abstract class ActionController_Base extends Object
 {
   public $helpers = ':all';
@@ -132,8 +133,8 @@ abstract class ActionController_Base extends Object
   # - text: render some text, with no processing --useful for pushing cached html.
   # - xml: export resource as XML.
   # 
-  # TODO: render(:partial => 'xx/yy')  => app/views/xx/_yy.html.tpl
-  # TODO: render(:file => '/xx/yy/zz.html.tpl') => /xx/yy/zz.html.tpl
+  # TODO: render(:partial => 'xx/yy') => app/views/xx/_yy.html.tpl (no layout)
+  # TODO: render(:file => '/xx/yy/zz.html.tpl') => /xx/yy/zz.html.tpl (no layout)
   # 
   function render($options=null)
   {
@@ -219,6 +220,17 @@ abstract class ActionController_Base extends Object
       }
     }
     HTTP::redirect($url, $status);
+  }
+  
+  protected function remote_ip()
+  {
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+      return $_SERVER['HTTP_CLIENT_IP'];
+    }
+    return $_SERVER['REMOTE_ADDR'];
   }
   
   protected function before_filters() {}
