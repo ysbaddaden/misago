@@ -40,7 +40,7 @@ class Unit_Assertions_ResponseAssertions extends Unit_Assertions_DomAssertions
     $this->assert_not_equal($value, $expected, $comment);
   }
   
-  protected function test_assert_template()
+  protected function assert_template()
   {
     
   }
