@@ -7,7 +7,7 @@ class MisagoException extends Exception
   # TODO: Log error data & display a standard error page in production environment. 
   function render()
   {
-    HTTP::status($this->getCode());
+    header('Status: '.$this->getCode(), true);
     
     $message = $this->getMessage();
     $code    = $this->getCode();

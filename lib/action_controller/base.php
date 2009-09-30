@@ -1,7 +1,7 @@
 <?php
 
-# TODO: after_filters().
-# TODO: is_xml_http_request(), expires_in(), expires_now()
+# TODO: after_filters(), is_xml_http_request().
+# TODO: ActiveRecord_AbstractResponse.
 abstract class ActionController_Base extends Object
 {
   public $helpers = ':all';
@@ -9,13 +9,76 @@ abstract class ActionController_Base extends Object
   public $name;
   public $action;
   public $params;
+  public $view_path;
   public $flash;
 	
   protected $mapping          = array();
   protected $already_rendered = false;
   protected $skip_view        = false;
-  public    $view_path;
   
+  # For the list of HTTP status code, and explanations, see:
+  # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+  private $http_statuses = array(
+    100 => 'Continue',
+    101 => 'Switching Protocols',
+    
+    200 => 'OK',
+    201 => 'Created',
+    202 => 'Accepted',
+    203 => 'Non-Authoritative Content',
+    204 => 'No Content',
+    205 => 'Reset Content',
+    206 => 'Partial Content',
+    
+    300 => 'Multiple Choices',
+    301 => 'Moved Permanently',
+    302 => 'Found',
+    303 => 'See Other',
+    304 => 'Not Modified',
+    305 => 'Use Proxy',
+#   306 => '',
+    307 => 'Temporary Redirect',
+    
+    400 => 'Bad Request',
+    401 => 'Unauthorized',
+#   402 => 'Payment Required',
+    403 => 'Forbidden',
+    404 => 'Not Found',
+    405 => 'Method Not Allowed',
+    406 => 'Not Acceptable',
+    407 => 'Proxy Authentication Required',
+    408 => 'Request Timeout',
+    409 => 'Conflict',
+    410 => 'Gone',
+    411 => 'Length Required',
+    412 => 'Precondition Failed',
+    413 => 'Request Entity Too Large',
+    414 => 'Request-URI Too Long',
+    415 => 'Unsupported Media Type',
+    416 => 'Request Range Not Satisfiable',
+    417 => 'Expectation Failed',
+    
+    500 => 'Internal Server Error',
+    501 => 'Not Implemented',
+    502 => 'Bad Gateway',
+    503 => 'Service Unavailable',
+    504 => 'Gateway Timeout',
+    505 => 'HTTP Version Not Supported',
+  );
+  
+  private $http_mimetypes = array(
+    'text' => 'text/plain',
+    'html' => 'text/html',
+    'js'   => 'text/javascript',
+    'css'  => 'text/css',
+    'ics'  => 'text/calendar',
+    'csv'  => 'text/csv',
+    'xml'  => 'application/xml',
+    'rss'  => 'application/rss+xml',
+    'atom' => 'application/atom+xml',
+    'yaml' => 'application/x-yaml',
+    'json' => 'application/json',
+  );
   
   function __construct()
   {
@@ -30,6 +93,7 @@ abstract class ActionController_Base extends Object
     $this->flash = new ActionController_Flash();
   }
   
+  # @private
   function execute($mapping)
   {
     if (!is_array($mapping))
@@ -90,39 +154,87 @@ abstract class ActionController_Base extends Object
     }
   }
   
+  # Returns a response that has no content (merely headers).
+  # 
+  # Examples:
+  # 
+  #   head(array('status' => 201, 'location' => show_post_url($this->post));
+  #   head(403);
+  # 
+  function head($status_or_headers)
+  {
+    if (!headers_sent())
+    {
+      $headers = is_array($status_or_headers) ? $status_or_headers : array('status' => $status_or_headers);
+      foreach($headers as $k => $v) {
+        header("$k: $v", true);
+      }
+    }
+    $this->already_rendered = true;
+  }
+  
   # Renders a view or exports a resource.
   # 
-  # Render a view:
+  # =Render a view:
   # 
-  #   $this->render();
-  #   $this->render('edit');
-  #   # => renders edit.html.tpl
+  # Renders the view associated to an action, using the current request's
+  # format (html by default) or the one specified.
+  # 
+  #   # renders the current action:
+  #   render();
+  # 
+  #   # renders a specific action:
+  #   render('edit'); => edit.html.tpl
   #   
-  #   $this->render(array('action' => 'edit', 'format' => 'xml'));
-  #   # => renders edit.xml.tpl
+  #   # renders a specific action using a specific format:
+  #   render(array('action' => 'edit', 'format' => 'xml')); => edit.xml.tpl
   # 
-  # Render a view inside a layout:
+  # =Render a template
   # 
-  #   $this->render(array('action' => 'create', 'layout' => 'admin'));
-  #   # => renders create.html.tpl inside admin.html.tpl
+  # Instead of rendering an action, you may specify the template directly.
   # 
-  # Export a resource in a particular file format:
+  #   render('posts/show');
   # 
-  #   $this->render(array('xml' => $this->user));
+  # =Layouts
+  # 
+  # By default controller's layout (eg: layouts/posts.html.tpl) is used,
+  # and falls back to the generic default layout (layouts/default.html.tpl).
+  # 
+  #   # uses a particular layout:
+  #   render(array('action' => 'create', 'layout' => 'admin'));
+  #     => renders create.html.tpl inside admin.html.tpl
+  # 
+  #   # no layout at all:
+  #   render(array('layout' => false));
+  #   
+  #   # using a particular format:
+  #   render(array('action' => 'index', 'layout' => 'feeds', 'format' => 'rss'));
+  #     => renders index.rss.tpl inside feeds.rss.tpl
+  # 
+  # =Export a resource in a particular file format:
+  # 
+  # Being able to talk in XML or JSON to your server is great. Being able
+  # to easily export your data to these formats is even better.
+  # 
+  #   render(array('xml' => $this->user));
   #   # => exports $this->user as XML
   #   
-  #   $this->render(array('json' => $this->products));
+  #   render(array('json' => $this->products));
   #   # => exports $this->user as JSON
   # 
-  # Advanced uses (eg. webservices):
+  # Note: no layout is rendered when using XML or JSON exports.
   # 
-  #   $this->render(array('xml' => $this->product, 'status' => '201',
+  # =Headers
+  # 
+  # You may set the status and location headers:
+  # 
+  #   render(array('json' => $this->products->errors, 'status' => '412'));
+  #   render(array('xml'  => $this->product, 'status' => '201',
   #     'location' => show_product_url($this->product->id)));
-  #   $this->render(array('json' => $this->products->errors, 'status' => '412'));
   # 
-  # Available options:
+  # =Available options:
   # 
-  # - action: render the view associated to this action.
+  # - action: render the view associated to the current action.
   # - format: use this particular format.
   # - json: export resource as JSON.
   # - layout: use a particular layout (false for no layout).
@@ -145,22 +257,24 @@ abstract class ActionController_Base extends Object
       $options['format'] = empty($this->format) ? 'html' : $this->format;
     }
     
-    if (isset($options['location'])) {
-      HTTP::redirect($options['location'], isset($options['status']) ? $options['status'] : 302);
+    if (isset($options['location']))
+    {
+      $this->http_header('Status', isset($options['status']) ? $options['status'] : 302);
+      $this->http_header('Location', $options['location']);
     }
     elseif (isset($options['status'])) {
-      HTTP::status($options['status']);
+      $this->http_header('Status', $options['status']);
     }
     
     if (array_key_exists('xml', $options))
     {
-      HTTP::content_type('xml');
+      $this->http_header('Content-Type', 'application/xml');
       echo '<?xml version="1.0"?>';
       echo is_string($options['xml']) ? $options['xml'] : $options['xml']->to_xml();
     }
     elseif (array_key_exists('json', $options))
     {
-      HTTP::content_type('json');
+      $this->http_header('Content-Type', 'application/json');
       echo is_string($options['json']) ? $options['json'] : $options['json']->to_json();
     }
     elseif (array_key_exists('text', $options)) {
@@ -169,7 +283,7 @@ abstract class ActionController_Base extends Object
     else
     {
       if ($options['format'] != 'html') {
-        HTTP::content_type($options['format']);
+        $this->http_header('Content-Type', $this->http_mimetypes[$options['format']]);
       }
       
       if (!isset($options['template']))
@@ -186,14 +300,15 @@ abstract class ActionController_Base extends Object
   }
   
   # Renders a view or exports a resource, returned as a string.
-  function render_string($options=null)
+  # See render() for documentation.
+  function render_to_string($options=null)
   {
     ob_start();
     $this->render($options);
     return ob_get_clean();
   }
   
-  # Redirects to another page.
+  # Redirects to another URL.
   # 
   #   redirect_to('/path');
   #   redirect_to(articles_path());
@@ -204,9 +319,11 @@ abstract class ActionController_Base extends Object
   # 
   #   redirect_to('/posts/45.xml', 301); # found
   #   redirect_to('/posts/45.xml', 201); # created
-  # 
   protected function redirect_to($options, $status=302)
   {
+    $this->http_header('Status', $status);
+    
+    # URL
     if (is_array($options))
     {
       $options['path_only'] = false;
@@ -219,7 +336,17 @@ abstract class ActionController_Base extends Object
         $url = cfg::get('base_path').$url;
       }
     }
-    HTTP::redirect($url, $status);
+    
+    # HTTP Location
+    if (DEBUG < 2) {
+      $this->http_header('Location', $url);
+    }
+    else
+    {
+      $status_text = $this->http_statuses[$status];
+      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $status $status_text]</p>";
+    }
+    exit;
   }
   
   protected function remote_ip()
@@ -231,6 +358,46 @@ abstract class ActionController_Base extends Object
       return $_SERVER['HTTP_CLIENT_IP'];
     }
     return $_SERVER['REMOTE_ADDR'];
+  }
+  
+  # Sends a Cache-Control header for HTTP caching.
+  # 
+  # Defaults to private, telling proxies not to cache anything,
+  # which allows for some privacy of content.
+  # 
+  # Examples:
+  # 
+  #   expires_in(3600)
+  #   expires_in('+1 hour', array('private' => false))
+  # 
+  protected function expires_in($seconds, $options=array())
+  {
+    $cache_control = array(
+      'max-age' => is_string($seconds) ? strtotime($seconds) : $seconds,
+      'private' => true,
+    );
+    foreach($options as $k => $v)
+    {
+      if (!$v) {
+        continue;
+      }
+      $cache_control[] = ($v === true) ? $k : "$k=$v";
+    }
+    $this->http_header('Cache-Control', implode(', ', $cache_control));
+  }
+  
+  # Sends a Cache-Control header with 'no-cache' to disallow or
+  # cancel HTTP caching of current request.
+  protected function expires_now()
+  {
+    $this->http_header('Cache-Control', 'no-cache');
+  }
+  
+  private function http_header($k, $v)
+  {
+    if (!headers_sent()) {
+      header("$k: $v", true);
+    }
   }
   
   protected function before_filters() {}

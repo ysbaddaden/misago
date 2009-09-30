@@ -23,19 +23,24 @@ class IndexController extends ApplicationController
   
   function index()
   {
-    HTTP::status(200);
+    $this->head(200);
     exit;
   }
   
   function forbidden()
   {
-    HTTP::status(403);
+    $this->head(403);
     exit;
   }
   
   function redirected()
   {
     $this->redirect_to('/');
+  }
+  
+  function test_head()
+  {
+    $this->head(array('location' => '/', 'status' => 410));
   }
   
   function cookie()

@@ -80,6 +80,7 @@ class #{Controller}Controller extends ApplicationController
         case 'html': $this->redirect_to(show_#{model}_path($this->#{model})); break;
         case 'xml':
         case 'json': $this->render(array('xml' => $this->#{model}, 'status' => 200)); break;
+#        case 'json': $this->head(200); break;
       }
     }
     else
@@ -103,11 +104,11 @@ class #{Controller}Controller extends ApplicationController
       {
         case 'html': $this->redirect_to(#{model}s_path()); break;
         case 'xml':
-        case 'json': HTTP::status(410); break;
+        case 'json': $this->head(410); break;
       }
     }
     else {
-      HTTP::status(500);
+      $this->head(500);
     }
     exit;
   }

@@ -1,7 +1,9 @@
 <?php
+/*
 # For the list of HTTP status code, and explanations, see:
 # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-
+# 
+# @private
 class HTTP
 {
   static $codes = array(
@@ -83,27 +85,6 @@ class HTTP
       header("Status: $code", true);
     }
   }
-  
-  # Redirects current request.
-  static function redirect($url, $code=null)
-  {
-    if (DEBUG < 2)
-    {
-      if ($code) {
-        self::status($code);
-      }
-      header("Location: $url", true);
-    }
-    elseif ($code)
-    {
-      $status = self::$codes[$code];
-      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $code $status]</p>";
-    }
-    else {
-      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: 302 Found]</p>";
-    }
-    exit;
-  }
 }
-
+*/
 ?>

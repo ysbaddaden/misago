@@ -39,6 +39,13 @@ class TestIndexController extends Unit_TestFunctional
     $this->run_action('PUT', '/index/files', array('myfile' => '@'.__FILE__));
     $this->assert_true((bool)preg_match('/\[name\] => '.basename(__FILE__).'/', $this->response['body']), 'file upload throught PUT');
   }
+  
+  function test_head()
+  {
+    $this->run_action('GET', '/index/test_head');
+    $this->assert_response(410);
+    $this->assert_redirected_to('/');
+  }
 }
 new TestIndexController();
 

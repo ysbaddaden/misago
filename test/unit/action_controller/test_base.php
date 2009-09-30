@@ -1,11 +1,8 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 require_once ROOT."/app/controllers/application.php";
 
 class Test_ActionController_Base extends Unit_TestCase
@@ -53,15 +50,15 @@ class Test_ActionController_Base extends Unit_TestCase
   function test_render()
   {
     $controller = new SayController();
-    $html = $controller->render_string('hello');
+    $html = $controller->render_to_string('hello');
     $this->assert_equal(trim($html), "<html><head></head><body><p>Hello world!</p></body></html>");
 
     $controller = new SayController();
-    $html = $controller->render_string(array('action' => 'hello', 'layout' => 'basic'));
+    $html = $controller->render_to_string(array('action' => 'hello', 'layout' => 'basic'));
     $this->assert_equal(trim($html), "<html><body><p>Hello world!</p></body></html>");
 
     $controller = new SayController();
-    $html = $controller->render_string(array('action' => 'hello', 'format' => 'xml'));
+    $html = $controller->render_to_string(array('action' => 'hello', 'format' => 'xml'));
     $this->assert_equal(trim($html), "<say><message>hello world</message>\n</say>", "action+controller layout+format");
   }
   
@@ -69,11 +66,11 @@ class Test_ActionController_Base extends Unit_TestCase
   {
     $controller = new SayController();
     $controller->action = 'hello';
-    $html = $controller->render_string(array('layout' => 'basic'));
+    $html = $controller->render_to_string(array('layout' => 'basic'));
     $this->assert_equal(trim($html), "<html><body><p>Hello world!</p></body></html>", "particular layout");
     
     $controller = new ProductsController();
-    $html = $controller->render_string('index');
+    $html = $controller->render_to_string('index');
     $this->assert_equal(trim($html), "<html><body class=\"default\">products</body></html>", "default layout");
   }
   
@@ -83,11 +80,11 @@ class Test_ActionController_Base extends Unit_TestCase
     $product = new Product();
     
     $controller = new SayController();
-    $xml = $controller->render_string(array('xml' => new Product(3)));
+    $xml = $controller->render_to_string(array('xml' => new Product(3)));
     $this->assert_equal($xml, "<?xml version=\"1.0\"?><product><id>3</id><name><![CDATA[azerty]]></name><price>6.95</price><created_at></created_at><updated_at></updated_at><in_stock>1</in_stock><description></description></product>", "single resource as XML");
     
     $products = $product->find(':all', array('select' => 'id,name', 'order' => 'id asc', 'limit' => 3));
-    $xml = $controller->render_string(array('xml' => $products));
+    $xml = $controller->render_to_string(array('xml' => $products));
     $this->assert_equal($xml, "<?xml version=\"1.0\"?><products><product><id>1</id><name><![CDATA[bepo]]></name></product><product><id>2</id><name><![CDATA[qwerty]]></name></product><product><id>3</id><name><![CDATA[azerty]]></name></product></products>", "multiple resources as XML");
   }
   
@@ -97,11 +94,11 @@ class Test_ActionController_Base extends Unit_TestCase
     $product    = new Product();
     $controller = new SayController();
     
-    $json = $controller->render_string(array('json' => new Product(3)));
+    $json = $controller->render_to_string(array('json' => new Product(3)));
     $this->assert_equal($json, '{"id":3,"name":"azerty","price":6.95,"created_at":null,"updated_at":null,"in_stock":true,"description":null}', "single resource as JSON");
     
     $products = $product->find(':all', array('select' => 'id,name', 'order' => 'id asc', 'limit' => 3));
-    $json = $controller->render_string(array('json' => $products));
+    $json = $controller->render_to_string(array('json' => $products));
     $this->assert_equal($json, '[{"id":1,"name":"bepo"},{"id":2,"name":"qwerty"},{"id":3,"name":"azerty"}]', "multiple resources as JSON");
   }
   
@@ -109,13 +106,13 @@ class Test_ActionController_Base extends Unit_TestCase
   {
     $controller = new SayController();
     
-    $html = $controller->render_string(array('template' => 'errors/404'));
+    $html = $controller->render_to_string(array('template' => 'errors/404'));
     $this->assert_equal(trim($html), '<html><head></head><body>404 not found</body></html>');
     
-    $html = $controller->render_string(array('template' => 'errors/404', 'layout' => 'basic'));
+    $html = $controller->render_to_string(array('template' => 'errors/404', 'layout' => 'basic'));
     $this->assert_equal(trim($html), '<html><body>404 not found</body></html>');
     
-    $html = $controller->render_string(array('template' => 'errors/404', 'layout' => false));
+    $html = $controller->render_to_string(array('template' => 'errors/404', 'layout' => false));
     $this->assert_equal(trim($html), '404 not found');
   }
 }
