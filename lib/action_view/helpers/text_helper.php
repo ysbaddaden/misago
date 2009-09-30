@@ -37,7 +37,8 @@ function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
 }
 
 # Extracts an excerpt from text that matches the first instance of phrase.
-# TODO: excerpt()
+# 
+# @namespace ActionView_Helpers_TextHelper
 function excerpt($text, $phrase, $radius=100, $omission='...')
 {
   $pos = strpos($text, $phrase);
@@ -53,6 +54,9 @@ function excerpt($text, $phrase, $radius=100, $omission='...')
   return $str;
 }
 
+# Highlights some phrases in text using MARK.
+# 
+# @namespace ActionView_Helpers_TextHelper
 function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
 {
   if (is_array($phrases))
@@ -65,6 +69,9 @@ function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
   return preg_replace('/('.$phrases.')/', $highlighter, $text);
 }
 
+# Pluralizes a word depending on count.
+# 
+# @namespace ActionView_Helpers_TextHelper
 function pluralize($count, $singular, $plural=null)
 {
   if ($count != 1) {
@@ -75,6 +82,8 @@ function pluralize($count, $singular, $plural=null)
 
 # Simple formatting of text. Two linefeeds make for a paragraph,
 # and a single linefeed makes for line break.
+# 
+# @namespace ActionView_Helpers_TextHelper
 function simple_format($text)
 {
   $text = str_replace("\r", "", trim($text));
@@ -84,6 +93,8 @@ function simple_format($text)
 }
 
 # Truncates a string if it's longer than length, and appends a truncate string to it.
+# 
+# @namespace ActionView_Helpers_TextHelper
 function truncate($text, $length=30, $truncate_string='...')
 {
   if (strlen($text) > $length) {
@@ -102,6 +113,8 @@ function truncate($text, $length=30, $truncate_string='...')
 # You must strip all functions from markdown.php, keep defines
 # and rename the Markdown_Parser class to Markdown. Eventually
 # save it as vendor/markdown.php
+# 
+# @namespace ActionView_Helpers_TextHelper
 function markdown($text)
 {
 	$parser = new Markdown();
@@ -112,6 +125,8 @@ function markdown($text)
 # 
 # Download Textile from http://textile.thresholdstate.com/
 # and copy classTextile.php to vendor/textile.php
+# 
+# @namespace ActionView_Helpers_TextHelper
 function textilize($text)
 {
   $parser = new Textile();
