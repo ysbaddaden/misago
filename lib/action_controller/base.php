@@ -1,7 +1,6 @@
 <?php
 
 # TODO: after_filters(), is_xml_http_request().
-# TODO: ActiveRecord_AbstractResponse.
 abstract class ActionController_Base extends Object
 {
   public $helpers = ':all';
@@ -272,18 +271,6 @@ abstract class ActionController_Base extends Object
     exit;
   }
   
-  # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
-  protected function remote_ip()
-  {
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-      return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    }
-    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-      return $_SERVER['HTTP_CLIENT_IP'];
-    }
-    return $_SERVER['REMOTE_ADDR'];
-  }
-  
   # Sends a Cache-Control header for HTTP caching.
   # 
   # Defaults to private, telling proxies not to cache anything,
@@ -315,6 +302,24 @@ abstract class ActionController_Base extends Object
   protected function expires_now()
   {
     $this->response->headers['Cache-Control'] = 'no-cache, no-store';
+  }
+  
+  # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
+  protected function remote_ip()
+  {
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+      return $_SERVER['HTTP_CLIENT_IP'];
+    }
+    return $_SERVER['REMOTE_ADDR'];
+  }
+  
+  # Checks wether the request is made from AJAX.
+  protected function is_xml_http_request()
+  {
+    return (isset($_SERVER['X-Requested-With']) and $_SERVER['X-Requested-With'] == 'XMLHttpRequest');
   }
   
   protected function before_filters() {}
