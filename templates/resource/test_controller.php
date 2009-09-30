@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../config/boot.php';
 
-class Test_#{Controller}Controller extends Unit_FunctionalTest
+class Test_#{Controller}Controller extends ActionController_TestCase
 {
   function test_true()
   {

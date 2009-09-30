@@ -2,7 +2,7 @@
 if (!isset($_ENV['MISAGO_ENV'])) $_ENV['MISAGO_ENV'] = 'test';
 require_once dirname(__FILE__).'/../test_app/config/boot.php';
 
-class TestIndexController extends Unit_TestFunctional
+class TestIndexController extends ActionController_TestCase
 {
   function test_query_string_parse()
   {
