@@ -148,6 +148,12 @@ class ActionController_Routing extends Object
     
     self::$current_format = $mapping[':format'];
     
+    foreach($mapping as $k => $v)
+    {
+      if (is_symbol($k) and is_string($v)) {
+        $mapping[$k] = urldecode($v);
+      }
+    }
     unset($mapping['conditions']);
     unset($mapping['requirements']);
     
@@ -301,6 +307,10 @@ class ActionController_Routing extends Object
     
     if (!isset($keys[':format']) and isset(self::$current_format)) {
       $keys[':format'] = self::$current_format;
+    }
+    
+    foreach($keys as $k => $v) {
+      $keys[$k] = urlencode($v);
     }
     
     foreach($route as $k => $v)
