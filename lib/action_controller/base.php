@@ -16,70 +16,6 @@ abstract class ActionController_Base extends Object
   protected $already_rendered = false;
   protected $skip_view        = false;
   
-  # For the list of HTTP status code, and explanations, see:
-  # http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-  private $http_statuses = array(
-    100 => 'Continue',
-    101 => 'Switching Protocols',
-    
-    200 => 'OK',
-    201 => 'Created',
-    202 => 'Accepted',
-    203 => 'Non-Authoritative Content',
-    204 => 'No Content',
-    205 => 'Reset Content',
-    206 => 'Partial Content',
-    
-    300 => 'Multiple Choices',
-    301 => 'Moved Permanently',
-    302 => 'Found',
-    303 => 'See Other',
-    304 => 'Not Modified',
-    305 => 'Use Proxy',
-#   306 => '',
-    307 => 'Temporary Redirect',
-    
-    400 => 'Bad Request',
-    401 => 'Unauthorized',
-#   402 => 'Payment Required',
-    403 => 'Forbidden',
-    404 => 'Not Found',
-    405 => 'Method Not Allowed',
-    406 => 'Not Acceptable',
-    407 => 'Proxy Authentication Required',
-    408 => 'Request Timeout',
-    409 => 'Conflict',
-    410 => 'Gone',
-    411 => 'Length Required',
-    412 => 'Precondition Failed',
-    413 => 'Request Entity Too Large',
-    414 => 'Request-URI Too Long',
-    415 => 'Unsupported Media Type',
-    416 => 'Request Range Not Satisfiable',
-    417 => 'Expectation Failed',
-    
-    500 => 'Internal Server Error',
-    501 => 'Not Implemented',
-    502 => 'Bad Gateway',
-    503 => 'Service Unavailable',
-    504 => 'Gateway Timeout',
-    505 => 'HTTP Version Not Supported',
-  );
-  
-  private $http_mimetypes = array(
-    'text' => 'text/plain',
-    'html' => 'text/html',
-    'js'   => 'text/javascript',
-    'css'  => 'text/css',
-    'ics'  => 'text/calendar',
-    'csv'  => 'text/csv',
-    'xml'  => 'application/xml',
-    'rss'  => 'application/rss+xml',
-    'atom' => 'application/atom+xml',
-    'yaml' => 'application/x-yaml',
-    'json' => 'application/json',
-  );
-  
   function __construct()
   {
     $this->name      = get_class($this);
@@ -90,7 +26,8 @@ abstract class ActionController_Base extends Object
       sanitize_magic_quotes($this->params);
     }
     
-    $this->flash = new ActionController_Flash();
+    $this->flash    = new ActionController_Flash();
+    $this->response = new ActionController_AbstractResponse();
   }
   
   # @private
@@ -110,6 +47,7 @@ abstract class ActionController_Base extends Object
     {
       $this->mapping =& $mapping;
       $this->action  = $this->mapping[':action'];
+      $this->format  = empty($this->mapping[':format']) ? 'html' : $this->mapping[':format'];
       
       $params = array_diff_key($this->mapping, array(
         ':controller' => '',
@@ -118,9 +56,6 @@ abstract class ActionController_Base extends Object
         ':format' => '',
       ));
       $this->params = array_merge($this->params, $params);
-      
-      $this->format = empty($this->mapping[':format']) ?
-        'html' : $this->mapping[':format'];
     }
     
     if (DEBUG == 1)
@@ -163,13 +98,9 @@ abstract class ActionController_Base extends Object
   # 
   function head($status_or_headers)
   {
-    if (!headers_sent())
-    {
-      $headers = is_array($status_or_headers) ? $status_or_headers : array('status' => $status_or_headers);
-      foreach($headers as $k => $v) {
-        header("$k: $v", true);
-      }
-    }
+    $headers = is_array($status_or_headers) ? $status_or_headers : array('status' => $status_or_headers);
+    $this->response->headers = array_merge($this->response->headers, $headers);
+    $this->response->send();
     $this->already_rendered = true;
   }
   
@@ -257,45 +188,41 @@ abstract class ActionController_Base extends Object
       $options['format'] = empty($this->format) ? 'html' : $this->format;
     }
     
-    if (isset($options['location']))
-    {
-      $this->http_header('Status', isset($options['status']) ? $options['status'] : 302);
-      $this->http_header('Location', $options['location']);
+    if (isset($options['location'])) {
+      $this->response->redirect($options['location'], isset($options['status']) ? $options['status'] : 302);
     }
     elseif (isset($options['status'])) {
-      $this->http_header('Status', $options['status']);
+      $this->response->status($options['status']);
     }
     
     if (array_key_exists('xml', $options))
     {
-      $this->http_header('Content-Type', 'application/xml');
-      echo '<?xml version="1.0"?>';
-      echo is_string($options['xml']) ? $options['xml'] : $options['xml']->to_xml();
+      $this->response->content_type('application/xml');
+      $this->response->body = '<?xml version="1.0"?>'.
+        (is_string($options['xml']) ? $options['xml'] : $options['xml']->to_xml());
     }
     elseif (array_key_exists('json', $options))
     {
-      $this->http_header('Content-Type', 'application/json');
-      echo is_string($options['json']) ? $options['json'] : $options['json']->to_json();
+      $this->response->content_type('application/json');
+      $this->response->body = is_string($options['json']) ? $options['json'] : $options['json']->to_json();
     }
     elseif (array_key_exists('text', $options)) {
-      echo $options['text'];
+      $this->response->body = $options['text'];
     }
     else
     {
-      if ($options['format'] != 'html') {
-        $this->http_header('Content-Type', $this->http_mimetypes[$options['format']]);
-      }
-      
       if (!isset($options['template']))
       {
         $action = isset($options['action']) ? $options['action'] : $this->action;
         $options['template'] = $this->view_path.'/'.$action;
       }
-      
       $view = new ActionView_Base($this);
-      echo $view->render($options);
+      
+      $this->response->content_type_from_format($options['format']);
+      $this->response->body = $view->render($options);
     }
     
+    $this->response->send();
     $this->already_rendered = true;
   }
   
@@ -319,36 +246,33 @@ abstract class ActionController_Base extends Object
   # 
   #   redirect_to('/posts/45.xml', 301); # found
   #   redirect_to('/posts/45.xml', 201); # created
-  protected function redirect_to($options, $status=302)
+  protected function redirect_to($url, $status=302)
   {
-    $this->http_header('Status', $status);
-    
-    # URL
-    if (is_array($options))
+    if (is_array($url))
     {
-      $options['path_only'] = false;
-      $url = url_for($options);
+      $url['path_only'] = false;
+      $url = url_for($url);
     }
     else
     {
-      $url = (string)$options;
+      $url = (string)$url;
       if (!strpos($url, '://')) {
         $url = cfg::get('base_path').$url;
       }
     }
     
-    # HTTP Location
     if (DEBUG < 2) {
-      $this->http_header('Location', $url);
+      $this->response->redirect($url, $status);
     }
     else
     {
-      $status_text = $this->http_statuses[$status];
+      $status_text = $this->response->status($status);
       echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $status $status_text]</p>";
     }
     exit;
   }
   
+  # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
   protected function remote_ip()
   {
     if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
@@ -373,7 +297,7 @@ abstract class ActionController_Base extends Object
   protected function expires_in($seconds, $options=array())
   {
     $cache_control = array(
-      'max-age' => is_string($seconds) ? strtotime($seconds) : $seconds,
+      'max-age' => is_integer($seconds) ? $seconds : strtotime($seconds),
       'private' => true,
     );
     foreach($options as $k => $v)
@@ -383,21 +307,14 @@ abstract class ActionController_Base extends Object
       }
       $cache_control[] = ($v === true) ? $k : "$k=$v";
     }
-    $this->http_header('Cache-Control', implode(', ', $cache_control));
+    $this->response->headers['Cache-Control'] = implode(', ', $cache_control);
   }
   
   # Sends a Cache-Control header with 'no-cache' to disallow or
   # cancel HTTP caching of current request.
   protected function expires_now()
   {
-    $this->http_header('Cache-Control', 'no-cache');
-  }
-  
-  private function http_header($k, $v)
-  {
-    if (!headers_sent()) {
-      header("$k: $v", true);
-    }
+    $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
   
   protected function before_filters() {}
