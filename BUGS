@@ -1,7 +1,8 @@
 
 Known bugs and oddities in misago:
 
-ActionView:
- * html helper is missing some functions: css, js, etc.
- * FormHelper::errors_on() & FormHelper::errors_on_base() are not tested.
+ActionView_Helpers_FormHelper:
+
+  * errors_on() & errors_on_base() are not tested.
+
 
