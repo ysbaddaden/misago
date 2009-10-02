@@ -2,6 +2,7 @@
 
 class Session
 {
+  # Starts a session (if none already exists).
   static function start($session_id=null, $force_new_id=false)
   {
     # session has already been started.
@@ -25,14 +26,16 @@ class Session
     return Session::init();
   }
   
+  # Destroys current session and starts up another one.
   static function restart($session_id=null)
   {
-    session_destroy();
+    Session::destroy();
     ($session_id === null) ? session_regenerate_id() : session_id($session_id);
     session_start();
     return Session::init();
   }
   
+  # Destroys current session.
   static function destroy()
   {
     if (!isset($_SESSION)) {
