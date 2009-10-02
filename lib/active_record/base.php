@@ -476,7 +476,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     }
     return $rows;
   }
-  
+  /*
   # Returns raw result as an array of values.
   # 
   # Use find() instead, unless you need special features. Be aware
@@ -501,6 +501,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     }
     return $rs;
   }
+  */
   
   # Counts columns. SQL Request is supposed to return a single column
   # and a single row (returns a single int).

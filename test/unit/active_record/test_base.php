@@ -190,7 +190,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal(count($products), 1);
     $this->assert_equal($products[0]->id, 2);
   }
-  
+  /*
   function test_raw_find_by_sql()
   {
     $product = new Product();
@@ -200,7 +200,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_type($ary[0], 'array');
     $this->assert_equal($ary[0][0], '1');
   }
-  
+  */
   function test_count_by_sql()
   {
     $product = new Product();
