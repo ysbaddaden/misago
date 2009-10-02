@@ -461,6 +461,62 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return $this->find(':values', $options);
   }
   
+  # Returns an array of ActiveRecords, using results as attributes.
+  # 
+  # Use find() unless you need special features. Be aware that
+  # custom SQL requests may brake whenever you switch between
+  # connection adapters.
+  function & find_by_sql($sql)
+  {
+    $class = get_class($this);
+    $rows  = $this->db->select_all($sql);
+    
+    foreach(array_keys($rows) as $i) {
+      $rows[$i] = new $class($rows[$i]);
+    }
+    return $rows;
+  }
+  
+  # Returns raw result as an array of values.
+  # 
+  # Use find() instead, unless you need special features. Be aware
+  # that custom SQL requests may brake whenever you switch between
+  # connection adapters.
+  # 
+  # It may prove useful for statistics, when you need grouping using
+  # complicated SQL functions for instance.
+  # 
+  #   $data = $post->raw_find_by_sql("select yearweek(created_at, 1), count(*)
+  #     from posts group by yearweek(created_at, 1) asc ;");
+  # 
+  #   $data = $post->raw_find_by_sql("select yearweek(created_at, 1), count(*)
+  #     from posts group by concat_ws('-', year(created_at), month(created_at)) desc ;");
+  # 
+  function & raw_find_by_sql($sql)
+  {
+    $class = get_class($this);
+    $rs = $this->db->select_all($sql);
+    foreach($rs as $k => $v) {
+      $rs[$k] = array_values($v);
+    }
+    return $rs;
+  }
+  
+  # Counts columns. SQL Request is supposed to return a single column
+  # and a single row (returns a single int).
+  # 
+  #   $count = $post->count_by_sql("select count(*) from posts where created_at > now()");
+  # 
+  # Use find() instead, unless you need special features. Be aware
+  # that custom SQL requests may brake whenever you switch between
+  # connection adapters.
+  function count_by_sql($sql)
+  {
+    $class = get_class($this);
+    $rows  = $this->db->select_values($sql);
+    return (int)$rows[0];
+  }
+  
   # Checks wether a given record exists or not.
   function exists($id)
   {
