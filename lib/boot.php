@@ -28,7 +28,6 @@ if (!function_exists('apc_store')) {
 
 require 'cfg.php';
 require 'misago_log.php';
-require 'http.php';
 require 'application.php';
 
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
