@@ -33,6 +33,7 @@ parse_query_string();
 if ($_SERVER['HTTP_METHOD'] == 'PUT') {
   parse_post_body();  
 }
+$_REQUEST = array_merge($_GET, $_POST);
 
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
