@@ -25,10 +25,14 @@ require 'active_support/time.php';
 if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
-
 require 'cfg.php';
 require 'misago_log.php';
 require 'application.php';
+
+parse_query_string();
+if ($_SERVER['HTTP_METHOD'] == 'PUT') {
+  parse_post_body();  
+}
 
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
@@ -36,9 +40,7 @@ require ROOT.'/config/environment.php';
 require 'i18n.php';
 I18n::startup();
 
-require 'action_controller/functions.php';
 require ROOT.'/config/routes.php';
-ActionController_host_analyzer();
 
 
 function __autoload($class)
@@ -64,6 +66,39 @@ function sanitize_magic_quotes(&$params)
   }
   else {
 	  $params = stripslashes($params);
+  }
+}
+
+function parse_query_string()
+{
+  if (empty($_SERVER['QUERY_STRING']))
+  {
+    $_SERVER['QUERY_STRING'] = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+    parse_str($_SERVER['QUERY_STRING'], $_GET);
+  }
+}
+  
+# TODO: Parse multipart/form-data.
+# TODO: Parse incoming XML.
+function parse_post_body()
+{
+  switch($this->content_type())
+  {
+    case 'application/x-www-form-urlencoded':
+      parse_str($this->raw_body(), $_POST);
+    break;
+    
+    case 'multipart/form-data':
+      // ...
+    break;
+    
+    case 'application/xml': case 'text/xml':
+      // ...
+    break;
+    
+    case 'application/json':
+      $_POST = json_decode($this->raw_body(), true);
+    break;
   }
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-# TODO: after_filters(), is_xml_http_request().
+# TODO: after_filters()
 abstract class ActionController_Base extends Object
 {
   public $helpers = ':all';
@@ -15,18 +15,23 @@ abstract class ActionController_Base extends Object
   protected $already_rendered = false;
   protected $skip_view        = false;
   
-  function __construct()
+  function __construct(ActionController_AbstractRequest $request)
   {
+    $this->request   = $request;
+    $this->response  = new ActionController_AbstractResponse();
+    $this->flash     = new ActionController_Flash();
+    
     $this->name      = get_class($this);
-    $this->params    = array_merge($_GET, $_POST);
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    
-    if (get_magic_quotes_gpc()) {
-      sanitize_magic_quotes($this->params);
-    }
-    
-    $this->flash    = new ActionController_Flash();
-    $this->response = new ActionController_AbstractResponse();
+    $this->params    = $this->request->parameters();
+    /*
+    cfg::set('base_url',
+      $this->request->protocol().
+      $this->request->host().
+      $this->request->port_string().
+      $this->request->relative_url_root()
+    );
+    */
   }
   
   # @private
@@ -256,7 +261,7 @@ abstract class ActionController_Base extends Object
     {
       $url = (string)$url;
       if (!strpos($url, '://')) {
-        $url = cfg::get('base_path').$url;
+        $url = $this->request->relative_url_root().$url;
       }
     }
     
@@ -307,19 +312,13 @@ abstract class ActionController_Base extends Object
   # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
   protected function remote_ip()
   {
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-      return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    }
-    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-      return $_SERVER['HTTP_CLIENT_IP'];
-    }
-    return $_SERVER['REMOTE_ADDR'];
+    return $this->request->remote_ip();
   }
   
   # Checks wether the request is made from AJAX.
   protected function is_xml_http_request()
   {
-    return (isset($_SERVER['X-Requested-With']) and $_SERVER['X-Requested-With'] == 'XMLHttpRequest');
+    return $this->request->is_xml_http_request();
   }
   
   protected function before_filters() {}
