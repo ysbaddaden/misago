@@ -83,7 +83,8 @@ class ActionController_AbstractResponse extends Object
   
   function content_type_from_format($format)
   {
-    return $this->headers['Content-Type'] = $this->mimetypes[$format];
+    $format = isset($this->mimetypes[$format]) ? $this->mimetypes[$format] : 'text/html';
+    return $this->headers['Content-Type'] = $format;
   }
   
   function status($status=null)

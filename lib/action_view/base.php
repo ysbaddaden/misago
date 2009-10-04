@@ -184,7 +184,8 @@ class ActionView_Base extends Object
       else {
         $__partial_file = $this->view_path.'/_'.$options['partial'];
       }
-      $__partial_file .= ".{$this->view_format}.tpl";
+      $__view_format = isset($options['format']) ? $options['format'] : $this->view_format;
+      $__partial_file .= ".{$__view_format}.tpl";
       
       if (file_exists(ROOT."/app/views/{$__partial_file}"))
       {

@@ -32,6 +32,8 @@ interface ActionController_AbstractRequest
   # Otherwise returns the empty string.
   function port_string();
   
+  function subdomains();
+  
   # Path from request URI.
   function path();
   

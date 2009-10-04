@@ -75,6 +75,15 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     return ($port == 80 or $port == 443) ? '' : ":$port";
   }
   
+  function subdomains()
+  {
+    $parts = explode('.', $this->host());
+    if (count($parts) > 2) {
+      return array_slice($parts, 0, count($parts) - 2);
+    }
+    return array();
+  }
+  
   function path()
   {
     return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);

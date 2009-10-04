@@ -73,6 +73,11 @@ class ActionController_TestRequest extends Object implements ActionController_Ab
     return ($port == 80 or $port == 443) ? '' : ":$port";
   }
   
+  function subdomains()
+  {
+    return array();
+  }
+  
   function path()
   {
     return $this->data['path'];
