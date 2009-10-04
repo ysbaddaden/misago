@@ -84,12 +84,15 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   {
     $column = trim($column);
     
+    # is this an SQL function?
     if (preg_match('/^(.*)(\b[\w_]+)\(([^\(\)]*)\)(.*)$/i', $column, $match))
     {
       $rs = empty($match[3]) ? "{$match[2]}()" :
-        "{$match[2]}(".$this->_quote_column($match[3]).")";
+        "{$match[2]}(".$this->quote_columns($match[3]).")";
       return "{$match[1]}$rs{$match[4]}";
     }
+    
+    # simple column
     return $this->_quote_column($column);
   }
   
@@ -115,7 +118,12 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # Quotes a series of columns for use in a SQL query.
   function quote_columns($columns)
   {
-    if (!is_array($columns)) {
+    if (!is_array($columns))
+    {
+#      if (preg_match_all('/(\b[\w_]+)\(([^\(\)]*)\)/i', $columns, $matches))
+#      {
+#        print_r($matches[0]);
+#      }
       $columns = explode(',', $columns);
     }
     $columns = array_map(array($this, 'quote_column'), $columns);

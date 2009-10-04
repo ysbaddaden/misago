@@ -1,11 +1,8 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
 class Orphan extends ActiveRecord_Base {
   
@@ -178,8 +175,27 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal(count($products), 3);
     
     $product = $product->first();
-
     $this->assert_instance_of($product, 'Product');
+  }
+  
+  function test_find_by_sql()
+  {
+    $product = new Product();
+    $products = $product->find_by_sql('select * from products');
+    $this->assert_type($products, 'array');
+    $this->assert_equal(count($products), 3);
+    $this->assert_instance_of($products[0], 'Product');
+
+    $products = $product->find_by_sql('select id from products where id = 2');
+    $this->assert_equal(count($products), 1);
+    $this->assert_equal($products[0]->id, 2);
+  }
+  
+  function test_count_by_sql()
+  {
+    $product = new Product();
+    $this->assert_equal($product->count_by_sql('select count(*) from products'), 3);
+    $this->assert_equal($product->count_by_sql('select count(*) from products where id = 1'), 1);
   }
   
   function test_update()

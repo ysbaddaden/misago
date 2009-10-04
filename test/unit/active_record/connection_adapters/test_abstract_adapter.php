@@ -74,7 +74,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
   {
     $db = new FakeAdapter(array());
     
-    $test = $db->sanitize_order('*');
+    $test = $db->quote_column('*');
     $this->assert_equal(trim($test), '*');
     
     $test = $db->quote_column('products');
@@ -92,8 +92,11 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $test = $db->quote_column('sum(paypal.montant)');
     $this->assert_equal($test, 'sum("paypal"."montant")');
 
-    $test = $db->sanitize_order('COUNT(*)');
+    $test = $db->quote_column('COUNT(*)');
     $this->assert_equal(trim($test), 'COUNT(*)');
+
+    $test = $db->quote_column('CONCAT(a, b)');
+    $this->assert_equal(trim($test), 'CONCAT("a", "b")');
   }
   
   function test_quote_columns()
