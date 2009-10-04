@@ -22,6 +22,4 @@ date_default_timezone_set('UTC');
 # cfg::set('mailer_return_path', 'postmaster@domain.com');
 # cfg::set('mailer_default_from', 'me <contact@domain.com>');
 
-Session::start();
-
 ?>

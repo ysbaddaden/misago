@@ -2,43 +2,35 @@
 
 class ActionController_Dispatcher extends Object
 {
+  protected $request;
+  protected $response;
+  
+  function __construct($request=null, $response=null)
+  {
+    $this->request  = ($request  !== null) ? $request  : new ActionController_CgiRequest();
+    $this->response = ($response !== null) ? $response : new ActionController_AbstractResponse();
+  }
+  
   static function dispatch()
   {
-    $request = new ActionController_CgiRequest();
+    $dispatcher = new self();
+    $dispatcher->handle_request();
+  }
+  
+  # TODO: Parse out methods from ActionController_Base (and above): they're not actions for sure.
+  protected function handle_request()
+  {
+    $controller = ActionController_Routing::recognize($this->request);
+    $params = $this->request->path_parameters();
     
-    # routes
-    $map = ActionController_Routing::draw();
-    $mapping = $map->route(strtoupper($request->method()), $request->path());
-    $map->build_path_and_url_helpers();
-    
-    # controller
-    $name  = $mapping[':controller'].'_controller';
-    $class = String::camelize($name);
-    
-    if (file_exists(ROOT."/app/controllers/$name.php"))
-    {
-      $controller = new $class($request);
-      
-      # action!
-      if (method_exists($controller, $mapping[':action']))
-      {
-        if ($mapping[':action'] != 'execute'
-          and strpos($mapping[':action'], '__') !== 0
-          and is_callable(array($controller, $mapping[':action'])))
-        {
-          $controller->execute($mapping);
-        }
-        else {
-          throw new MisagoException("Tried to call a private/protected method as a public action: {$mapping[':action']}", 400);
-        }
-      }
-      else {
-        throw new MisagoException("No such action: $class->{$mapping[':action']}", 404);
-      }
+    if (!method_exists($controller, $params[':action'])) {
+      throw new MisagoException("No such action: ".get_class($controller)."->{$params[':action']}", 404);
     }
-    else {
-      throw new MisagoException("No such controller: {$class}", 404);
+    if ($params[':action'] == 'process' or !is_callable(array($controller, $params[':action']))) {
+      throw new MisagoException("Tried to call a private/protected method as a public action: {$params[':action']}", 400);      
     }
+    
+    $controller->process($this->request, $this->response);
   }
 }
 

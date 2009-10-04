@@ -11,6 +11,12 @@ class TestIndexController extends ActionController_TestCase
     
     $this->run_action('POST', '/index/get?a=abcd&c=aze%20rty', array('a' => 'b', 'c' => 'd'));
     $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
+    
+    $this->run_action('PUT', '/index/get?a=abcd&c=aze%20rty', array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
+    
+    $this->run_action('DELETE', '/index/get?a=abcd&c=aze%20rty', array('a' => 'b', 'c' => 'd'));
+    $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
   }
   
   function test_postfields_parse()
@@ -27,7 +33,7 @@ class TestIndexController extends ActionController_TestCase
     $this->run_action('POST', '/index/post', array('a' => array('b', 'd'), 'c' => 'aze rty'));
     $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => array('b', 'd'), 'c' => 'aze rty'), true)), 'sub array with no keys');
     
-    $this->run_action('POST', '/index/post', array('a' => array('b' => 'bb', 'd' => 'dd'), 'c' => 'aze rty'));
+    $this->run_action('PUT', '/index/post', array('a' => array('b' => 'bb', 'd' => 'dd'), 'c' => 'aze rty'));
     $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => array('b' => 'bb', 'd' => 'dd'), 'c' => 'aze rty'), true)), 'sub array with keys');
   }
   

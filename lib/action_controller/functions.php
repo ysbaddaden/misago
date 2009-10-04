@@ -1,4 +1,5 @@
 <?php
+/*
 # Dispatches the current request.
 # 
 # This will route the request, make some preparations
@@ -57,5 +58,5 @@ function ActionController_host_analyzer()
     cfg::set('base_url', "{$protocol}://{$host}".(($base_path == '/') ? '' : $base_path));
   }
 }
-
+*/
 ?>

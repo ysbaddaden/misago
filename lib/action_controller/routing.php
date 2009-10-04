@@ -1,5 +1,6 @@
 <?php
 
+# IMPROVE: store routes in APC!
 class ActionController_Routing extends Object
 {
   private $routes          = array();
@@ -17,10 +18,32 @@ class ActionController_Routing extends Object
   # Singleton
   static function draw()
   {
-    if (self::$map === null) {
+    if (self::$map === null)
+    {
       self::$map = new self();
+      require ROOT.'/config/routes.php';
     }
     return self::$map;
+  }
+  
+  # Returns the controller for a given request.
+  static function recognize($request)
+  {
+    $map = self::draw();
+    $map->build_path_and_url_helpers();
+    
+    $params = $map->route(strtoupper($request->method()), $request->path());
+    $request->path_parameters($params);
+    
+    $name  = $params[':controller'].'_controller';
+    $class = String::camelize($name);
+    
+    if (!file_exists(ROOT."/app/controllers/$name.php")) {
+      throw new MisagoException("No such controller $class.", 404);
+    }
+    
+    $controller = new $class();
+    return $controller;
   }
   
   # Empties the routes.

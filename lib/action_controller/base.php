@@ -1,95 +1,82 @@
 <?php
 
-# TODO: after_filters()
 abstract class ActionController_Base extends Object
 {
-  public $helpers = ':all';
-  
-  public $name;
-  public $action;
-  public $params;
-  public $view_path;
-  public $flash;
+  public    $helpers = ':all';
+  public    $flash;
+  public    $action;
+  public    $params;
+  public    $view_path;
 	
-  protected $mapping          = array();
+  protected $request;
+  protected $response;
+  
   protected $already_rendered = false;
   protected $skip_view        = false;
   
-  function __construct(ActionController_AbstractRequest $request)
+  function __construct()
   {
-    $this->request   = $request;
-    $this->response  = new ActionController_AbstractResponse();
-    $this->flash     = new ActionController_Flash();
-    
-    $this->name      = get_class($this);
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    $this->params    = $this->request->parameters();
-    /*
+    I18n::initialize();
+  }
+  
+  function __get($attr)
+  {
+    if ($attr == 'format') {
+      return $this->request->format();
+    }
+    return null;
+  }
+  
+  function __set($attr, $value)
+  {
+    if ($attr == 'format') {
+      return $this->request->format($value);
+    }
+    return $this->$attr = $value;;
+  }
+  
+  # @private
+  function process($request=null, $response=null)
+  {
+    @Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
+    
+    $this->request  = ($request  !== null) ? $request  : new ActionController_CgiRequest();
+    $this->response = ($response !== null) ? $response : new ActionController_AbstractResponse();
+    $this->flash    = new ActionController_Flash();
+    
     cfg::set('base_url',
       $this->request->protocol().
       $this->request->host().
       $this->request->port_string().
       $this->request->relative_url_root()
     );
-    */
-  }
-  
-  # @private
-  function execute($mapping)
-  {
-    if (!is_array($mapping))
-    {
-      $this->action  = $mapping;
-      $this->mapping = array(
-        ':method' => 'GET',
-        ':controller' => str_replace('_controller', '', String::underscore($this->name)),
-        ':action' => $mapping,
-        ':format' => 'html',
-      );
-    }
-    else
-    {
-      $this->mapping =& $mapping;
-      $this->action  = $this->mapping[':action'];
-      $this->format  = empty($this->mapping[':format']) ? 'html' : $this->mapping[':format'];
-      
-      $params = array_diff_key($this->mapping, array(
-        ':controller' => '',
-        ':action' => '',
-        ':method' => '',
-        ':format' => '',
-      ));
-      $this->params = array_merge($this->params, $params);
-    }
+    
+    $this->params = $this->request->parameters();
+    $this->action = $this->params[':action'];
     
     if (DEBUG == 1)
     {
+      misago_log("\n\nHTTP request: ".strtoupper($this->request->method())." ".
+        $this->request->path()."[".date('Y-m-d H:i:s T')."]\n");
       $time = microtime(true);
-      $date = date('Y-m-d H:i:s T');
-      
-      misago_log(sprintf("\n\nHTTP REQUEST: {$this->mapping[':method']} ".
-        get_class($this)."::".$this->action." [%s]\n", $date));
     }
     
-    # some helpers
+    # helpers
     require_once(ROOT.'/app/helpers/application_helper.php');
-    require_once(ROOT."/app/helpers/{$this->mapping[':controller']}_helper.php");
+    require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
     
     $this->before_filters();
     $this->{$this->action}();
     
-    if (!$this->already_rendered
-      and !$this->skip_view)
-    {
+    if (!$this->already_rendered and !$this->skip_view) {
       $this->render($this->action);
     }
     
-#    $this->after_filters();
+#    $this->response->body = $this->after_filters($this->response->body);
     
-    if (DEBUG == 1)
-    {
-      $time = microtime(true) - $time;
-      misago_log(sprintf("End of HTTP request ; Elapsed time: %.02fms", $time));
+    if (DEBUG == 1) {
+      misago_log(sprintf("End of HTTP request; Elapsed time: %.02fms", microtime(true) - $time));
     }
   }
   
@@ -185,11 +172,25 @@ abstract class ActionController_Base extends Object
   # 
   function render($options=null)
   {
+    $this->__render($options);
+    $this->response->send();
+  }
+  
+  # Renders a view or exports a resource, returned as a string.
+  # See render() for documentation.
+  function render_to_string($options=null)
+  {
+    $this->__render($options);
+    return $this->response->body;
+  }
+  
+  private function __render($options)
+  {
     if (!is_array($options)) {
       $options = array('action' => ($options === null) ? $this->action : $options);
     }
     if (!isset($options['format'])) {
-      $options['format'] = empty($this->format) ? 'html' : $this->format;
+      $options['format'] = $this->format;
     }
     
     if (isset($options['location'])) {
@@ -226,17 +227,7 @@ abstract class ActionController_Base extends Object
       $this->response->body = $view->render($options);
     }
     
-    $this->response->send();
     $this->already_rendered = true;
-  }
-  
-  # Renders a view or exports a resource, returned as a string.
-  # See render() for documentation.
-  function render_to_string($options=null)
-  {
-    ob_start();
-    $this->render($options);
-    return ob_get_clean();
   }
   
   # Redirects to another URL.
@@ -273,6 +264,7 @@ abstract class ActionController_Base extends Object
       $status_text = $this->response->status($status);
       echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $status $status_text]</p>";
     }
+    
     exit;
   }
   
@@ -321,8 +313,16 @@ abstract class ActionController_Base extends Object
     return $this->request->is_xml_http_request();
   }
   
-  protected function before_filters() {}
-#  protected function after_filters()  {}
+  
+  protected function before_filters()
+  {
+    
+  }
+  
+#  protected function after_filters($body)
+#  {
+#    return $body;
+#  }
 }
 
 ?>

@@ -71,8 +71,8 @@ class I18n
   static public  $locale       = 'en';
   static private $translations = array();
   
-  # Starts the I18n translator.
-  static function startup()
+  # Initializes the I18n translator.
+  static function initialize()
   {
     if (cfg::is_set('i18n_default_locale')) {
       self::$locale = cfg::get('i18n_default_locale');

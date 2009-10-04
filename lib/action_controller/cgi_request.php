@@ -2,16 +2,18 @@
 
 class ActionController_CgiRequest extends Object implements ActionController_AbstractRequest
 {
-  public $headers;
+  public    $headers;
+  protected $format;
+  protected $path_parameters;
   
   function __construct()
   {
     $this->parse_headers();
-#    $this->parse_query_string();
-    
-#    if ($this->method() == 'put') {
-#      $this->parse_post_body();
-#    }
+    $this->parse_query_string();
+    if ($this->method() == 'put') {
+      $this->parse_post_body();
+    }
+    $_REQUEST = array_merge($_GET, $_POST);
   }
   
   function accepts()
@@ -24,9 +26,19 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     return $_SERVER['CONTENT_TYPE'];
   }
   
+  # IMPROVE: Check HTTP Accept header when :format isn't specifically defined in path_parameters.
   function format($force_format=null)
   {
-    
+    if ($force_format !== null) {
+      return $this->format = $force_format;
+    }
+    elseif (!empty($this->format)) {
+      return $this->format;
+    }
+    elseif (!empty($this->path_parameters[':format'])) {
+      return $this->path_parameters[':format'];
+    }
+    return 'html';
   }
   
   function method()
@@ -68,6 +80,11 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
   }
   
+  function url()
+  {
+    
+  }
+  
   function relative_url_root()
   {
     if (isset($_SERVER['REDIRECT_URI']))
@@ -80,23 +97,20 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     return '';
   }
   
-  function remote_ip()
+  function path_parameters($params=null)
   {
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-      return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    if ($params !== null) {
+      $this->path_parameters = $params;
     }
-    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
-      return $_SERVER['HTTP_CLIENT_IP'];
-    }
-    return $_SERVER['REMOTE_ADDR'];
+    return $this->path_parameters;
   }
   
   function & parameters()
   {
-    $params = array_merge($_GET, $_POST);
-    if (get_magic_quotes_gpc()) {
-      sanitize_magic_quotes($params);
-    }
+    $params = array_merge($_GET, $_POST, $this->path_parameters);
+#    if (get_magic_quotes_gpc()) {
+#      sanitize_magic_quotes($params);
+#    }
     return $params;
   }
   
@@ -113,6 +127,17 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     return (isset($_SERVER['X-Requested-With']) and $_SERVER['X-Requested-With'] == 'XMLHttpRequest');
   }
   
+  function remote_ip()
+  {
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+      return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+      return $_SERVER['HTTP_CLIENT_IP'];
+    }
+    return $_SERVER['REMOTE_ADDR'];
+  }
+  
   
   private function parse_headers()
   {
@@ -126,7 +151,7 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
       }
     }
   }
-  /*
+  
   private function parse_query_string()
   {
     if (empty($_SERVER['QUERY_STRING']))
@@ -159,7 +184,6 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
       break;
     }
   }
-  */
 }
 
 ?>
