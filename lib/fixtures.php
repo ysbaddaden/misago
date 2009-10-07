@@ -17,8 +17,9 @@ class Fixtures
     
     $fixtures = array();
     foreach($files as $file) {
-      $fixtures = str_replace('.yml', '', basename($file));
+      $fixtures[] = str_replace('.yml', '', basename($file));
     }
+    return $fixtures;
   }
   
   static private function & parse($fixture)
@@ -39,9 +40,6 @@ class Fixtures
       }
       return;
     }
-    
-    misago_log("FIXTURE: $fixture\n");
-    
     self::$connection->truncate($fixture);
     
     $rows = Fixtures::parse($fixture);
