@@ -91,7 +91,7 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
   
   function url()
   {
-    
+    return $this->protocol().$this->host().$this->port_string().$_SERVER['REQUEST_URI'];
   }
   
   function relative_url_root()
