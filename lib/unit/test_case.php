@@ -16,16 +16,8 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
     
     parent::__construct();
     
-    $this->truncate_fixtures();
+    $this->truncate($this->fixtures);
     self::drop_database();
-  }
-  
-  function truncate_fixtures()
-  {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    foreach(array_unique($this->fixtures) as $table_name) {
-      $db->truncate($table_name);
-    }
   }
   
   static function create_database($force=false)
@@ -34,15 +26,15 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
     {
       self::$_db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
       self::$_db->connect();
-
+      
       $dbname = self::$_db->config('database');
-
-      # drops database (just in case)
+      
+      # drops database if exists
       if (self::$_db->database_exists($dbname)) {
         self::$_db->drop_database($dbname);
       }
       
-      # creates database & tables
+      # creates database & migrates
       self::$_db->create_database($dbname);
       require MISAGO."/lib/commands/db/migrate.php";
     }
@@ -62,23 +54,11 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   #   $this->fixtures('chapters,pages');
   function fixtures($fixtures)
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    
-    if (!empty($fixtures)) {
-      $fixtures = array_collection($fixtures);
-    }
-    $this->truncate($fixtures);
-    
-    foreach($fixtures as $fixture)
+    if (!empty($fixtures))
     {
-      $contents = file_get_contents(ROOT."/test/fixtures/$fixture.yml");
-      $entries  = Yaml::decode($contents);
-      
-      foreach($entries as $entry) {
-        $db->insert($fixture, $entry);
-      }
-      
-      $this->fixtures[] = $fixture;
+      $fixtures = array_collection($fixtures);
+      Fixtures::insert($fixtures);
+      $this->fixtures = array_merge($this->fixtures, $fixtures);
     }
   }
   
@@ -87,13 +67,8 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   #   $this->truncate('chapters,pages');
   function truncate($tables)
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
-    
     if (!empty($tables)) {
-      $tables = array_collection($tables);
-    }
-    foreach($tables as $table_name) {
-      $db->truncate($table_name);
+      Fixtures::truncate(array_collection($tables));
     }
   }
 }

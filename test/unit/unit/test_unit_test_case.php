@@ -9,6 +9,8 @@ require_once dirname(__FILE__)."/../../../lib/unit/test_case.php";
 
 class Test_Unit_TestCase extends Unit_TestCase
 {
+  protected $fixtures = array();
+  
   function test_load_fixtures()
   {
     $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);

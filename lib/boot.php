@@ -29,17 +29,13 @@ require 'cfg.php';
 require 'misago_log.php';
 require 'application.php';
 
-#parse_query_string();
-#if ($_SERVER['HTTP_METHOD'] == 'PUT') {
-#  parse_post_body();  
-#}
-#$_REQUEST = array_merge($_GET, $_POST);
+require 'action_controller/routing.php';
 
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
 
-#require 'i18n.php';
-#I18n::initialize();
+require 'i18n.php';
+I18n::initialize();
 
 
 function __autoload($class)
