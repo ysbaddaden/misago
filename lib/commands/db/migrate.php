@@ -1,41 +1,114 @@
 <?php
-# IMPROVE: Add possibility to run a specific migration (version = XXX).
+# Syntaxes:
+# 
+#   $ script/db/migrate
+#     => migrates from current_version to latest_version
+#   
+#   $ script/db/migrate VERSION=XXX
+#     => if version > current_version: migrates up
+#     => if version < current_version: migrates down
+#   
+#   $ script/db/migrate up VERSION=XXX
+#     => runs a single migration up (will do nothing if already done)
+#   
+#   $ script/db/migrate up VERSION=XXX
+#     => runs a single migration down (will do nothing if not done)
+#   
+#   $ script/db/migration redo
+#     => rollbacks the last migration and then migrates it up again
+#   
+#   $ script/db/migration redo STEP=3
+#     => rollbacks the last 3 migrations and then migrates them up again
 
-$direction = isset($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 'up';
-$from_version = ActiveRecord_Migration::get_version();
+$action = null;
 
-$migration_files = glob(ROOT.'/db/migrate/*.php');
-sort($migration_files);
-
-$runned_migrations = 0;
-
-foreach($migration_files as $file)
+foreach($_SERVER['argv'] as $v)
 {
-  $file = str_replace(ROOT.'/db/migrate/', '', $file);
-  preg_match("/^([\d]+)_([\w_]+)\.php$/", $file, $match);
-  
-  $ts = $match[1];
-  if ($ts > $from_version)
+  switch($v)
   {
-    $runned_migrations += 1;
-    
-    require ROOT.'/db/migrate/'.$file;
-    $class = String::singularize(String::camelize($match[2]));
-    
-    $migration = new $class($ts, $_SERVER['MISAGO_ENV']);
-    $result = $migration->migrate($direction);
-    
-    if ($result) {
-      ActiveRecord_Migration::save_version($ts);
-    }
-    else {
-      throw new Exception("An error occured.");
-    }
+    case 'up':   $action = 'up';   break;
+    case 'down': $action = 'down'; break;
+    case 'redo': $action = 'redo'; break;
+    default:
+      if (preg_match('/^([A-Z_]+)=(.+)$/', $v, $match)) {
+        define($match[1], $match[2]);
+      }
   }
 }
+$from_version = ActiveRecord_Migration::get_version();
+$migrations   = ActiveRecord_Migration::migrations();
 
-if ($runned_migrations === 0) {
-  echo "Database is up to date.\n";
+switch($action)
+{
+  case 'up':
+    echo "script/db/migrate up VERSION=XXX is unsupported for now.\n";
+  break;
+  
+  case 'down':
+    echo "script/db/migrate down VERSION=XXX is unsupported for now.\n";
+  break;
+  
+  case 'redo':
+    if (!defined('STEP')) {
+      define('STEP', 1);
+    }
+    if (STEP > 0)
+    {
+      # migrates down x steps
+      $migration = end($migrations);
+      for($i=0; $i<STEP; $i++)
+      {
+        ActiveRecord_Migration::run($migration, 'down');
+        $migration = prev($migrations);
+      }
+      
+      # migrates up x steps
+      for($i=0; $i<STEP; $i++) {
+        ActiveRecord_Migration::run(next($migrations), 'up');
+      }
+    }
+    else {
+      echo "Error.\n";
+    }
+  break;
+  
+  default:
+    if (!defined('VERSION'))
+    {
+      $last = end($migrations);
+      define('VERSION', $last['version']);
+    }
+    
+    if ($from_version < VERSION)
+    {
+      # migrates up
+      foreach($migrations as $migration)
+      {
+        if ($migration['version'] > $from_version
+          and $migration['version'] <= VERSION)
+        {
+          ActiveRecord_Migration::run($migration, 'up');
+        }
+      }
+    }
+    elseif ($from_version > VERSION)
+    {
+      # migrates down
+      $migration = end($migrations);
+      while($migration !== false)
+      {
+        if ($migration['version'] <= $from_version
+          and $migration['version'] > VERSION)
+        {
+          ActiveRecord_Migration::run($migration, 'down');
+        }
+        $migration = prev($migrations);
+      }
+    }
+    else {
+      echo "Database is up to date.\n";
+    }
+  break;
 }
 
 ?>

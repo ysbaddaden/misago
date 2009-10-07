@@ -6,9 +6,9 @@ class ActiveRecord_Migration
   protected $db;
   protected $version;
   
-  function __construct($version, $environment)
+  function __construct($version)
   {
-    $this->db = ActiveRecord_Connection::get($environment);
+    $this->db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     $this->version = $version;
   }
   
@@ -55,7 +55,59 @@ class ActiveRecord_Migration
     }
   }
   
-  # Migrate database in the given direction (either up or down).
+  # Returns the full list of migrations.
+  static function migrations()
+  {
+    $files = glob(ROOT.'/db/migrate/*.php');
+    sort($files);
+    
+    $migrations = array();
+    foreach($files as $file)
+    {
+      preg_match('/^(\d+)_(.+)$/', basename($file), $match);
+      $migrations[$match[1]] =array(
+        'version' => $match[1],
+        'file'    => $file,
+        'class'   => String::singularize(String::camelize(str_replace('.php', '', $match[2]))),
+      );
+    }
+    return $migrations;
+  }
+  
+  # Runs a particular migration.
+  static function run($migration, $direction='up')
+  {
+    require_once $migration['file'];
+    $class = $migration['class'];
+    
+    $obj = new $class($migration['version']);
+    $rs = $obj->migrate($direction);
+    
+    if ($rs)
+    {
+      switch ($direction)
+      {
+        case 'up': $version = $migration['version']; break;
+        case 'down':
+          $version = 0;
+          foreach(array_keys(ActiveRecord_Migration::migrations()) as $v)
+          {
+            if ($v == $migration['version']) {
+              break;
+            }
+            $version = $v;
+          }
+        break;
+      }
+      ActiveRecord_Migration::save_version($version);
+    }
+    else {
+      throw new Exception("An error occured.");
+    }
+  }
+  
+  
+  # Runs migration in the given direction (either up or down).
   function migrate($direction)
   {
     $time   = microtime(true);
