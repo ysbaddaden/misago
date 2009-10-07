@@ -1,25 +1,4 @@
 <?php
-# Syntaxes:
-# 
-#   $ script/db/migrate
-#     => migrates from current_version to latest_version
-#   
-#   $ script/db/migrate VERSION=XXX
-#     => if version > current_version: migrates up
-#     => if version < current_version: migrates down
-#   
-#   $ script/db/migrate up VERSION=XXX
-#     => runs a single migration up (will do nothing if already done)
-#   
-#   $ script/db/migrate up VERSION=XXX
-#     => runs a single migration down (will do nothing if not done)
-#   
-#   $ script/db/migration redo
-#     => rollbacks the last migration and then migrates it up again
-#   
-#   $ script/db/migration redo STEP=3
-#     => rollbacks the last 3 migrations and then migrates them up again
-
 $action = null;
 
 foreach($_SERVER['argv'] as $v)
@@ -29,6 +8,25 @@ foreach($_SERVER['argv'] as $v)
     case 'up':   $action = 'up';   break;
     case 'down': $action = 'down'; break;
     case 'redo': $action = 'redo'; break;
+    case '--help':
+      
+      echo "\n";
+      echo "$ script/db/migrate\n";
+      echo "   => will run all required migrations up to the latest one.\n";
+      echo "\n";
+      echo "$ script/db/migrate VERSION=XXX\n";
+      echo "   => will run all required migrations (up or down) until the target\n";
+      echo "      is reached. On up the target migration is runned. On down the\n";
+      echo "      target migration isn't.\n";
+      echo "\n";
+      echo "$ script/db/migrate redo\n";
+      echo "   => will migrate down the last migration, before migrating up again.\n";
+      echo "\n";
+      echo "$ script/db/migrate redo STEP=2\n";
+      echo "   => will migrate down the last 2 migrations, before migrating up again.\n";
+      echo "\n";
+    
+    exit;
     default:
       if (preg_match('/^([A-Z_]+)=(.+)$/', $v, $match)) {
         define($match[1], $match[2]);
