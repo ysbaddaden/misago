@@ -4,7 +4,7 @@ $_SERVER['migrate_debug'] = 0;
 class Unit_TestCase extends Unit_Assertions_ResponseAssertions
 {
   static public  $batch_run = false;
-  static private $_db;
+  static private $connection;
   
   protected $fixtures = array();
   
@@ -24,18 +24,18 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   {
     if (!self::$batch_run or $force)
     {
-      self::$_db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
-      self::$_db->connect();
+      self::$connection = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
+      self::$connection->connect();
       
-      $dbname = self::$_db->config('database');
+      $dbname = self::$connection->config('database');
       
       # drops database if exists
-      if (self::$_db->database_exists($dbname)) {
-        self::$_db->drop_database($dbname);
+      if (self::$connection->database_exists($dbname)) {
+        self::$connection->drop_database($dbname);
       }
       
       # creates database & migrates
-      self::$_db->create_database($dbname);
+      self::$connection->create_database($dbname);
       require MISAGO."/lib/commands/db/migrate.php";
     }
   }
@@ -45,7 +45,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
     if (!self::$batch_run or $force)
     {
       ActiveRecord_Connection::get($_SERVER['MISAGO_ENV'])->disconnect();
-      self::$_db->drop_database(self::$_db->config('database'));
+      self::$connection->drop_database(self::$connection->config('database'));
     }
   }
   
