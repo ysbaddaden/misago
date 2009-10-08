@@ -135,6 +135,8 @@ class ActionController_Routing extends Object
   
   
   # Returns a mapping for a given method+path.
+  # 
+  # @private
   function & route($method, $uri)
   {
     $uri = trim($uri, '/');
@@ -187,6 +189,8 @@ class ActionController_Routing extends Object
   # Returns a path for a given mapping.
   # 
   # FIXME: Handle special requirements for keys to select the route.
+  # 
+  # @private
   function reverse(array $mapping)
   {
     $_mapping = array_merge(array(
@@ -242,15 +246,15 @@ class ActionController_Routing extends Object
     return true;
   }
   
-  /**
-   * Creates helper functions to build paths and URL from routing definition
-   * (aka reverse routing). For instance the following route will produce the
-   * 'show_product_path()' and 'show_product_url()' functions:
-   *
-   *   'product/:id' => {:controller => 'products', :action => 'show'}
-   * 
-   * IMPROVE: Recognize keys' special requirements (?)
-   */
+  # Creates helper functions to build paths and URL from routing definition
+  # (aka reverse routing). For instance the following route will produce the
+  # 'show_product_path()' and 'show_product_url()' functions:
+  # 
+  #   'product/:id' => {:controller => 'products', :action => 'show'}
+  # 
+  # IMPROVE: Recognize keys' special requirements (?)
+  # 
+  # @private
   function build_path_and_url_helpers()
   {
     if (DEBUG
@@ -389,6 +393,8 @@ class ActionController_Routing extends Object
 # 
 # IMPROVE: url_for: handle specified options (host, protocol, etc.)
 # IMPROVE: url_for: permit for simplified calls, like url_for(array(':action' => 'index')), which shall use the current controller.
+# 
+# @namespace ActionController
 function url_for($options)
 {
   if ($options instanceof ActiveRecord_Record)
