@@ -1,9 +1,26 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
+/* Functional tests for ActionControllers.
+ 
+ = Example:
+ 
+   <?php
+   class Test_StoriesController extends ActionControllerTest
+   {
+     function test_index()
+     {
+       $this->run_action(stories_path());
+       $this->assert_response(200);
+       $this->assert_select('.stories li', 4);
+     }
+   }
+   new Test_StoriesController();
+   ?>
+*/
 class ActionController_TestCase extends Unit_TestCase
 {
-  # IMPROVE: Start and stop a test server (script/server -p 3009 -e test).
+  # IMPROVE: Use TestRequest instead of calling a test server.
   function __construct()
   {
     $map = ActionController_Routing::draw();
@@ -12,8 +29,6 @@ class ActionController_TestCase extends Unit_TestCase
   }
   
   # Executes an action on test server.
-  # 
-  # Examples:
   # 
   #   $this->run_action('GET', '/accounts');
   #   $this->run_action('PUT', '/accounts', array('account' => array('user_name' => 'azeroth'));
