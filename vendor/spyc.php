@@ -64,7 +64,7 @@ class SPYC_YAMLNode
  * </code>
  * @package Spyc
  */
-class Yaml
+class Spyc
 {
   /**
    * Load YAML into a PHP array statically
