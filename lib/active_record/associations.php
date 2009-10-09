@@ -7,8 +7,8 @@
 # ==belongs_to
 #
 # Represents a one-to-one relationship, in the point of view
-# of the child. The counterpart is either a has_one or
-# has_many relationship (see below).
+# of the child. The counterpart is either a `has_one` or
+# `has_many` relationship (see below).
 # 
 # ===Example: 
 # 
@@ -30,11 +30,11 @@
 # ==has_one
 # 
 # Represents a one-to-one relationship, in the point of view
-# of the parent. The counterpart is a belongs_to relationship.
+# of the parent. The counterpart is a `belongs_to` relationship.
 # 
 # The difference with a belongs_to relationship, is where the
-# foreign key is located: in this model for a belongs_to
-# relationship; in the related model for a has_one relationship.
+# foreign key is located: in this model for a `belongs_to`
+# relationship; in the related model for a `has_one` relationship.
 # 
 # ===Example:
 #
@@ -55,7 +55,7 @@
 # ==has_many
 # 
 # Represents a one-to-many relationship, in the point of view
-# of the parent. The counterpart is a belongs_to relationship.
+# of the parent. The counterpart is a `belongs_to` relationship.
 # 
 # ===Example: 
 # 
@@ -77,7 +77,7 @@
 # 
 # ===:through
 # 
-# Declares a has_many relationship, but through a join model.
+# Declares a `has_many` relationship, but through a join model.
 # 
 # [TODO]
 # 

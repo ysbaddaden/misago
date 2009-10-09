@@ -1,6 +1,18 @@
 <?php
 # Helper to create new tables. Generally used in migrations,
 # but permits to create temporary tables on the fly too.
+# 
+#   $t = $this->db->new_table('authors');
+#   $t->add_column('name', 'string', array('limit' => 50));
+#   $t->add_timestamps('date');
+#   $t->create();
+# 
+# Create a temporary table, with no primary key:
+# 
+#   $t = $this->db->new_table('stats', array('primary_key' => false, 'temporary' => true));
+#   $t->add_column('counts', 'integer');
+#   $t->create();
+# 
 class ActiveRecord_Table
 {
   private $db;
@@ -16,8 +28,11 @@ class ActiveRecord_Table
   # 
   # Options: 
   # 
-  # - id: automatically create the 'id' column (primary_key)
-  # - options: addition to table creation (eg: 'engine=myisam')
+  # - `id` (boolean): automatically create the primary key column (default)
+  # - `options`: addition to table creation (eg: 'engine=myisam')
+  # - `temporary` (bool): true to create a temporary table
+  # - `force` (null, bool): true to drop table before create, otherwise creates if not exists
+  # 
   function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $db)
   {
     $this->db   = $db;
@@ -35,25 +50,25 @@ class ActiveRecord_Table
   # 
   # Types:
   # 
-  # - primary_key (integer)
-  # - string
-  # - text
-  # - integer
-  # - float
-  # - decimal
-  # - date
-  # - time
-  # - datetime
-  # - boolean
-  # - binary
+  # - `primary_key` (auto_increment integer, serial, ...)
+  # - `string`
+  # - `text`
+  # - `integer`
+  # - `float`
+  # - `decimal`
+  # - `date`
+  # - `time`
+  # - `datetime`
+  # - `boolean`
+  # - `binary`
   # 
   # Options:
   # 
-  # - primary_key (boolean): column is the primary key?
-  # - null (boolean): can the column be null?
-  # - limit (integer): maximum size
-  # - default: default value
-  # - signed (boolean): is the integer/float column signed?
+  # - `primary_key` (boolean): column is the primary key?
+  # - `null` (boolean): can the column be null?
+  # - `limit` (integer): maximum size
+  # - `default`: default value
+  # - `signed` (boolean): is the integer/float column signed?
   # 
   # Examples:
   # 
@@ -80,9 +95,9 @@ class ActiveRecord_Table
   # 
   # Types:
   # 
-  # - date: will add created_on & updated_on.
-  # - time: will add created_at & updated_at.
-  # - datetime: will add created_at & updated_at.
+  # - `date`: will add `created_on` & `updated_on`.
+  # - `time`: will add `created_at` & `updated_at`.
+  # - `datetime`: will add `created_at` & `updated_at`.
   # 
   function add_timestamps($type='datetime')
   {

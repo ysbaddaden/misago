@@ -1,7 +1,7 @@
 <?php
 
 # Contains a collection of records.
-# Used by has many and HABTM relationships.
+# Used by `has_many` and `HABTM` relationships.
 class ActiveRecord_Collection extends ActiveArray
 {
   protected $parent;

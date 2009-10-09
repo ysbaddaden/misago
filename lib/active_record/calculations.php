@@ -1,7 +1,23 @@
 <?php
 
+# Calculates with data.
+# 
+# 
 class ActiveRecord_Calculations extends ActiveRecord_Behaviors
 {
+  # Generic calculation method.
+  # 
+  # Use whatever mathematic SQL function. For +count+, +average+,
+  # +sum+, +minimum+ and +maximum+, use the optimized methods instead.
+  # 
+  # It returns a single float/integer if no `group` option is present.
+  # otherwise returns a `column => value` pair hash.
+  # 
+  # Options:
+  # 
+  # - `select`
+  # - `distinct`
+  # 
   function calculate($operation, $column='*', $options=array())
   {
     if (isset($options['select'])) {
@@ -37,6 +53,7 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
   #   $people->count(array('conditions' => 'age = 26'))
   #   $people->count('id', array('conditions' => 'age = 26'))
   # 
+  # Returned value is always is an integer.
   function count()
   {
     $column  = '*';

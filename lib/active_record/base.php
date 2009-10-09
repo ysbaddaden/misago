@@ -3,9 +3,9 @@
 # Database object abstraction.
 # 
 # Permits to handle database entries like objects. It supports
-# CRUD operations (create, read, update and delete), validations
-# through ActiveRecord_Validations, and relations through
-# ActiveRecord_Associations.
+# CRUD operations (+create+, read, +update+ and +delete+), validations
+# through +ActiveRecord_Validations+, and relations through
+# +ActiveRecord_Associations+.
 # 
 # =CRUD
 # 
@@ -54,12 +54,12 @@
 #   $posts = $post->find_all_by_category('aaa');
 #   $posts = $post->find_all_by_category('aaa', array('order' => 'title asc'));
 # 
-# If no posts are found, returns an empty ActiveArray.
+# If no posts are found, returns an empty +ActiveArray+.
 # 
 # ===Find values
 # 
 # Data won't be processed into objects, and it shall return a simple hash
-# of key => value pairs. It's especially useful for collecting data for a
+# of `key => value` pairs. It's especially useful for collecting data for a
 # HTML select. for instance
 # 
 #   $post   = new Post();
@@ -69,7 +69,7 @@
 # 
 # ===Scopes
 # 
-# Scopes are predefined options for find requests.
+# Scopes are predefined options for +find+ requests.
 # 
 # ====Default scope
 # 
@@ -106,25 +106,25 @@
 #   $post = new Post(4);
 #   $post->update_attributes(array('category' => 'ddd'));
 #   
-# Check update(), update_attribute() and update_attributes() for
+# Check +update+, +update_attribute+ and +update_attributes+ for
 # more examples.
 # 
 # 
 # ==Delete
 # 
-# There are two ways to delete records: delete or destroy.
+# There are two ways to delete records: +delete+ or +destroy+.
 # 
-# The difference is that delete always instanciates the record
+# The difference is that +delete+ always instanciates the record
 # before deletion, permitting to interact with it. To delete an
 # uploaded photo when deleting an image from a web gallery for
 # instance.
 # 
-# On the contrary, destroy will delete all records at once in
+# On the contrary, +destroy+ will delete all records at once in
 # the database. There is no way to interact with the deletion
 # of a particular entry.
 # 
-# The advantage of delete is to be able to interact with the
-# deletion, but the advantage of destroy is it should be faster,
+# The advantage of +delete+ is to be able to interact with the
+# deletion, but the advantage of +destroy+ is it should be faster,
 # especially when deleting many records.
 # 
 # ===delete
@@ -171,19 +171,19 @@
 # - [7] after_create()
 # - [8] after_save()
 # 
-# As you can see, there is a lot of callbacks, which permits you to
+# As you can see, there are a lot of callbacks, which permits you to
 # interact with the creation process at every step of it. Same goes
-# for update, which has the same lifecycle, but uses particular
+# for +update+, which has the same lifecycle, but uses particular
 # `on_update` callbacks instead of `on_create`.
 # 
-# Delete has callbacks too. But the lifecycle is simplier:
+# +delete+ has callbacks too, but the lifecycle is simplier:
 # 
 # - delete()
 # - [1] before_delete()
 # - *actually deletes the entry*
 # - [2] after_delete()
 # 
-# Remember that only delete has callbacks, destroy has no such methods.
+# Remember that only +delete+ has callbacks, +destroy+ has no such handlers.
 # 
 # 
 # TODO: Named scopes.
@@ -304,15 +304,13 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return String::humanize($human_name);
   }
   
-  /**
-   * Declares some magic methods.
-   * 
-   * Examples:
-   * 
-   *   $user  = $user->find_by_id();
-   *   $post  = $post->find_first_by_tag($tag);
-   *   $posts = $post->find_all_by_category_id($category_id);
-   */
+  # Declares some magic methods.
+  # 
+  # Examples:
+  # 
+  #   $user  = $user->find_by_id();
+  #   $post  = $post->find_first_by_tag($tag);
+  #   $posts = $post->find_all_by_category_id($category_id);
   function __call($func, $args)
   {
     if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $func, $match))
@@ -342,31 +340,29 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return parent::__call($func, $args);
   }
   
-  /**
-   * Finds records in database.
-   * 
-   * Methods:
-   * 
-   * - :all    Returns all found records.
-   * - :first  Returns the first found record (null if nothing is found).
-   * - :values Returns bare values (uninstanciated).
-   * 
-   * Options:
-   * 
-   * - select (collection)
-   * - conditions (string, array or hash)
-   * - group (collection)
-   * - order (collection)
-   * - limit (integer)
-   * - page (integer)
-   * - include (collection)
-   * 
-   * Eager Loading:
-   * 
-   * See ActiveRecord_Associations.
-   * 
-   * TEST: Test option 'group'.
-   */
+  # Finds records in database.
+  # 
+  # Methods:
+  # 
+  # - `:all`    Returns all found records.
+  # - `:first`  Returns the first found record (null if nothing is found).
+  # - `:values` Returns bare values (uninstanciated).
+  # 
+  # Options:
+  # 
+  # - `select` (collection)
+  # - `conditions` (string, array or hash)
+  # - `group` (collection)
+  # - `order` (collection)
+  # - `limit` (integer)
+  # - `page` (integer)
+  # - `include` (collection)
+  # 
+  # Eager Loading:
+  # 
+  # See +ActiveRecord_Associations+.
+  # 
+  # TEST: Test option 'group'.
   function find($method_or_id=':all', $options=null)
   {
     # arguments
@@ -443,19 +439,19 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     }
   }
   
-  # Shortcut for find(:all).
+  # Shortcut for +find+(:all).
   function all($options=null)
   {
     return $this->find(':all', $options);
   }
   
-  # Shortcut for find(:first).
+  # Shortcut for +find+(:first).
   function first($options=null)
   {
     return $this->find(':first', $options);
   }
   
-  # Shortcut for find(:values).
+  # Shortcut for +find+(:values).
   function values($options=null)
   {
     return $this->find(':values', $options);
@@ -463,7 +459,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   
   # Returns an array of ActiveRecords, using results as attributes.
   # 
-  # Use find() unless you need special features. Be aware that
+  # Use +find+ instead, unless you need special features. Be aware that
   # custom SQL requests may brake whenever you switch between
   # connection adapters.
   function & find_by_sql($sql)
@@ -482,7 +478,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   #   $count = $post->count_by_sql("select count(*) from posts where created_at > now()");
   # 
-  # Use find() instead, unless you need special features. Be aware
+  # Use +count+ instead, unless you need special features. Be aware
   # that custom SQL requests may brake whenever you switch between
   # connection adapters.
   function count_by_sql($sql)
@@ -502,6 +498,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return (bool)$this->count($options);
   }
   
+  # Returns full SQL string from given options.
   function build_sql_from_options($options)
   {
     # builds SQL
@@ -539,7 +536,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       $limit = $this->db->sanitize_limit($options['limit'], $page);
     }
     
-#    return "SELECT $select FROM $table $joins $where $group $order $limit ;";
     return "SELECT $select FROM $table $joins $where $group $order $limit";
   } 
   
@@ -606,7 +602,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # You better consider this method as private.
   # Do not use unless you know what you are doing (ie. you're hacking misago).
-  # Use ActiveRecord_Base::create() instead.
+  # Use +ActiveRecord_Base::create()+ instead.
   # 
   # @private
   protected function _create()
@@ -649,7 +645,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # You better consider this method as private.
   # Do not use unless you know what you are doing (ie. you're hacking misago).
-  # Use ActiveRecord_Base::update() or ActiveRecord_Base::update_attributes() instead.
+  # Use +ActiveRecord_Base::update()+ or +ActiveRecord_Base::update_attributes()+ instead.
   # 
   # @private
   protected function _update()
@@ -693,12 +689,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return false;
   }
   
-  /**
-   * Creates a new record.
-   * 
-   *   $user  = $user->create(array('name' => 'John'));
-   *   $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
-   */
+  # Creates a new record.
+  # 
+  #   $user  = $user->create(array('name' => 'John'));
+  #   $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
   function create(array $attributes)
   {
     if (func_num_args() == 1)
@@ -737,19 +731,17 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return $records;
   }
   
-  /**
-   * Updates one or many records.
-   * 
-   *   # update one row
-   *   $user = $user->update(1, array('name' => 'Joe'));
-   *   
-   *   # update many rows
-   *   $people = array(
-   *     1 => array('name' => 'Polly'),
-   *     2 => array('name' => 'Jean')
-   *   );
-   *   $users = $user->update(array_keys($people), array_values($people));
-   */
+  # Updates one or many records.
+  # 
+  #   # update one row
+  #   $user = $user->update(1, array('name' => 'Joe'));
+  #   
+  #   # update many rows
+  #   $people = array(
+  #     1 => array('name' => 'Polly'),
+  #     2 => array('name' => 'Jean')
+  #   );
+  #   $users = $user->update(array_keys($people), array_values($people));
   function update($id, $attributes)
   {
     if (!is_array($id))
@@ -786,62 +778,54 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return $records;
   }
   
-  /**
-   * Updates a single attribute of record, without going throught
-   * the validation process.
-   * 
-   *   $post->update_attribute('name', 'my first post [update]');
-   */
+  # Updates a single attribute of record, without going throught
+  # the validation process.
+  # 
+  #   $post->update_attribute('name', 'my first post [update]');
   function update_attribute($attribute, $value)
   {
     $this->$attribute = $value;
     return $this->save(false);
   }
   
-  /**
-   * Updates some attributes of record.
-   * 
-   *   $post = new Post(1);
-   *   $post->title    = 'my first post [update]';
-   *   $post->category = 2;
-   *   $post->update_attributes(array('title', 'category'));
-   *   $post->update_attributes('title, category');
-   *   
-   *   $post->update_attributes(array(
-   *     'title'    => 'my first post [update 2]',
-   *     'category' => 3
-   *   ));
-   */
+  # Updates some attributes of record.
+  # 
+  #   $post = new Post(1);
+  #   $post->title    = 'my first post [update]';
+  #   $post->category = 2;
+  #   $post->update_attributes(array('title', 'category'));
+  #   $post->update_attributes('title, category');
+  #   
+  #   $post->update_attributes(array(
+  #     'title'    => 'my first post [update 2]',
+  #     'category' => 3
+  #   ));
   function update_attributes($updates)
   {
     $this->set_attributes($updates);
     return $this->save();
   }
   
-  /**
-   * Updates many records at once.
-   * 
-   * Available options:
-   * 
-   * - limit
-   * - order
-   */
+  # Updates many records at once.
+  # 
+  # Available options:
+  # 
+  # - `limit`
+  # - `order`
   function update_all($updates, $conditions=null, $options=null)
   {
     $options['primary_key'] = $this->primary_key;
     return $this->db->update($this->table_name, $updates, $conditions, $options);
   }
   
-  /**
-   * Deletes a record.
-   * 
-   *   # deletes a given record
-   *   $post->delete(123);
-   *   
-   *   # deletes current record
-   *   $post = new Post(456);
-   *   $post->delete();
-   */
+  # Deletes a record.
+  # 
+  #   # deletes a given record
+  #   $post->delete(123);
+  #   
+  #   # deletes current record
+  #   $post = new Post(456);
+  #   $post->delete();
   function delete($id=null)
   {
     if ($id === null) {
@@ -877,16 +861,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return true;
   }
   
-  /**
-   * Deletes many records at once.
-   * 
-   * Each matching record are instanciated, and deletion callbacks are run.
-   * 
-   * Available options:
-   * 
-   * - limit
-   * - order
-   */
+  # Deletes many records at once.
+  # 
+  # Each matching record are instanciated, and deletion callbacks are run.
+  # 
+  # Available options:
+  # 
+  # - `limit`
+  # - `order`
   function delete_all($conditions=null, $options=null)
   {
     if (!empty($conditions)) {
