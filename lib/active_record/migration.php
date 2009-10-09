@@ -58,7 +58,7 @@ class ActiveRecord_Migration
   # Returns the full list of migrations.
   static function migrations()
   {
-    $files = glob(ROOT.'/db/migrate/*.php');
+    $files = glob(ROOT.DS.'db'.DS.'migrate'.DS.'*.php');
     sort($files);
     
     $migrations = array();

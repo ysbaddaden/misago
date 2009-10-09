@@ -173,7 +173,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   
   private function configure_associations()
   {
-    $apc_key = TMP.'/cache/active_records/associations_'.get_class($this);
+    $apc_key = TMP.DS.'cache'.DS.'active_records'.DS.'associations_'.get_class($this);
     $this->associations = apc_fetch($apc_key, $success);
     if ($success === false)
     {

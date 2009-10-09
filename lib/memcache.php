@@ -1,5 +1,6 @@
 <?php
 
+# @private
 class Memcache
 {
   function __construct()

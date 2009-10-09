@@ -1,22 +1,25 @@
 <?php
 
-/*
- Passes temporary variables to the very next request.
- 
- For instance in your controller:
-
-   if ($this->article->save())
-   {
-     $this->flash['notice'] = 'Article was successfully created.';
-     redirect_to(show_article_path($this->article->id));
-   }
-
- Then in your view:
-
-   <? if (isset($this->flash['notice'])): ?>
-     <div class="notice"><?= $this->flash['notice'] ?></div>
-   <? endif; ?>
-*/
+# Passes temporary variables to the very next request.
+# 
+# For instance in your controller:
+#
+#   if ($this->article->save())
+#   {
+#     $this->flash['notice'] = 'Article was successfully created.';
+#     redirect_to(show_article_path($this->article->id));
+#   }
+#
+# Then in your view:
+#
+#   <\? if (isset($this->flash['notice'])): ?\>
+#     <div class="notice"><\?= $this->flash['notice'] ?\></div>
+#   <\? endif; ?\>
+# 
+# Please remember that variables will be forgotten at the end of the
+# following request. Variables are only accessible at request n+1, not
+# at request n+2, n+3, etc.
+# 
 class ActionController_Flash extends ArrayObject
 {
   private $hash = array();

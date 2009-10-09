@@ -1,16 +1,16 @@
 <?php
 require ROOT.'/config/initializers/inflections.php';
 
+# Checks wether a string is a symbol or not.
+# @namespace ActiveSupport
 function is_symbol($str)
 {
   return (is_string($str) and strpos($str, ':') === 0);
 }
 
-/**
- * Extensions for strings.
- * 
- * @namespace ActiveSupport
- */
+# Extensions for strings.
+# 
+# @namespace ActiveSupport
 class String extends Inflections
 {
 	static protected $trans;

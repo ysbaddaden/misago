@@ -1,18 +1,78 @@
 <?php
 
+# Actions Controllers are the core logic of your application.
+# They process HTTP requests, manipulate your models, passes data
+# to views and return an HTTP response.
+# 
+# A sample controller looks like this:
+# 
+#   class PostsController extends ActionController_Base
+#   {
+#     function show()
+#     {
+#       $this->post = new Post($this->params[':id']);
+#     }
+#     
+#     function create()
+#     {
+#       $this->post = new Post($this->params['account']);
+#       if ($this->post->save()) {
+#         $this->redirect_to(show_post_path($this->post));
+#       }
+#     }
+#   }
+# 
+# = Renders
+# 
+# Actions, by default, render a view from `app/views` using the name of
+# the controller for the folder, the name of the action for the template,
+# and the current format (default to `html`).
+# 
+# For instance calling `/posts/index` will process `PostsController::index()`
+# and render `app/views/posts/show.html.tpl`.
+# 
+# == Attributes
+# 
+# Any attribute your define in your action to your controller, will then be
+# available to your view. For instance:
+#
+#   class PostsController extends ActionController_Base
+#   {
+#     function show() {
+#       $this->post = new Post($this->params[':id']);
+#     }
+#   }
+# 
+# Then in your view you can access `$this->post`:
+# 
+#   <h1><\?= $this->post->title ?\></h1>
+# 
 abstract class ActionController_Base extends Object
 {
-  public    $helpers = ':all';
-  public    $flash;
-  public    $action;
-  public    $params;
-  public    $view_path;
+  public $helpers = ':all';
+  
+  # See +ActionController_Flash+.
+  public $flash;
+  
+  # The currently executed action.
+  public $action;
+  
+  # Merged GET and POST parameters plus PATH parameters from route.
+  public $params;
+  
+  public $view_path;
 	
+	# Request data.
   protected $request;
+  
+  # @private
   protected $response;
   
+  # @private
   protected $already_rendered = false;
-  protected $skip_view        = false;
+
+  # True to skip rendering.
+  protected $skip_view = false;
   
   function __construct()
   {
@@ -63,8 +123,8 @@ abstract class ActionController_Base extends Object
     }
     
     # helpers
-    require_once(ROOT.'/app/helpers/application_helper.php');
-    require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
+    require_once(ROOT.DS.'app'.DS.'helpers'.DS.'application_helper.php');
+    require_once(ROOT.DS.'app'.DS.'helpers'.DS."{$this->params[':controller']}_helper.php");
     
     $this->before_filters();
     $this->{$this->action}();
@@ -122,14 +182,14 @@ abstract class ActionController_Base extends Object
   # By default controller's layout (eg: layouts/posts.html.tpl) is used,
   # and falls back to the generic default layout (layouts/default.html.tpl).
   # 
-  #   # uses a particular layout:
+  #   # use a particular layout:
   #   render(array('action' => 'create', 'layout' => 'admin'));
   #     => renders create.html.tpl inside admin.html.tpl
   # 
   #   # no layout at all:
   #   render(array('layout' => false));
   #   
-  #   # using a particular format:
+  #   # use a particular format:
   #   render(array('action' => 'index', 'layout' => 'feeds', 'format' => 'rss'));
   #     => renders index.rss.tpl inside feeds.rss.tpl
   # 

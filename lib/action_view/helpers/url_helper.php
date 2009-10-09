@@ -68,7 +68,7 @@ function current_page($url)
 # 
 # Options:
 # 
-# - confirm: adds a JavaScript confirm dialog.
+# - `confirm`: adds a JavaScript confirm dialog.
 # 
 # @namespace ActionView_Helpers_UrlHelper
 function link_to($content, $url=null, $attributes=null)
@@ -145,8 +145,8 @@ function link_to_unless_current($content, $url, $attributes=null)
 # 
 # Special attributes:
 # 
-# - method: forces HTTP method
-# - confirm: asks for JavaScript confirmation before submitting form
+# - `method`: forces HTTP method
+# - `confirm`: asks for JavaScript confirmation before submitting form
 # 
 # @namespace ActionView_Helpers_UrlHelper
 function button_to($name, $url, $attributes=null)

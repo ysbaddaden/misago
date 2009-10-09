@@ -1,10 +1,8 @@
 <?php
-/**
- * Emulates APC caching features when APC is missing.
- * 
- * IMPROVE: Save data on disk, to emulate between requests cache.
- * IMPROVE: Check for data expiration (done once at request startup?).
- */
+# Emulates APC caching features when APC is missing.
+# 
+# IMPROVE: Save data on disk, to emulate between requests cache.
+# IMPROVE: Check for data expiration (done once at request startup?).
 
 $GLOBALS['__fake_apc_data'] = array();
 #$GLOBALS['__fake_apc_expires'] = array();
@@ -12,7 +10,6 @@ $GLOBALS['__fake_apc_data'] = array();
 
 # Caches a variable in the data store, only if it's not already stored. 
 # 
-# @namespace APC
 # @private
 function apc_add($key, $var, $ttl=0)
 {
@@ -24,7 +21,6 @@ function apc_add($key, $var, $ttl=0)
 
 # Caches a variable in the data store. 
 # 
-# @namespace APC
 # @private
 function apc_store($key, $var, $ttl=0)
 {
@@ -35,7 +31,6 @@ function apc_store($key, $var, $ttl=0)
 
 # Fetches a stored variable from the cache.
 # 
-# @namespace APC
 # @private
 function apc_fetch($key, &$success=null)
 {
@@ -49,7 +44,6 @@ function apc_fetch($key, &$success=null)
 
 # Removes a stored variable from the cache.
 # 
-# @namespace APC
 # @private
 function apc_delete($key)
 {
@@ -60,7 +54,6 @@ function apc_delete($key)
 
 # Clears user cache.
 # 
-# @namespace APC
 # @private
 function apc_clear_cache()
 {

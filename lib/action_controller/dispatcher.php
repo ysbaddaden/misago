@@ -1,5 +1,14 @@
 <?php
 
+# Dispatches and processes a HTTP request.
+# 
+# For instance, your index.php may look like this:
+# 
+#   <\?php
+#   require_once dirname(__FILE__).'/config/boot.php';
+#   ActionController_Dispatcher::dispatch();
+#   ?\>
+# 
 class ActionController_Dispatcher extends Object
 {
   protected $request;

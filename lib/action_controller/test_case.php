@@ -1,23 +1,20 @@
 <?php
 $_SERVER['migrate_debug'] = 0;
 
-/* Functional tests for ActionControllers.
- 
- = Example:
- 
-   <?php
-   class Test_StoriesController extends ActionControllerTest
-   {
-     function test_index()
-     {
-       $this->run_action(stories_path());
-       $this->assert_response(200);
-       $this->assert_select('.stories li', 4);
-     }
-   }
-   new Test_StoriesController();
-   ?>
-*/
+# Functional tests for ActionControllers.
+# 
+#   <\?php
+#   class Test_StoriesController extends ActionControllerTest
+#   {
+#     function test_index()
+#     {
+#       $this->run_action(stories_path());
+#       $this->assert_response(200);
+#       $this->assert_select('.stories li', 4);
+#     }
+#   }
+#   new Test_StoriesController();
+#   ?\>
 class ActionController_TestCase extends Unit_TestCase
 {
   # IMPROVE: Use TestRequest instead of calling a test server.
@@ -31,10 +28,11 @@ class ActionController_TestCase extends Unit_TestCase
   # Executes an action on test server.
   # 
   #   $this->run_action('GET', '/accounts');
-  #   $this->run_action('PUT', '/accounts', array('account' => array('user_name' => 'azeroth'));
+  #   $this->run_action('PUT', '/accounts',
+  #     array('account' => array('user_name' => 'azeroth'));
   #   
   #   $this->run_action(new_account_path());
-  #   $this->run_action(delete_account_path(), array('account' => array('user_name' => 'azeroth'));
+  #   $this->run_action(delete_account_path());
   # 
   protected function & run_action($method, $uri=null, $postfields=null, $files=null)
   {

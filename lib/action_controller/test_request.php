@@ -1,5 +1,5 @@
 <?php
-
+# @private
 class ActionController_TestRequest extends Object implements ActionController_AbstractRequest
 {
   public  $headers = array();

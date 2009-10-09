@@ -1,5 +1,5 @@
 <?php
-require dirname(__FILE__).'/../config/boot.php';
+require dirname(__FILE__).DS.'..'.DS.'config'.DS.'boot.php';
 
 try {
   ActionController_Dispatcher::dispatch();

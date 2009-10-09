@@ -36,9 +36,9 @@ class ActiveRecord_Behaviors_Taggable_Base
       "{$singular}_list" => "tag_list"
     );
     $functions  = array(
-      "find_with_{$plural}" => 'find_tagged_with',
+      "find_with_{$plural}"  => 'find_tagged_with',
       "count_with_{$plural}" => 'count_tagged_with',
-      "{$singular}_count"   => 'tag_count',
+      "{$singular}_count"    => 'tag_count',
     );
     $this->parent->map_module($this, $attributes, $functions);
   }

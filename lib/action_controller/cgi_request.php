@@ -1,7 +1,14 @@
 <?php
 
+# (F)CGI requests.
 # 
-# See +ActionController_AbstractRequest+ for documentation.
+# CgiRequest handles HTTP headers, GET and POST parameters, etc.
+# for (F)CGI requests. For instance on PUT requests, POST data isn't
+# parsed. Also when using the 404-handler, QUERY_STRING isn't parsed.
+# 
+# CgiRequest handles all of that, and much more, transparently.
+# 
+# See +ActionController_AbstractRequest+ for actual documentation.
 # 
 class ActionController_CgiRequest extends Object implements ActionController_AbstractRequest
 {
@@ -173,8 +180,7 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     }
   }
   
-  # TODO: Parse multipart/form-data.
-  # TODO: Parse incoming XML.
+  # TODO: Parse multipart/form-data, as well as XM and /JSON post data.
   private function parse_post_body()
   {
     switch($this->content_type())

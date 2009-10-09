@@ -210,7 +210,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     $this->db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
     
     # columns' definition
-    $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
+    $apc_key = TMP.DS.'cache'.DS.'active_records'.DS.'columns_'.$this->table_name;
     $this->columns = apc_fetch($apc_key, $success);
     if ($success === false)
     {

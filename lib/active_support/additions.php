@@ -1,5 +1,7 @@
 <?php
 
+# Checks wether a variable is blank or not.
+# 
 # @namespace ActiveSupport
 function is_blank($var)
 {

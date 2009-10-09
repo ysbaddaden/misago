@@ -1,6 +1,7 @@
 <?php
 
 # Renders a trace as string (html or text)
+# @private
 function debug_render_backtrace($backtrace, $var_export=true)
 {
   $html = ini_get('html_errors');
@@ -42,6 +43,7 @@ function debug_render_backtrace($backtrace, $var_export=true)
 }
 
 # TODO: Render an exception page in production environment.
+# @private
 function error_handler($errno, $errstr, $errfile=null, $errline=null, array $errcontext=null)
 {
   $backtrace = debug_backtrace();
@@ -64,6 +66,7 @@ function error_handler($errno, $errstr, $errfile=null, $errline=null, array $err
   }
 }
 
+# @private
 function exception_handler($e)
 {
   $message = $e->getMessage();

@@ -1,6 +1,6 @@
 <?php
 
-# Helper object to create a HTML form for a record.
+# Helper object to create a HTML form associated to a record.
 # 
 # Initiate helper for a class:
 # 
@@ -16,10 +16,10 @@
 #   $f->start(update_user_path($user->id))
 #   $f->label('username');
 #   $f->text_field('username');
-#   $f->submit('Save');
+#   submit_tag('Save');
 #   $f->end();
 # 
-# You may also mix multiple records:
+# You may also mix records:
 # 
 #   $p = fields_for($user->profile);
 #   $f->start(update_user_path($user->id))

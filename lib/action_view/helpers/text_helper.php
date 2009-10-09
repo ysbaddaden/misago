@@ -17,8 +17,7 @@ class ActionView_Helpers_TextHelper_NS
 
 # Transforms all links and email addresses to clickable links.
 # 
-# - link limits what should be linked: all, email_addresses, urls.
-# - callback permits to use a function for preg_replace_callback that will replace link's text.
+# - `link` limits what should be linked: all, email_addresses, urls.
 # 
 # @namespace ActionView_Helpers_TextHelper
 function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
@@ -54,7 +53,7 @@ function excerpt($text, $phrase, $radius=100, $omission='...')
   return $str;
 }
 
-# Highlights some phrases in text using MARK.
+# Highlights some phrases in text using the MARK tag.
 # 
 # @namespace ActionView_Helpers_TextHelper
 function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
@@ -69,7 +68,7 @@ function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
   return preg_replace('/('.$phrases.')/', $highlighter, $text);
 }
 
-# Pluralizes a word depending on count.
+# Pluralizes a word depending on `count`.
 # 
 # @namespace ActionView_Helpers_TextHelper
 function pluralize($count, $singular, $plural=null)
@@ -81,7 +80,7 @@ function pluralize($count, $singular, $plural=null)
 }
 
 # Simple formatting of text. Two linefeeds make for a paragraph,
-# and a single linefeed makes for line break.
+# and a single linefeed makes for a line break.
 # 
 # @namespace ActionView_Helpers_TextHelper
 function simple_format($text)
@@ -110,9 +109,9 @@ function truncate($text, $length=30, $truncate_string='...')
 # Requires PHP Markdown or PHP Markdown Extra by Michel Fortin:
 # http://michelf.com/projects/php-markdown/
 # 
-# You must strip all functions from markdown.php, keep defines
-# and rename the Markdown_Parser class to Markdown. Eventually
-# save it as vendor/markdown.php
+# You must strip all functions from `markdown.php`, keep defines,
+# rename the `Markdown_Parser` class to `Markdown`, and eventually
+# save it as `vendor/markdown.php`.
 # 
 # @namespace ActionView_Helpers_TextHelper
 function markdown($text)
@@ -123,8 +122,8 @@ function markdown($text)
 
 # Formats text using the Textile syntax.
 # 
-# Download Textile from http://textile.thresholdstate.com/
-# and copy classTextile.php to vendor/textile.php
+# Download Textile from http://textile.thresholdstate.com/ and copy
+# `classTextile.php` to `vendor/textile.php`
 # 
 # @namespace ActionView_Helpers_TextHelper
 function textilize($text)

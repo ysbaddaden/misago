@@ -1,5 +1,15 @@
 <?php
 
+# YAML serializing.
+# 
+#   # encode:
+#   $data = array(...);
+#   $yaml_string = Yaml::encode($data);
+#   
+#   # decode:
+#   $yaml_string = file_get_contents('accounts.yml');
+#   $accounts = Yaml::decode($yaml_string);
+# 
 class Yaml
 {
   static function decode($input)

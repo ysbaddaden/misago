@@ -1,18 +1,16 @@
 <?php
-/**
- * Helpful functions to render form fields for a model.
- * 
- * Example:
- * 
- *   <? $search = new Search() ?>
- *   <?= form_tag(search_path()) ?>
- *     <p>
- *       <?= label($search, 'query') ?>
- *       <?= text_field($search, 'query') ?>
- *       <?= submit_tag() ?>
- *     </p>
- *   </form>
- */
+
+# Helpful functions to render form fields for a model.
+# 
+#   <\? $search = new Search() ?\>
+#   <\?= form_tag(search_path()) ?\>
+#     <p>
+#       <\?= label($search, 'query') ?\>
+#       <\?= text_field($search, 'query') ?\>
+#       <\?= submit_tag() ?\>
+#     </p>
+#   </form>
+# 
 class ActionView_Helpers_FormHelper_NS
 {
   # 
@@ -40,11 +38,11 @@ class ActionView_Helpers_FormHelper_NS
 
 # Renders a label tag.
 # 
-#   form::label('Product', 'in_stock');
-#   form::label('Product', 'in_stock', 'In stock?');
-#   form::label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
-#   form::label('Invoice', 'address', null, array('class' => 'invoice-address'));
-#   form::label('Invoice', 'address', array('class' => 'invoice-address'));
+#   label('Product', 'in_stock');
+#   label('Product', 'in_stock', 'In stock?');
+#   label('Product', 'in_stock', 'In stock?', array('class' => 'available'));
+#   label('Invoice', 'address', null, array('class' => 'invoice-address'));
+#   label('Invoice', 'address', array('class' => 'invoice-address'));
 # 
 # @namespace ActionView_Helpers_FormHelper
 function label($object, $column, $text=null, $attributes=null)
@@ -143,51 +141,6 @@ function select($object, $column, $options, $attributes=null)
   $value   = is_object($object) ? $object->$column : null;
   $options = options_for_select($options, $value);
   return select_tag($name, $options, $attributes);
-}
-
-# Parses options for a select option field.
-# 
-# Render from a hash:
-# 
-#   $options = array(
-#     'Keyboard' => 45,
-#     'Mouse' => 72,
-#     'Scanner' => 59,
-#   );
-#   $html_options = options_for_select($options, 45);
-# 
-# Render from an ActiveRecord resultset:
-# 
-#   $products = $post->find(':values', array('select' => 'id,name'));
-#   $html_options = options_for_select($products, 59);
-# 
-# @namespace ActionView_Helpers_FormHelper
-# TODO: Move options_for_select() to FormOptionsHelper.
-function options_for_select($options, $selected=null)
-{
-  if ($selected === null) {
-    $selected = array();
-  }
-  elseif (!is_array($selected)) {
-    $selected = array($selected);
-  }
-  
-  if (!is_hash($options))
-  {
-    $_options = array();
-    foreach($options as $ary) {
-      $_options[$ary[0]] = $ary[1];
-    }
-    $options =& $_options;
-  }
-  
-  $str = '';
-  foreach($options as $name => $value)
-  {
-    $attr = (in_array($value, $selected)) ? ' selected="selected"' : '';
-    $str .= "<option value=\"$value\"$attr>$name</option>";
-  }
-  return $str;
 }
 
 ?>

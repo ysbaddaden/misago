@@ -1,9 +1,9 @@
 <?php
 
-# Handles response data.
+# Response data.
 # 
-# Please note that response should never be used directly. You
-# better use methods from +ActionController_Base+ instead.
+# This is some Misaso internal, response should never be used directly.
+# You should use methods from +ActionController_Base+ instead.
 # 
 class ActionController_AbstractResponse extends Object
 {

@@ -1,6 +1,104 @@
 <?php
 
-# IMPROVE: store routes in APC!
+# Routing is what connects HTTP requests to your application's controllers,
+# parsing actions an parameters too.
+# 
+# You do configure your application's routes in `config/routes.php`.
+# A basic route config file looks like this:
+# 
+#   $map = ActionController_Routing::draw();
+#   
+#   # basic route: connects `/login` to `AccountsController::login()`
+#   $map->connect('login', array(':controller' => 'accounts',
+#     ':action' = 'login'));
+#   
+#   # landing page: `/` => `HomeController::index()`
+#   $map->root(array(':controller' => 'home'));
+#   
+#   # default route
+#   $map->connect(':controller/:action/:id.:format');
+# 
+# You may use a different default route, for instance:
+# 
+#   $map->connect(':controller/:action.:format');
+#   $map->connect(':controller/:id/:action.:format');
+# 
+# =Named routes
+# 
+# You may configure named routes, which will not only recognize the route
+# but will also create some helper functions. For instance:
+# 
+#   $map->named('purchase', 'products/:id/purchase',
+#     array(':controller' => 'order', ':action' => 'purchase'));
+# 
+# This will create the following functions: `purchase_path()` and `purchase_url()`,
+# which you may use like this:
+# 
+#   purchase_path(1);
+#   purchase_path(array(':id' => 1));
+#   purchase_path(new Product(1));
+# 
+# =Requirements (Regular Expressions)
+# 
+# You may check parameters by using regular expressions. A route that doesn't match
+# requirements isn't matched. In this example `:id` must be an integer:
+# 
+#   $map->connect('/posts/:id', array(':controller' => 'posts',
+#     'requirements' => array(':id' => '\d+')));
+# 
+# =Conditions
+# 
+# You may add conditions to routes. At the moment only the HTTP method
+# can be a condition. For instance the following route will only be used
+# on a POST request:
+# 
+#   $this->connect('login', array(':controller' => 'accounts', ':action' => 'login',
+#     'conditions' => array('method' => 'POST')));
+# 
+# Using named routes with conditions, returned URL will be an +ActionController_Url+
+# or +ActionController_Path+ object, that will be transparently handled by view's
+# helpers to generate links and forms that will use the correct HTTP method.
+# 
+# =RESTful routes
+# 
+# REST webservices are handled transparently by misago.
+# 
+# Attention: in RESTful routes `:id` must be an integer.
+# 
+# Example:
+# 
+#   $map->resource('posts');
+# 
+# This will create the following named routes:
+# 
+#   GET    /posts          => PostsController::index()
+#   GET    /posts/new      => PostsController::neo()
+#   POST   /posts          => PostsController::create()
+#   GET    /posts/:id/edit => PostsController::edit()
+#   GET    /posts/:id      => PostsController::show()
+#   PUT    /posts/:id      => PostsController::update()
+#   DELETE /posts/:id      => PostsController::delete()
+# 
+# Of course being named routes it also creates the following helper functions
+# (they also exists with the `_url` form):
+# 
+#   posts_path()       => GET    /posts
+#   new_post_path()    => GET    /posts/new
+#   create_post_path() => POST   /posts
+#   show_post_path()   => GET    /posts/:id
+#   edit_post_path()   => GET    /posts/:id/edit
+#   update_post_path() => PUT    /posts/:id
+#   delete_post_path() => DELETE /posts/:id
+# 
+# To create a REST resource, just generate it:
+#
+#   $ script/generate resource posts
+# 
+# This will create the full featured controller, the model and add the route
+# to your configuration.
+# 
+# IMPROVE: cache routes (in APC).
+# 
 class ActionController_Routing extends Object
 {
   private $routes          = array();
@@ -21,12 +119,12 @@ class ActionController_Routing extends Object
     if (self::$map === null)
     {
       self::$map = new self();
-      require ROOT.'/config/routes.php';
+      require ROOT.DS.'config'.DS.'routes.php';
     }
     return self::$map;
   }
   
-  # Returns the controller for a given request.
+  # Recognizes the route for the given request, an returns the associated controller.
   static function recognize($request)
   {
     $map = self::draw();
@@ -38,7 +136,7 @@ class ActionController_Routing extends Object
     $name  = $params[':controller'].'_controller';
     $class = String::camelize($name);
     
-    if (!file_exists(ROOT."/app/controllers/$name.php")) {
+    if (!file_exists(ROOT.DS.'app'.DS.'controllers'.DS."$name.php")) {
       throw new MisagoException("No such controller $class.", 404);
     }
     
@@ -46,7 +144,7 @@ class ActionController_Routing extends Object
     return $controller;
   }
   
-  # Empties the routes.
+  # Empties routes.
   function reset()
   {
     $this->routes = array();
@@ -58,7 +156,7 @@ class ActionController_Routing extends Object
     $this->connect_route(null, $path, $mapping);
   }
   
-  # Connects the homepage
+  # Connects the homepage.
   function root(array $mapping)
   {
     foreach($this->routes as $i => $route)
@@ -126,11 +224,11 @@ class ActionController_Routing extends Object
     
     $this->named("$plural",          "$name.:format",          array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
     $this->named("new_$singular",    "$name/new.:format",      array(':controller' => $name, ':action' => 'neo',    'conditions' => array('method' => 'GET')));
-    $this->named("show_$singular",   "$name/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')));
-    $this->named("edit_$singular",   "$name/:id/edit.:format", array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET')));
+    $this->named("show_$singular",   "$name/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET'),    'requirements' => array(':id' => '\d+')));
+    $this->named("edit_$singular",   "$name/:id/edit.:format", array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET'),    'requirements' => array(':id' => '\d+')));
     $this->named("create_$singular", "$name.:format",          array(':controller' => $name, ':action' => 'create', 'conditions' => array('method' => 'POST')));
-    $this->named("update_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT')));
-    $this->named("delete_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE')));
+    $this->named("update_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT'),    'requirements' => array(':id' => '\d+')));
+    $this->named("delete_$singular", "$name/:id.:format",      array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE'), 'requirements' => array(':id' => '\d+')));
   }
   
   
@@ -246,20 +344,14 @@ class ActionController_Routing extends Object
     return true;
   }
   
-  # Creates helper functions to build paths and URL from routing definition
-  # (aka reverse routing). For instance the following route will produce the
-  # 'show_product_path()' and 'show_product_url()' functions:
-  # 
-  #   'product/:id' => {:controller => 'products', :action => 'show'}
-  # 
-  # IMPROVE: Recognize keys' special requirements (?)
+  # Builds the named routes helper functions.
   # 
   # @private
   function build_path_and_url_helpers()
   {
     if (DEBUG
-      or !file_exists(TMP.'/built_path_and_url_helpers.php')
-      or time() - strtotime('-24 hours') > filemtime(TMP.'/built_path_and_url_helpers.php'))
+      or !file_exists(TMP.DS.'built_path_and_url_helpers.php')
+      or time() - strtotime('-24 hours') > filemtime(TMP.DS.'built_path_and_url_helpers.php'))
     {
       $functions = array();
       foreach($this->routes as $route)
@@ -271,9 +363,10 @@ class ActionController_Routing extends Object
         }
       }
       $contents = '<?php '.implode("\n\n", $functions).' ?>';
-      file_put_contents(TMP.'/built_path_and_url_helpers.php', $contents);
+      file_put_contents(TMP.DS.'built_path_and_url_helpers.php', $contents);
     }
-    include TMP.'/built_path_and_url_helpers.php';
+    
+    include TMP.DS.'built_path_and_url_helpers.php';
   }
   
   private function build_named_function($type, &$route)

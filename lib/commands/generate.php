@@ -19,7 +19,7 @@ for($i = 1; $i < count($_SERVER['argv']); $i++)
 # basic usage
 if (!isset($arguments[0]))
 {
-  $generators = glob(MISAGO.'/lib/commands/generators/*.php');
+  $generators = glob(MISAGO.DS.'lib'.DS.'commands'.DS.'generators'.DS.'*.php');
   foreach($generators as $i => $generator) {
     $generators[$i] = str_replace('.php', '', basename($generator));
   }
@@ -37,7 +37,7 @@ class Generator_Base
   
   protected function check_path($path, $type='file')
   {
-    if (file_exists(ROOT.'/'.$path))
+    if (file_exists(ROOT.DS.$path))
     {
       if ($type == 'file' and in_array('-f', $this->options)) {
         echo "   overwrite  $path\n";
@@ -56,8 +56,8 @@ class Generator_Base
   
   protected function create_directory($path)
   {
-    if ($this->check_path("$path/", 'directory')) {
-      return mkdir(ROOT.'/'.$path, 0755, true);
+    if ($this->check_path($path.DS, 'directory')) {
+      return mkdir(ROOT.DS.$path, 0755, true);
     }
     return false;
   }
@@ -68,7 +68,7 @@ class Generator_Base
       return false;
     }
     
-    $content = file_get_contents(MISAGO.'/templates/'.$template);
+    $content = file_get_contents(MISAGO.DS.'templates'.DS.$template);
     
     if (!empty($vars))
     {
@@ -82,7 +82,7 @@ class Generator_Base
       $content = str_replace($keys, $values, $content);
     }
     
-    return file_put_contents(ROOT.'/'.$path, $content);
+    return file_put_contents(ROOT.DS.$path, $content);
   }
 }
 
@@ -90,7 +90,7 @@ class Generator_Base
 $generator = array_shift($arguments);
 $class     = 'Generator_'.String::camelize($generator);
 
-require "commands/generators/{$generator}.php";
+require "commands".DS."generators".DS."{$generator}.php";
 new $class($arguments, $options);
 
 ?>

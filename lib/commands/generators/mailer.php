@@ -21,12 +21,12 @@ class Generator_Mailer extends Generator_Base
       'table'    => $table,
     );
     
-    $this->create_directory('app/models');
-    $this->create_directory('app/views/'.$filename);
-    $this->create_directory('test/unit');
+    $this->create_directory('app'.DS.'models');
+    $this->create_directory('app'.DS.'views'.DS.$filename);
+    $this->create_directory('test'.DS.'unit');
     
-    $test = $this->create_file_from_template("app/models/{$filename}.php", 'mailer/model.php', $vars);
-    $this->create_file_from_template("test/unit/test_{$filename}.php", 'mailer/test.php', $vars);
+    $test = $this->create_file_from_template("app".DS."models".DS."{$filename}.php", 'mailer'.DS.'model.php', $vars);
+    $this->create_file_from_template("test".DS."unit".DS."test_{$filename}.php", 'mailer'.DS.'test.php', $vars);
   }
 }
 

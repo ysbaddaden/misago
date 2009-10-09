@@ -4,10 +4,9 @@
 # 
 # Options:
 # 
-# - multipart: sets enctype to multipart/form-data;
+# - multipart: sets `enctype` to `multipart/form-data`;
 # 
-# If method is different of GET or POST, a hidden field
-# will be added: `_method`.
+# If method is different from GET or POST, a hidden field will be added: `_method`.
 # 
 # @namespace ActionView_Helpers_FormTagHelper
 function form_tag($url, $attributes=null)
@@ -124,9 +123,54 @@ function radio_button_tag($name, $value, $attributes=null)
   return tag('input', $attributes);
 }
 
+# Parses options for a select option field.
+# 
+# Render from a hash:
+# 
+#   $options = array(
+#     'Keyboard' => 45,
+#     'Mouse' => 72,
+#     'Scanner' => 59,
+#   );
+#   $html_options = options_for_select($options, 45);
+# 
+# Render from an ActiveRecord resultset:
+# 
+#   $products = $post->find(':values', array('select' => 'id,name'));
+#   $html_options = options_for_select($products, 59);
+# 
+# @namespace ActionView_Helpers_FormHelper
+# TODO: Move options_for_select() to FormOptionsHelper.
+function options_for_select($options, $selected=null)
+{
+  if ($selected === null) {
+    $selected = array();
+  }
+  elseif (!is_array($selected)) {
+    $selected = array($selected);
+  }
+  
+  if (!is_hash($options))
+  {
+    $_options = array();
+    foreach($options as $ary) {
+      $_options[$ary[0]] = $ary[1];
+    }
+    $options =& $_options;
+  }
+  
+  $str = '';
+  foreach($options as $name => $value)
+  {
+    $attr = (in_array($value, $selected)) ? ' selected="selected"' : '';
+    $str .= "<option value=\"$value\"$attr>$name</option>";
+  }
+  return $str;
+}
+
 # Renders a select option field.
 # 
-# $options must be a string of OPTION tags. You may use options_for_select()
+# `$options` must be a string of OPTION tags. You may use +options_for_select+
 # to build it.
 # 
 # Example:

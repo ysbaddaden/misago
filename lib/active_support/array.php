@@ -1,9 +1,7 @@
 <?php
 
-/**
- * Checks wether an array is a hash of key/value pairs or just a list of values.
- * @namespace ActiveSupport_Array
- */
+# Checks wether an array is a hash of key/value pairs or just a list of values.
+# @namespace ActiveSupport_Array
 function is_hash($arr)
 {
   if (!is_array($arr)) {
@@ -19,16 +17,12 @@ function is_hash($arr)
   return false;
 }
 
-/**
- * Simplifies handling of collections.
- * 
- * Examples:
- * 
- * - $collection = array_collection('a,b,  c, d');
- * - $collection = array_collection(array('a', ' b', 'c '));
- * 
- * @namespace ActiveSupport_Array
- */
+# Simplifies handling of collections.
+# 
+#   $collection = array_collection('a,b,  c, d');
+#   $collection = array_collection(array('a', ' b', 'c '));
+# 
+# @namespace ActiveSupport_Array
 function & array_collection($collection)
 {
   if (!is_array($collection)) {
@@ -45,10 +39,8 @@ function & array_collection($collection)
   return $_collection;
 }
 
-/**
- * Recursively merges hashes, overwriting non array/hash values.
- * @namespace ActiveSupport_Array
- */
+# Recursively merges hashes, overwriting non array/hash values.
+# @namespace ActiveSupport_Array
 function & hash_merge_recursive()
 {
   $hashes = func_get_args();
@@ -68,10 +60,8 @@ function & hash_merge_recursive()
   return $hash;
 }
 
-/**
- * Recursively sorts arrays (skipping hashes).
- * @namespace ActiveSupport_Array
- */
+# Recursively sorts arrays (skipping hashes).
+# @namespace ActiveSupport_Array
 function array_sort_recursive(&$ary)
 {
   sort($ary);

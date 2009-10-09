@@ -19,24 +19,24 @@
 # 
 # =Mail
 #
-# See documentation of ActionMailer_Mail for configuration methods.
+# See documentation of +ActionMailer_Mail+ for configuration methods.
 # 
 # =Mail body
 # 
 # The body is just a view template. For instance:
 # 
-# - app/views/notifier/signup_notification.plain.tpl
-# - app/views/notifier/signup_notification.html.tpl
+# - `app/views/notifier/signup_notification.plain.tpl`
+# - `app/views/notifier/signup_notification.html.tpl`
 # 
 # To pass data from the ActionMailer to the view template,
 # you may use the `body()` method.
 # 
 # Please note that for the time being, it is necessary to have
-# both the 'plain' and 'html' templates.
+# both the `plain` and `html` templates.
 # 
 # =Delivering
 # 
-# Simply call the deliver() method:
+# Simply call the +deliver+ method:
 # 
 #   $notifier = new Notifier();
 #   $mail = $notifier->signup_notification($account);
@@ -49,11 +49,11 @@
 # 
 # =Configuration option
 # 
-# You may set the following configuration options (using cfg::set()).
+# You may set the following configuration options (using `cfg::set()`).
 # 
-# - mailer_perform_deliveries: set to false to prevent all email from being sent. Set to true otherwise (default).
-# - mailer_delivery_method: defines a delivery method, either 'sendmail' or 'test'.
-# - mailer_return_path: you may define a default return-path for all your emails.
+# - `mailer_perform_deliveries`: set to false to prevent all email from being sent. Set to true otherwise (default).
+# - `mailer_delivery_method`: defines a delivery method, either 'sendmail' or 'test'.
+# - `mailer_return_path`: you may define a default return-path for all your emails.
 # 
 class ActionMailer_Base extends Object
 {
