@@ -1,5 +1,8 @@
 <?php
 
+# 
+# See +ActionController_AbstractRequest+ for documentation.
+# 
 class ActionController_CgiRequest extends Object implements ActionController_AbstractRequest
 {
   public    $headers;

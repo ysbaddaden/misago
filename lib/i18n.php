@@ -107,7 +107,7 @@ class I18n
     return ($translation !== null) ? $translation : $str;
   }
   
-  # Same as translate(), but returns null if no translation is found.
+  # Same as +translate+, but returns null if no translation is found.
   static function do_translate($str, $options=null)
   {
     $ctx = isset($options['context']) ? $options['context'] : null;
