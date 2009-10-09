@@ -34,7 +34,6 @@ require 'action_controller'.DS.'routing.php';
 require ROOT.DS.'config'.DS.'environments'.DS."{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.DS.'config'.DS.'environment.php';
 
-require 'i18n.php';
 I18n::initialize();
 
 
@@ -42,7 +41,6 @@ function __autoload($class)
 {
   $path = str_replace('_', DS, $class);
   $path = String::underscore($path);
-  
   if (!include "$path.php")
   {
     echo "\nError: an error occured while loading $path.php\n";
