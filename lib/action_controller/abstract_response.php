@@ -1,6 +1,10 @@
 <?php
 
-# @private
+# Handles response data.
+# 
+# Please note that response should never be used directly. You
+# better use methods from +ActionController_Base+ instead.
+# 
 class ActionController_AbstractResponse extends Object
 {
   public $headers = array(

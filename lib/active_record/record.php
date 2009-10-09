@@ -57,7 +57,7 @@ abstract class ActiveRecord_Record extends Object implements Iterator
   }
   
   # Sets record's attributes.
-  protected function set_attributes($arg)
+  function set_attributes($arg)
   {
     foreach($arg as $attribute => $value) {
       $this->$attribute = $value;
