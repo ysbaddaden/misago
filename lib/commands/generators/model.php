@@ -22,14 +22,14 @@ class Generator_Model extends Generator_Base
     );
     
     # directories
-    $this->create_directory('app'.DS.'models');
-    $this->create_directory('test'.DS.'unit');
-    $this->create_directory('test'.DS.'fixtures');
+    $this->create_directory('app/models');
+    $this->create_directory('test/unit');
+    $this->create_directory('test/fixtures');
     
     # files
-    $test = $this->create_file_from_template("app".DS."models".DS."{$filename}.php", 'model'.DS.'model.php', $vars);
-    $this->create_file_from_template("test".DS."unit".DS."test_{$filename}.php", 'model'.DS.'test.php', $vars);
-    $this->create_file_from_template("test".DS."fixtures".DS."{$table}.yml", 'model'.DS.'fixture.yml', $vars);
+    $test = $this->create_file_from_template("app/models/{$filename}.php", 'model/model.php', $vars);
+    $this->create_file_from_template("test/unit/test_{$filename}.php", 'model/test.php', $vars);
+    $this->create_file_from_template("test/fixtures/{$table}.yml", 'model/fixture.yml', $vars);
     
     # migrations
     $filename = gmdate('YmdHis').'_create_'.$table;
@@ -39,8 +39,8 @@ class Generator_Model extends Generator_Base
       'Model'    => $class,
       'table'    => $table,
     );
-    $this->create_directory('db'.DS.'migrate');
-    $this->create_file_from_template("db".DS."migrate".DS."{$filename}.php", 'model'.DS.'migration.php', $vars);
+    $this->create_directory('db/migrate');
+    $this->create_file_from_template("db/migrate/{$filename}.php", 'model/migration.php', $vars);
   }
 }
 

@@ -10,11 +10,11 @@ class ActiveRecord_Connection
   # Loads configurations from config/database.yml.
   static function load_configuration()
   {
-    $apc_key = TMP.DS.'cache'.DS.'database.serialized.php';
+    $apc_key = TMP.'/cache/database.serialized.php';
     self::$configurations = apc_fetch($apc_key, $success);
     if ($success === false)
     {
-      $configurations = file_get_contents(ROOT.DS.'config'.DS.'database.yml');
+      $configurations = file_get_contents(ROOT.'/config/database.yml');
       self::$configurations = Yaml::decode($configurations);
       apc_store($apc_key, self::$configurations);
     }

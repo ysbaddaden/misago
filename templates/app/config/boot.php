@@ -1,20 +1,22 @@
 <?php
 
-define('DS',     DIRECTORY_SEPARATOR);
-define('ROOT',   dirname(dirname(__FILE__)));
-define('APP',    ROOT.DS.'app');
-define('MISAGO', ROOT.DS.'lib'.DS.'misago');
-define('PUBLIC', ROOT.DS.'public');
-define('TMP',    ROOT.DS.'tmp');
- 
-# or if you are using PHAR:
-#define('ROOT',   dirname(dirname(__FILE__)));
-#define('APP',    ROOT.DS.'app');
-#define('MISAGO', 'phar://misago.phar');
-#define('PUBLIC', ROOT.DS.'public');
-#define('TMP',    ROOT.DS.'tmp');
+# PHP 5.2
+define('ROOT', dirname(dirname(__FILE__)));
 
-#require ROOT.DS.'lib'.DS.'misago.phar';
-require MISAGO.DS.'lib'.DS.'boot.php';
+# PHP 5.3
+#define('ROOT', dirname(__DIR__));
+
+define('APP',    ROOT.'/app');
+define('PUBLIC', ROOT.'/public');
+define('TMP',    ROOT.'/tmp');
+
+# symlink
+define('MISAGO', ROOT.'/lib/misago');
+
+# ext/phar 
+#define('MISAGO', 'phar://misago.phar');
+#require ROOT.'/lib/misago.phar';
+
+require MISAGO.'/lib/boot.php';
 
 ?>

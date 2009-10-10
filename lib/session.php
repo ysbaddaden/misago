@@ -1,6 +1,6 @@
 <?php
 
-# NOTE: Should session handing be moved to ActionController?
+# NOTE: Should session be moved into ActionController?
 class Session
 {
   # Starts a session (if none already exists).

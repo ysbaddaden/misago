@@ -18,17 +18,17 @@ class Generator_Controller extends Generator_Base
       'Class'    => $class,
     );
     
-    $this->create_directory('app'.DS.'controllers');
-    $this->create_directory('app'.DS.'helpers');
-    $this->create_directory("app".DS."views".DS."{$filename}");
-    $this->create_directory("test".DS."functional");
-#   $this->create_directory("app".DS."views".DS."layouts");
+    $this->create_directory('app/controllers');
+    $this->create_directory('app/helpers');
+    $this->create_directory("app/views/{$filename}");
+    $this->create_directory("test/functional");
+#   $this->create_directory("app/views/layouts");
     
-    $this->create_file_from_template("app".DS."controllers".DS."{$filename}_controller.php",      'controller'.DS.'controller.php', $vars);
-    $this->create_file_from_template("test".DS."functional".DS."test_{$filename}_controller.php", 'controller'.DS.'test.php',       $vars);
-    $this->create_file_from_template("app".DS."helpers".DS."{$filename}_helper.php",              'controller'.DS.'helper.php',     $vars);
+    $this->create_file_from_template("app/controllers/{$filename}_controller.php",      'controller/controller.php', $vars);
+    $this->create_file_from_template("test/functional/test_{$filename}_controller.php", 'controller/test.php',       $vars);
+    $this->create_file_from_template("app/helpers/{$filename}_helper.php",              'controller/helper.php',     $vars);
     
-#   $this->create_file_from_template("app".DS."views".DS."layouts".DS."{$filename}.html.tpl", 'controller'.DS.'layout.html.tpl', $vars);
+#   $this->create_file_from_template("app/views/layouts/{$filename}.html.tpl", 'controller/layout.html.tpl', $vars);
   }
 }
 

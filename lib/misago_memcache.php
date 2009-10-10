@@ -1,5 +1,6 @@
 <?php
 
+# TODO: Implement a singleton: $mc = MisagoMemcache::get().
 class MisagoMemcache extends Memcache
 {
   protected $permanent = false;

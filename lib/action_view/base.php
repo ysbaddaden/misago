@@ -28,14 +28,14 @@ class ActionView_Base extends Object
     
     if (!isset($helpers) or $helpers == ':all')
     {
-      $helpers = apc_fetch(TMP.DS.'list_of_helpers', $success);
+      $helpers = apc_fetch(TMP.'/list_of_helpers', $success);
       
       if ($success === false)
       {
         $helpers = array();
-        $this->_find_helpers($helpers, MISAGO.DS.'lib'.DS.'action_view'.DS.'helpers'.DS);
-        $this->_find_helpers($helpers, ROOT.DS.'app'.DS.'helpers'.DS);
-        apc_store(TMP.DS.'list_of_helpers', $helpers, strtotime('+24 hours'));
+        $this->_find_helpers($helpers, MISAGO.'/lib/action_view/helpers/');
+        $this->_find_helpers($helpers, ROOT.'/app/helpers/');
+        apc_store(TMP.'/list_of_helpers', $helpers, strtotime('+24 hours'));
       }
     }
     
@@ -121,7 +121,7 @@ class ActionView_Base extends Object
       $this->view_format = isset($options['format']) ? $options['format'] : 'html';
       $__template_file = "{$options['template']}.{$this->view_format}.tpl";
       
-      if (file_exists(ROOT.DS."app".DS."views".DS."{$__template_file}"))
+      if (file_exists(ROOT."/app/views/{$__template_file}"))
       {
         if ($this->controller !== null) {
           $this->copy_controller_vars();
@@ -129,7 +129,7 @@ class ActionView_Base extends Object
         
         # view
         ob_start();
-        include ROOT.DS."app".DS."views/{$__template_file}";
+        include ROOT."/app/views/{$__template_file}";
         $this->yield('content', ob_get_clean());
         
         # no layout
@@ -141,10 +141,10 @@ class ActionView_Base extends Object
         if (isset($options['layout']))
         {
           $__layout_file = "{$options['layout']}.{$this->view_format}.tpl";
-          if (file_exists(ROOT.DS."app".DS."views".DS."layouts".DS."{$__layout_file}"))
+          if (file_exists(ROOT."app/views/layouts/{$__layout_file}"))
           {
             ob_start();
-            include ROOT.DS."app".DS."views".DS."layouts".DS."{$__layout_file}";
+            include ROOT."/app/views/layouts/{$__layout_file}";
             return ob_get_clean();
           }
           else {
@@ -154,16 +154,16 @@ class ActionView_Base extends Object
         else
         {
           $__layout_file = "{$this->view_path}.{$this->view_format}.tpl";
-          if (file_exists(ROOT.DS."app".DS."views".DS."layouts".DS."{$__layout_file}"))
+          if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
           {
             ob_start();
-            include ROOT.DS."app".DS."views".DS."layouts".DS."{$__layout_file}";
+            include ROOT."/app/views/layouts/{$__layout_file}";
             return ob_get_clean();
           }
-          elseif (file_exists(ROOT.DS."app".DS."views".DS."layouts".DS."default.{$this->view_format}.tpl"))
+          elseif (file_exists(ROOT."/app/views/layouts/default.{$this->view_format}.tpl"))
           {
             ob_start();
-            include ROOT.DS."app".DS."views".DS."layouts".DS."default.{$this->view_format}.tpl";
+            include ROOT."/app/views/layouts/default.{$this->view_format}.tpl";
             return ob_get_clean();
           }
         }
@@ -179,22 +179,22 @@ class ActionView_Base extends Object
       if (strpos($options['partial'], '/'))
       {
         $__partial_file = explode('/', $options['partial'], 2);
-        $__partial_file = $__partial_file[0].DS.'_'.$__partial_file[1];
+        $__partial_file = $__partial_file[0].'/_'.$__partial_file[1];
       }
       else {
-        $__partial_file = $this->view_path.DS.'_'.$options['partial'];
+        $__partial_file = $this->view_path.'/_'.$options['partial'];
       }
       $__view_format = isset($options['format']) ? $options['format'] : $this->view_format;
       $__partial_file .= ".{$__view_format}.tpl";
       
-      if (file_exists(ROOT.DS."app".DS."views".DS."{$__partial_file}"))
+      if (file_exists(ROOT."/app/views/{$__partial_file}"))
       {
         ob_start();
         
         if (!isset($options['collection']))
         {
           # partial
-          include ROOT.DS."app".DS."views".DS."{$__partial_file}";
+          include ROOT."/app/views/{$__partial_file}";
         }
         else
         {
@@ -207,7 +207,7 @@ class ActionView_Base extends Object
           {
             $$__partial_var      = $__partial_value;
             $$__partial_counter += 1;
-            include ROOT.DS."app".DS."views".DS."{$__partial_file}";
+            include ROOT."/app/views/{$__partial_file}";
           }
         }
         return ob_get_clean();

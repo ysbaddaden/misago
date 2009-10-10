@@ -12,7 +12,7 @@ class Fixtures
   
   static private function & all()
   {
-    $files = glob(ROOT.DS.'test'.DS.'fixtures'.DS.'*.yml');
+    $files = glob(ROOT.'/test/fixtures/*.yml');
     sort($files);
     
     $fixtures = array();
@@ -25,7 +25,7 @@ class Fixtures
   static private function & parse($fixture)
   {
     if (!isset(self::$cache[$fixture])) {
-      self::$cache[$fixture] = Yaml::decode(file_get_contents(ROOT.DS.'test'.DS.'fixtures'.DS.$fixture.'.yml'));
+      self::$cache[$fixture] = Yaml::decode(file_get_contents(ROOT.'/test/fixtures/'$fixture.'.yml'));
     }
     return self::$cache[$fixture];
   }
