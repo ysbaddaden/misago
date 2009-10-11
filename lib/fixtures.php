@@ -25,7 +25,7 @@ class Fixtures
   static private function & parse($fixture)
   {
     if (!isset(self::$cache[$fixture])) {
-      self::$cache[$fixture] = Yaml::decode(file_get_contents(ROOT.'/test/fixtures/'$fixture.'.yml'));
+      self::$cache[$fixture] = Yaml::decode(file_get_contents(ROOT.'/test/fixtures/'.$fixture.'.yml'));
     }
     return self::$cache[$fixture];
   }

@@ -141,7 +141,7 @@ class ActionView_Base extends Object
         if (isset($options['layout']))
         {
           $__layout_file = "{$options['layout']}.{$this->view_format}.tpl";
-          if (file_exists(ROOT."app/views/layouts/{$__layout_file}"))
+          if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
           {
             ob_start();
             include ROOT."/app/views/layouts/{$__layout_file}";
