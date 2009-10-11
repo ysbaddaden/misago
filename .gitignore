@@ -1,1 +1,4 @@
-doc/*
+doc/*.html
+doc/*.css
+doc/classes/
+
