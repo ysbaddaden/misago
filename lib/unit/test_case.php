@@ -36,7 +36,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
       
       # creates database & migrates
       self::$connection->create_database($dbname);
-      require MISAGO.DS."lib".DS."commands".DS."db".DS."migrate.php";
+      require MISAGO."/lib/commands/db/migrate.php";
     }
   }
   

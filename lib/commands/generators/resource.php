@@ -28,23 +28,23 @@ class Generator_Resource extends Generator_Base
       'table'          => $table,
     );
     
-    $this->create_directory('app'.DS.'controllers');
-    $this->create_directory('app'.DS.'helpers');
-    $this->create_directory("app".DS."views".DS."{$filename}");
-    $this->create_directory('app'.DS.'models');
-    $this->create_directory('test'.DS.'functional');
-    $this->create_directory('test'.DS.'unit');
-    $this->create_directory('test'.DS.'fixtures');
+    $this->create_directory('app/controllers');
+    $this->create_directory('app/helpers');
+    $this->create_directory("app/views/{$filename}");
+    $this->create_directory('app/models');
+    $this->create_directory('test/functional');
+    $this->create_directory('test/unit');
+    $this->create_directory('test/fixtures');
     
     # controller
-    $this->create_file_from_template("app".DS."controllers".DS."{$filename}_controller.php",      'resource'.DS.'controller.php', $vars);
-    $this->create_file_from_template("test".DS."functional".DS."test_{$filename}_controller.php", 'resource'.DS.'test_controller.php', $vars);
-    $this->create_file_from_template("app".DS."helpers".DS."{$filename}_helper.php",              'resource'.DS.'helper.php', $vars);
+    $this->create_file_from_template("app/controllers/{$filename}_controller.php",      'resource/controller.php', $vars);
+    $this->create_file_from_template("test/functional/test_{$filename}_controller.php", 'resource/test_controller.php', $vars);
+    $this->create_file_from_template("app/helpers/{$filename}_helper.php",              'resource/helper.php', $vars);
     
     # model
-    $this->create_file_from_template("app".DS."models".DS."{$model_filename}.php",     'resource'.DS.'model.php',      $vars);
-    $this->create_file_from_template("test".DS."unit".DS."test_{$model_filename}.php", 'resource'.DS.'test_model.php', $vars);
-    $this->create_file_from_template("test".DS."fixtures".DS."{$table}.yml",           'resource'.DS.'fixture.yml',    $vars);
+    $this->create_file_from_template("app/models/{$model_filename}.php",     'resource/model.php',      $vars);
+    $this->create_file_from_template("test/unit/test_{$model_filename}.php", 'resource/test_model.php', $vars);
+    $this->create_file_from_template("test/fixtures/{$table}.yml",           'resource/fixture.yml',    $vars);
     
     # migration
     $migration_filename = gmdate('YmdHis').'_create_'.$table;
@@ -60,13 +60,13 @@ class Generator_Resource extends Generator_Base
     # IMPROVE: Generate views for 'script/generate resource'
     
     # routes
-    $routes_contents = file_get_contents(ROOT.DS.'config'.DS.'routes.php');
+    $routes_contents = file_get_contents(ROOT.'/config/routes.php');
     $pos = strpos($routes_contents, '$map');
     $pos = strpos($routes_contents, "\n", $pos) + 1;
     $routes_a = substr($routes_contents, 0, $pos);
     $routes_b = substr($routes_contents, $pos);
     $routes_contents  = $routes_a."\n\$map->resource('$filename');\n".$routes_b;
-    file_put_contents(ROOT.DS.'config'.DS.'routes.php', $routes_contents);
+    file_put_contents(ROOT.'/config/routes.php', $routes_contents);
   }
 }
 

@@ -119,7 +119,7 @@ class ActionController_Routing extends Object
     if (self::$map === null)
     {
       self::$map = new self();
-      require ROOT.DS.'config'.DS.'routes.php';
+      require ROOT.'/config/routes.php';
     }
     return self::$map;
   }
@@ -136,7 +136,7 @@ class ActionController_Routing extends Object
     $name  = $params[':controller'].'_controller';
     $class = String::camelize($name);
     
-    if (!file_exists(ROOT.DS.'app'.DS.'controllers'.DS."$name.php")) {
+    if (!file_exists(ROOT."/app/controllers/$name.php")) {
       throw new MisagoException("No such controller $class.", 404);
     }
     
@@ -350,8 +350,8 @@ class ActionController_Routing extends Object
   function build_path_and_url_helpers()
   {
     if (DEBUG
-      or !file_exists(TMP.DS.'built_path_and_url_helpers.php')
-      or time() - strtotime('-24 hours') > filemtime(TMP.DS.'built_path_and_url_helpers.php'))
+      or !file_exists(TMP.'/named_routes_helpers.php')
+      or time() - strtotime('-24 hours') > filemtime(TMP.'/named_routes_helpers.php'))
     {
       $functions = array();
       foreach($this->routes as $route)
@@ -363,10 +363,10 @@ class ActionController_Routing extends Object
         }
       }
       $contents = '<?php '.implode("\n\n", $functions).' ?>';
-      file_put_contents(TMP.DS.'built_path_and_url_helpers.php', $contents);
+      file_put_contents(TMP.'/named_routes_helpers.php', $contents);
     }
     
-    include TMP.DS.'built_path_and_url_helpers.php';
+    include TMP.'/named_routes_helpers.php';
   }
   
   private function build_named_function($type, &$route)

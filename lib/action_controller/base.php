@@ -123,8 +123,8 @@ abstract class ActionController_Base extends Object
     }
     
     # helpers
-    require_once(ROOT.DS.'app'.DS.'helpers'.DS.'application_helper.php');
-    require_once(ROOT.DS.'app'.DS.'helpers'.DS."{$this->params[':controller']}_helper.php");
+    require_once(ROOT.'/app/helpers/application_helper.php');
+    require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
     
     $this->before_filters();
     $this->{$this->action}();

@@ -25,8 +25,8 @@ class ActionView_Helpers_AssetTag_NS
       if (strpos($path, '/') !== 0) {
         $path = "$base_path/$path";
       }
-      if (file_exists(ROOT.DS.'public'.$path)) {
-        $path .= '?'.filemtime(ROOT.DS.'public'.$path);
+      if (file_exists(ROOT.'/public'.$path)) {
+        $path .= '?'.filemtime(ROOT.'/public'.$path);
       }
     }
     return $path;

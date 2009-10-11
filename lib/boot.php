@@ -1,13 +1,13 @@
 <?php
 
 ini_set('include_path',
-	ROOT.DS.'app'.DS.'models'.PATH_SEPARATOR.
-	ROOT.DS.'app'.DS.'controllers'.PATH_SEPARATOR.
-	ROOT.DS.'app'.DS.'helpers'.PATH_SEPARATOR.
-	ROOT.DS.'lib'.PATH_SEPARATOR.
-	MISAGO.DS.'lib'.DS.'action_view'.DS.'helpers'.PATH_SEPARATOR.
-	MISAGO.DS.'lib'.PATH_SEPARATOR.
-	MISAGO.DS.'vendor'.PATH_SEPARATOR.
+	ROOT.'/app/models'.PATH_SEPARATOR.
+	ROOT.'/app/controllers'.PATH_SEPARATOR.
+	ROOT.'/app/helpers'.PATH_SEPARATOR.
+	ROOT.'/lib'.PATH_SEPARATOR.
+	MISAGO.'/lib/action_view/helpers'.PATH_SEPARATOR.
+	MISAGO.'/lib'.PATH_SEPARATOR.
+	MISAGO.'/vendor'.PATH_SEPARATOR.
 	ini_get('include_path').PATH_SEPARATOR
 );
 
@@ -16,11 +16,11 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require 'error_handlers.php';
-require 'active_support'.DS.'additions.php';
-require 'active_support'.DS.'string.php';
-require 'active_support'.DS.'array.php';
-require 'active_support'.DS.'active_array.php';
-require 'active_support'.DS.'time.php';
+require 'active_support/additions.php';
+require 'active_support/string.php';
+require 'active_support/array.php';
+require 'active_support/active_array.php';
+require 'active_support/time.php';
 
 if (!function_exists('apc_store')) {
   require 'fake_apc.php';
@@ -29,17 +29,17 @@ require 'cfg.php';
 require 'misago_log.php';
 require 'application.php';
 
-require 'action_controller'.DS.'routing.php';
+require 'action_controller/routing.php';
 
-require ROOT.DS.'config'.DS.'environments'.DS."{$_SERVER['MISAGO_ENV']}.php";
-require ROOT.DS.'config'.DS.'environment.php';
+require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
+require ROOT.'/config/environment.php';
 
 I18n::initialize();
 
 
 function __autoload($class)
 {
-  $path = str_replace('_', DS, $class);
+  $path = str_replace('_', '/', $class);
   $path = String::underscore($path);
   if (!include "$path.php")
   {
