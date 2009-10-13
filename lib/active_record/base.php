@@ -191,12 +191,22 @@
 # 
 abstract class ActiveRecord_Base extends ActiveRecord_Calculations
 {
+  # Database object.
+  protected $connection;
+  
+  # Alias for `$connection`.
   protected $db;
+  
+  # Name of database's tables.
   protected $table_name;
   protected $primary_key   = 'id';
+  
   protected $default_scope = array();
   
+  # @private
   protected $attr_read = array('primary_key', 'new_record', 'table_name');
+  
+  # @private
   protected $behaviors = array();
   
   
@@ -207,14 +217,15 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     if (empty($this->table_name)) {
       $this->table_name = String::underscore(String::pluralize(get_class($this)));
     }
-    $this->db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $this->connection = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $this->db = $this->connection;
     
     # columns' definition
     $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
     $this->columns = apc_fetch($apc_key, $success);
     if ($success === false)
     {
-      $this->columns = $this->db->columns($this->table_name);
+      $this->columns = $this->connection->columns($this->table_name);
       apc_store($apc_key, $this->columns);
     }
     
@@ -401,7 +412,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     switch($method)
     {
       case ':all':
-        $results = $this->db->select_all($sql);
+        $results = $this->connection->select_all($sql);
         $records = array();
         foreach($results as $result)
         {
@@ -417,7 +428,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       break;
       
       case ':first':
-        $result = $this->db->select_one($sql);
+        $result = $this->connection->select_one($sql);
         if ($result)
         {
           $record = new $model($result);
@@ -430,7 +441,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       break;
       
       case ':values':
-        $results = $this->db->select_all($sql);
+        $results = $this->connection->select_all($sql);
         foreach($results as $i => $values) {
           $results[$i] = array_values($results[$i]);
         }
@@ -465,7 +476,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   function & find_by_sql($sql)
   {
     $class = get_class($this);
-    $rows  = $this->db->select_all($sql);
+    $rows  = $this->connection->select_all($sql);
     
     foreach(array_keys($rows) as $i) {
       $rows[$i] = new $class($rows[$i]);
@@ -484,7 +495,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   function count_by_sql($sql)
   {
     $class = get_class($this);
-    $rows  = $this->db->select_values($sql);
+    $rows  = $this->connection->select_values($sql);
     return (int)$rows[0];
   }
   
@@ -502,8 +513,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   function build_sql_from_options($options)
   {
     # builds SQL
-    $table  = $this->db->quote_table($this->table_name);
-    $select = empty($options['select']) ? '*' : $this->db->quote_columns($options['select']);
+    $table  = $this->connection->quote_table($this->table_name);
+    $select = empty($options['select']) ? '*' : $this->connection->quote_columns($options['select']);
     $where  = '';
     $group  = '';
     $order  = '';
@@ -522,18 +533,18 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       $joins = implode(' ', $joins);
     }
     if (!empty($options['conditions'])) {
-      $where = 'WHERE '.$this->db->sanitize_sql_for_conditions($options['conditions']);
+      $where = 'WHERE '.$this->connection->sanitize_sql_for_conditions($options['conditions']);
     }
     if (!empty($options['group'])) {
-      $group = 'GROUP BY '.$this->db->sanitize_order($options['group']);
+      $group = 'GROUP BY '.$this->connection->sanitize_order($options['group']);
     }
     if (!empty($options['order'])) {
-      $order = 'ORDER BY '.$this->db->sanitize_order($options['order']);
+      $order = 'ORDER BY '.$this->connection->sanitize_order($options['order']);
     }
     if (isset($options['limit']))
     {
       $page  = isset($options['page']) ? $options['page'] : null;
-      $limit = $this->db->sanitize_limit($options['limit'], $page);
+      $limit = $this->connection->sanitize_limit($options['limit'], $page);
     }
     
     return "SELECT $select FROM $table $joins $where $group $order $limit";
@@ -541,7 +552,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   
   function merge_conditions($a, $b)
   {
-    return $this->db->merge_conditions($a, $b);
+    return $this->connection->merge_conditions($a, $b);
   }
   
   function & merge_options($a, $b)
@@ -566,18 +577,18 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     if (is_string($func)) {
       $func = array($this, $func);
     }
-    $this->db->transaction('begin');
+    $this->connection->transaction('begin');
     
     try {
       $rs = call_user_func_array($func, $args);
     }
     catch(Exception $e)
     {
-      $this->db->transaction('rollback');
+      $this->connection->transaction('rollback');
       return false;
     }
     
-    $this->db->transaction('commit');
+    $this->connection->transaction('commit');
     return $rs;
   }
   
@@ -620,7 +631,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     
     # create
     $attributes = $this->attributes();
-    $id = $this->db->insert($this->table_name, $attributes, $this->primary_key);
+    $id = $this->connection->insert($this->table_name, $attributes, $this->primary_key);
     if ($id)
     {
       $this->new_record = false;
@@ -672,7 +683,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     if (empty($updates)) {
       return true;
     }
-    $rs = $this->db->update($this->table_name, $updates, $conditions);
+    $rs = $this->connection->update($this->table_name, $updates, $conditions);
     
     if ($rs !== false)
     {
@@ -815,7 +826,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   function update_all($updates, $conditions=null, $options=null)
   {
     $options['primary_key'] = $this->primary_key;
-    return $this->db->update($this->table_name, $updates, $conditions, $options);
+    return $this->connection->update($this->table_name, $updates, $conditions, $options);
   }
   
   # Deletes a record.
@@ -843,7 +854,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       $record->delete_associated();
       
       $conditions = array($this->primary_key => $record->id);
-      if (!$this->db->delete($this->table_name, $conditions)) {
+      if (!$this->connection->delete($this->table_name, $conditions)) {
         return false;
       }
       
@@ -876,7 +887,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     }
     
     $sql = $this->build_sql_from_options($options);
-    $ids = $this->db->select_values($sql);
+    $ids = $this->connection->select_values($sql);
     
     foreach($ids as $id)
     {
@@ -896,7 +907,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       $id = $this->id;
     }
     $conditions = array($this->primary_key => $id);
-    return $this->db->delete($this->table_name, $conditions);
+    return $this->connection->delete($this->table_name, $conditions);
   }
   
   # Same as +destroy+ but raises an ActiveRecord_Exception on error.
@@ -914,7 +925,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   function destroy_all($conditions=null, $options=null)
   {
     $options['primary_key'] = $this->primary_key;
-    return $this->db->delete($this->table_name, $conditions, $options);
+    return $this->connection->delete($this->table_name, $conditions, $options);
   }
   
   protected function before_save()   {}

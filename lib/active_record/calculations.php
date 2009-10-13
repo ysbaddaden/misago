@@ -87,7 +87,7 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
   {
     $options['select'] = "{$options['group']}, {$options['select']}";
     $sql     = $this->build_sql_from_options($options);
-    $results = $this->db->select_all($sql);
+    $results = $this->connection->select_all($sql);
     
     $values = array();
     foreach($results as $rs)
@@ -101,7 +101,7 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
   private function execute_simple_calculation($operation, $column, &$options)
   {
     $sql = $this->build_sql_from_options($options);
-    $rs  = $this->db->select_value($sql);
+    $rs  = $this->connection->select_value($sql);
     return ($operation == 'count') ? (int)$rs : $rs;
   }
 }

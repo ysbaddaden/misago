@@ -300,9 +300,9 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
             'limit'  => '',
             'page'   => '',
           ));
-          $def['find_options']['joins'] = "inner join ".$this->db->quote_table($def['join_table']).
-            " on ".$this->db->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
-            " = ".$this->db->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
+          $def['find_options']['joins'] = "inner join ".$this->connection->quote_table($def['join_table']).
+            " on ".$this->connection->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
+            " = ".$this->connection->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
           $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
           $def['find_scope'] = ':all';
         break;
@@ -366,7 +366,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 		    $options['conditions'] = array($assoc['find_key'] => $this->id);
 		    
 		    $sql = $record->build_sql_from_options($options);
-		    return $record->db->select_values($sql);
+		    return $record->connection->select_values($sql);
 		  }
 		}
   	
@@ -496,23 +496,23 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     switch($assoc['type'])
     {
       case 'belongs_to':
-        return "$type join ".$this->db->quote_table($assoc['table_name']).
-          " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
-          " = ".$this->db->quote_column("{$this->table_name}.{$assoc['foreign_key']}");
+        return "$type join ".$this->connection->quote_table($assoc['table_name']).
+          " on ".$this->connection->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
+          " = ".$this->connection->quote_column("{$this->table_name}.{$assoc['foreign_key']}");
       
       case 'has_one':
       case 'has_many':
-        return "$type join ".$this->db->quote_table($assoc['table_name']).
-          " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
-          " = ".$this->db->quote_column("{$this->table_name}.{$this->primary_key}");
+        return "$type join ".$this->connection->quote_table($assoc['table_name']).
+          " on ".$this->connection->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
+          " = ".$this->connection->quote_column("{$this->table_name}.{$this->primary_key}");
       
       case 'has_and_belongs_to_many':
-        return "$type join ".$this->db->quote_table($assoc['join_table']).
-          " on ".$this->db->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
-          " = ".$this->db->quote_column("{$this->table_name}.{$this->primary_key}").
-          " $type join ".$this->db->quote_table($assoc['table_name']).
-          " on ".$this->db->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
-          " = ".$this->db->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
+        return "$type join ".$this->connection->quote_table($assoc['join_table']).
+          " on ".$this->connection->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
+          " = ".$this->connection->quote_column("{$this->table_name}.{$this->primary_key}").
+          " $type join ".$this->connection->quote_table($assoc['table_name']).
+          " on ".$this->connection->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
+          " = ".$this->connection->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
     }
   }
   

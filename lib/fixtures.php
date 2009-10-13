@@ -10,26 +10,6 @@ class Fixtures
     self::$connection = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
   }
   
-  static private function & all()
-  {
-    $files = glob(ROOT.'/test/fixtures/*.yml');
-    sort($files);
-    
-    $fixtures = array();
-    foreach($files as $file) {
-      $fixtures[] = str_replace('.yml', '', basename($file));
-    }
-    return $fixtures;
-  }
-  
-  static private function & parse($fixture)
-  {
-    if (!isset(self::$cache[$fixture])) {
-      self::$cache[$fixture] = Yaml::decode(file_get_contents(ROOT.'/test/fixtures/'.$fixture.'.yml'));
-    }
-    return self::$cache[$fixture];
-  }
-  
   static function insert($fixture=null)
   {
     if ($fixture === null or is_array($fixture))
@@ -59,7 +39,28 @@ class Fixtures
     }
     self::$connection->truncate($table);
   }
+  
+  
+  static private function & all()
+  {
+    $files = glob(ROOT.'/test/fixtures/*.yml');
+    sort($files);
+    
+    $fixtures = array();
+    foreach($files as $file) {
+      $fixtures[] = str_replace('.yml', '', basename($file));
+    }
+    return $fixtures;
+  }
+  
+  static private function & parse($fixture)
+  {
+    if (!isset(self::$cache[$fixture])) {
+      self::$cache[$fixture] = Yaml::decode(file_get_contents(ROOT.'/test/fixtures/'.$fixture.'.yml'));
+    }
+    return self::$cache[$fixture];
+  }
 }
-
 Fixtures::initialize();
+
 ?>

@@ -2,20 +2,21 @@
 # Helper to create new tables. Generally used in migrations,
 # but permits to create temporary tables on the fly too.
 # 
-#   $t = $this->db->new_table('authors');
+#   $t = $this->connection->new_table('authors');
 #   $t->add_column('name', 'string', array('limit' => 50));
 #   $t->add_timestamps('date');
 #   $t->create();
 # 
 # Create a temporary table, with no primary key:
 # 
-#   $t = $this->db->new_table('stats', array('primary_key' => false, 'temporary' => true));
+#   $t = $this->connection->new_table('stats', array('primary_key' => false, 'temporary' => true));
 #   $t->add_column('counts', 'integer');
 #   $t->create();
 # 
 class ActiveRecord_Table
 {
-  private $db;
+  protected $connection;
+  protected $db;
   
   public $name;
   public $columns = array();
@@ -33,9 +34,10 @@ class ActiveRecord_Table
   # - `temporary` (bool): true to create a temporary table
   # - `force` (null, bool): true to drop table before create, otherwise creates if not exists
   # 
-  function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $db)
+  function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $connection)
   {
-    $this->db   = $db;
+    $this->connection = $connection;
+    $this->db = $this->connection;
     $this->name = $name;
     
     if (!empty($options)) {
@@ -120,7 +122,7 @@ class ActiveRecord_Table
   function create()
   {
     $this->definitions['columns'] =& $this->columns;
-    return $this->db->create_table($this->name, $this->definitions);
+    return $this->connection->create_table($this->name, $this->definitions);
   }
 }
 

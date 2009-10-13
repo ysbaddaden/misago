@@ -3,12 +3,17 @@
 # Handles database migrations.
 class ActiveRecord_Migration
 {
+  # Database Object.
+  protected $connection;
+  
+  # Alias for `$connection`.
   protected $db;
   protected $version;
   
   function __construct($version)
   {
-    $this->db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $this->connection = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $this->db = $this->connection;
     $this->version = $version;
   }
   
