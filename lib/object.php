@@ -3,9 +3,11 @@
 # Generic object, to share methods between all misago's classes.
 abstract class Object
 {
+  # A collection of attributes that must be accessible read-only (they must be protected).
   protected $attr_read = array();
-  protected $__mapped_attributes = array();
-  protected $__mapped_methods    = array();
+  
+  private   $__mapped_attributes = array();
+  private   $__mapped_methods    = array();
   
   function __get($attr)
   {
@@ -14,6 +16,9 @@ abstract class Object
     }
     elseif (isset($this->__mapped_attributes[$attr])) {
       return $this->__mapped_attributes[$attr]['object']->{$this->__mapped_attributes[$attr]['attribute']};
+    }
+    elseif (method_exists($this, $attr)) {
+      return $this->$attr();
     }
     return null;
   }
@@ -24,6 +29,9 @@ abstract class Object
     {
       $this->__mapped_attributes[$attr]['object']->{$this->__mapped_attributes[$attr]['attribute']} = $value;
       return $value;
+    }
+    elseif (method_exists($this, $attr)) {
+      return $this->$attr($value);
     }
     return $this->$attr = $value;
   }

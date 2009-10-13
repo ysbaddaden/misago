@@ -11,6 +11,16 @@ class SomeObject extends Object
   protected $table_name  = 'some_objects';
   protected $primary_key = 'private';
   protected $attr_read   = array('new_record', 'table_name');
+  
+  private $id = 'a';
+  
+  function id($id=null)
+  {
+    if ($id !== null) {
+      return $this->id = $id;
+    }
+    return $this->id;
+  }
 }
 
 class TestObject extends Unit_Test
@@ -21,6 +31,14 @@ class TestObject extends Unit_Test
     $this->assert_false($o->new_record);
     $this->assert_equal($o->table_name, 'some_objects');
     $this->assert_null($o->primary_key);
+  }
+  
+  function test_functions_as_attributes()
+  {
+    $o = new SomeObject();
+    $this->assert_equal($o->id, 'a');
+    $this->assert_equal($o->id = 'b', 'b');
+    $this->assert_equal($o->id, 'b');
   }
 }
 
