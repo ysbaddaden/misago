@@ -1,6 +1,40 @@
 <?php
 
 # Generic object, to share methods between all misago's classes.
+# 
+# Example class:
+# 
+#   class MyClass extends Object
+#   {
+#     protected $id;
+#     protected $table_name = 'classes';
+#     protected $attr_read = array('table_name');
+#     
+#     function id($id=null)
+#     {
+#       if ($id !== null) {
+#         $this->id = $id;
+#       }
+#       return $this->id;
+#     }
+#   }
+#   
+# =Read-only attributes.
+# 
+# You may define a list of `protected` attributes that may be accessible on get.
+# 
+#   $o = new MyClass();
+#   $o->table_name          => returns 'classes'
+#   $o->table_name = 'aaa'  => error: protected attribute
+# 
+# =Get/set methods as attributes
+# 
+# +Object+ permits to use get/set methods like standard attributes.
+# 
+#   $o = new MyClass();
+#   $o->id = 4  # sets attribute throught the id() method.
+#   $o->id      # gets attribute throught the id() method (thus returns 4).
+# 
 abstract class Object
 {
   # A collection of attributes that must be accessible read-only (they must be protected).
