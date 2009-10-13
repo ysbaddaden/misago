@@ -2,6 +2,30 @@
 
 # Validation methods for ActiveRecords.
 # 
+# Example:
+# 
+#   class User extends ActiveRecord_Base
+#   {
+#     protected function validate()
+#     {
+#       $this->assert_uniqueness_of('user_name');
+#     }
+#     
+#     protected function validate_on_create()
+#     {
+#       $this->assert_length_of('user_name', array('minimum' => 3, 'maximum' => 20));
+#     }
+#   }
+# 
+# =Associations
+# 
+# Dependent associated records are also validated before saving. If any dependent
+# record's validation fails, this record's validation will fail.
+# 
+# =Callbacks
+# 
+# See +ActionController_Base+ for help on the different callbacks.
+# 
 # TEST: Test validates_associated.
 # IMPROVE: Add possibility to validate a date/time.
 # TODO: On update only validate changed attributes (check new record).

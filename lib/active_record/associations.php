@@ -26,7 +26,6 @@
 #   $post_id    = $comment->post->id;
 #   $post_title = $comment->post->title;
 # 
-# 
 # ==has_one
 # 
 # Represents a one-to-one relationship, in the point of view
@@ -118,6 +117,38 @@
 #   programmer_id
 #   project_id
 # 
+#
+# =Auto-generated methods and attributes
+# 
+# ==Singular associations (one-to-one)
+# 
+# Declaring a `belongs_to` or `has_one` association generates the following
+# attributes and methods (where `other` is the name of the relation, for
+# instance `invoice`, `post`, etc).
+# 
+# - other
+# - build_other($attributes=array())
+# - create_other($attributes=array())
+# 
+# ==Plural associations (one-to-many / many-to-many)
+# 
+# Declaring a `has_many` or `has_and_belongs_to_many` association generates
+# the following attributes and methods (where `others` is the name of the
+# relation, for instance `posts`, `comments`, etc).
+# 
+# - others
+# - others.build($attributes=array())
+# - others.create($attributes=array())
+# - others.clear()
+# - others.count()
+# - others.find()
+# - others.delete(record)
+# - others.delete_all()
+# - others.destroy_all()
+# 
+# See +ActionController_Collection+ for details.
+# 
+# TODO: others=, other_ids(), others.is_empty()
 # 
 # =Eager Loading (include)
 #
@@ -317,7 +348,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       }
       return $this->$attribute = new ActiveRecord_Collection($this, array(), $assoc);
 		}
-  	
+		
     # another kind of attribute
     return parent::__get($attribute);
   }
