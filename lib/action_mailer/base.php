@@ -29,7 +29,7 @@
 # - `app/views/notifier/signup_notification.html.tpl`
 # 
 # To pass data from the ActionMailer to the view template,
-# you may use the +body+ method.
+# you may use the +ActionMailer_Mail::body()+ method.
 # 
 # Please note that for the time being, it is necessary to have
 # both the `plain` and `html` templates.

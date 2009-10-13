@@ -142,13 +142,11 @@
 # - others.clear()
 # - others.count()
 # - others.find()
-# - others.delete(record)
+# - others.delete(record, record, ...)
 # - others.delete_all()
 # - others.destroy_all()
 # 
 # See +ActionController_Collection+ for details.
-# 
-# TODO: others=, other_ids(), others.is_empty()
 # 
 # =Eager Loading (include)
 #

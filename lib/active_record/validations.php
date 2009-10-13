@@ -17,14 +17,25 @@
 #     }
 #   }
 # 
-# =Associations
+# = Calls
+# 
+# You may ask for a specific validation using +is_valid()+ or when saving
+# with +save_with_validation()+, which is the default for +ActiveRecord_Base::save()+.
+# 
+# = Error object
+# 
+# All validation errors are accessible throught the `errors` attribute,
+# which is an instance of +ActiveRecord_Errors+. You may also manually add
+# errors throught that same object.
+# 
+# = Associations
 # 
 # Dependent associated records are also validated before saving. If any dependent
 # record's validation fails, this record's validation will fail.
 # 
-# =Callbacks
+# = Callbacks
 # 
-# See +ActionController_Base+ for help on the different callbacks.
+# See +ActiveRecord_Base+ for help on the different callbacks.
 # 
 # TEST: Test validates_associated.
 # IMPROVE: Add possibility to validate a date/time.

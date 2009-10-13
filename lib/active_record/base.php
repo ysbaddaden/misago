@@ -3,9 +3,14 @@
 # Database object abstraction.
 # 
 # Permits to handle database entries like objects. It supports
-# CRUD operations (+create+, read, +update+ and +delete+), validations
-# through +ActiveRecord_Validations+, and relations through
-# +ActiveRecord_Associations+.
+# CRUD operations (+create+, read, +update+ and +delete+).
+# 
+# Extends:
+# 
+# - +ActiveRecord_Record+
+# - +ActiveRecord_Associations+
+# - +ActiveRecord_Calculations+
+# - +ActiveRecord_Validations+
 # 
 # =CRUD
 # 
