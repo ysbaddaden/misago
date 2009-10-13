@@ -1,0 +1,11 @@
+
+  * Unit_TestCase:
+    * load $this->fixtures (:all by default, none if empty).
+  
+  * ActionController:
+    * write CgiResponse & TestResponse (< AbstractResponse)
+  
+  * ActionController_TestCase:
+    * do not rely on external web server, use TestRequest & TestResponse
+      instead which would be faster and simpler for the end-user.
+
