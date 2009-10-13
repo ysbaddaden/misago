@@ -15,11 +15,11 @@ class ActiveRecord_AdapterNotFound extends ActiveRecord_Exception {}
 
 class ActiveRecord_AdapterNotSpecified extends ActiveRecord_Exception {}
 
-#class ActiveRecord_AssociationTypeMismatch extends ActiveRecord_Exception {}
+class ActiveRecord_AssociationTypeMismatch extends ActiveRecord_Exception {}
 
-#class ActiveRecord_AttributeAssignmentError extends ActiveRecord_Exception {}
+class ActiveRecord_AttributeAssignmentError extends ActiveRecord_Exception {}
 
-#class ActiveRecord_ConfigurationError extends ActiveRecord_Exception {}
+class ActiveRecord_ConfigurationError extends ActiveRecord_Exception {}
 
 class ActiveRecord_ConnectionNotEstablished extends ActiveRecord_Exception {}
 
