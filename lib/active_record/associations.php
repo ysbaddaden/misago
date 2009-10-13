@@ -349,6 +349,27 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       return $this->$attribute = new ActiveRecord_Collection($this, array(), $assoc);
 		}
 		
+    # list of ids for a has_many or HABTM relation?
+		elseif(preg_match('/(.+)_ids/', $attribute, $match))
+		{
+		  $assoc_name = String::pluralize($match[1]);
+		  
+		  if (isset($this->associations[$assoc_name]) and
+		    ($this->associations[$assoc_name]['type'] == 'has_many'
+		      or $this->associations[$assoc_name]['type'] == 'has_and_belongs_to_many'))
+		  {
+		    $assoc  =& $this->associations[$assoc_name];
+        $model  = $assoc['class_name'];
+		    $record = new $model();
+		    
+		    $options['select']     = $record->primary_key;
+		    $options['conditions'] = array($assoc['find_key'] => $this->id);
+		    
+		    $sql = $record->build_sql_from_options($options);
+		    return $record->db->select_values($sql);
+		  }
+		}
+  	
     # another kind of attribute
     return parent::__get($attribute);
   }

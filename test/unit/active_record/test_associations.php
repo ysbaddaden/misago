@@ -236,6 +236,12 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal($basket, null, "record exists, but doesn't belongs to this parent, thus null");
   }
   
+  function test_other_ids()
+  {
+    $order = new Order(1);
+    $this->assert_equal($order->basket_ids, array(1, 2, 3));
+  }
+  
   # TEST: test_others_build_when_parent_is_new_record()
   function test_others_build_when_parent_is_new_record()
   {
