@@ -1,6 +1,6 @@
 <?php
 
-# Handles configuration across the framework and the application.
+# Handles configuration across the framework and application.
 class cfg
 {
   static protected $data = array();
