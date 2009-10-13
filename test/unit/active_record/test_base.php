@@ -10,6 +10,8 @@ class Orphan extends ActiveRecord_Base {
 
 class Test_ActiveRecord_Base extends Unit_TestCase
 {
+  protected $fixtures = array();
+  
   function test_no_such_table()
   {
     try
@@ -405,7 +407,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
 	
   function test_find_with_joins()
   {
-    $this->fixtures("products, orders, baskets, invoices");
+    $this->fixtures('products', 'orders', 'baskets', 'invoices');
   	
     $product = new product();
     $products = $product->find(':all', array(
@@ -545,7 +547,7 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   
   function test_eager_loading_with_default_scope()
   {
-    $this->fixtures('baskets,orders');
+    $this->fixtures('baskets', 'orders');
     
     $order  = new Order();
     $orders = $order->find(':all', array('conditions' => 'id = 1', 'include' => 'baskets'));

@@ -58,7 +58,7 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
   
   function test_find_with_tags()
   {
-    $this->fixtures('posts,tags');
+    $this->fixtures('posts', 'tags');
     $post = new Post();
     
     $posts = $post->find_with_tags('php');

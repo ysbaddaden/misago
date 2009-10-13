@@ -40,8 +40,8 @@ class Fixtures
     self::$connection->truncate($table);
   }
   
-  
-  static private function & all()
+  # Returns the full list of available fixtures.
+  static function & all()
   {
     $files = glob(ROOT.'/test/fixtures/*.yml');
     sort($files);

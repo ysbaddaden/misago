@@ -11,7 +11,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
 {
   function test_belongs_to_relationship()
   {
-    $this->fixtures("products, orders, baskets, invoices");
+    $this->fixtures('products', 'orders', 'baskets', 'invoices');
     
     $invoice = new Invoice(1);
     $this->assert_instance_of($invoice->order, 'Order');
@@ -40,7 +40,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_has_and_belongs_to_many_relationship()
   {
-    $this->fixtures('programmers, projects, programmers_projects');
+    $this->fixtures('programmers', 'projects', 'programmers_projects');
     
     $programmer = new Programmer(1);
     $this->assert_instance_of($programmer->projects, 'ActiveRecord_Collection');
@@ -306,7 +306,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_dependent_nullifying()
   {
-    $this->fixtures('orders,invoices,baskets');
+    $this->fixtures('orders', 'invoices', 'baskets');
     
     $order = new NullifyOrder(2);
     $order->delete();
@@ -335,7 +335,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_dependent_destroy()
   {
-    $this->fixtures('orders,invoices,baskets');
+    $this->fixtures('orders', 'invoices', 'baskets');
     
     $order = new DestroyOrder(1);
     $order->delete();
@@ -347,7 +347,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true($order->invoice->exists(2), 'invoice was not destroyed');
     $this->assert_equal($order->baskets->find(4)->id, 4, 'baskets were not destroyed');
     
-    $this->fixtures('orders,invoices');
+    $this->fixtures('orders', 'invoices');
     
     $invoice = new DestroyInvoice(1);
     $invoice->delete();
@@ -356,7 +356,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_dependent_delete()
   {
-    $this->fixtures('orders,invoices,baskets');
+    $this->fixtures('orders', 'invoices', 'baskets');
     
     $order = new DeleteOrder(1);
     $order->delete();
@@ -368,7 +368,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true($order->invoice->exists(2), 'invoice was not destroyed');
     $this->assert_equal($order->baskets->find(4)->id, 4, 'baskets were not destroyed');
 
-    $this->fixtures('orders,invoices');
+    $this->fixtures('orders', 'invoices');
     
     $invoice = new DeleteInvoice(1);
     $invoice->delete();

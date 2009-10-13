@@ -12,7 +12,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   function __construct()
   {
     self::create_database();
-#    $this->fixtures();
+    $this->load_fixtures();
     
     parent::__construct();
     
@@ -49,14 +49,23 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
     }
   }
   
+  protected function load_fixtures()
+  {
+    if ($this->fixtures === ':all') {
+      $this->fixtures = Fixtures::all();
+    }
+    Fixtures::insert($this->fixtures);
+  }
+  
   # Loads one or many fixtures into the database.
   # 
-  #   $this->fixtures('chapters,pages');
-  function fixtures($fixtures)
+  #   $this->fixtures('chapters', 'pages');
+  function fixtures($fixture)
   {
+    $fixtures = func_get_args();
+    
     if (!empty($fixtures))
     {
-      $fixtures = array_collection($fixtures);
       Fixtures::insert($fixtures);
       $this->fixtures = array_merge($this->fixtures, $fixtures);
     }

@@ -8,7 +8,7 @@ class Test_ActiveRecord_Calculations extends Unit_TestCase
 {
   function test_simple_count()
   {
-    $this->fixtures('posts,tags,products');
+    $this->fixtures('posts', 'tags', 'products');
     
     $post = new Post();
     $this->assert_equal($post->count(), 3);

@@ -29,7 +29,7 @@ class Test_Unit_TestCase extends Unit_TestCase
     $data = $db->select_values('select id from orders order by id asc ;');
     $this->assert_equal($data, array(), "orders must be empty");
     
-    $this->fixtures("orders, invoices");
+    $this->fixtures('orders', 'invoices');
     
     $data = $db->select_values('select id from invoices order by id asc limit 2;');
     $this->assert_equal($data, array('1', '2'), "orders must have been populated");
