@@ -137,7 +137,7 @@ class Unit_Test
       
       # failure
       $this->count_failures += 1;
-      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment='');
+      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment);
       printf(Terminal::colorize("  expected:", 'BOLD')." %s\n", $str_expected);
       printf(Terminal::colorize("       got:", 'BOLD')." %s\n", $str_got);
     }
