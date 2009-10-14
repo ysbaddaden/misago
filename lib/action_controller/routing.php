@@ -453,13 +453,13 @@ class ActionController_Routing extends Object
 # 
 # Options:
 # 
-# - anchor: adds an anchor the the URL.
-# - path_only: false to return an absolute URI, true to return the path only (defaults to true).
-# - protocol: overwrites the current protocol.
-# - host: overwrites the current host.
-# - port: overwrites the current port.
-# - user: username for HTTP login.
-# - password: password for HTTP login.
+# - `anchor`: adds an anchor to the URL.
+# - `path_only`: false to return an absolute URI, true to return the path only (defaults to true).
+# - `protocol`: overwrites the current protocol.
+# - `host`: overwrites the current host.
+# - `port`: overwrites the current port.
+# - `user`: username for HTTP login.
+# - `password`: password for HTTP login.
 # 
 # Example:
 # 
