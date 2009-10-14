@@ -72,6 +72,7 @@ class ActiveRecord_Collection extends ActiveArray
   {
     $records = func_get_args();
     $removed = $this->klass->transaction(array($this, '_block_delete'), $records);
+    
     if ($removed === false) {
       return false;
     }

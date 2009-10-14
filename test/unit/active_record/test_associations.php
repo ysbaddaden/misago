@@ -1,18 +1,15 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
 class Test_ActiveRecord_Associations extends Unit_TestCase
 {
+  protected $fixtures = array('products', 'orders', 'baskets', 'invoices', 'programmers', 'projects', 'programmers_projects');
+  
   function test_belongs_to_relationship()
   {
-    $this->fixtures('products', 'orders', 'baskets', 'invoices');
-    
     $invoice = new Invoice(1);
     $this->assert_instance_of($invoice->order, 'Order');
     $this->assert_equal($invoice->order->id, 1);
@@ -40,8 +37,6 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_has_and_belongs_to_many_relationship()
   {
-    $this->fixtures('programmers', 'projects', 'programmers_projects');
-    
     $programmer = new Programmer(1);
     $this->assert_instance_of($programmer->projects, 'ActiveRecord_Collection');
     $this->assert_equal($programmer->projects->count(), 2);
@@ -173,54 +168,56 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_equal($order->baskets->count(), 0);
   }
   
-  function test_others_delete()
+  function test_others_delete_one()
   {
-    $this->fixtures('baskets');
-    
     $order = new Order(1);
     $order->baskets->delete($order->baskets[0]);
     $this->assert_equal($order->baskets->count(), 2, 'collection has been reduced by 1');
     
     $order = new Order(1);
     $this->assert_equal($order->baskets->count(), 2, 'record must have been deleted from database');
-
+    
     $this->fixtures('baskets');
-
+  }
+  
+  function test_others_delete_many()
+  {
     $order = new Order(1);
     $order->baskets->delete($order->baskets[0], $order->baskets[2]);
     $this->assert_equal($order->baskets->count(), 1, 'collection has been reduced by 2');
 
     $order = new Order(1);
     $this->assert_equal($order->baskets->count(), 1, 'the 2 records must have been deleted from database');
+    
+    $this->fixtures('baskets');
   }
   
   function test_others_delete_all()
   {
-    $this->fixtures('baskets');
-    
     $order = new Order(1);
     $order->baskets->delete_all();
     $this->assert_equal($order->baskets->count(), 0, 'collection is now empty');
     
     $order = new Order(1);
     $this->assert_equal($order->baskets->count(), 0, 'records must have been deleted from database');
+    
+    $this->fixtures('baskets');
   }
   
   function test_others_destroy_all()
   {
-    $this->fixtures('baskets');
-    
     $order = new Order(1);
     $order->baskets->destroy_all();
     $this->assert_equal($order->baskets->count(), 0, 'collection is now empty');
     
     $order = new Order(1);
     $this->assert_equal($order->baskets->count(), 0, 'records must have been destroyed from database');
+    
+    $this->fixtures('baskets');
   }
   
   function test_others_find()
   {
-    $this->fixtures('baskets');
     $order = new Order(1);
     $this->assert_equal($order->baskets->find()->count(), 3, 'default: return all others for parent');
     
@@ -306,8 +303,6 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   
   function test_dependent_nullifying()
   {
-    $this->fixtures('orders', 'invoices', 'baskets');
-    
     $order = new NullifyOrder(2);
     $order->delete();
     
@@ -331,12 +326,12 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     
     $basket = new Basket(2);
     $this->assert_equal($basket->order_id, 1, "has many foreign key isn't nullified on destroy");
+    
+    $this->fixtures('orders', 'invoices', 'baskets');
   }
   
   function test_dependent_destroy()
   {
-    $this->fixtures('orders', 'invoices', 'baskets');
-    
     $order = new DestroyOrder(1);
     $order->delete();
     $this->assert_false($order->invoice->exists(1), 'invoice was destroyed');
@@ -352,12 +347,12 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $invoice = new DestroyInvoice(1);
     $invoice->delete();
     $this->assert_false($invoice->order->exists(1), 'order was destroyed');
+    
+    $this->fixtures('orders', 'invoices', 'baskets');
   }
   
   function test_dependent_delete()
   {
-    $this->fixtures('orders', 'invoices', 'baskets');
-    
     $order = new DeleteOrder(1);
     $order->delete();
     $this->assert_false($order->invoice->exists(1), 'invoice was deleted');
@@ -373,6 +368,8 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $invoice = new DeleteInvoice(1);
     $invoice->delete();
     $this->assert_false($invoice->order->exists(1), 'order was destroyed');
+    
+    $this->fixtures('orders', 'invoices', 'baskets');
   }
 }
 
@@ -408,7 +405,6 @@ class DestroyInvoice extends Invoice
   protected $table_name = "invoices";
   protected $belongs_to = array('order' => array('dependent' => 'destroy'));
 }
-
 
 new Test_ActiveRecord_Associations();
 

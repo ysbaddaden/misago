@@ -6,7 +6,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   static public  $batch_run = false;
   static private $connection;
   
-  protected $fixtures = array();
+  protected $fixtures = ':all';
   
   
   function __construct()
@@ -18,6 +18,13 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
     
     $this->truncate($this->fixtures);
     self::drop_database();
+  }
+  
+  protected function run_test($method)
+  {
+    self::$connection->transaction('begin');
+    parent::run_test($method);
+    self::$connection->transaction('rollback');
   }
   
   static function create_database($force=false)

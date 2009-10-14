@@ -34,22 +34,7 @@ class Unit_Test
       
       misago_log("------- $method:\n");
       
-      try
-      {
-        # runs test
-        $this->$method();
-      }
-      catch(Exception $e)
-      {
-        # an exception was raised
-        $this->count_errors += 1;
-        
-        printf("\n".Terminal::colorize("An exception was raised", 'RED')." in %s:\n", $method);
-        printf("[%d] %s\n\n", $e->getCode(), $e->getMessage());
-        printf("Occured at line %d in file %s\n", $e->getLine(), $e->getFile());
-        echo $e->getTraceAsString();
-        echo "\n";
-      }
+      $this->run_test($method);
     }
     
     # finished
@@ -60,6 +45,24 @@ class Unit_Test
     $text  = sprintf("%d tests, %d assertions, %d failures, %d errors",
       $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors);
     echo Terminal::colorize($text, ($this->count_failures + $this->count_errors) ? 'RED' : 'GREEN')."\n";
+  }
+  
+  protected function run_test($method)
+  {
+    try {
+      $this->$method();
+    }
+    catch(Exception $e)
+    {
+      # an exception was raised
+      $this->count_errors += 1;
+      
+      printf("\n".Terminal::colorize("An exception was raised", 'RED')." in %s:\n", $method);
+      printf("[%d] %s\n\n", $e->getCode(), $e->getMessage());
+      printf("Occured at line %d in file %s\n", $e->getLine(), $e->getFile());
+      echo $e->getTraceAsString();
+      echo "\n";
+    }
   }
   
   protected function assert_true($arg, $comment='')
