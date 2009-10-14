@@ -1,11 +1,8 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
 
 # TEST: Attribute & method names must be built from the association's name (ie. category_list, find_with_categories, etc).
 class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
@@ -14,6 +11,11 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
   {
     $post = new Post();
     $this->assert_instance_of($post->tag_list, 'ActiveRecord_Behaviors_Taggable_TagList');
+    
+    # assigning & casting
+    $post->tag_list = array('aaa', 'bbb', 'ccc');
+    $this->assert_equal((string)$post->tag_list, 'aaa, bbb, ccc');
+    $this->assert_equal((array)$post->tag_list, array('aaa', 'bbb', 'ccc'));
   }
   
   function test_get_tag_list_when_parent_is_new_record()
@@ -44,6 +46,24 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
     
     $post->tag_list = 'aaa,bbb,ddd';
     $this->assert_equal((array)$post->tag_list, array('aaa', 'bbb', 'ddd'), "the list must have been updated");
+  }
+  
+  function test_add_remove_methods()
+  {
+    $post = new Post();
+    $post->tag_list = 'aaa,bbb,ccc';
+    
+    $post->tag_list->remove('bbb');
+    $this->assert_equal((string)$post->tag_list, 'aaa, ccc');
+    
+    $post->tag_list->add('aze');
+    $this->assert_equal((string)$post->tag_list, 'aaa, aze, ccc');
+    
+    $post->tag_list->remove('unknown_tag');
+    $this->assert_equal((string)$post->tag_list, 'aaa, aze, ccc');
+    
+    $post->tag_list->add('aaa');
+    $this->assert_equal((string)$post->tag_list, 'aaa, aze, ccc');
   }
   
   function test_create_with_tags()

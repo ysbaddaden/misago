@@ -1,21 +1,35 @@
 <?php
 
-# Handles tags stored in an has many relationship.
+# Handles tags stored in a has_many relationship.
 # 
-#   class Post extends ActiveRecord_Base {
+#   class Post extends ActiveRecord_Base
+#   {
+#     protected $has_many  = array('tags');
 #     protected $behaviors = array('taggable' => array('tags'));
 #   }
 #   
 #   $p = new Post(5);
+# 
+#   # assigning:
 #   $p->tag_list = 'php, javascript';
-#   $p->tag_list; # => ArrayObject('javascript', 'php')
+#   $p->tag_list;         # => ArrayObject('javascript', 'php')
 #   
 #   $p->tag_list->add('code');
 #   $p->tag_list->remove('php');
-#   $p->tag_list; # => ArrayObject('code', 'javascript')
+#   $p->tag_list;         # => ArrayObject('code', 'javascript')
 #   
+#   # type casting:
+#   (string)$p->tag_list; # => 'code, javascript'
+#   (array)$p->tag_list;  # => array('code', 'javascript')
+# 
+# =Find tagged with
+# 
+# Returns a collection of posts with the `javascript` tag:
+# 
 #   $posts = $p->find_tagged_with('javascript');
-#   
+# 
+# = Tag clouds
+# 
 #   $tags = $p->tag_count();
 #   tag_cloud($tags);
 # 

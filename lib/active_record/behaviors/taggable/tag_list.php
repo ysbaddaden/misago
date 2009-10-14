@@ -34,19 +34,30 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
   
   function add($tag)
   {
-    
+    $tags = (array)$this;
+    if (!in_array($tag, $tags))
+    {
+      $tags[] = $tag;
+      $this->set($tags);
+    }
   }
   
   function remove($tag)
   {
-    
+    $tags  = (array)$this;
+    $index = array_search($tag, $tags);
+    if ($index !== false)
+    {
+      unset($tags[$index]);
+      $this->set($tags);
+    }
   }
   
   function __toString()
   {
     return implode(', ', (array)$this);
   }
-    
+  
   # @private
   function set($tags='')
   {
