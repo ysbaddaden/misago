@@ -1,5 +1,5 @@
 #! /usr/bin/php
 <?php
-require dirname(__FILE__).DS.'..'.DS.'config'.DS.'boot.php';
-require 'commands'.DS.'generate.php';
+require dirname(__FILE__).'/../config/boot.php';
+require 'commands/generate.php';
 ?>
