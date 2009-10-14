@@ -15,14 +15,19 @@ for($i = 1; $i < count($_SERVER['argv']); $i++)
   }
 }
 
-
 # basic usage
 if (!isset($arguments[0]))
 {
-  $generators = glob(MISAGO.'/lib/commands/generators/*.php');
-  foreach($generators as $i => $generator) {
-    $generators[$i] = str_replace('.php', '', basename($generator));
+  $generators = array();
+  
+  $d = dir(MISAGO.'/lib/commands/generators/');
+  while(($file = $d->read()) !== false)
+  {
+    if (preg_match('/^(.+)\.php$/', $file, $match)) {
+      $generators[] = $match[1];
+    }
   }
+  $d->close();
   
   echo "Usage: script/generate <generator>\n";
   echo "Available generators: ".implode(', ', $generators)."\n";
