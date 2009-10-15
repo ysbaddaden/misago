@@ -48,6 +48,11 @@ class IndexController extends ApplicationController
     setcookie('misago', 'azerty');
     exit;
   }
+  
+  function html()
+  {
+    
+  }
 }
 
 ?>
