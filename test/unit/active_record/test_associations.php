@@ -76,6 +76,13 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_true(isset($invoices[0]->order));
     $this->assert_true(isset($invoices[1]->order));
     $this->assert_instance_of($invoices[0]->order, 'Order');
+    
+    $basket  = new Basket();
+    $baskets = $basket->find(':all', array('conditions' => array('id' => array(3, 4)), 'include' => 'order', 'order' => 'id asc'));
+    $this->assert_true(isset($baskets[0]->order));
+    $this->assert_true(isset($baskets[1]->order));
+    $this->assert_instance_of($baskets[0]->order, 'Order');
+    $this->assert_equal($baskets[1]->order->id, 2);
   }
   
   function test_eager_loading_for_has_one()

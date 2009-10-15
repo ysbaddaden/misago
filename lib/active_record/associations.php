@@ -427,21 +427,28 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       return;
     }
     
-    $ids = array();
-    foreach($records as $record)
-    {
-      $id = $record->id;
-      $ids[$id] = $record;
-    }
-    
     foreach(array_collection($includes) as $include)
     {
-      $fk    = $this->associations[$include]['find_key'];
-      $model = $this->associations[$include]['class_name'];
+      $find_key = $this->associations[$include]['find_key'];
+      $model    = $this->associations[$include]['class_name'];
+      
+      $ids = array();
+      if ($this->associations[$include]['type'] == 'belongs_to')
+      {
+        foreach($records as $record) {
+          $ids[] = $record->{$this->associations[$include]['foreign_key']};
+        }
+      }
+      else
+      {
+        foreach($records as $record) {
+          $ids[] = $record->id;
+        }
+      }
       
 			$options = isset($this->associations[$include]['find_options']) ?
 			  $this->associations[$include]['find_options'] : array();
-	    $options['conditions'] = array($fk => array_keys($ids));
+      $options['conditions'] = array($find_key => $ids);
 	    
       $assoc   = new $model();
       $results = $assoc->find(':all', $options);
@@ -450,22 +457,36 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       {
         case 'belongs_to':
         case 'has_one':
-          foreach($results as $rs)
+          if ($this->associations[$include]['type'] == 'belongs_to')
           {
-            $id = $rs->$fk;
-            $ids[$id]->$include = $rs;
+            $record_key = $this->associations[$include]['foreign_key'];
+            $rs_key = 'id';
           }
-          foreach($ids as $record)
+          else
           {
-            if (!isset($record->$include)) {
-              $record->$include = null;
+            $record_key = 'id';
+            $rs_key = $find_key;
+          }
+          
+          foreach($records as $record)
+          {
+            $r = null;
+            foreach($results as $rs)
+            {
+              if ($record->$record_key == $rs->$rs_key)
+              {
+                $r = $rs;
+                break;
+              }
             }
+            $record->$include = $r;
           }
         break;
         
         case 'has_many':
         case 'has_and_belongs_to_many':
-          $assoc_key  = $record->associations[$include]['foreign_key'];
+          $assoc_key = $record->associations[$include]['foreign_key'];
+          
           foreach($records as $record)
           {
             $_results = array();
