@@ -75,6 +75,12 @@ class DOMSelector
 {
   function __construct($html)
   {
+    # drops DOCTYPE since it triggers a warning (StartTag: invalid element name in Entity)
+    $html = preg_replace('/<!DOCTYPE (?:.+?)>/i', '', $html);
+    
+    # drops XMLNS definitions because XPATH evaluates nothing when XMLNS are defined
+    $html = preg_replace('/(<.*)xmlns="(?:.+?)"(.*>)/', '\1\2', $html);
+    
     $this->dom = new DOMDocument();
     $this->dom->loadXML(html_entity_decode($html, ENT_NOQUOTES, 'UTF-8'));
     $this->xpath = new DOMXpath($this->dom);
@@ -117,42 +123,61 @@ class DOMSelector
   function selector_to_xpath($selector)
   {
     $selector = 'descendant-or-self::' . $selector;
+    
     // :button, :submit, etc
-    $selector = preg_replace('/:(button|submit|file|checkbox|radio|image|reset|text|password)/', 'input[@type="\1"]', $selector);
+#    $selector = preg_replace('/:(button|submit|file|checkbox|radio|image|reset|text|password)/', 'input[@type="\1"]', $selector);
+
     // [id]
     $selector = preg_replace('/\[(\w+)\]/', '*[@\1]', $selector);
+    
     // foo[id=foo]
     $selector = preg_replace('/\[(\w+)=[\'"]?(.*?)[\'"]?\]/', '[@\1="\2"]', $selector);
+    
     // [id=foo]
     $selector = str_replace(':[', ':*[', $selector);
+    
     // div#foo
     $selector = preg_replace('/([\w\-]+)\#([\w\-]+)/', '\1[@id="\2"]', $selector);
+    
     // #foo
     $selector = preg_replace('/\#([\w\-]+)/', '*[@id="\1"]', $selector);
+    
     // div.foo
     $selector = preg_replace('/([\w\-]+)\.([\w\-]+)/', '\1[contains(concat(" ",@class," ")," \2 ")]', $selector);
+    
     // .foo
     $selector = preg_replace('/\.([\w\-]+)/', '*[contains(concat(" ",@class," ")," \1 ")]', $selector);
+    
     // div:first-child
     $selector = preg_replace('/([\w\-]+):first-child/', '*/\1[position()=1]', $selector);
+    
     // div:last-child
     $selector = preg_replace('/([\w\-]+):last-child/', '*/\1[position()=last()]', $selector);
+    
     // :first-child
     $selector = str_replace(':first-child', '*/*[position()=1]', $selector);
+    
     // :last-child
     $selector = str_replace(':last-child', '*/*[position()=last()]', $selector);
+    
     // div:nth-child
     $selector = preg_replace('/([\w\-]+):nth-child\((\d+)\)/', '*/\1[position()=\2]', $selector);
+    
     // :nth-child
     $selector = preg_replace('/:nth-child\((\d+)\)/', '*/*[position()=\1]', $selector);
+    
     // :contains(Foo)
     $selector = preg_replace('/([\w\-]+):contains\((.*?)\)/', '\1[contains(string(.),"\2")]', $selector);
+    
     // >
     $selector = preg_replace('/\s*>\s*/', '/', $selector);
+    
     // ~
     $selector = preg_replace('/\s*~\s*/', '/following-sibling::', $selector);
+    
     // +
     $selector = preg_replace('/\s*\+\s*([\w\-]+)/', '/following-sibling::\1[position()=1]', $selector);
+    
     // ' '
     $selector = preg_replace(
       array('/\s+/', '/"\/descendant::"/', '/"\/descendant::/', '/\/descendant::"/'),
@@ -161,6 +186,7 @@ class DOMSelector
     );
     $selector = str_replace(']*', ']', $selector);
     $selector = str_replace(']/*', ']', $selector);
+    
     return $selector;
   }
 }
