@@ -291,7 +291,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $this->assert_equal($test->method, 'DELETE');
   }
   
-  function test_path_for()
+  function test_url_for()
   {
     $map = ActionController_Routing::draw();
     $map->reset();
@@ -305,6 +305,9 @@ class Test_ActionController_Routing extends Unit_TestCase
     
     $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc', 'path_only' => false);
     $this->assert_equal(url_for($options), 'http://localhost:3009/pages.xml?order=asc');
+    
+    $this->assert_equal(url_for(array(':controller' => 'admin', 'format' => 'html')), '/admin?format=html',
+      "using query string parameter (string) sharing path parameter (symbol) name");
   }
   
   function test_named_routes()
@@ -438,7 +441,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $this->assert_equal((string)update_article_path(array(':id' => 43, 'edit' => '1', 'action' => 'first')),
       '/articles/43?edit=1&action=first');
     
-    # bug: using query string parameters sharing the name of path parameters
+    # using query string parameters (string) sharing the name of path parameters (symbol)
     $this->assert_equal((string)update_article_path(array(':id' => 2, 'format' => 'html')), '/articles/2?format=html');
     $this->assert_equal((string)update_article_path(array('id' => 2)), '/articles/:id?id=2');
   }
