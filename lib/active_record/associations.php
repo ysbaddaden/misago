@@ -448,7 +448,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       
 			$options = isset($this->associations[$include]['find_options']) ?
 			  $this->associations[$include]['find_options'] : array();
-      $options['conditions'] = array($find_key => $ids);
+      $options['conditions'] = array($find_key => array_unique($ids));
 	    
       $assoc   = new $model();
       $results = $assoc->find(':all', $options);
