@@ -3,9 +3,7 @@
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-$location = dirname(__FILE__).'/../../..';
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
 class Test_ActionController_Routing extends Unit_TestCase
 {
@@ -439,6 +437,10 @@ class Test_ActionController_Routing extends Unit_TestCase
       '/articles/1?session_id=abcd');
     $this->assert_equal((string)update_article_path(array(':id' => 43, 'edit' => '1', 'action' => 'first')),
       '/articles/43?edit=1&action=first');
+    
+    # bug: using query string parameters sharing the name of path parameters
+    $this->assert_equal((string)update_article_path(array(':id' => 2, 'format' => 'html')), '/articles/2?format=html');
+    $this->assert_equal((string)update_article_path(array('id' => 2)), '/articles/:id?id=2');
   }
 }
 

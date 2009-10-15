@@ -419,7 +419,7 @@ class ActionController_Routing extends Object
         if (!is_symbol($k))
         {
           $query[$k] = $v;
-          unset($keys[$v]);
+          unset($keys[$k]);
         }
       }
       $query_string = http_build_query($query);
