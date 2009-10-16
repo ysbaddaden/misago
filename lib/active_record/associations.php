@@ -26,6 +26,17 @@
 #   $post_id    = $comment->post->id;
 #   $post_title = $comment->post->title;
 # 
+# ===Options for `belongs to`
+# 
+# - class_name
+# - conditions
+# - dependent
+# - foreign_key
+# - include
+# - select
+# - table_name
+# 
+# 
 # ==has_one
 # 
 # Represents a one-to-one relationship, in the point of view
@@ -50,6 +61,18 @@
 #   $order = new Order(456);
 #   $invoice_id = $order->invoice->id;
 # 
+# ===Options for `has_one`
+# 
+# - class_name
+# - conditions
+# - dependent
+# - foreign_key
+# - include
+# - order
+# - primary_key
+# - select
+# - table_name
+# 
 # 
 # ==has_many
 # 
@@ -73,6 +96,19 @@
 #	    echo $tag->name.", ";
 #   }
 # 
+# ===Options for `has_many`
+# 
+# - class_name
+# - conditions
+# - dependent
+# - foreign_key
+# - include
+# - limit
+# - order
+# - page
+# - primary_key
+# - select
+# - table_name
 # 
 # ===:through
 # 
@@ -98,6 +134,23 @@
 #   class Project extends ActiveRecord_Base {
 #     protected $has_and_belongs_to_many = array('programmers');
 #   }
+# 
+# ===Options for `has_and_belongs_to_many`
+# 
+# - association_foreign_key
+# - association_primary_key
+# - class_name
+# - conditions
+# - dependent
+# - foreign_key
+# - group
+# - include
+# - join_table
+# - limit
+# - order
+# - page
+# - select
+# - table_name
 # 
 # ===Join table
 # 
@@ -148,6 +201,42 @@
 # 
 # See +ActionController_Collection+ for details.
 # 
+# = Dependent relations
+# 
+# You may want to delete, destroy or nullify dependent relations when
+# you delete a record. For instance when deleting a blog post, you better
+# delete all associated comments and tags.
+# 
+# By default this is not activated. You have to define it.
+# 
+#   class Post extends ActiveRecord_Base
+#   {
+#     protected $has_many = array(
+#       'comments' => array('dependent' => 'delete_all'),
+#       'tags'     => array('dependent' => 'delete_all')
+#     );
+#   } 
+# 
+# Depending on the type of relation, you will have access to different
+# dependent actions:
+# 
+# == belongs_to
+# 
+# - `destroy`: calls the `delete` method on associated object.
+# - `delete`:  calls the `destroy_all` method on all objects.
+# 
+# == has_one
+# 
+# - `destroy`: calls the `delete` method on associated object.
+# - `delete`:  calls the `destroy_all` method on all objects.
+# - `nullify`: calls the `destroy_all` method on all objects.
+# 
+# == has_many
+# 
+# - `destroy`:    calls the `delete_all` method of the collection.
+# - `delete_all`: calls the `destroy_all` method of the collection.
+# - `nullify`:    nullifies the foreign key on associated objects.
+# 
 # =Eager Loading (include)
 #
 # Permits to limitate repetitive requests of relationships' data by
@@ -183,8 +272,9 @@
 #   }
 # 
 # FIXME: handle others.build, etc. methods for HABTM relationships.
-# TODO: Implement has_many :through association.
-# TODO: Implement belongs_to :polymorphic association.
+# IMPROVE: has_many options: counter_sql, finder_sql
+# IMPROVE: HABTM options: counter_sql, finder_sql, insert_sql, delete_sql
+# TODO: Implement has_many/has_one :through association.
 abstract class ActiveRecord_Associations extends ActiveRecord_Record
 {
   protected $belongs_to = array();
@@ -258,22 +348,37 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       switch($type)
       {
         case 'belongs_to':
-          $def['find_key']   = $this->primary_key;
-          $def['find_scope'] = ':first';
+          $def['find_key']     = $this->primary_key;
+          $def['find_scope']   = ':first';
+          $def['find_options'] = array_intersect_key($def, array(
+            'select'     => '',
+            'conditions' => '',
+            'include'    => '',
+          ));
         break;
         
         case 'has_one':
-          $def['find_key']   = $def['foreign_key'];
-          $def['find_scope'] = ':first';
+          $def['find_key']     = $def['foreign_key'];
+          $def['find_scope']   = ':first';
+          $def['find_options'] = array_intersect_key($def, array(
+            'select'     => '',
+            'conditions' => '',
+            'include'    => '',
+            'order'      => '',
+          ));
         break;
         
         case 'has_many':
-          $def['find_key']   = $def['foreign_key'];
-          $def['find_scope'] = ':all';
+          $def['find_key']     = $def['foreign_key'];
+          $def['find_scope']   = ':all';
           $def['find_options'] = array_intersect_key($def, array(
-            'select' => '',
-            'order'  => '',
-            'limit'  => '',
+            'select'     => '',
+            'conditions' => '',
+            'order'      => '',
+            'limit'      => '',
+            'page'       => '',
+            'group'      => '',
+            'include'    => '',
           ));
         break;
         
@@ -290,19 +395,21 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
             $def['association_foreign_key'] = String::underscore($def['class_name']).'_id';
           }
           
+          $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
+          $def['find_scope'] = ':all';
           $def['find_options'] = array_intersect_key($def, array(
-            'select' => '',
-            'group'  => '',
-#            'having'  => '',
-            'order'  => '',
-            'limit'  => '',
-            'page'   => '',
+            'select'     => '',
+            'conditions' => '',
+            'group'      => '',
+#            'having'     => '',
+            'order'      => '',
+            'limit'      => '',
+            'page'       => '',
+            'include'    => '',
           ));
           $def['find_options']['joins'] = "inner join ".$this->connection->quote_table($def['join_table']).
             " on ".$this->connection->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
             " = ".$this->connection->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
-          $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
-          $def['find_scope'] = ':all';
         break;
       }
       $this->associations[$name] = $def;
@@ -319,16 +426,15 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       
 		  if (!$this->new_record)
 		  {
-		    # parent already exists
+		    # parent does exist
 			  $options = isset($assoc['find_options']) ? $assoc['find_options'] : array();
 			  
-			  if ($assoc['type'] == 'belongs_to') {
-			    $options['conditions'] = array($assoc['find_key'] => $this->{$assoc['foreign_key']});
-			  }
-			  else {
-			    $options['conditions'] = array($assoc['find_key'] => $this->id);
-			  }
-			  
+			  $conditions = ($assoc['type'] == 'belongs_to') ?
+			    array($assoc['find_key'] => $this->{$assoc['foreign_key']}) :
+  		    array($assoc['find_key'] => $this->id);
+			  $options['conditions'] = empty($options['conditions']) ? $conditions :
+		      $this->merge_conditions($options['conditions'], $conditions);
+		    
 			  $record = new $model();
 			  $found  = $record->find($assoc['find_scope'], $options);
         
@@ -342,7 +448,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       
       # association doesn't exists
       if ($assoc['type'] == 'belongs_to' or $assoc['type'] == 'has_one') {
-        return $this->$attribute = new $model;
+        return $this->$attribute = new $model();
       }
       return $this->$attribute = new ActiveRecord_Collection($this, array(), $assoc);
 		}
@@ -360,9 +466,11 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         $model  = $assoc['class_name'];
 		    $record = new $model();
 		    
-		    $options['select']     = $record->primary_key;
-		    $options['conditions'] = array($assoc['find_key'] => $this->id);
-		    
+		    $conditions = array($assoc['find_key'] => $this->id);
+		    $options['conditions'] = empty($options['conditions']) ? $conditions :
+		      $this->merge_conditions($options['conditions'], $conditions);
+		    $options['select'] = $record->primary_key;
+	      
 		    $sql = $record->build_sql_from_options($options);
 		    return $record->connection->select_values($sql);
 		  }
@@ -420,7 +528,6 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   	parent::__wakeup();
   }
   
-  # TODO: Recursive includes in eager loading.
   protected function eager_loading($records, $includes)
   {
     if (count($records) == 0) {
@@ -432,6 +539,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
       $find_key = $this->associations[$include]['find_key'];
       $model    = $this->associations[$include]['class_name'];
       
+      # ids
       $ids = array();
       if ($this->associations[$include]['type'] == 'belongs_to')
       {
@@ -446,13 +554,19 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         }
       }
       
+      # options
 			$options = isset($this->associations[$include]['find_options']) ?
 			  $this->associations[$include]['find_options'] : array();
-      $options['conditions'] = array($find_key => array_unique($ids));
+		  
+      $conditions = array($find_key => array_unique($ids));
+		  $options['conditions'] = empty($options['conditions']) ? $conditions :
+		    $this->merge_conditions($options['conditions'], $conditions);
 	    
+	    # find
       $assoc   = new $model();
       $results = $assoc->find(':all', $options);
       
+      # dispatch
       switch($this->associations[$include]['type'])
       {
         case 'belongs_to':
