@@ -26,7 +26,7 @@
 #   $post_id    = $comment->post->id;
 #   $post_title = $comment->post->title;
 # 
-# ===Options for `belongs to`
+# ===Options for belongs to
 # 
 # - class_name
 # - conditions
@@ -61,7 +61,7 @@
 #   $order = new Order(456);
 #   $invoice_id = $order->invoice->id;
 # 
-# ===Options for `has_one`
+# ===Options for has_one
 # 
 # - class_name
 # - conditions
@@ -96,7 +96,7 @@
 #	    echo $tag->name.", ";
 #   }
 # 
-# ===Options for `has_many`
+# ===Options for has_many
 # 
 # - class_name
 # - conditions
@@ -135,7 +135,7 @@
 #     protected $has_and_belongs_to_many = array('programmers');
 #   }
 # 
-# ===Options for `has_and_belongs_to_many`
+# ===Options for has_and_belongs_to_many
 # 
 # - association_foreign_key
 # - association_primary_key
@@ -222,14 +222,14 @@
 # 
 # == belongs_to
 # 
-# - `destroy`: calls the `delete` method on associated object.
-# - `delete`:  calls the `destroy_all` method on all objects.
+# - `destroy`: calls the `delete` method of associated object.
+# - `delete`:  calls the `destroy` method of associated object.
 # 
 # == has_one
 # 
-# - `destroy`: calls the `delete` method on associated object.
-# - `delete`:  calls the `destroy_all` method on all objects.
-# - `nullify`: calls the `destroy_all` method on all objects.
+# - `destroy`: calls the `delete` method of associated object.
+# - `delete`:  calls the `destroy` method of associated object.
+# - `nullify`: nullifies the foreign key of associated object.
 # 
 # == has_many
 # 
