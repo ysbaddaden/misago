@@ -47,7 +47,7 @@
 # 
 #   <h1><\?= $this->post->title ?\></h1>
 # 
-abstract class ActionController_Base extends Object
+abstract class ActionController_Base extends ActionController_Caching
 {
   public $helpers = ':all';
   
@@ -62,9 +62,6 @@ abstract class ActionController_Base extends Object
   
   # Template folder containing views.
   public $view_path;
-	
-	# See +ActiveSupport_Cache+.
-	public $cache;
 	
 	# Request data.
   protected $request;
@@ -81,10 +78,7 @@ abstract class ActionController_Base extends Object
   function __construct()
   {
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    
-    $CacheStoreClassName = cfg::is_set('cache_store') ? cfg::get('cache_store') : 'apc_store';
-    $this->cache = new $CacheStoreClassName();
-    
+    parent::__construct();
     I18n::initialize();
   }
   
@@ -334,39 +328,6 @@ abstract class ActionController_Base extends Object
     }
     
     exit;
-  }
-  
-  # Sends a Cache-Control header for HTTP caching.
-  # 
-  # Defaults to private, telling proxies not to cache anything,
-  # which allows for some privacy of content.
-  # 
-  # Examples:
-  # 
-  #   expires_in(3600)
-  #   expires_in('+1 hour', array('private' => false))
-  # 
-  protected function expires_in($seconds, $options=array())
-  {
-    $cache_control = array(
-      'max-age' => is_integer($seconds) ? $seconds : strtotime($seconds),
-      'private' => true,
-    );
-    foreach($options as $k => $v)
-    {
-      if (!$v) {
-        continue;
-      }
-      $cache_control[] = ($v === true) ? $k : "$k=$v";
-    }
-    $this->response->headers['Cache-Control'] = implode(', ', $cache_control);
-  }
-  
-  # Sends a Cache-Control header with 'no-cache' to disallow or
-  # cancel HTTP caching of current request.
-  protected function expires_now()
-  {
-    $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
   
   # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
