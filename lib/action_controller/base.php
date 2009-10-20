@@ -60,7 +60,11 @@ abstract class ActionController_Base extends Object
   # Merged GET and POST parameters plus PATH parameters from route.
   public $params;
   
+  # Template folder containing views.
   public $view_path;
+	
+	# See +ActiveSupport_Cache+.
+	public $cache;
 	
 	# Request data.
   protected $request;
@@ -77,6 +81,10 @@ abstract class ActionController_Base extends Object
   function __construct()
   {
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
+    
+    $CacheStoreClassName = cfg::is_set('cache_store') ? cfg::get('cache_store') : 'apc_store';
+    $this->cache = new $CacheStoreClassName();
+    
     I18n::initialize();
   }
   
