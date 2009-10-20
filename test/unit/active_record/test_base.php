@@ -574,6 +574,18 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal($monitoring->human_attribute_name('length_string'), 'Length string');
     $this->assert_equal($monitoring->human_attribute_name('length_string2'), 'My length', 'specified translation (I18n)');
   }
+  
+  function test_cache_key()
+  {
+    $order = new Order();
+    $this->assert_equal($order->cache_key, 'orders/new');
+    $this->assert_equal($order->find(1)->cache_key, 'order/1-20091005124536');
+    
+    $this->fixtures('programmers');
+    
+    $programmer = new Programmer(2);
+    $this->assert_equal($programmer->cache_key, 'programmer/2');
+  }
 }
 
 new Test_ActiveRecord_Base();
