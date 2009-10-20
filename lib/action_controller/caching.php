@@ -3,9 +3,7 @@
 abstract class ActionController_Caching extends Object
 {
 	# See +ActiveSupport_Cache+.
-	public $cache;
-  
-  function __construct()
+  function cache()
   {
     $CacheStoreClassName = 'ActiveSupport_Cache_'.String::camelize(cfg::is_set('cache_store') ? cfg::get('cache_store') : 'apc_store');
     $this->cache = new $CacheStoreClassName();

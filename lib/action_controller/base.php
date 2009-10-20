@@ -78,7 +78,6 @@ abstract class ActionController_Base extends ActionController_Caching
   function __construct()
   {
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    parent::__construct();
     I18n::initialize();
   }
   
@@ -87,7 +86,7 @@ abstract class ActionController_Base extends ActionController_Caching
     if ($attr == 'format') {
       return $this->request->format();
     }
-    return null;
+    return parent::__get($attr);
   }
   
   function __set($attr, $value)
@@ -95,7 +94,7 @@ abstract class ActionController_Base extends ActionController_Caching
     if ($attr == 'format') {
       return $this->request->format($value);
     }
-    return $this->$attr = $value;;
+    return parent::__set($attr, $value);
   }
   
   # @private
