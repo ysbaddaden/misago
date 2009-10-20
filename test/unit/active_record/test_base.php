@@ -46,6 +46,10 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product(array('name' => 'azerty', 'price' => 18.99));
     $this->assert_equal($product->name, 'azerty');
     $this->assert_equal($product->price, 18.99);
+    
+    $this->fixtures('products');
+    $product = new Product(1);
+    $this->assert_equal($product->name, 'bepo');
   }
   
   function test_create()
@@ -268,6 +272,10 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product = new Product(1);
     $this->assert_false($product->new_record());
+    
+    $product = new Product(102);
+    $this->assert_null($product->id);
+    $this->assert_true($product->new_record());
     
     $products = $product->all();
     $this->assert_false($products[0]->new_record());

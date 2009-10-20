@@ -254,7 +254,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       if (!is_array($arg))
       {
         $arg = $this->find($arg);
-        $this->new_record = false;
+        if ($arg !== null) {
+          $this->new_record = false;
+        }
       }
       ActiveRecord_Record::__construct($arg);
     }
