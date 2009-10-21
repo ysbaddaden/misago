@@ -131,11 +131,16 @@ abstract class ActionController_Base extends ActionController_Caching
     
     $this->before_filters();
     
-    $this->process_action();
+    if ($this->shall_we_cache_action()) {
+      $this->cache_action();
+    }
+    else {
+      $this->process_action();
+    }
     
     # page caching
-    if (isset($this->caches_page[$this->action])) {
-      $this->_cache_page();
+    if ($this->shall_we_cache_page()) {
+      $this->cache_page();
     }
     
 #    $this->after_filters();

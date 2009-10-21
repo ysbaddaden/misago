@@ -100,10 +100,11 @@ abstract class ActionController_Caching extends Object
     return $this->cache;
   }
   
+  
   # Manually caches the current request as a real file into the `public` folder.
   function cache_page($content=null, $options=null)
   {
-    $path = $this->cache_page_key($options);
+    $path = $this->page_cache_key($options);
     $dir  = dirname($path);
     if (!empty($dir) and !file_exists(ROOT.'/public'.$dir)) {
       mkdir(ROOT.'/public'.$dir, 0775, true);
@@ -111,15 +112,15 @@ abstract class ActionController_Caching extends Object
     file_put_contents(ROOT.'/public'.$path, ($content === null) ? $this->response->body : $content);
   }
   
-  # Deletes cached page.
+  # Deletes a cached page.
   function expire_page($options=null)
   {
-    $path = $this->cache_page_key($options);
+    $path = $this->page_cache_key($options);
     if (file_exists(ROOT.'/public'.$path)) {
       unlink(ROOT.'/public'.$path);
     }
   }
-  /*
+  
   # Deletes cached action.
   function expire_action($options)
   {
@@ -129,10 +130,10 @@ abstract class ActionController_Caching extends Object
   # Deletes a cached fragment.
   function expire_fragment($options)
   {
-    $key = $this->cache_fragment_key($options);
+    $key = $this->fragment_cache_key($options);
     $this->cache->delete($key);
   }
-  */
+  
   
   # Sends a Cache-Control header for HTTP caching.
   # 
@@ -144,7 +145,7 @@ abstract class ActionController_Caching extends Object
   #   expires_in(3600)
   #   expires_in('+1 hour', array('private' => false))
   # 
-  protected function expires_in($seconds, $options=array())
+  function expires_in($seconds, $options=array())
   {
     $cache_control = array(
       'max-age' => is_integer($seconds) ? (time() + $seconds) : strtotime($seconds),
@@ -162,54 +163,63 @@ abstract class ActionController_Caching extends Object
   
   # Sends a Cache-Control header with 'no-cache' to disallow or
   # cancel HTTP caching of current request.
-  protected function expires_now()
+  function expires_now()
   {
     $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
   
   
   # @private
-  protected function _cache_page()
+  protected function shall_we_cache_page()
   {
-    $cache = true;
-    
-    if (isset($this->caches_page[$this->action]['unless']))
+    if (isset($this->caches_page[$this->action]))
     {
-      $test  = array_intersect_assoc($this->params, $this->caches_page[$this->action]['unless']);
-      $cache = empty($test);
+      $cache = true;
+      
+      if (isset($this->caches_page[$this->action]['unless']))
+      {
+        $test = array_intersect_assoc($this->params, $this->caches_page[$this->action]['unless']);
+        $cache &= empty($test);
+      }
+      if (isset($this->caches_page[$this->action]['if']))
+      {
+        $test = array_intersect_assoc($this->params, $this->caches_page[$this->action]['if']);
+        $cache &= (!empty($test));
+      }
+      
+      return $cache;
     }
-    if (isset($this->caches_page[$this->action]['if']))
-    {
-      $test  = array_intersect_assoc($this->params, $this->caches_page[$this->action]['if']);
-      $cache = (!empty($test));
-    }
-    if ($cache) {
-      $this->cache_page();
-    }
+    return false;
   }
-  /*
+  
   # @private
-  protected function matches_cache_action()
+  protected function shall_we_cache_action()
   {
-    $cache = false;
-    
-    if (isset($this->caches_action[$this->action]['unless']))
+    if (isset($this->caches_page[$this->action]))
     {
-      $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['unless']);
-      $cache = empty($test);
+      $cache = true;
+      
+      if (isset($this->caches_action[$this->action]['unless']))
+      {
+        $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['unless']);
+        $cache &= empty($test);
+      }
+      if (isset($this->caches_action[$this->action]['if']))
+      {
+        $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['if']);
+        $cache &= (!empty($test));
+      }
+      
+      return $cache;
     }
-    if (isset($this->caches_action[$this->action]['if']))
-    {
-      $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['if']);
-      $cache = (!empty($test));
-    }
-    return $cache;
+    return false;
   }
   
   # @private
   protected function cache_action()
   {
-    $key     = $this->request->host().$this->request->port_string().$this->request->path();
+    $options = array_merge(array('path_only' => false, ':format' => $this->format), $this->params);
+    $key     = $this->fragment_cache_key($options);
     $content = $this->cache->read($key);
     
     if ($content === false)
@@ -218,42 +228,50 @@ abstract class ActionController_Caching extends Object
       $this->cache->write($key, $this->response->body);
     }
     else {
-      echo $content;
+      $this->response->body = $content;
     }
   }
-  */
   
-  private function cache_page_key($options)
+  private function page_cache_key($options)
   {
     switch(gettype($options))
     {
       case 'array':
-        if (!isset($options[':controller'])) {
-          $options[':controller'] = $this->params[':controller'];
-        }
+        $options = array_merge(array(
+          ':controller' => $this->params[':controller'],
+          ':action'     => $this->action,
+          ':format'     => $this->format,
+          ':path_only'  => true,
+        ), $options);
         $path = url_for($options);
       break;
       case 'string': $path = $options; break;
       default:       $path = $this->request->path(); break;
     }
+    
     if ($path == '' or $path == '/') {
       $path = "/index.{$this->format}";
     }
     return $path;
   }
-  /*
-  private function cache_fragment_key($options)
+  
+  function fragment_cache_key($options)
   {
-    if (!isset($options[':controller'])) {
-      $options[':controller'] = $this->params[':controller'];
+    switch(gettype($options))
+    {
+      case 'array':
+        $options = array_merge(array(
+          ':controller' => $this->params[':controller'],
+          ':format'     => $this->format,
+          ':path_only'  => true,
+        ), $options);
+        $suffix = isset($options[':action_suffix']) ? $options[':action_suffix'] : '';
+        return url_for($options).$suffix;
+      break;
+      
+      default: return $options;
     }
-    if (!isset($options[':format'])) {
-      $options[':format'] = $this->format;
-    }
-    $suffix = isset($options[':action_suffix']) ? $options[':action_suffix'] : '';
-    return url_for($options).$suffix;
   }
-  */
 }
 
 ?>

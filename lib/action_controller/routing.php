@@ -518,6 +518,7 @@ function url_for($options)
       $query_string[] = "$k=".urlencode($v);
     }
   }
+  sort($query_string);
   
   $path .= (empty($query_string) ? '' : '?'.implode('&', $query_string)).
     (empty($options['anchor']) ? '' : "#{$options['anchor']}");
