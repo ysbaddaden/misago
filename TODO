@@ -1,6 +1,3 @@
-
-  * Unit_TestCase:
-    * load $this->fixtures (:all by default, none if empty).
   
   * ActionController:
     * write CgiResponse & TestResponse (< AbstractResponse)

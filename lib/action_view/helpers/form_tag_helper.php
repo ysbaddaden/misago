@@ -140,7 +140,6 @@ function radio_button_tag($name, $value, $attributes=null)
 #   $html_options = options_for_select($products, 59);
 # 
 # @namespace ActionView_Helpers_FormHelper
-# TODO: Move options_for_select() to FormOptionsHelper.
 function options_for_select($options, $selected=null)
 {
   if ($selected === null) {

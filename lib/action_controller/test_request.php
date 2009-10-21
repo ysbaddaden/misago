@@ -36,7 +36,6 @@ class ActionController_TestRequest extends Object implements ActionController_Ab
     return $this->data['content_type'];
   }
   
-  # IMPROVE: Check HTTP Accept header when :format isn't specifically defined in path_parameters.
   function format($force_format=null)
   {
     return $this->data[':format'];

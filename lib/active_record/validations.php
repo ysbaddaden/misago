@@ -39,7 +39,7 @@
 # 
 # TEST: Test validates_associated.
 # IMPROVE: Add possibility to validate a date/time.
-# TODO: On update only validate changed attributes (check new record).
+# IMPROVE: On update only validate changed attributes (check new record).
 abstract class ActiveRecord_Validations extends ActiveRecord_Associations
 {
   protected $validates_associated = array();

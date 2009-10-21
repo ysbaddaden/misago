@@ -191,7 +191,6 @@
 # Remember that only +delete+ has callbacks, +destroy+ has no such handlers.
 # 
 # 
-# TODO: Named scopes.
 # TEST: Test callbacks.
 # 
 abstract class ActiveRecord_Base extends ActiveRecord_Calculations
