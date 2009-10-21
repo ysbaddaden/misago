@@ -81,6 +81,25 @@ class Time extends Object
       case 'time':     return date('H:i:s', $this->timestamp);
     }
   }
+    
+  function format($str)
+  {
+    return strftime($str, $this->timestamp);
+  }
+  
+  function to_s($type=null)
+  {
+    if ($type = 'number')
+    {
+      switch($this->type)
+      {
+        case 'date':     return date('Ymd',    $this->timestamp);
+        case 'time':     return date('His',    $this->timestamp);
+        case 'datetime': return date('YmdHis', $this->timestamp);
+      }
+    }
+    return (string)$this;
+  }
   
   function to_timestamp()
   {
@@ -182,11 +201,6 @@ class Time extends Object
     
     # too old / far
     return $this->to_nice();
-  }
-  
-  function format($str)
-  {
-    return strftime($str, $this->timestamp);
   }
 }
 

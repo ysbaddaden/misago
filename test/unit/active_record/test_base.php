@@ -46,6 +46,10 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $product = new Product(array('name' => 'azerty', 'price' => 18.99));
     $this->assert_equal($product->name, 'azerty');
     $this->assert_equal($product->price, 18.99);
+    
+    $this->fixtures('products');
+    $product = new Product(1);
+    $this->assert_equal($product->name, 'bepo');
   }
   
   function test_create()
@@ -268,6 +272,10 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     
     $product = new Product(1);
     $this->assert_false($product->new_record());
+    
+    $product = new Product(102);
+    $this->assert_null($product->id);
+    $this->assert_true($product->new_record());
     
     $products = $product->all();
     $this->assert_false($products[0]->new_record());
@@ -573,6 +581,18 @@ class Test_ActiveRecord_Base extends Unit_TestCase
     $this->assert_equal($monitoring->human_attribute_name('title'), 'Title', 'defaults to humanize()');
     $this->assert_equal($monitoring->human_attribute_name('length_string'), 'Length string');
     $this->assert_equal($monitoring->human_attribute_name('length_string2'), 'My length', 'specified translation (I18n)');
+  }
+  
+  function test_cache_key()
+  {
+    $order = new Order();
+    $this->assert_equal($order->cache_key, 'orders/new');
+    $this->assert_equal($order->find(1)->cache_key, 'order/1-20091005124536');
+    
+    $this->fixtures('programmers');
+    
+    $programmer = new Programmer(2);
+    $this->assert_equal($programmer->cache_key, 'programmer/2');
   }
 }
 

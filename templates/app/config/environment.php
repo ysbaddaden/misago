@@ -17,9 +17,12 @@ setlocale(LC_ALL, 'en_US.UTF-8');
 date_default_timezone_set('UTC');
 
 # mailer
-# cfg::set('mailer_perform_deliveries', false);
-# cfg::set('delivery_method', 'sendmail');
-# cfg::set('mailer_return_path', 'postmaster@domain.com');
-# cfg::set('mailer_default_from', 'me <contact@domain.com>');
+#cfg::set('mailer_perform_deliveries', false);
+#cfg::set('delivery_method', 'sendmail');
+#cfg::set('mailer_return_path', 'postmaster@domain.com');
+#cfg::set('mailer_default_from', 'me <contact@domain.com>');
+
+# cache
+cfg::set('cache_store', 'apc_store');
 
 ?>

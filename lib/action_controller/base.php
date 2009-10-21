@@ -47,7 +47,7 @@
 # 
 #   <h1><\?= $this->post->title ?\></h1>
 # 
-abstract class ActionController_Base extends Object
+abstract class ActionController_Base extends ActionController_Caching
 {
   public $helpers = ':all';
   
@@ -60,6 +60,7 @@ abstract class ActionController_Base extends Object
   # Merged GET and POST parameters plus PATH parameters from route.
   public $params;
   
+  # Template folder containing views.
   public $view_path;
 	
 	# Request data.
@@ -77,7 +78,6 @@ abstract class ActionController_Base extends Object
   function __construct()
   {
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    I18n::initialize();
   }
   
   function __get($attr)
@@ -85,7 +85,7 @@ abstract class ActionController_Base extends Object
     if ($attr == 'format') {
       return $this->request->format();
     }
-    return null;
+    return parent::__get($attr);
   }
   
   function __set($attr, $value)
@@ -93,10 +93,11 @@ abstract class ActionController_Base extends Object
     if ($attr == 'format') {
       return $this->request->format($value);
     }
-    return $this->$attr = $value;;
+    return parent::__set($attr, $value);
   }
   
   # @private
+  # TODO: check for $cache_action.
   function process($request=null, $response=null)
   {
     @Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
@@ -326,39 +327,6 @@ abstract class ActionController_Base extends Object
     }
     
     exit;
-  }
-  
-  # Sends a Cache-Control header for HTTP caching.
-  # 
-  # Defaults to private, telling proxies not to cache anything,
-  # which allows for some privacy of content.
-  # 
-  # Examples:
-  # 
-  #   expires_in(3600)
-  #   expires_in('+1 hour', array('private' => false))
-  # 
-  protected function expires_in($seconds, $options=array())
-  {
-    $cache_control = array(
-      'max-age' => is_integer($seconds) ? $seconds : strtotime($seconds),
-      'private' => true,
-    );
-    foreach($options as $k => $v)
-    {
-      if (!$v) {
-        continue;
-      }
-      $cache_control[] = ($v === true) ? $k : "$k=$v";
-    }
-    $this->response->headers['Cache-Control'] = implode(', ', $cache_control);
-  }
-  
-  # Sends a Cache-Control header with 'no-cache' to disallow or
-  # cancel HTTP caching of current request.
-  protected function expires_now()
-  {
-    $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
   
   # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).

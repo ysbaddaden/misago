@@ -127,9 +127,9 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
   function & parameters()
   {
     $params = array_merge($_GET, $_POST, $this->path_parameters);
-#    if (get_magic_quotes_gpc()) {
-#      sanitize_magic_quotes($params);
-#    }
+    if (get_magic_quotes_gpc()) {
+      $this->sanitize_magic_quotes($params);
+    }
     return $params;
   }
   
@@ -180,7 +180,7 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
     }
   }
   
-  # TODO: Parse multipart/form-data, as well as XM and /JSON post data.
+  # TODO: Parse multipart/form-data, as well as XML post data.
   private function parse_post_body()
   {
     switch($this->content_type())
@@ -200,6 +200,19 @@ class ActionController_CgiRequest extends Object implements ActionController_Abs
       case 'application/json':
         $_POST = json_decode($this->raw_body(), true);
       break;
+    }
+  }
+  
+  private function sanitize_magic_quotes($ary)
+  {
+    if (is_array($ary))
+    {
+	    foreach(array_keys($ary) as $k) {
+		    sanitize_magic_quotes($ary[$k]);
+	    }
+    }
+    else {
+	    $ary = stripslashes($ary);
     }
   }
 }

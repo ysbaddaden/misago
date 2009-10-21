@@ -253,7 +253,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       if (!is_array($arg))
       {
         $arg = $this->find($arg);
-        $this->new_record = false;
+        if ($arg !== null) {
+          $this->new_record = false;
+        }
       }
       ActiveRecord_Record::__construct($arg);
     }
@@ -930,6 +932,26 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   {
     $options['primary_key'] = $this->primary_key;
     return $this->connection->delete($this->table_name, $conditions, $options);
+  }
+  
+  # Generates a cache key for this record.
+  # 
+  # Produces `class_name/id-updated_at` if `update_at` exists,
+  # otherwise falls back to `class_name/id`.
+  function cache_key()
+  {
+    if ($this->new_record) {
+      return String::underscore(String::pluralize(get_class($this))).'/new';
+    }
+    elseif (isset($this->columns['updated_at'])) {
+      return String::underscore(get_class($this)).'/'.$this->id.'-'.$this->updated_at->to_s('number');
+    }
+    elseif (isset($this->columns['updated_on'])) {
+      return String::underscore(get_class($this)).'/'.$this->id.'-'.$this->updated_on->to_s('number');
+    }
+    else {
+      return String::underscore(get_class($this)).'/'.$this->id;
+    }
   }
   
   protected function before_save()   {}
