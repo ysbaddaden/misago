@@ -1,5 +1,4 @@
 <?php
-
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
@@ -316,7 +315,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map->reset();
     $map->named('about',    'about', array(':controller' => 'html', ':action' => 'about'));
     $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     
     $this->assert_equal($map->route('GET', 'about'), array(
       ':method'     => 'GET',
@@ -343,7 +342,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map = ActionController_Routing::draw();
     $map->reset();
     $map->resource('users');
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     
     $this->assert_true(function_exists('users_path'));
     $this->assert_true(function_exists('show_user_path'));
@@ -386,7 +385,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map = ActionController_Routing::draw();
     $map->reset();
     $map->root(array(':controller' => 'welcome'));
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     
     $this->assert_true(function_exists('root_path'));
     $this->assert_true(function_exists('root_url'));
@@ -400,7 +399,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map = ActionController_Routing::draw();
     $map->reset();
     $map->resource('products');
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     $this->fixtures('products');
     
     $this->assert_equal((string)show_product_path(new Product(1)), '/products/1');
@@ -422,7 +421,7 @@ class Test_ActionController_Routing extends Unit_TestCase
     $map->reset();
     $map->resource('articles');
     $map->connect(':controller/:action/:id.:format');
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     
     $map->route('GET', '/articles/create.xml');
     $this->assert_equal((string)show_article_path(4), '/articles/4.xml');

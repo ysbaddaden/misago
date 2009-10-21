@@ -1,9 +1,10 @@
 <?php
 
-# NOTE: Should session be moved into ActionController?
+# IMPROVE: if we are running in CLI, set session.use_cookies to false.
 class Session
 {
   # Starts a session (if none already exists).
+  # Returns the session's id.
   static function start($session_id=null, $force_new_id=false)
   {
     # session has already been started.
@@ -51,6 +52,8 @@ class Session
   # 
   # 1. session must already exist;
   # 2. a session_id cannot move from one browser to another.
+  # 
+  # Returns the session's id.
   private static function init()
   {
     $user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;

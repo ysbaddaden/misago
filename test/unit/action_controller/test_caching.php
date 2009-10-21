@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
-class Test_ActionController_Caching extends ActionController_TestCase
+class Test_ActionController_Caching extends Unit_TestCase
 {
   function test_cache_store()
   {

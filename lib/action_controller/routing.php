@@ -128,7 +128,7 @@ class ActionController_Routing extends Object
   static function recognize($request)
   {
     $map = self::draw();
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     
     $params = $map->route(strtoupper($request->method()), $request->path());
     $request->path_parameters($params);
@@ -347,7 +347,7 @@ class ActionController_Routing extends Object
   # Builds the named routes helper functions.
   # 
   # @private
-  function build_path_and_url_helpers()
+  function build_named_route_helpers()
   {
     if (DEBUG
       or !file_exists(TMP.'/named_routes_helpers.php')

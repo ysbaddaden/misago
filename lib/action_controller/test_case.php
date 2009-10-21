@@ -21,7 +21,7 @@ class ActionController_TestCase extends Unit_TestCase
   function __construct()
   {
     $map = ActionController_Routing::draw();
-    $map->build_path_and_url_helpers();
+    $map->build_named_route_helpers();
     parent::__construct();
   }
   

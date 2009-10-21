@@ -64,6 +64,7 @@ function error_handler($errno, $errstr, $errfile=null, $errline=null, array $err
     echo "\n".Terminal::colorize($errstr, 'RED')."\n  in $errfile(line $errline)\n";
     echo Terminal::colorize($trace, 'LIGHT_GRAY')."\n";
   }
+#  exit;
 }
 
 # @private
