@@ -125,8 +125,7 @@ abstract class ActionController_Base extends ActionController_Caching
       $time = microtime(true);
     }
     
-    # helpers
-    require_once(ROOT.'/app/helpers/application_helper.php');
+    # helper
     require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
     
     $this->before_filters();

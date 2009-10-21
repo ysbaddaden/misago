@@ -17,12 +17,12 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 
 require 'error_handlers.php';
 require 'active_support/active_support.php';
+require 'action_controller/action_controller.php';
 
 if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
 require 'misago_log.php';
-require 'application.php';
 
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
