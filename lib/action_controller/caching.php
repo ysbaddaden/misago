@@ -42,6 +42,9 @@
 # created and the filters executed, but the action will not be processed
 # if a cache is available.
 # 
+# TODO: :layout => false to only cache the view (while still rendering the layout).
+# TODO: :cache_path
+# 
 # ==Example
 # 
 #   class PostsController extends ActionController_Base
@@ -116,7 +119,7 @@ abstract class ActionController_Caching extends Object
       unlink(ROOT.'/public'.$path);
     }
   }
-  
+  /*
   # Deletes cached action.
   function expire_action($options)
   {
@@ -129,7 +132,7 @@ abstract class ActionController_Caching extends Object
     $key = $this->cache_fragment_key($options);
     $this->cache->delete($key);
   }
-  
+  */
   
   # Sends a Cache-Control header for HTTP caching.
   # 
@@ -184,7 +187,7 @@ abstract class ActionController_Caching extends Object
       $this->cache_page();
     }
   }
-  
+  /*
   # @private
   protected function matches_cache_action()
   {
@@ -204,20 +207,21 @@ abstract class ActionController_Caching extends Object
   }
   
   # @private
-  protected function _cache_action()
+  protected function cache_action()
   {
     $key     = $this->request->host().$this->request->port_string().$this->request->path();
     $content = $this->cache->read($key);
     
     if ($content === false)
     {
-      $this->_process_action();
+      $this->process_action();
       $this->cache->write($key, $this->response->body);
     }
     else {
       echo $content;
     }
   }
+  */
   
   private function cache_page_key($options)
   {
@@ -237,7 +241,7 @@ abstract class ActionController_Caching extends Object
     }
     return $path;
   }
-  
+  /*
   private function cache_fragment_key($options)
   {
     if (!isset($options[':controller'])) {
@@ -249,6 +253,7 @@ abstract class ActionController_Caching extends Object
     $suffix = isset($options[':action_suffix']) ? $options[':action_suffix'] : '';
     return url_for($options).$suffix;
   }
+  */
 }
 
 ?>

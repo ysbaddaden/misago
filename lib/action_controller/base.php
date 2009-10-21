@@ -131,12 +131,7 @@ abstract class ActionController_Base extends ActionController_Caching
     
     $this->before_filters();
     
-    if ($this->matches_cache_action()) {
-      $this->cache_action('_process_action');
-    }
-    else {
-      $this->_process_action();
-    }
+    $this->process_action();
     
     # page caching
     if (isset($this->caches_page[$this->action])) {
@@ -150,7 +145,8 @@ abstract class ActionController_Base extends ActionController_Caching
     }
   }
   
-  private function _process_action()
+  # @private
+  protected function process_action()
   {
     $this->{$this->action}();
     if (!$this->already_rendered and !$this->skip_view) {
