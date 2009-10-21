@@ -63,9 +63,10 @@ abstract class ActionController_Base extends ActionController_Caching
   # Template folder containing views.
   public $view_path;
 	
-	# Request data.
+	# Request data. See +ActionController_AbstractRequest+.
   protected $request;
   
+  # Response data. See +ActionController_AbstractResponse+.
   # @private
   protected $response;
   
@@ -78,6 +79,7 @@ abstract class ActionController_Base extends ActionController_Caching
   function __construct()
   {
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
+    parent::__construct();
   }
   
   function __get($attr)
@@ -119,7 +121,7 @@ abstract class ActionController_Base extends ActionController_Caching
     if (DEBUG == 1)
     {
       misago_log("\n\nHTTP request: ".strtoupper($this->request->method())." ".
-        $this->request->path()."[".date('Y-m-d H:i:s T')."]\n");
+        $this->request->path()." [".date('Y-m-d H:i:s T')."]\n");
       $time = microtime(true);
     }
     
@@ -128,13 +130,19 @@ abstract class ActionController_Base extends ActionController_Caching
     require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
     
     $this->before_filters();
-    $this->{$this->action}();
     
+    # action & view
+    $this->{$this->action}();
     if (!$this->already_rendered and !$this->skip_view) {
       $this->render($this->action);
     }
     
 #    $this->response->body = $this->after_filters($this->response->body);
+    
+    # page caching
+    if (isset($this->caches_page[$this->action])) {
+      $this->_cache_page();
+    }
     
     if (DEBUG == 1) {
       misago_log(sprintf("End of HTTP request; Elapsed time: %.02fms", microtime(true) - $time));
@@ -233,20 +241,6 @@ abstract class ActionController_Base extends ActionController_Caching
   # 
   function render($options=null)
   {
-    $this->__render($options);
-    $this->response->send();
-  }
-  
-  # Renders a view or exports a resource, returned as a string.
-  # See render() for documentation.
-  function render_to_string($options=null)
-  {
-    $this->__render($options);
-    return $this->response->body;
-  }
-  
-  private function __render($options)
-  {
     if (!is_array($options)) {
       $options = array('action' => ($options === null) ? $this->action : $options);
     }
@@ -289,6 +283,14 @@ abstract class ActionController_Base extends ActionController_Caching
     }
     
     $this->already_rendered = true;
+  }
+  
+  # Renders a view or exports a resource, returned as a string.
+  # See +render()+ for documentation.
+  function render_to_string($options=null)
+  {
+    $this->render($options);
+    return $this->response->body;
   }
   
   # Redirects to another URL.

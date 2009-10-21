@@ -64,30 +64,48 @@ abstract class ActionController_Caching extends Object
   protected $caches_page   = array();
   protected $caches_action = array();
   
+  function __construct()
+  {
+    foreach($this->caches_page as $k => $v)
+    {
+      if (is_integer($k))
+      {
+        $this->caches_page[$v] = array();
+        unset($this->caches_page[$k]);
+      }
+    }
+    
+    foreach($this->caches_action as $k => $v)
+    {
+      if (is_integer($k))
+      {
+        $this->caches_action[$v] = array();
+        unset($this->caches_action[$k]);
+      }
+    }
+  }
+  
 	# See +ActiveSupport_Cache+.
   function cache()
   {
-    $cache_store = cfg::is_set('cache_store') ? cfg::get('cache_store') : 'apc_store';
-    $CacheStoreClassName = 'ActiveSupport_Cache_'.String::camelize($cache_store);
-    $this->cache = new $CacheStoreClassName();
+    if (!isset($this->cache))
+    {
+      $cache_store = cfg::is_set('cache_store') ? cfg::get('cache_store') : 'apc_store';
+      $CacheStoreClassName = 'ActiveSupport_Cache_'.String::camelize($cache_store);
+      $this->cache = new $CacheStoreClassName();
+    }
+    return $this->cache;
   }
   
-  # Manually caches the current request as a real file, into the `public`
-  # folder. That way the web server will serve it directly, without even
-  # entering the framework.
-  # 
-  # For instance caching the `root_path` will create `public/index.html`,
-  # and caching `show_member_path(array(':id' => 1, 'format' => 'xml'))`
-  # will create `public/members/1.xml`.
+  # Manually caches the current request as a real file into the `public` folder.
   function cache_page($content=null, $options=null)
   {
     $path = $this->cache_page_key($options);
     $dir  = dirname($path);
-    if (!file_exists($dir)) {
-      mkdir($dir, 0775, true);
+    if (!empty($dir) and !file_exists(ROOT.'/public'.$dir)) {
+      mkdir(ROOT.'/public'.$dir, 0775, true);
     }
-    file_put_contents(ROOT.'/public'.$path, ($content === null) ?
-      $this->response->body : $content);
+    file_put_contents(ROOT.'/public'.$path, ($content === null) ? $this->response->body : $content);
   }
   
   # Deletes cached page.
@@ -145,25 +163,52 @@ abstract class ActionController_Caching extends Object
     $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
   
+  # @private
+  protected function _cache_page()
+  {
+    $cache = true;
+    
+    if (isset($this->caches_page[$this->action]['unless']))
+    {
+      $test  = array_intersect_assoc($this->params, $this->caches_page[$this->action]['unless']);
+      $cache = empty($test);
+    }
+    
+    if (isset($this->caches_page[$this->action]['if']))
+    {
+      $test  = array_intersect_assoc($this->params, $this->caches_page[$this->action]['if']);
+      $cache = (!empty($test));
+    }
+    
+    if ($cache) {
+      $this->cache_page();
+    }
+  }
+  
   private function cache_page_key($options)
   {
     switch(gettype($options))
     {
-      case 'array':  return url_for($options); break;
-      case 'string': return $options; break;
-      default:
-        $path = $this->request->path();
-        if ($path == '/') {
-          $path = "/index.{$this->format}";
+      case 'array':
+        if (!isset($options[':controller'])) {
+          $options[':controller'] = $this->params[':controller'];
         }
-        return $path;
+        $path = url_for($options);
       break;
+      case 'string': $path = $options; break;
+      default:       $path = $this->request->path(); break;
     }
+    if ($path == '' or $path == '/') {
+      $path = "/index.{$this->format}";
+    }
+    return $path;
   }
   
   private function cache_fragment_key($options)
   {
-    $options[':controller'] = $this->params[':controller'];
+    if (!isset($options[':controller'])) {
+      $options[':controller'] = $this->params[':controller'];
+    }
     if (!isset($options[':format'])) {
       $options[':format'] = $this->format;
     }
