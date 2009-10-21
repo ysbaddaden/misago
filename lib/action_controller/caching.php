@@ -13,6 +13,10 @@
 # cached pages, since the application isn't even reached. If you need
 # authentification check action caching below.
 # 
+# Please note that GET parameters are overlooked by the cache, which
+# means that `/members.rss` and `/members.rss?limit=10` will share the
+# same cache file.
+# 
 # ==Example
 # 
 #   class PostsController extends ActionController_Base
@@ -55,7 +59,9 @@ abstract class ActionController_Caching extends Object
   # folder. That way the web server will serve it directly, without even
   # entering the framework.
   # 
-  # For instance caching the `root_path` will create `public/index.html`.
+  # For instance caching the `root_path` will create `public/index.html`,
+  # and caching `show_member_path(array(':id' => 1, 'format' => 'xml'))`
+  # will create `public/members/1.xml`.
   function cache_page($content=null, $options=null)
   {
     $path = $this->cache_page_key($options);
@@ -67,7 +73,7 @@ abstract class ActionController_Caching extends Object
       $this->response->body : $content);
   }
   
-  # Deletes cache page identified by +$key+.
+  # Deletes cached page.
   function expire_page($options=null)
   {
     $path = $this->cache_page_key($options);
@@ -76,11 +82,13 @@ abstract class ActionController_Caching extends Object
     }
   }
   
+  # Deletes cached action.
   function expire_action($options)
   {
     $this->expire_fragment($options);
   }
   
+  # Deletes a cached fragment.
   function expire_fragment($options)
   {
     $key = $this->cache_fragment_key($options);
