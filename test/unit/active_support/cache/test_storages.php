@@ -76,13 +76,15 @@ class Test_ActiveSupport_Cache_ApcStore extends Test_ActiveSupport_Cache_Store
 }
 new Test_ActiveSupport_Cache_ApcStore();
 
-class Test_ActiveSupport_Cache_MemcacheStore extends Test_ActiveSupport_Cache_Store
+if (class_exists('Memcache', false))
 {
-  function setup()
+  class Test_ActiveSupport_Cache_MemcacheStore extends Test_ActiveSupport_Cache_Store
   {
-    $this->cache = new ActiveSupport_Cache_MemcacheStore();
+    function setup()
+    {
+      $this->cache = new ActiveSupport_Cache_MemcacheStore();
+    }
   }
+  new Test_ActiveSupport_Cache_MemcacheStore();
 }
-new Test_ActiveSupport_Cache_MemcacheStore();
-
 ?>
