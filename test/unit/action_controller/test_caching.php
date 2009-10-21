@@ -74,6 +74,11 @@ class Test_ActionController_Caching extends ActionController_TestCase
     $controller->expire_page();
     $this->assert_false(file_exists(ROOT.'/public/caching/feed.xml'));
   }
+  
+  function test_caches_action()
+  {
+    
+  }
 }
 
 new Test_ActionController_Caching();

@@ -1,8 +1,8 @@
 <?php
 
 # Actions Controllers are the core logic of your application.
-# They process HTTP requests, manipulate your models, passes data
-# to views and return an HTTP response.
+# They process HTTP requests, manipulate your models, pass data
+# to views and return HTTP responses.
 # 
 # A sample controller looks like this:
 # 
@@ -22,7 +22,7 @@
 #     }
 #   }
 # 
-# = Renders
+# =Renders
 # 
 # Actions, by default, render a view from `app/views` using the name of
 # the controller for the folder, the name of the action for the template,
@@ -31,7 +31,7 @@
 # For instance calling `/posts/index` will process `PostsController::index()`
 # and render `app/views/posts/show.html.tpl`.
 # 
-# == Attributes
+# ==Attributes
 # 
 # Any attribute your define in your action to your controller, will then be
 # available to your view. For instance:
@@ -131,21 +131,30 @@ abstract class ActionController_Base extends ActionController_Caching
     
     $this->before_filters();
     
-    # action & view
-    $this->{$this->action}();
-    if (!$this->already_rendered and !$this->skip_view) {
-      $this->render($this->action);
+    if ($this->matches_cache_action()) {
+      $this->cache_action('_process_action');
     }
-    
-#    $this->response->body = $this->after_filters($this->response->body);
+    else {
+      $this->_process_action();
+    }
     
     # page caching
     if (isset($this->caches_page[$this->action])) {
       $this->_cache_page();
     }
     
+#    $this->after_filters();
+    
     if (DEBUG == 1) {
       misago_log(sprintf("End of HTTP request; Elapsed time: %.02fms", microtime(true) - $time));
+    }
+  }
+  
+  private function _process_action()
+  {
+    $this->{$this->action}();
+    if (!$this->already_rendered and !$this->skip_view) {
+      $this->render($this->action);
     }
   }
   

@@ -2,7 +2,7 @@
 
 # Caching.
 # 
-# =Page caching [todo]
+# =Page caching
 # 
 # Caches the current action as a real file in the public directory,
 # that matches the path of the current request. That way the web
@@ -173,15 +173,47 @@ abstract class ActionController_Caching extends Object
       $test  = array_intersect_assoc($this->params, $this->caches_page[$this->action]['unless']);
       $cache = empty($test);
     }
-    
     if (isset($this->caches_page[$this->action]['if']))
     {
       $test  = array_intersect_assoc($this->params, $this->caches_page[$this->action]['if']);
       $cache = (!empty($test));
     }
-    
     if ($cache) {
       $this->cache_page();
+    }
+  }
+  
+  # @private
+  protected function matches_cache_action()
+  {
+    $cache = false;
+    
+    if (isset($this->caches_action[$this->action]['unless']))
+    {
+      $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['unless']);
+      $cache = empty($test);
+    }
+    if (isset($this->caches_action[$this->action]['if']))
+    {
+      $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['if']);
+      $cache = (!empty($test));
+    }
+    return $cache;
+  }
+  
+  # @private
+  protected function _cache_action()
+  {
+    $key     = $this->request->host().$this->request->port_string().$this->request->path();
+    $content = $this->cache->read($key);
+    
+    if ($content === false)
+    {
+      $this->_process_action();
+      $this->cache->write($key, $this->response->body);
+    }
+    else {
+      echo $content;
     }
   }
   
@@ -203,7 +235,7 @@ abstract class ActionController_Caching extends Object
     }
     return $path;
   }
-  
+  /*
   private function cache_fragment_key($options)
   {
     if (!isset($options[':controller'])) {
@@ -215,6 +247,7 @@ abstract class ActionController_Caching extends Object
     $suffix = isset($options[':action_suffix']) ? $options[':action_suffix'] : '';
     return url_for($options).$suffix;
   }
+  */
 }
 
 ?>
