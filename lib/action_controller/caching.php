@@ -130,6 +130,7 @@ abstract class ActionController_Caching extends Object
     $this->cache->delete($key);
   }
   
+  
   # Sends a Cache-Control header for HTTP caching.
   # 
   # Defaults to private, telling proxies not to cache anything,
@@ -162,6 +163,7 @@ abstract class ActionController_Caching extends Object
   {
     $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
+  
   
   # @private
   protected function _cache_page()
@@ -235,7 +237,7 @@ abstract class ActionController_Caching extends Object
     }
     return $path;
   }
-  /*
+  
   private function cache_fragment_key($options)
   {
     if (!isset($options[':controller'])) {
@@ -247,7 +249,6 @@ abstract class ActionController_Caching extends Object
     $suffix = isset($options[':action_suffix']) ? $options[':action_suffix'] : '';
     return url_for($options).$suffix;
   }
-  */
 }
 
 ?>
