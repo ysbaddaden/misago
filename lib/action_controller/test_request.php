@@ -10,7 +10,6 @@ class ActionController_TestRequest extends Object implements ActionController_Ab
     'protocol'     => 'http://',
     'host'         => 'localhost',
     'port'         => '3009',
-    'path'         => '',
     'content_type' => 'text/html',
     ':method'      => 'GET',
     ':action'      => 'index',
@@ -79,7 +78,8 @@ class ActionController_TestRequest extends Object implements ActionController_Ab
   
   function path()
   {
-    return $this->data['path'];
+    return isset($this->data['path']) ? $this->data['path'] :
+      (string)url_for($this->path_parameters());
   }
   
   function url()

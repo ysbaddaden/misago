@@ -40,6 +40,7 @@ class ActionController_Dispatcher extends Object
     }
     
     $controller->process($this->request, $this->response);
+    $this->response->send();
   }
 }
 
