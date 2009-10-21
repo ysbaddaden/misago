@@ -35,6 +35,23 @@
 # 
 # =Action caching [todo]
 # 
+# Sometimes you need a user be authentified before serving pages, and
+# thus can't use page caching. This is were action caching comes in.
+# 
+# In action caching, the framework will be  started, the controller
+# created and the filters executed, but the action will not be processed
+# if a cache is available.
+# 
+# ==Example
+# 
+#   class PostsController extends ActionController_Base
+#   {
+#     protected $caches_action = array(
+#       'index',
+#       'feed' => array('if' => array(':format' => 'html'))
+#     );
+#   }
+# 
 # 
 # =Fragment caching [todo]
 # 
@@ -127,7 +144,6 @@ abstract class ActionController_Caching extends Object
   {
     $this->response->headers['Cache-Control'] = 'no-cache, no-store';
   }
-  
   
   private function cache_page_key($options)
   {
