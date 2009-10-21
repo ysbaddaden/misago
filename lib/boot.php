@@ -16,20 +16,13 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require 'error_handlers.php';
-require 'active_support/additions.php';
-require 'active_support/string.php';
-require 'active_support/array.php';
-require 'active_support/active_array.php';
-require 'active_support/time.php';
+require 'active_support/active_support.php';
 
 if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
-require 'cfg.php';
 require 'misago_log.php';
 require 'application.php';
-
-require 'action_controller/routing.php';
 
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
@@ -46,19 +39,6 @@ function __autoload($class)
     echo "\nError: an error occured while loading $path.php\n";
     debug_print_backtrace();
     exit;
-  }
-}
-
-function sanitize_magic_quotes(&$params)
-{
-  if (is_array($params))
-  {
-	  foreach(array_keys($params) as $k) {
-		  sanitize_magic_quotes($params[$k]);
-	  }
-  }
-  else {
-	  $params = stripslashes($params);
   }
 }
 

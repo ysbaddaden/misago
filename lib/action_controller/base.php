@@ -78,7 +78,6 @@ abstract class ActionController_Base extends ActionController_Caching
   function __construct()
   {
     $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    I18n::initialize();
   }
   
   function __get($attr)
@@ -98,6 +97,7 @@ abstract class ActionController_Base extends ActionController_Caching
   }
   
   # @private
+  # TODO: check for $cache_action.
   function process($request=null, $response=null)
   {
     @Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
