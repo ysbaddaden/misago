@@ -22,6 +22,20 @@
 #     }
 #   }
 # 
+# =Inheritence
+# 
+# An ActionController is composed of the following classes:
+# 
+# - +ActionController_Base+
+# - +ActionController_Caching+
+# - +ActionController_Rescue+
+# 
+# And uses some classes as attributes:
+# 
+# - `$cache`: +ActionController_Cache_Store+
+# - `$flash`: +ActionController_Flash+
+# - `$request`: +ActionController_AbstractRequest+
+# 
 # =Renders
 # 
 # Actions, by default, render a view from `app/views` using the name of
@@ -76,10 +90,12 @@ abstract class ActionController_Base extends ActionController_Caching
   # True to skip rendering.
   protected $skip_view = false;
   
+  private $rendering_time = 0;
+  
   function __construct()
   {
-    $this->view_path = String::underscore(str_replace('Controller', '', get_class($this)));
-    parent::__construct();
+    ActionController_Rescue::__construct();
+    ActionController_Caching::__construct();
   }
   
   function __get($attr)
@@ -99,9 +115,10 @@ abstract class ActionController_Base extends ActionController_Caching
   }
   
   # @private
-  # TODO: check for $cache_action.
   function process($request=null, $response=null)
   {
+    $request_time = microtime(true);
+    
     @Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
     
     $this->request  = ($request  !== null) ? $request  : new ActionController_CgiRequest();
@@ -118,35 +135,47 @@ abstract class ActionController_Base extends ActionController_Caching
     $this->params = $this->request->parameters();
     $this->action = $this->params[':action'];
     
-    if (DEBUG == 1)
-    {
-      misago_log("\n\nHTTP request: ".strtoupper($this->request->method())." ".
-        $this->request->path()." [".date('Y-m-d H:i:s T')."]\n");
-      $time = microtime(true);
-    }
-    
-    # helper
     require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
+    $this->view_path = $this->params[':controller'];
     
-    $this->before_filters();
-    
-    if ($this->shall_we_cache_action()) {
-      $this->cache_action();
+    $this->logger->info(sprintf("Processing %s::%s (for %s at %s) [%s] ",
+      get_class($this), $this->action, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli', date('Y-m-d H:i:s'),
+      strtoupper($this->request->method())
+    ));
+    if (isset($_SESSION)) {
+      $this->logger->info("  Session: ".session_id());
     }
-    else {
-      $this->process_action();
+    $this->logger->info("  Parameters: ".json_encode($this->params));
+    
+    try
+    {
+      $this->before_filters();
+      
+      if ($this->shall_we_cache_action()) {
+        $this->cache_action();
+      }
+      else {
+        $this->process_action();
+      }
+       
+      if ($this->shall_we_cache_page()) {
+        $this->cache_page();
+      }
+      
+#      $this->after_filters();
+    }
+    catch(Exception $exception) {
+      $this->rescue_action($exception);
     }
     
-    # page caching
-    if ($this->shall_we_cache_page()) {
-      $this->cache_page();
-    }
+    $this->request_time = (microtime(true) - $request_time) / 1000;
     
-#    $this->after_filters();
-    
-    if (DEBUG == 1) {
-      misago_log(sprintf("End of HTTP request; Elapsed time: %.02fms", microtime(true) - $time));
-    }
+    $this->logger->info(sprintf("Completed in %.5f (%d reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
+      $this->request_time, floor(1 / $this->request_time),
+      $this->rendering_time, round(100 / $this->request_time * $this->rendering_time),
+      $this->response->headers['Status'], $this->response->status(),
+      $this->request->url()
+    ));
   }
   
   # @private
@@ -250,6 +279,8 @@ abstract class ActionController_Base extends ActionController_Caching
   # 
   function render($options=null)
   {
+    $rendering_time = microtime(true);
+    
     if (!is_array($options)) {
       $options = array('action' => ($options === null) ? $this->action : $options);
     }
@@ -266,16 +297,21 @@ abstract class ActionController_Base extends ActionController_Caching
     
     if (array_key_exists('xml', $options))
     {
+      $this->logger->debug("Rendering XML");
       $this->response->content_type('application/xml');
       $this->response->body = '<?xml version="1.0"?>'.
         (is_string($options['xml']) ? $options['xml'] : $options['xml']->to_xml());
+      
     }
     elseif (array_key_exists('json', $options))
     {
+      $this->logger->debug("Rendering JSON");
       $this->response->content_type('application/json');
       $this->response->body = is_string($options['json']) ? $options['json'] : $options['json']->to_json();
     }
-    elseif (array_key_exists('text', $options)) {
+    elseif (array_key_exists('text', $options))
+    {
+      $this->logger->debug("Rendering plain text");
       $this->response->body = $options['text'];
     }
     else
@@ -285,12 +321,14 @@ abstract class ActionController_Base extends ActionController_Caching
         $action = isset($options['action']) ? $options['action'] : $this->action;
         $options['template'] = $this->view_path.'/'.$action;
       }
-      $view = new ActionView_Base($this);
+      $this->logger->debug("Rendering {$options['template']}");
       
+      $view = new ActionView_Base($this);
       $this->response->content_type_from_format($options['format']);
       $this->response->body = $view->render($options);
     }
     
+    $this->rendering_time = (microtime(true) - $rendering_time) / 1000;
     $this->already_rendered = true;
   }
   
@@ -327,6 +365,8 @@ abstract class ActionController_Base extends ActionController_Caching
         $url = $this->request->relative_url_root().$url;
       }
     }
+    
+    $this->logger->debug("Redirected to $url");
     
     if (DEBUG < 2) {
       $this->response->redirect($url, $status);

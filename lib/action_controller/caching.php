@@ -74,7 +74,7 @@
 # =HTTP browser cache
 # 
 # 
-abstract class ActionController_Caching extends Object
+abstract class ActionController_Caching extends ActionController_Rescue
 {
   protected $caches_page   = array();
   protected $caches_action = array();
