@@ -84,7 +84,10 @@ class ActionController_TestRequest extends Object implements ActionController_Ab
   
   function url()
   {
-    return $this->data['url'];
+    if (isset($this->data['url'])) {
+      return $this->data['url'];
+    }
+    return url_for(array_merge($this->path_parameters, $this->get));
   }
   
   function relative_url_root()

@@ -22,6 +22,11 @@ class CachingController extends ApplicationController
   {
     $this->head(200);
   }
+  
+  function error()
+  {
+    throw new MisagoException('An error occured', 500);
+  }
 }
 
 ?>

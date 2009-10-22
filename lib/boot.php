@@ -15,10 +15,8 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'development';
 }
 
-require 'error_handlers.php';
 require 'active_support/active_support.php';
 require 'action_controller/action_controller.php';
-
 if (!function_exists('apc_store')) {
   require 'fake_apc.php';
 }
@@ -28,7 +26,6 @@ require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
 
 I18n::initialize();
-
 
 function __autoload($class)
 {
