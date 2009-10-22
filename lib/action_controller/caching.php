@@ -25,35 +25,47 @@
 #       'index',
 #       'feed' => array('unless' => array(':format' => 'html'))
 #     );
+#     
+#     function create()
+#     {
+#       $this->expire_page(array(':action' => 'index'));
+#     }
 #   }
 # 
 # ==Conditions
 # 
-# You may set conditions with `if` and `unless` options. Both will
-# accept any parameter that might be present in `$this->format`.
+# You may set conditions with `if` and `unless` options. Both
+# accept any parameter that might be present in path parameters.
 # 
 # 
-# =Action caching [todo]
+# =Action caching
 # 
-# Sometimes you need a user be authentified before serving pages, and
-# thus can't use page caching. This is were action caching comes in.
+# In action caching, the request goes throught the Action Controller,
+# but the action will not be processed if a cache is available.
+# Filters will be processed thought, which allows to cache pages
+# only available to authenticated users for instance.
 # 
-# In action caching, the framework will be  started, the controller
-# created and the filters executed, but the action will not be processed
-# if a cache is available.
-# 
-# TODO: :layout => false to only cache the view (while still rendering the layout).
-# TODO: :cache_path
+# The cache key is made from the host (and port), the path of the
+# request and the GET parameters. Which means that `x.domain.com/list`,
+# `y.domain.com/list` and `x.domain.com/list?page=2` will be different
+# caches. This allows for subdomains personalization for instance.
 # 
 # ==Example
 # 
 #   class PostsController extends ActionController_Base
 #   {
+#     protected $before_filters = array(
+#       'authenticate' => array('only' => 'feed')
+#     );
 #     protected $caches_action = array(
 #       'index',
 #       'feed' => array('if' => array(':format' => 'html'))
 #     );
 #   }
+# 
+# TODO: :layout => false to only cache the view (while still rendering the layout).
+# TODO: :cache_path
+# TODO: :expires_in
 # 
 # 
 # =Fragment caching [todo]
