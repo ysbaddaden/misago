@@ -33,7 +33,7 @@ class ActionController_Dispatcher extends Object
     $params = $this->request->path_parameters();
     
     if (!method_exists($controller, $params[':action'])) {
-      throw new MisagoException("No such action: ".get_class($controller)."->{$params[':action']}", 404);
+      throw new MisagoException("No such action: ".get_class($controller)."::{$params[':action']}", 404);
     }
     if ($params[':action'] == 'process' or !is_callable(array($controller, $params[':action']))) {
       throw new MisagoException("Tried to call a private/protected method as a public action: {$params[':action']}", 400);      

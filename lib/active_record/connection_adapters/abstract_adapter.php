@@ -16,6 +16,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function __construct(array $config)
   {
     $this->config = $config;
+    $this->logger = MisagoLogger::singleton();
   }
   
   function __destruct()
@@ -525,30 +526,15 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   protected function report_error($sql, $message)
   {
-    if (DEBUG > 1) {
-      echo "\n$message\n$sql\n";
-    }
-    elseif (DEBUG) {
-      misago_log("$message\n$sql\n");
-    }
-    else
-    {
-      # IMPROVE: Add some error logging for 'production' environment.
-      
-    }
+    $this->logger->error("$message\n$sql\n");
   }
   
   protected function log_query($sql, $affected_rows, $time)
   {
-    $message = sprintf("%s\nAffected rows: %d; Elapsed time: %.02fms\n",
-      $sql, $affected_rows, $time);
-    
-    if (DEBUG > 2) {
-      echo "\n$message\n";
-    }
-    else {
-      misago_log($message);
-    }
+    $sql   = str_replace("\n", "\n    ", wordwrap($sql, 70));
+    $klass = explode('_', get_class($this));
+    $message = sprintf("\n    ".array_pop($klass)." -- Affected rows: %d; Elapsed time: %.02fms\n    %s\n", $affected_rows, $time, $sql);
+    $this->logger->debug($message);
   }
   
   # Truncates a table.

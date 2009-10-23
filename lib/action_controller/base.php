@@ -157,7 +157,7 @@ abstract class ActionController_Base extends ActionController_Caching
       else {
         $this->process_action();
       }
-       
+      
       if ($this->shall_we_cache_page()) {
         $this->cache_page();
       }
@@ -368,15 +368,14 @@ abstract class ActionController_Base extends ActionController_Caching
     
     $this->logger->debug("Redirected to $url");
     
-    if (DEBUG < 2) {
+#    if (DEBUG < 2) {
       $this->response->redirect($url, $status);
-    }
-    else
-    {
-      $status_text = $this->response->status($status);
-      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $status $status_text]</p>";
-    }
-    
+#    }
+#    else
+#    {
+#      $status_text = $this->response->status($status);
+#      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $status $status_text]</p>";
+#    }
     exit;
   }
   
