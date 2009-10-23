@@ -30,6 +30,7 @@ for ($i=0; $i<$_SERVER['argc']; $i++)
   }
 }
 
+# lighttpd's config
 $config_file = ROOT.'/config/lighttpd.conf';
 $config_data = file_get_contents($config_file);
 
@@ -46,19 +47,58 @@ $config_data = str_replace(array_keys($vars), array_values($vars), $config_data)
 $config_file = TMP.'/lighttpd.conf';
 file_put_contents($config_file, $config_data);
 
-# starts server
-echo "Starting lighttpd at http://$http_host:$http_port/\n";
-echo "MISAGO_ENV={$environment} lighttpd -Df {$config_file}\n";
+# signals
+declare(ticks = 1);
 
-`MISAGO_ENV={$environment} lighttpd -Df {$config_file}`;
+# semaphores
+file_put_contents(TMP."/msgqueue-$environment", '');
+$msg_queue = msg_get_queue(ftok(TMP."/msgqueue-$environment", 'M'), 0666);
 
-/*
-# tails application's log
-$log_file = ROOT."/log/$environment.log";
-`tail -f $log_file`;
+# let's fork!
+$pid = pcntl_fork();
+if ($pid == -1) {
+  die("Could not fork.\n");
+}
+elseif($pid)
+{
+  # cleanup when signal is received
+  function server_sig_handler($signo)
+  {
+    global $msg_queue, $environment;
+    
+    msg_remove_queue($msg_queue);
+    unlink(TMP."/msgqueue-$environment");
+    
+    echo "\nReceived signal. Exiting.\n";
+    exit;
+  }
+  pcntl_signal(SIGINT, 'server_sig_handler');
+  pcntl_signal(SIGTERM, 'server_sig_handler');
+  
+  # logger
+  do
+  {
+    if (msg_receive($msg_queue, 0, $msg_type, 16384, $message, false, MSG_IPC_NOWAIT, $errno)) {
+      echo $message;
+    }
+    else
+    {
+      # 1/4s
+      usleep(250000);
+    }
+  }
+  while(true);
+  
+  # prevents against zombies
+  pcntl_wait($status);
+}
+else
+{
+  # starts server
+  echo "=> Starting lighttpd at http://$http_host:$http_port/\n";
+  echo "=> MISAGO_ENV={$environment} lighttpd -Df {$config_file}\n\n";
+  
+  passthru("MISAGO_ENV={$environment} lighttpd -Df {$config_file}");
+}
 
-# stops server
-$pid = file_get_contents(TMP.'/lighttpd.pid');
-`kill $pid`;
-*/
 ?>

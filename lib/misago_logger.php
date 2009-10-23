@@ -17,11 +17,19 @@ class Logger
   function __construct($log_device=STDERR)
   {
     $this->add_log_device($log_device);
+    
+    if (file_exists(TMP."/msgqueue-{$_SERVER['MISAGO_ENV']}")) {
+      $this->msg_queue = msg_get_queue(ftok(TMP."/msgqueue-{$_SERVER['MISAGO_ENV']}", 'M'), 0666);
+    }
   }
   
   function __destruct()
   {
     $this->flush();
+    
+#    if ($this->msg_queue) {
+#      msg_remove_queue($msg_queue);
+#    }
   }
   
   # Adds a file handler or file to write to.
@@ -58,6 +66,8 @@ class Logger
         if ($device['log_level'] !== null and $device['log_level'] > $severity) continue;
         fwrite($device['file'], $messages);
       }
+      
+      msg_send($this->msg_queue, $severity, $messages, false, false, $errstr);
     }
   }
   
@@ -69,7 +79,7 @@ class Logger
     }
   }
   
-  # Logs an warning.
+  # Logs a warning.
   function warn($message)
   {
     if ($this->level <= self::WARN) {
