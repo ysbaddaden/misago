@@ -1,5 +1,7 @@
 <?php
-if (!isset($_ENV['MISAGO_ENV'])) $_ENV['MISAGO_ENV'] = 'test';
+if (!isset($_SERVER['MISAGO_ENV'])) {
+  $_SERVER['MISAGO_ENV'] = 'test';
+}
 require_once dirname(__FILE__).'/../test_app/config/boot.php';
 
 class TestIndexController extends ActionController_TestCase
@@ -51,6 +53,13 @@ class TestIndexController extends ActionController_TestCase
     $this->run_action('GET', '/index/test_head');
     $this->assert_response(410);
     $this->assert_redirected_to('/');
+  }
+  
+  function test_xml()
+  {
+    $this->run_action('GET', '/index/errors.xml');
+    $this->assert_response(412);
+    print_r($this->response);
   }
 }
 new TestIndexController();

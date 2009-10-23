@@ -109,32 +109,32 @@ abstract class ActionController_Rescue extends Object
     {
       $this->response->status($exception->getCode());
       
-      $body  = '<!DOCTYPE html>';
-      $body .= '<html>';
-      $body .= '<head>';
-      $body .= '<style type="text/css">';
-      $body .= '  body { font: normal 12px/1.5 sans-serif; color: #333; background: #FFF; }';
-      $body .= '  pre { font: normal 12px/1.5 monospace; background: #F4F4F4; padding: 1em; }';
-      $body .= '</style>';
-      $body .= '</head>';
-      $body .= '<body>';
+      $body  = '<!DOCTYPE html>'."\n";
+      $body .= '<html>'."\n";
+      $body .= '<head>'."\n";
+      $body .= '<style type="text/css">'."\n";
+      $body .= '  body { font: normal 12px/1.5 sans-serif; color: #333; background: #FFF; }'."\n";
+      $body .= '  pre { font: normal 12px/1.5 monospace; background: #F4F4F4; padding: 1em; }'."\n";
+      $body .= '</style>'."\n";
+      $body .= '</head>'."\n";
+      $body .= '<body>'."\n";
       
-      $body .= '<h1>'.$message.'</h1>';
-      $body .= '<p>MISAGO_ROOT: '.ROOT.'</p>';
-      $body .= '<pre>'.$exception->getTraceAsString().'</pre>';
+      $body .= '<h1>'.$message.'</h1>'."\n";
+      $body .= '<p>MISAGO_ROOT: '.ROOT.'</p>'."\n";
+      $body .= '<pre>'.$exception->getTraceAsString().'</pre>'."\n";
       
-      $body .= '<h2>Request</h2>';
-      $body .= '<h3>Parameters</h3>';
-      $body .= '<pre>'.print_r($this->params, true).'</pre>';
-      $body .= '<h3>Session data</h3>';
-      $body .= '<pre>'.print_r($_SESSION, true).'</pre>';
+      $body .= '<h2>Request</h2>'."\n";
+      $body .= '<h3>Parameters</h3>'."\n";
+      $body .= '<pre>'.print_r($this->params, true).'</pre>'."\n";
+      $body .= '<h3>Session data</h3>'."\n";
+      $body .= '<pre>'.print_r($_SESSION, true).'</pre>'."\n";
       
-      $body .= '<h2>Response</h2>';
-      $body .= '<h3>headers</h3>';
-      $body .= '<pre>'.print_r($this->response->headers, true).'</pre>'; 
+      $body .= '<h2>Response</h2>'."\n";
+      $body .= '<h3>headers</h3>'."\n";
+      $body .= '<pre>'.print_r($this->response->headers, true).'</pre>'."\n"; 
       
-      $body .= '</body>';
-      $body .= '</html>';
+      $body .= '</body>'."\n";
+      $body .= '</html>'."\n";
       
       $this->response->body = $body;
       $this->response->send();

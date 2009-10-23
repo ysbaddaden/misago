@@ -26,9 +26,6 @@ class Logger
   function __destruct()
   {
     $this->flush();
-#    if ($this->msg_queue) {
-#      msg_remove_queue($msg_queue);
-#    }
   }
   
   # Adds a file handler or file to write to.

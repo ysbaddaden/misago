@@ -22,6 +22,7 @@ class Test_Unit_Assertions_ResponseAssertions extends ActionController_TestCase
     
     $this->run_action('GET', '/index/redirected');
     $this->assert_redirected_to('/');
+    $this->assert_response(302);
   }
   
   function test_cookie()
