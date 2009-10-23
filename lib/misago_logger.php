@@ -26,7 +26,6 @@ class Logger
   function __destruct()
   {
     $this->flush();
-    
 #    if ($this->msg_queue) {
 #      msg_remove_queue($msg_queue);
 #    }
@@ -67,7 +66,9 @@ class Logger
         fwrite($device['file'], $messages);
       }
       
-      msg_send($this->msg_queue, $severity, $messages, false, false, $errstr);
+      if (isset($this->msg_queue)) {
+        msg_send($this->msg_queue, $severity, $messages, false, false, $errstr);
+      }
     }
   }
   
