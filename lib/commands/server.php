@@ -72,7 +72,7 @@ elseif($pid)
     echo "\nReceived signal. Exiting.\n";
     exit;
   }
-  pcntl_signal(SIGINT, 'server_sig_handler');
+  pcntl_signal(SIGINT,  'server_sig_handler');
   pcntl_signal(SIGTERM, 'server_sig_handler');
   
   # logger
@@ -83,8 +83,8 @@ elseif($pid)
     }
     else
     {
-      # 1/4s
-      usleep(250000);
+      # 100ms
+      usleep(100000);
     }
   }
   while(true);

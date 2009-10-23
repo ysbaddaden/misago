@@ -67,7 +67,7 @@ class Logger
       }
       
       if (isset($this->msg_queue)) {
-        msg_send($this->msg_queue, $severity, $messages, false, false, $errstr);
+        msg_send($this->msg_queue, $severity, $messages, false, true, $errno);
       }
     }
   }
