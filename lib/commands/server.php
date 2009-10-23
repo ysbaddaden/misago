@@ -7,7 +7,7 @@ class ServerConfig
   static $http_host   = 'localhost';
   static $http_port   = 3000;
   
-  static $fcgi_bind;
+  static $fcgi_socket;
   static $php_ini;
   
   static $server_conf;
@@ -16,8 +16,20 @@ class ServerConfig
   static $http_server = 'lighttpd'; # either 'lighttpd' or 'nginx'
 }
 
-ServerConfig::$fcgi_bind = TMP.'/fastcgi-php.socket';
-ServerConfig::$php_ini   = ROOT.'/config/php.ini';
+ServerConfig::$fcgi_socket = TMP.'/misago.sock';
+ServerConfig::$php_ini     = ROOT.'/config/php.ini';
+
+for ($i=0; $i<$_SERVER['argc']; $i++)
+{
+  switch($_SERVER['argv'][$i])
+  {
+    case '-e': $i += 1; ServerConfig::$environment = $_SERVER['argv'][$i]; break;
+    case '-h': $i += 1; ServerConfig::$http_host   = $_SERVER['argv'][$i]; break;
+    case '-p': $i += 1; ServerConfig::$http_port   = $_SERVER['argv'][$i]; break;
+    case 'lighttpd':    ServerConfig::$http_server = 'lighttpd';           break;
+    case 'nginx':       ServerConfig::$http_server = 'nginx';              break;
+  }
+}
 
 switch(ServerConfig::$http_server)
 {
@@ -32,18 +44,6 @@ switch(ServerConfig::$http_server)
   break;
 }
 
-for ($i=0; $i<$_SERVER['argc']; $i++)
-{
-  switch($_SERVER['argv'][$i])
-  {
-    case '-e': $i += 1; ServerConfig::$environment = $_SERVER['argv'][$i]; break;
-    case '-h': $i += 1; ServerConfig::$http_host   = $_SERVER['argv'][$i]; break;
-    case '-p': $i += 1; ServerConfig::$http_port   = $_SERVER['argv'][$i]; break;
-    case 'lighttpd':    ServerConfig::$http_server = 'lighttpd';           break;
-    case 'nginx':       ServerConfig::$http_server = 'nginx';              break;
-  }
-}
-
 $vars = array(
   "#{ROOT}"        => ROOT,
   "#{PUBLIC_ROOT}" => ROOT.'/public',
@@ -52,7 +52,7 @@ $vars = array(
   "#{HTTP_PORT}"   => ServerConfig::$http_port,
   "#{TMP}"         => TMP,
   "#{LOG}"         => ROOT.'/log',
-  "#{FCGI_BIND}"   => ServerConfig::$fcgi_bind,
+  "#{FCGI_SOCKET}" => ServerConfig::$fcgi_socket,
 );
 
 # server's config
@@ -83,7 +83,7 @@ $fcgi_envs = array(
   'PHP_FCGI_CHILDREN'     => 5,
   'PHP_FCGI_MAX_REQUESTS' => 1000,
 );
-$fcgi_process = proc_open('exec php-cgi -b '.ServerConfig::$fcgi_bind, $descriptorspec, $pipes, null, $fcgi_envs);
+$fcgi_process = proc_open('exec php-cgi -b '.ServerConfig::$fcgi_socket, $descriptorspec, $pipes, null, $fcgi_envs);
 
 # HTTP server
 switch(ServerConfig::$http_server)
