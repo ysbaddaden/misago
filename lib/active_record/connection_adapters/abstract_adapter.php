@@ -531,10 +531,13 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   protected function log_query($sql, $affected_rows, $time)
   {
-    $sql   = str_replace("\n", "\n    ", wordwrap($sql, 70));
-    $klass = explode('_', get_class($this));
-    $message = sprintf("\n    ".array_pop($klass)." -- Affected rows: %d; Elapsed time: %.02fms\n    %s\n", $affected_rows, $time, $sql);
-    $this->logger->debug($message);
+    if ($this->logger->log_debug())
+    {
+      $sql   = str_replace("\n", "\n    ", wordwrap($sql, 70));
+      $klass = explode('_', get_class($this));
+      $message = sprintf("\n    ".array_pop($klass)." -- Affected rows: %d; Elapsed time: %.02fms\n    %s\n", $affected_rows, $time, $sql);
+      $this->logger->debug($message);
+    }
   }
   
   # Truncates a table.

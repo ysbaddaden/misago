@@ -72,47 +72,62 @@ class Logger
     }
   }
   
+  function log_error()
+  {
+    return ($this->level <= self::ERROR);
+  }
+  
+  function log_warning()
+  {
+    return ($this->level <= self::WARNING);
+  }
+  
+  function log_notice()
+  {
+    return ($this->level <= self::NOTICE);
+  }
+  
+  function log_info()
+  {
+    return ($this->level <= self::INFO);
+  }
+  
+  function log_debug()
+  {
+    return ($this->level <= self::DEBUG);
+  }
+  
   # Logs an error.
   function error($message)
   {
-    if ($this->level <= self::ERROR) {
-      $this->add(self::ERROR, $message);
-    }
+    $this->log_error() && $this->add(self::ERROR, $message);
   }
   
   # Logs a warning.
   function warn($message)
   {
-    if ($this->level <= self::WARN) {
-      $this->add(self::WARN, $message);
-    }
+    $this->log_warning() && $this->add(self::WARN, $message);
   }
   
   # logs a notice.
   function notice($message)
   {
-    if ($this->level <= self::NOTICE) {
-      $this->add(self::NOTICE, $message);
-    }
+    $this->log_notice() && $this->add(self::NOTICE, $message);
   }
   
   # logs an information message.
   function info($message)
   {
-    if ($this->level <= self::INFO) {
-      $this->add(self::INFO, $message);
-    }
+    $this->log_info() && $this->add(self::INFO, $message);
   }
   
   # Logs a debug message.
   function debug($message)
   {
-    if ($this->level <= self::DEBUG) {
-      $this->add(self::DEBUG, $message);
-    }
+    $this->log_debug() && $this->add(self::DEBUG, $message);
   }
   
-  # Logs an unknown error.
+  # Logs an unknown error. Unknown errors will always be logged.
   function unknown($message)
   {
     $this->add(null, $message);
@@ -144,7 +159,7 @@ class MisagoLogger extends Logger
   function __construct()
   {
     Logger::__construct(ROOT."/log/{$_SERVER['MISAGO_ENV']}.log");
-    switch(cfg::get('log_level', DEBUG ? 'debug' : 'info'))
+    switch(cfg::get('log_level', ($_SERVER['MISAGO_ENV'] == 'production') ? 'info' : 'debug'))
     {
       case 'error': $this->level = Logger::ERROR; break;
       case 'warn':  $this->level = Logger::WARN;  break;

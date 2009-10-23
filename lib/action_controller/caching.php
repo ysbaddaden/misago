@@ -74,7 +74,7 @@
 # =HTTP browser cache
 # 
 # 
-abstract class ActionController_Caching extends ActionController_Rescue
+abstract class ActionController_Caching extends ActionController_Filters
 {
   protected $caches_page   = array();
   protected $caches_action = array();
@@ -121,7 +121,7 @@ abstract class ActionController_Caching extends ActionController_Rescue
     if (!empty($dir) and !file_exists(ROOT.'/public'.$dir)) {
       mkdir(ROOT.'/public'.$dir, 0775, true);
     }
-    $this->logger->debug("Caching page in public/$path");
+    $this->logger->log_debug() && $this->logger->debug("Caching page in public/$path");
     file_put_contents(ROOT.'/public'.$path, ($content === null) ? $this->response->body : $content);
   }
   
@@ -131,7 +131,7 @@ abstract class ActionController_Caching extends ActionController_Rescue
     $path = $this->page_cache_key($options);
     if (file_exists(ROOT.'/public'.$path))
     {
-      $this->logger->debug("Expired page public/$path");
+      $this->logger->log_debug() && $this->logger->debug("Expired page public/$path");
       unlink(ROOT.'/public'.$path);
     }
   }
@@ -146,7 +146,7 @@ abstract class ActionController_Caching extends ActionController_Rescue
   function expire_fragment($options)
   {
     $key = $this->fragment_cache_key($options);
-    $this->logger->debug("Expired fragment $key");
+    $this->logger->log_debug() && $this->logger->debug("Expired fragment $key");
     $this->cache->delete($key);
   }
   
@@ -238,7 +238,7 @@ abstract class ActionController_Caching extends ActionController_Rescue
     $key     = $this->fragment_cache_key($options);
     $content = $this->cache->read($key);
     
-    $this->logger->debug("Caching action $key");
+    $this->logger->log_debug() && $this->logger->debug("Caching action $key");
     
     if ($content === false)
     {

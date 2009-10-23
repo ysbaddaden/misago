@@ -138,18 +138,21 @@ abstract class ActionController_Base extends ActionController_Caching
     require_once(ROOT."/app/helpers/{$this->params[':controller']}_helper.php");
     $this->view_path = $this->params[':controller'];
     
-    $this->logger->info(sprintf("Processing %s::%s (for %s at %s) [%s] ",
-      get_class($this), $this->action, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli', date('Y-m-d H:i:s'),
-      strtoupper($this->request->method())
-    ));
-    if (isset($_SESSION)) {
-      $this->logger->info("  Session: ".session_id());
+    if ($this->logger->log_info())
+    {
+      $this->logger->info(sprintf("Processing %s::%s (for %s at %s) [%s] ",
+        get_class($this), $this->action, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli', date('Y-m-d H:i:s'),
+        strtoupper($this->request->method())
+      ));
+      if (isset($_SESSION)) {
+        $this->logger->info("  Session: ".session_id());
+      }
+      $this->logger->info("  Parameters: ".json_encode($this->params));
     }
-    $this->logger->info("  Parameters: ".json_encode($this->params));
     
     try
     {
-      $this->before_filters();
+      $this->process_before_filters();
       
       if ($this->shall_we_cache_action()) {
         $this->cache_action();
@@ -162,7 +165,10 @@ abstract class ActionController_Base extends ActionController_Caching
         $this->cache_page();
       }
       
-#      $this->after_filters();
+#      $this->process_after_filters();
+    }
+    catch(ActionController_FailedFilter $exception) {
+      
     }
     catch(Exception $exception) {
       $this->rescue_action($exception);
@@ -170,7 +176,7 @@ abstract class ActionController_Base extends ActionController_Caching
     
     $this->request_time = (microtime(true) - $request_time) / 1000;
     
-    $this->logger->info(sprintf("Completed in %.5f (%d reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
+    $this->logger->log_info() && $this->logger->info(sprintf("Completed in %.5f (%d reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
       $this->request_time, floor(1 / $this->request_time),
       $this->rendering_time, round(100 / $this->request_time * $this->rendering_time),
       $this->response->headers['Status'], $this->response->status(),
@@ -297,7 +303,7 @@ abstract class ActionController_Base extends ActionController_Caching
     
     if (array_key_exists('xml', $options))
     {
-      $this->logger->debug("Rendering XML");
+      $this->logger->log_info() && $this->logger->info("Rendering XML");
       $this->response->content_type('application/xml');
       $this->response->body = '<?xml version="1.0"?>'.
         (is_string($options['xml']) ? $options['xml'] : $options['xml']->to_xml());
@@ -305,13 +311,13 @@ abstract class ActionController_Base extends ActionController_Caching
     }
     elseif (array_key_exists('json', $options))
     {
-      $this->logger->debug("Rendering JSON");
+      $this->logger->log_info() && $this->logger->info("Rendering JSON");
       $this->response->content_type('application/json');
       $this->response->body = is_string($options['json']) ? $options['json'] : $options['json']->to_json();
     }
     elseif (array_key_exists('text', $options))
     {
-      $this->logger->debug("Rendering plain text");
+      $this->logger->log_info() && $this->logger->info("Rendering plain text");
       $this->response->body = $options['text'];
     }
     else
@@ -321,7 +327,7 @@ abstract class ActionController_Base extends ActionController_Caching
         $action = isset($options['action']) ? $options['action'] : $this->action;
         $options['template'] = $this->view_path.'/'.$action;
       }
-      $this->logger->debug("Rendering {$options['template']}");
+      $this->logger->log_info() && $this->logger->info("Rendering {$options['template']}");
       
       $view = new ActionView_Base($this);
       $this->response->content_type_from_format($options['format']);
@@ -366,17 +372,9 @@ abstract class ActionController_Base extends ActionController_Caching
       }
     }
     
-    $this->logger->debug("Redirected to $url");
-    
-#    if (DEBUG < 2) {
-      $this->response->redirect($url, $status);
-#    }
-#    else
-#    {
-#      $status_text = $this->response->status($status);
-#      echo "<p style=\"text-align:center\"><a href=\"$url\" style=\"font-weight:bold\">Redirect to: $url</a> [status: $status $status_text]</p>";
-#    }
-    exit;
+    $this->logger->log_info() && $this->logger->info("Redirected to $url");
+    $this->response->redirect($url, $status);
+    $this->already_rendered = true;
   }
   
   # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
@@ -390,17 +388,6 @@ abstract class ActionController_Base extends ActionController_Caching
   {
     return $this->request->is_xml_http_request();
   }
-  
-  
-  protected function before_filters()
-  {
-    
-  }
-  
-#  protected function after_filters($body)
-#  {
-#    return $body;
-#  }
 }
 
 ?>
