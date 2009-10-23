@@ -34,12 +34,13 @@ switch(ServerConfig::$http_server)
 
 for ($i=0; $i<$_SERVER['argc']; $i++)
 {
-  $arg = $_SERVER['argv'][$i];
-  switch($arg)
+  switch($_SERVER['argv'][$i])
   {
     case '-e': $i += 1; ServerConfig::$environment = $_SERVER['argv'][$i]; break;
     case '-h': $i += 1; ServerConfig::$http_host   = $_SERVER['argv'][$i]; break;
     case '-p': $i += 1; ServerConfig::$http_port   = $_SERVER['argv'][$i]; break;
+    case 'lighttpd':    ServerConfig::$http_server = 'lighttpd';           break;
+    case 'nginx':       ServerConfig::$http_server = 'nginx';              break;
   }
 }
 
@@ -60,20 +61,20 @@ $config_data = str_replace(array_keys($vars), array_values($vars), $config_data)
 file_put_contents(ServerConfig::$server_tmp_conf, $config_data);
 
 
-echo "=> Booting misago in '".ServerConfig::$environment."' environment\n";
+echo "=> Booting misago in '".ServerConfig::$environment."' environment (pid ".getmypid().")\n";
 
 # semaphores
 file_put_contents(TMP."/msgqueue-".ServerConfig::$environment, '');
 $msg_queue = msg_get_queue(ftok(TMP."/msgqueue-".ServerConfig::$environment, 'M'), 0666);
 
+
+# FastCGI service
+echo "=> Starting FastCGI service\n";
 $descriptorspec = array(
    0 => array("pipe", "r"),
    1 => array("pipe", "w"),
    2 => array("pipe", "w") // stderr is a file to write to
 );
-
-# FastCGI service
-echo "=> Starting FastCGI service at ".ServerConfig::$fcgi_bind."\n";
 $fcgi_envs = array(
   'PATH'  => getenv('PATH'),
   'USER'  => getenv('USER'),
@@ -98,6 +99,8 @@ switch(ServerConfig::$http_server)
   break;
 }
 
+echo "Hit Ctrl+c to shutdown misago\n";
+
 # signals (for clean shutdown)
 declare(ticks = 1);
 
@@ -118,6 +121,7 @@ pcntl_signal(SIGTERM, 'server_sig_handler');
 
 
 # logs messages (sent by FastCGI processes)
+# waiting for SIGINT (Ctrl+c) to be sent.
 do
 {
   if (msg_receive($msg_queue, 0, $msg_type, 16384, $message, false, MSG_IPC_NOWAIT, $errno)) {
