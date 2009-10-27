@@ -154,10 +154,8 @@ class Misago
     else
     {
       echo Terminal::colorize("     create  $path\n", 'BROWN');
-      if (!self::$pretend)
-      {
+      if (!self::$pretend) {
         mkdir($path);
-        self::copy_filemode($path_from, $path_to);
       }
     }
   }
