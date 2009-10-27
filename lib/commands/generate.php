@@ -45,7 +45,7 @@ class Generator_Base
     if (file_exists(ROOT.'/'.$path))
     {
       if ($type == 'file' and in_array('-f', $this->options)) {
-        echo "   overwrite  $path\n";
+        echo Terminal::colorize("   overwrite  $path\n", 'BROWN');
       }
       else
       {
@@ -54,7 +54,7 @@ class Generator_Base
       }
     }
     else {
-      echo "      create  $path\n";
+      echo Terminal::colorize("      create  $path\n", 'BROWN');
     }
     return true;
   }
