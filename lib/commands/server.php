@@ -12,12 +12,10 @@ class ServerConfig
   
   static $server_conf;
   static $server_tmp_conf;
+  static $pid_file;
   
   static $http_server = 'lighttpd'; # either 'lighttpd' or 'nginx'
 }
-
-ServerConfig::$fcgi_socket = TMP.'/misago.sock';
-ServerConfig::$php_ini     = ROOT.'/config/php.ini';
 
 for ($i=0; $i<$_SERVER['argc']; $i++)
 {
@@ -30,6 +28,10 @@ for ($i=0; $i<$_SERVER['argc']; $i++)
     case 'nginx':       ServerConfig::$http_server = 'nginx';              break;
   }
 }
+
+ServerConfig::$fcgi_socket = TMP.'/misago.sock';
+ServerConfig::$php_ini     = ROOT.'/config/php.ini';
+ServerConfig::$pid_file    = TMP.'/'.ServerConfig::$http_server.'.pid';
 
 switch(ServerConfig::$http_server)
 {
@@ -52,6 +54,7 @@ $vars = array(
   "#{HTTP_PORT}"   => ServerConfig::$http_port,
   "#{TMP}"         => TMP,
   "#{LOG}"         => ROOT.'/log',
+  "#{PID}"         => ServerConfig::$pid_file,
   "#{FCGI_SOCKET}" => ServerConfig::$fcgi_socket,
 );
 
@@ -114,6 +117,12 @@ function server_sig_handler($signo)
   
   proc_terminate($fcgi_process);
   proc_terminate($http_process);
+  
+  if (file_exists(ServerConfig::$pid_file))
+  {
+    $pid = (int)file_get_contents(ServerConfig::$pid_file);
+    posix_kill($pid, SIGTERM);
+  }
   exit;
 }
 pcntl_signal(SIGINT,  'server_sig_handler');
