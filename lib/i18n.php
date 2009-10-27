@@ -163,7 +163,9 @@ class I18n
         $translations  = hash_merge_recursive($translations, $_translations);
       }
       
-      $translations = self::flatten_translation_keys($translations[$locale]);
+      if (!empty($translations[$locale])) {
+        $translations = self::flatten_translation_keys($translations[$locale]);
+      }
       apc_store(TMP."/cache/locales.$locale.php", $translations, strtotime('+1 day'));
     }
     
