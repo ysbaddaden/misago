@@ -9,7 +9,7 @@ development:
 production:
   adapter: mysql
   host: localhost
-  database: #{appname}_production
+  database: #{appname}
   username: root
   password: 
 
