@@ -1,31 +1,198 @@
 #! /usr/bin/php
 <?php
+require_once dirname(__FILE__).'/../lib/terminal.php';
 
-if (!isset($_SERVER['argv'][1]))
+$options     = array();
+$path_to_app = '';
+
+for($i=1; $i<$_SERVER['argc']; $i++)
 {
-  echo "Usage: misago {$app_name}";
-  exit;
+  switch($_SERVER['argv'][$i])
+  {
+    case '-p': case '--pretend': $options['pretend']   = true;  break;
+    case '-s': case '--skip':    $options['overwrite'] = false; break;
+    case '-f': case '--force':   $options['overwrite'] = true;  break;
+    default:
+      if (strpos($_SERVER['argv'][$i], '-') === 0)
+      {
+        echo "Unknown option: {$_SERVER['argv'][$i]}\n";
+        exit;
+      }
+      $path_to_app = $_SERVER['argv'][$i];
+  }
 }
 
-$path_to   = $_SERVER['argv'][1];
-$path_here = dirname(__FILE__);
+$misago = new Misago($options);
+switch($path_to_app)
+{
+  case '':       $misago->help();    break;
+  case 'update': $misago->upgrade(); break;
+  default:       $misago->install_to($path_to_app);
+}
 
-`cp -r {$path_here}/../templates/app {$path_to}`;
+class Misago
+{
+  static    $pretend   = false;
+  static    $overwrite = false;
+  protected $templates_path;
+  
+  function __construct($options=array())
+  {
+    $this->templates_path = dirname(__FILE__).'/../templates/app';
+    foreach($options as $k => $v) {
+      self::$$k = $v;
+    }
+  }
+  
+  function help()
+  {
+    echo "Installs or updates a misago application.\n";
+    echo "\n";
+    echo "  $ misago [options] <path/to/app>\n";
+    echo "  $ misago [options] update\n";
+    echo "\n";
+    echo "Available options:\n";
+    echo "\n";
+    echo "  -p,--pretend    Run but do not write anything\n";
+    echo "  -s,--skip       Skip existing files (default)\n";
+    echo "  -f,--force      Overwrite existing files (default)\n";
+    echo "\n";
+    echo "Examples:\n";
+    echo "\n";
+    echo "  $ misago ~/src/webapp\n";
+    echo "  $ cd ~/src/webapp && misago update\n";
+    echo "\n";
+  }
+  
+  function install_to($path)
+  {
+    if (file_exists($path))
+    {
+      echo "Error $path: directory already exists.\n";
+      exit;
+    }
+    
+    self::create_dir_unless_exists($path);
+    self::browse_and_copy($this->templates_path, $path);
+    self::create_missing_dirs($path);
+    
+    if (!self::$pretend)
+    {
+      self::configure_files($path);
+      symlink(dirname(__FILE__)."/..", "{$path}/lib/misago");
+    }
+    
+    echo "\n".wordwrap("Note: there is a known bug with PHP 5.3, where PHP will complain ".
+      "about a missing file (spyc.php, which is in misago/vendor). Using a ".
+      "relative link for lib/misago (or using a PHAR archive) solves the ".
+      "problem. For instance:", 70)."\n";
+    echo "\n";
+    echo "  $ rm $path/lib/misago\n";
+    echo "  $ cd $path/lib\n";
+    echo "  $ ln -sf ../relative/path/to/misago misago\n";
+    echo "\n";
+  }
+  
+  function upgrade()
+  {
+    self::browse_and_copy($this->templates_path, '.');
+    self::create_missing_dirs('.');
+  }
+  
+  private static function browse_and_copy($path_from, $path_to)
+  {
+    $d = dir($path_from);
+    while(false !== ($f = $d->read()))
+    {
+      if ($f == '.' or $f == '..') continue;
+      
+      if (is_dir("$path_from/$f"))
+      {
+        self::create_dir_unless_exists("{$path_to}/$f");
+        self::browse_and_copy("{$path_from}/$f", "{$path_to}/$f");
+      }
+      elseif (is_file("{$path_from}/$f")) {
+        self::copy_file_unless_exists("{$path_from}/$f", "{$path_to}/$f");
+      }
+    }
+  }
 
-`mkdir -p {$path_to}/lib`;
-`ln -sf {$path_here}/.. {$path_to}/lib/misago`;
-
-`mkdir -p {$path_to}/app/views/layouts`;
-`mkdir -p {$path_to}/app/models`;
-`mkdir -p {$path_to}/db`;
-`mkdir -p {$path_to}/doc`;
-`mkdir -p {$path_to}/log`;
-`mkdir -p {$path_to}/test/unit`;
-`mkdir -p {$path_to}/test/functional`;
-`mkdir -p {$path_to}/test/fixtures`;
-`mkdir -p {$path_to}/tmp/cache/lighttpd/compress`;
-`mkdir -p {$path_to}/vendor`;
-
-`sed -i 's/\#{appname}/$path_to/g' {$path_to}/config/database.yml`;
+  private static function create_missing_dirs($path_to)
+  {
+    self::create_dir_unless_exists("$path_to/app/views");
+    self::create_dir_unless_exists("$path_to/app/views/layouts");
+    self::create_dir_unless_exists("$path_to/app/models");
+    self::create_dir_unless_exists("$path_to/db");
+    self::create_dir_unless_exists("$path_to/db/migrate");
+    self::create_dir_unless_exists("$path_to/lib");
+    self::create_dir_unless_exists("$path_to/log");
+    self::create_dir_unless_exists("$path_to/test");
+    self::create_dir_unless_exists("$path_to/test/unit");
+    self::create_dir_unless_exists("$path_to/test/functional");
+    self::create_dir_unless_exists("$path_to/test/fixtures");
+    self::create_dir_unless_exists("$path_to/vendor");
+  }
+  
+  private static function configure_files($path_to)
+  {
+    if (!self::$pretend)
+    {
+      $appname = basename($path_to);
+      $database_yml = "$path_to/config/database.yml";
+      
+      $contents = file_get_contents($database_yml);
+      $contents = str_replace('#{appname}', $appname, $contents);
+      file_put_contents($database_yml, $contents);
+    }
+  }
+  
+  private static function create_dir_unless_exists($path)
+  {
+    if (file_exists($path)) {
+      echo "     exists  $path\n";
+    }
+    else
+    {
+      echo Terminal::colorize("     create  $path\n", 'BROWN');
+      if (!self::$pretend)
+      {
+        mkdir($path);
+        self::copy_filemode($path_from, $path_to);
+      }
+    }
+  }
+  
+  private static function copy_file_unless_exists($path_from, $path_to)
+  {
+    $write = true;
+    if (file_exists($path_to))
+    {
+      if (self::$overwrite) {
+        echo Terminal::colorize("  overwrite  $path_to\n", 'BROWN');
+      }
+      else
+      {
+        $write = false;
+        echo "     exists  $path_to\n";
+      }
+    }
+    else
+    {
+      echo  Terminal::colorize("     create  $path_to\n", 'BROWN');
+    }
+    
+    if ($write and !self::$pretend)
+    {
+      copy($path_from, $path_to);
+      self::copy_filemode($path_from, $path_to);
+    }
+  }
+  
+  private static function copy_filemode($path_from, $path_to)
+  {
+    $fh = fopen($path_from, 'r'); $stats = fstat($fh); fclose($fh);
+    chmod($path_to, $stats['mode']);
+  }
+}
 
 ?>
