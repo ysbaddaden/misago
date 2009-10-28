@@ -6,7 +6,7 @@ class TestFiltersController extends ActionController_Base
   public $var_c;
   public $var_d;
   public $var_e;
-  public $var_index;
+  public $var_action;
   
   function __construct($type)
   {
@@ -16,12 +16,12 @@ class TestFiltersController extends ActionController_Base
     {
       case 'before':
         $this->append_before_filter('b', 'c');
-        $this->prepend_before_filter('a');
+        $this->prepend_before_filter('a', array('except' => array('show', 'neo')));
       break;
       
       case 'after':
         $this->append_after_filter('b', 'c');
-        $this->prepend_before_filter('a');
+        $this->prepend_before_filter('a', array('only' => array('index')));
       break;
       
       case 'skip':
@@ -34,7 +34,19 @@ class TestFiltersController extends ActionController_Base
   
   function index()
   {
-    $this->var_index = true;
+    $this->var_action = 'index';
+    $this->head(200);
+  }
+  
+  function show()
+  {
+    $this->var_action = 'show';
+    $this->head(200);
+  }
+  
+  function neo()
+  {
+    $this->var_action = 'neo';
     $this->head(200);
   }
   

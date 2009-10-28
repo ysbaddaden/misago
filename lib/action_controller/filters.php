@@ -57,18 +57,35 @@ abstract class ActionController_Filters extends ActionController_Rescue
   private function _prepend_filters($to, $filters)
   {
     $to = "{$to}_filters";
-    array_reverse($filters);
     
+    $options = end($filters);
+    if (is_array($options)) {
+      unset($filters[key($filters)]);
+    }
+    else {
+      $options = null;
+    }
+    
+    array_reverse($filters);
     foreach($filters as $filter) {
-      array_unshift($this->$to, $filter);
+      array_unshift($this->$to, array($filter, $options));
     }
   }
   
   private function _append_filters($to, $filters)
   {
     $to = "{$to}_filters";
+    
+    $options = end($filters);
+    if (is_array($options)) {
+      unset($filters[key($filters)]);
+    }
+    else {
+      $options = null;
+    }
+    
     foreach($filters as $filter) {
-      array_push($this->$to, $filter);
+      array_push($this->$to, array($filter, $options));
     }
   }
   
@@ -76,11 +93,13 @@ abstract class ActionController_Filters extends ActionController_Rescue
   # @private
   protected function process_before_filters()
   {
-    foreach($this->before_filters as $method)
+    foreach($this->before_filters as $filter)
     {
-      if (!in_array($method, $this->skip_filters))
+      if (!in_array($filter[0], $this->skip_filters)
+        and (!isset($filter[1]['except']) or !in_array($this->action, $filter[1]['except']))
+        and (!isset($filter[1]['only'])   or  in_array($this->action, $filter[1]['only'])))
       {
-        $rs = $this->$method();
+        $rs = $this->{$filter[0]}();
         
         if ($rs === false) {
           throw new ActionController_FailedFilter();
@@ -92,10 +111,13 @@ abstract class ActionController_Filters extends ActionController_Rescue
   # @private
   protected function process_after_filters()
   {
-    foreach($this->after_filters as $method)
+    foreach($this->after_filters as $filter)
     {
-      if (!in_array($method, $this->skip_filters)) {
-        $rs = $this->$method();
+      if (!in_array($filter[0], $this->skip_filters)
+        and (!isset($filter[1]['except']) or !in_array($this->action, $filter[1]['except']))
+        and (!isset($filter[1]['only'])   or  in_array($this->action, $filter[1]['only'])))
+      {
+        $rs = $this->{$filter[0]}();
       }
     }
   }
