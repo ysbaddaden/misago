@@ -1,8 +1,15 @@
-  
+
   * ActionController:
     * write CgiResponse & TestResponse (< AbstractResponse)
   
   * ActionController_TestCase:
     * do not rely on external web server, use TestRequest & TestResponse
-      instead which would be faster and simpler for the end-user.
+      instead, which would be faster and simpler for the end-user.
+  
+  * Have a look to nanoserv:
+    http://nanoserv.si.kz/
+  
+  * parsing multipart/form-data:
+    http://www.faqs.org/rfcs/rfc2388.html
+    http://hg.mperillo.ath.cx/wsgix/file/70aacc4a8301/wsgix/parse.py
 

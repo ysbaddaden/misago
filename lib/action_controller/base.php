@@ -95,6 +95,7 @@ abstract class ActionController_Base extends ActionController_Caching
   function __construct()
   {
     ActionController_Rescue::__construct();
+#    ActionController_Filters::__construct();
     ActionController_Caching::__construct();
   }
   
@@ -165,7 +166,7 @@ abstract class ActionController_Base extends ActionController_Caching
         $this->cache_page();
       }
       
-#      $this->process_after_filters();
+      $this->process_after_filters();
     }
     catch(ActionController_FailedFilter $exception) {
       
