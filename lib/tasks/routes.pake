@@ -1,0 +1,41 @@
+<?php
+
+task('routes', 'prints the full list of routes');
+
+function routes()
+{
+  $routes  = array();
+  $lengths = array(0, 0, 0, 0);
+  
+  foreach(\ActionController_Routing::collect() as $route)
+  {
+    $method = isset($route['mapping']['conditions']['method']) ?
+      $route['mapping']['conditions']['method'] : '';
+    
+    $params = array();
+    foreach($route['mapping'] as $k => $v)
+    {
+      if (is_symbol($k)) {
+        $params[] = $k.'=>"'.$v.'"';
+      }
+    }
+    $params = empty($params) ? '' : '{'.implode(',', $params).'}';
+    
+    $routes[]   = array($route['name'], $method, '/'.$route['path'], $params);
+    $lengths[0] = max($lengths[0], strlen($route['name']));
+    $lengths[1] = max($lengths[1], strlen($method));
+    $lengths[2] = max($lengths[2], strlen($route['path']));
+  }
+  
+  foreach($routes as $route)
+  {
+    echo "  ";
+    foreach($route as $i => $v)
+    {
+      echo str_pad($v, $lengths[$i], ' ', ($i == 0) ? STR_PAD_LEFT : STR_PAD_RIGHT).' ';
+    }
+    echo "\n";
+  }
+}
+
+?>

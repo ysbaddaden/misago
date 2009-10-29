@@ -1,4 +1,6 @@
 <?php
+echo "DEPRECATED: use 'pake db:migrate' instead";
+
 $action = null;
 
 foreach($_SERVER['argv'] as $v)

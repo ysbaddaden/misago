@@ -29,7 +29,7 @@ for ($i=0; $i<$_SERVER['argc']; $i++)
   }
 }
 
-ServerConfig::$fcgi_socket = TMP.'/misago.sock';
+ServerConfig::$fcgi_socket = TMP.'/sockets/'.ServerConfig::$environment.'.sock';
 ServerConfig::$php_ini     = ROOT.'/config/php.ini';
 ServerConfig::$pid_file    = TMP.'/'.ServerConfig::$http_server.'.pid';
 
@@ -76,7 +76,7 @@ echo "=> Starting FastCGI service\n";
 $descriptorspec = array(
    0 => array("pipe", "r"),
    1 => array("pipe", "w"),
-   2 => array("pipe", "w") // stderr is a file to write to
+   2 => array("pipe", "w")
 );
 $fcgi_envs = array(
   'PATH'  => getenv('PATH'),
@@ -114,6 +114,7 @@ function server_sig_handler($signo)
   
   msg_remove_queue($msg_queue);
   unlink(TMP."/msgqueue-".ServerConfig::$environment);
+  unlink(ServerConfig::$server_tmp_conf);
   
   proc_terminate($fcgi_process);
   proc_terminate($http_process);

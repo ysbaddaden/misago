@@ -447,6 +447,12 @@ class ActionController_Routing extends Object
     
     return $path.(empty($query_string) ? '' : "?{$query_string}");
   }
+  
+  static function collect()
+  {
+    $map = ActionController_Routing::draw();
+    return $map->routes;
+  }
 }
 
 # Resolves an URL (reverse routing).

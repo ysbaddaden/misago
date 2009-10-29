@@ -28,9 +28,10 @@
 # 
 # - +ActionController_Base+
 # - +ActionController_Caching+
+# - +ActionController_Filters+
 # - +ActionController_Rescue+
 # 
-# And uses some classes as attributes:
+# And uses some objects:
 # 
 # - `$cache`: +ActionController_Cache_Store+
 # - `$flash`: +ActionController_Flash+

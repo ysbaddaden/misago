@@ -1,0 +1,46 @@
+<?php
+
+namespace tmp;
+
+task('tmp:create',        'creates tmp subdirectories');
+task('tmp:clear',         'clears tmp');
+task('tmp:clear cache',   'clears all files and directories in tmp/cache');
+task('tmp:clear pids',    'clears all files in tmp/pids');
+task('tmp:clear sockets', 'clears all files in tmp/sockets');
+
+function clear($what=null)
+{
+  switch($what)
+  {
+    case 'cache':
+      \Pake\FileUtils\rmdir(ROOT.'/tmp/cache');
+      echo "Cleared cache\n";
+    break;
+    
+    case 'pids':
+      \Pake\FileUtils\rmdir(ROOT.'/tmp/pids');
+      echo "Cleared PIDs\n";
+    break;
+    
+    case 'sockets':
+      \Pake\FileUtils\rmdir(ROOT.'/tmp/sockets');
+      echo "Cleared sockets\n";
+    break;
+    
+    default:
+      clear('cache');
+      clear('pids');
+      clear('sockets');
+    break;
+  }
+}
+
+function create()
+{
+  \Pake\FileUtils\mkdir(ROOT.'/tmp');
+  \Pake\FileUtils\mkdir(ROOT.'/tmp/cache');
+  \Pake\FileUtils\mkdir(ROOT.'/tmp/pids');
+  \Pake\FileUtils\mkdir(ROOT.'/tmp/sockets');
+}
+
+?>

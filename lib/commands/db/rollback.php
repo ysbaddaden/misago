@@ -1,4 +1,6 @@
 <?php
+echo "DEPRECATED: use 'pake db:rollback' instead";
+
 #   script/db/rollback
 #     => rollbacks the last migration
 #   

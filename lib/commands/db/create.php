@@ -1,4 +1,5 @@
 <?php
+echo "DEPRECATED: use 'pake db:create' instead";
 
 $db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
 $db->connect();

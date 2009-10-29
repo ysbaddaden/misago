@@ -1,4 +1,5 @@
 <?php
+echo "DEPRECATED: use 'pake db:fixtures' instead";
 
 if ($_SERVER['argc'] == 1) {
   die("Syntax error: script/db/fixtures load\n");
