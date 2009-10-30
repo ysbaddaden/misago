@@ -1,22 +1,26 @@
 <?php
 
-namespace db;
+desc('creates the database for current environment');
+task('db:create', 'db_create');
 
-task('db:create',              'creates the database for current environment');
-task('db:drop',                'drops database for current environment');
-task('db:migrate',             'migrates the database for current environment');
-task('db:migrate help',        'displays help for migrations');
-task('db:migrate redo',        'migrates down the last migration, before migrating up again');
-task('db:migrate redo STEP=2', 'migrates down the last two migration, before migrating up again');
-task('db:rollback',            'migrates down the last runned migration');
-task('db:rollback STEP=2',     'migrates down the last two runned migration');
-task('db:reset',               'drops the current database, recreates it, before migrating up again');
-task('db:fixtures',            'loads fixtures into current environment');
+desc('drops database for current environment');
+task('db:drop', 'db_drop');
 
+desc('migrates the database for current environment (for help check db:migrate help)');
+task('db:migrate', 'db_migrate');
 
-function create()
+desc('migrates down the last runned migration (use STEP=X to specify more)');
+task('db:rollback', 'db_rollback');
+
+desc('drops the current database, recreates it, before migrating up again');
+task('db:reset', 'db_reset');
+
+desc('loads fixtures into current environment');
+task('db:fixtures', 'db_fixtures');
+
+function db_create()
 {
-  $db = \ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
+  $db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
   $db->connect();
 
   $dbname = $db->config('database');
@@ -28,9 +32,9 @@ function create()
   }
 }
 
-function drop()
+function db_drop()
 {
-  $db = \ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
+  $db = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
   $db->connect();
 
   $dbname = $db->config('database');
@@ -42,7 +46,7 @@ function drop()
   }
 }
 
-function migrate($cmd='')
+function db_migrate($cmd='')
 {
   switch($cmd)
   {
@@ -55,7 +59,7 @@ function migrate($cmd='')
     break;
     
     case 'redo':
-      $migrations   = \ActiveRecord_Migration::migrations();
+      $migrations   = ActiveRecord_Migration::migrations();
       if (!isset($_SERVER['STEP'])) $_SERVER['STEP'] = 1;
       
       if ($_SERVER['STEP'] > 0)
@@ -64,20 +68,20 @@ function migrate($cmd='')
         $migration = end($migrations);
         for ($i = 0; $i < $_SERVER['STEP']; $i++)
         {
-          \ActiveRecord_Migration::run($migration, 'down');
+          ActiveRecord_Migration::run($migration, 'down');
           $migration = prev($migrations);
         }
         
         # migrates up x steps
         for ($i = 0; $i < $_SERVER['STEP']; $i++) {
-          \ActiveRecord_Migration::run(next($migrations), 'up');
+          ActiveRecord_Migration::run(next($migrations), 'up');
         }
       }
     break;
     
     case '':
-      $from_version = \ActiveRecord_Migration::get_version();
-      $migrations   = \ActiveRecord_Migration::migrations();
+      $from_version = ActiveRecord_Migration::get_version();
+      $migrations   = ActiveRecord_Migration::migrations();
       
       if (empty($_SERVER['VERSION']))
       {
@@ -92,7 +96,7 @@ function migrate($cmd='')
           if ($migration['version'] > $from_version
             and $migration['version'] <= $_SERVER['VERSION'])
           {
-            \ActiveRecord_Migration::run($migration, 'up');
+            ActiveRecord_Migration::run($migration, 'up');
           }
         }
       }
@@ -104,7 +108,7 @@ function migrate($cmd='')
           if ($migration['version'] <= $from_version
             and $migration['version'] > $_SERVER['VERSION'])
           {
-            \ActiveRecord_Migration::run($migration, 'down');
+            ActiveRecord_Migration::run($migration, 'down');
           }
           $migration = prev($migrations);
         }
@@ -134,23 +138,23 @@ function migrate($cmd='')
   }
 }
 
-function rollback()
+function db_rollback()
 {
-  $from_version = \ActiveRecord_Migration::get_version();
-  $migrations   = \ActiveRecord_Migration::migrations();
+  $from_version = ActiveRecord_Migration::get_version();
+  $migrations   = ActiveRecord_Migration::migrations();
   
   if (!isset($_SERVER['STEP'])) $_SERVER['STEP'] = 1;
   
   if ($_SERVER['STEP'] > 0)
   {
-    $migration = \reset($migrations);
+    $migration = reset($migrations);
     while($migration !== false)
     {
       if ($migration['version'] == $from_version)
       {
         for($i = 0; $i < $_SERVER['STEP']; $i++)
         {
-          \ActiveRecord_Migration::run($migration, 'down');
+          ActiveRecord_Migration::run($migration, 'down');
           $migration = prev($migrations);
           if ($migration === false) break;
         }
@@ -161,14 +165,14 @@ function rollback()
   }
 }
 
-function fixtures($cmd='load')
+function db_fixtures($cmd='load')
 {
   if ($cmd == 'load') {
-    \Fixtures::insert();
+    Fixtures::insert();
   }
 }
 
-function reset()
+function db_reset()
 {
   drop();
   create();

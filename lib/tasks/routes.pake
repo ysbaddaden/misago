@@ -1,6 +1,7 @@
 <?php
 
-task('routes', 'prints the full list of routes');
+desc('prints the full list of routes');
+task('routes');
 
 function routes()
 {
@@ -30,8 +31,7 @@ function routes()
   foreach($routes as $route)
   {
     echo "  ";
-    foreach($route as $i => $v)
-    {
+    foreach($route as $i => $v) {
       echo str_pad($v, $lengths[$i], ' ', ($i == 0) ? STR_PAD_LEFT : STR_PAD_RIGHT).' ';
     }
     echo "\n";
