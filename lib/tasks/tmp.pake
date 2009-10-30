@@ -1,46 +1,51 @@
 <?php
 
-namespace tmp;
+desc('creates tmp subdirectories');
+task('tmp:create', 'tmp_create');
 
-task('tmp:create',        'creates tmp subdirectories');
-task('tmp:clear',         'clears tmp');
-task('tmp:clear cache',   'clears all files and directories in tmp/cache');
-task('tmp:clear pids',    'clears all files in tmp/pids');
-task('tmp:clear sockets', 'clears all files in tmp/sockets');
+desc('clears tmp');
+task('tmp:clear', 'tmp_clear');
 
-function clear($what=null)
+desc('clears all files and directories in tmp/cache');
+task('tmp:clear:cache', 'tmp_clear_cache');
+
+desc('clears all files in tmp/pids');
+task('tmp:clear:pids', 'tmp_clear_pids');
+
+desc('clears all files in tmp/sockets');
+task('tmp:clear:sockets', 'tmp_clear_sockets');
+
+function tmp_clear($what=null)
 {
-  switch($what)
-  {
-    case 'cache':
-      \Pake\FileUtils\rmdir(ROOT.'/tmp/cache');
-      echo "Cleared cache\n";
-    break;
-    
-    case 'pids':
-      \Pake\FileUtils\rmdir(ROOT.'/tmp/pids');
-      echo "Cleared PIDs\n";
-    break;
-    
-    case 'sockets':
-      \Pake\FileUtils\rmdir(ROOT.'/tmp/sockets');
-      echo "Cleared sockets\n";
-    break;
-    
-    default:
-      clear('cache');
-      clear('pids');
-      clear('sockets');
-    break;
-  }
+  tmp_clear_cache('cache');
+  tmp_clear_pids('pids');
+  tmp_clear_sockets('sockets');
 }
 
-function create()
+function tmp_clear_cache()
 {
-  \Pake\FileUtils\mkdir(ROOT.'/tmp');
-  \Pake\FileUtils\mkdir(ROOT.'/tmp/cache');
-  \Pake\FileUtils\mkdir(ROOT.'/tmp/pids');
-  \Pake\FileUtils\mkdir(ROOT.'/tmp/sockets');
+  Pake_FileUtils::rmdir(ROOT.'/tmp/cache');
+  echo "Cleared cache\n";
+}
+
+function tmp_clear_pids()
+{
+  Pake_FileUtils::rmdir(ROOT.'/tmp/pids');
+  echo "Cleared PIDs\n";
+}
+
+function tmp_clear_sockets()
+{
+  Pake_FileUtils::rmdir(ROOT.'/tmp/sockets');
+  echo "Cleared sockets\n";
+}
+
+function tmp_create()
+{
+  Pake_FileUtils::mkdir(ROOT.'/tmp');
+  Pake_FileUtils::mkdir(ROOT.'/tmp/cache');
+  Pake_FileUtils::mkdir(ROOT.'/tmp/pids');
+  Pake_FileUtils::mkdir(ROOT.'/tmp/sockets');
 }
 
 ?>
