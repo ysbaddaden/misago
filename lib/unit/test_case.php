@@ -11,6 +11,8 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   
   function __construct()
   {
+    $this->logger = MisagoLogger::singleton();
+    
     self::create_database();
     $this->load_fixtures();
     
