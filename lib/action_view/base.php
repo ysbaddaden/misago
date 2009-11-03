@@ -6,7 +6,7 @@
 # you shall not need to use this object directly, except for
 # a few methods, like +yield+ or rendering partials.
 # 
-class ActionView_Base extends Object
+class ActionView_Base extends Misago_Object
 {
   public    $view_path;
   public    $view_format;

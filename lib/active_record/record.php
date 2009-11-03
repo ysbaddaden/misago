@@ -37,7 +37,7 @@
 #   $product->changed          # => false
 #   $product->title_changed    # => false
 #   $product->title_change     # => null
-abstract class ActiveRecord_Record extends Object implements Iterator
+abstract class ActiveRecord_Record extends Misago_Object implements Iterator
 {
   protected $columns               = array();
   protected $__attributes          = array();

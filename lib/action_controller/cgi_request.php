@@ -10,7 +10,7 @@
 # 
 # See +ActionController_AbstractRequest+ for actual documentation.
 # 
-class ActionController_CgiRequest extends Object implements ActionController_AbstractRequest
+class ActionController_CgiRequest extends Misago_Object implements ActionController_AbstractRequest
 {
   public    $headers;
   protected $format;

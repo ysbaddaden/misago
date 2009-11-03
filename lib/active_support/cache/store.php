@@ -8,7 +8,7 @@
 # 
 # Note: +ActiveSupport_Cache+ is meant to store strings. An implementation
 # may store something else (like objects), but that shouldn't be used.
-abstract class ActiveSupport_Cache_Store extends Object
+abstract class ActiveSupport_Cache_Store extends Misago_Object
 {
   # Gets a variable.
   abstract function read($key);

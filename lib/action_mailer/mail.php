@@ -1,6 +1,6 @@
 <?php
 
-class ActionMailer_Mail extends Object
+class ActionMailer_Mail extends Misago_Object
 {
   public $action;
   

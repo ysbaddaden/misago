@@ -99,7 +99,7 @@
 # 
 # IMPROVE: cache routes (in APC).
 # 
-class ActionController_Routing extends Object
+class ActionController_Routing extends Misago_Object
 {
   private $routes          = array();
   private $default_mapping = array(

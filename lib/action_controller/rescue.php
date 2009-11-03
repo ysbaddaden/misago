@@ -2,7 +2,7 @@
 
 # You may overwrite any of these methods to handle errors and exceptions
 # raised within your application.
-abstract class ActionController_Rescue extends Object
+abstract class ActionController_Rescue extends Misago_Object
 {
   protected $rescue_errors   = array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR);
   protected $rescue_warnings = array(E_WARNING, E_USER_WARNING, E_CORE_WARNING, E_COMPILE_WARNING, E_RECOVERABLE_ERROR);

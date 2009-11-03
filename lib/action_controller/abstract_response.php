@@ -5,7 +5,7 @@
 # This is some Misaso internal, response should never be used directly.
 # You should use methods from +ActionController_Base+ instead.
 # 
-class ActionController_AbstractResponse extends Object
+class ActionController_AbstractResponse extends Misago_Object
 {
   public $headers = array(
     'Status'       => 200,

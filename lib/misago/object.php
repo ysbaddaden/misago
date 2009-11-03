@@ -4,7 +4,7 @@
 # 
 # Example class:
 # 
-#   class MyClass extends Object
+#   class MyClass extends Misago_Object
 #   {
 #     protected $id;
 #     protected $table_name = 'classes';
@@ -18,7 +18,7 @@
 #       return $this->id;
 #     }
 #   }
-#   
+# 
 # =Read-only attributes.
 # 
 # You may define a list of `protected` attributes that may be accessible on get.
@@ -35,7 +35,7 @@
 #   $o->id = 4  # sets attribute throught the id() method.
 #   $o->id      # gets attribute throught the id() method (thus returns 4).
 # 
-abstract class Object
+abstract class Misago_Object
 {
   # A collection of attributes that must be accessible read-only (they must be protected).
   protected $attr_read = array();

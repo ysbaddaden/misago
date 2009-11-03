@@ -1,6 +1,6 @@
 <?php
 # @namespace ActiveSupport
-class Time extends Object
+class Time extends Misago_Object
 {
   protected $raw_time;
   protected $timestamp;

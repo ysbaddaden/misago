@@ -5,7 +5,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
-class SomeObject extends Object
+class SomeObject extends Misago_Object
 {
   protected $new_record  = false;
   protected $table_name  = 'some_objects';

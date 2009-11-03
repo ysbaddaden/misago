@@ -55,7 +55,7 @@
 # - `mailer_delivery_method`: defines a delivery method, either 'sendmail' or 'test'.
 # - `mailer_return_path`: you may define a default return-path for all your emails.
 # 
-class ActionMailer_Base extends Object
+class ActionMailer_Base extends Misago_Object
 {
   public $helpers = ':all';
   public $params  = array();

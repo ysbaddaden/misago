@@ -1,6 +1,6 @@
 <?php
 # @private
-class ActionController_TestRequest extends Object implements ActionController_AbstractRequest
+class ActionController_TestRequest extends Misago_Object implements ActionController_AbstractRequest
 {
   public  $headers = array();
   

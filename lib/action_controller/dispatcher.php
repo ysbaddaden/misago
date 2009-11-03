@@ -9,7 +9,7 @@
 #   ActionController_Dispatcher::dispatch();
 #   ?\>
 # 
-class ActionController_Dispatcher extends Object
+class ActionController_Dispatcher extends Misago_Object
 {
   protected $request;
   protected $response;
