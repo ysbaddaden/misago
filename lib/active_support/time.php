@@ -80,6 +80,7 @@ class Time extends Misago_Object
       case 'date':     return date('Y-m-d', $this->timestamp);
       case 'time':     return date('H:i:s', $this->timestamp);
     }
+    return '';
   }
     
   function format($str)
