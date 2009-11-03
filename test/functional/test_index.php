@@ -59,7 +59,7 @@ class TestIndexController extends ActionController_TestCase
   {
     $this->run_action('GET', '/index/errors.xml');
     $this->assert_response(412);
-    print_r($this->response);
+    $this->assert_equal($this->response['body'], '<xml>error</xml>');
   }
 }
 new TestIndexController();
