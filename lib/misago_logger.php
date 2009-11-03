@@ -18,7 +18,9 @@ class Logger
   {
     $this->add_log_device($log_device);
     
-    if (file_exists(TMP."/msgqueue-{$_SERVER['MISAGO_ENV']}")) {
+    if (PHP_SAPI != 'cli'
+      and file_exists(TMP."/msgqueue-{$_SERVER['MISAGO_ENV']}"))
+    {
       $this->msg_queue = msg_get_queue(ftok(TMP."/msgqueue-{$_SERVER['MISAGO_ENV']}", 'M'), 0666);
     }
   }
