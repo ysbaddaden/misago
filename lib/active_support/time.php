@@ -72,7 +72,7 @@ class Time extends Misago_Object
   function __toString()
   {
     if ($this->timestamp === false) {
-      return $this->raw_time;
+      return empty($this->raw_time) ? '' : (string)$this->raw_time;
     }
     switch($this->type)
     {
