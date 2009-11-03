@@ -208,7 +208,7 @@ class ActionController_CgiRequest extends Misago_Object implements ActionControl
     if (is_array($ary))
     {
 	    foreach(array_keys($ary) as $k) {
-		    sanitize_magic_quotes($ary[$k]);
+		    $this->sanitize_magic_quotes($ary[$k]);
 	    }
     }
     else {
