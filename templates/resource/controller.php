@@ -62,7 +62,7 @@ class #{Controller}Controller extends ApplicationController
       {
         case 'html': $this->render('new'); break;
         case 'xml': 
-        case 'json': $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
+        case 'json': $this->render(array($this->format => $this->#{model}->errors, 'status' => 412)); break;
       }
     }
   }
@@ -79,7 +79,7 @@ class #{Controller}Controller extends ApplicationController
       {
         case 'html': $this->redirect_to(show_#{model}_path($this->#{model})); break;
         case 'xml':
-        case 'json': $this->render(array('xml' => $this->#{model}, 'status' => 200)); break;
+        case 'json': $this->render(array($this->format => $this->#{model}, 'status' => 200)); break;
 #        case 'json': $this->head(200); break;
       }
     }
@@ -89,7 +89,7 @@ class #{Controller}Controller extends ApplicationController
       {
         case 'html': $this->render('edit'); break;
         case 'xml':
-        case 'json': $this->render(array('xml' => $this->#{model}->errors, 'status' => 412)); break;
+        case 'json': $this->render(array($this->format => $this->#{model}->errors, 'status' => 412)); break;
       }
     }
   }
