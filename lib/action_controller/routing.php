@@ -8,11 +8,13 @@
 # 
 #   $map = ActionController_Routing::draw();
 #   
-#   # basic route: connects `/login` to `AccountsController::login()`
-#   $map->connect('login', array(':controller' => 'accounts',
-#     ':action' = 'login'));
+#   # basic route: connects +/login+ to +AccountsController::login()+
+#   $map->connect('login', array(
+#     ':controller' => 'accounts',
+#     ':action'     => 'login'
+#   ));
 #   
-#   # landing page: `/` => `HomeController::index()`
+#   # landing page: +/+ => +HomeController::index()+
 #   $map->root(array(':controller' => 'home'));
 #   
 #   # default route
@@ -31,7 +33,7 @@
 #   $map->named('purchase', 'products/:id/purchase',
 #     array(':controller' => 'order', ':action' => 'purchase'));
 # 
-# This will create the following functions: `purchase_path()` and `purchase_url()`,
+# This will create the following functions: +purchase_path()+ and +purchase_url()+,
 # which you may use like this:
 # 
 #   purchase_path(1);
@@ -41,7 +43,7 @@
 # =Requirements (Regular Expressions)
 # 
 # You may check parameters by using regular expressions. A route that doesn't match
-# requirements isn't matched. In this example `:id` must be an integer:
+# requirements isn't matched. In this example +:id+ must be an integer:
 # 
 #   $map->connect('/posts/:id', array(':controller' => 'posts',
 #     'requirements' => array(':id' => '\d+')));
@@ -55,15 +57,15 @@
 #   $this->connect('login', array(':controller' => 'accounts', ':action' => 'login',
 #     'conditions' => array('method' => 'POST')));
 # 
-# Using named routes with conditions, returned URL will be an +ActionController_Url+
-# or +ActionController_Path+ object, that will be transparently handled by view's
+# Using named routes with conditions, returned URL will be an <tt>ActionController_Url</tt>
+# or <tt>ActionController_Path</tt> object, that will be transparently handled by view's
 # helpers to generate links and forms that will use the correct HTTP method.
 # 
 # =RESTful routes
 # 
 # REST webservices are handled transparently by misago.
 # 
-# Attention: in RESTful routes `:id` must be an integer.
+# Attention: in RESTful routes +:id+ must be an integer.
 # 
 # Example:
 # 
@@ -80,7 +82,7 @@
 #   DELETE /posts/:id      => PostsController::delete()
 # 
 # Of course being named routes it also creates the following helper functions
-# (they also exists with the `_url` form):
+# (they also exists with the +_url+ form):
 # 
 #   posts_path()       => GET    /posts
 #   new_post_path()    => GET    /posts/new
@@ -234,7 +236,7 @@ class ActionController_Routing extends Misago_Object
   
   # Returns a mapping for a given method+path.
   # 
-  # @private
+  # :private:
   function & route($method, $uri)
   {
     $uri = trim($uri, '/');
@@ -288,7 +290,7 @@ class ActionController_Routing extends Misago_Object
   # 
   # FIXME: Handle special requirements for keys to select the route.
   # 
-  # @private
+  # :private:
   function reverse(array $mapping)
   {
     $_mapping = array_merge(array(
@@ -346,7 +348,7 @@ class ActionController_Routing extends Misago_Object
   
   # Builds the named routes helper functions.
   # 
-  # @private
+  # :private:
   function build_named_route_helpers()
   {
     if (DEBUG
@@ -380,7 +382,7 @@ class ActionController_Routing extends Misago_Object
     return $func;
   }
   
-  # @private
+  # :nodoc:
   static function named_function_path(&$route, $keys)
   {
     $method = isset($route['mapping']['conditions']['method']) ?
@@ -389,7 +391,7 @@ class ActionController_Routing extends Misago_Object
     return new ActionController_Path($method, $path);
   }
   
-  # @private
+  # :nodoc:
   static function named_function_url(&$route, $keys)
   {
     $method = isset($route['mapping']['conditions']['method']) ?
@@ -448,6 +450,7 @@ class ActionController_Routing extends Misago_Object
     return $path.(empty($query_string) ? '' : "?{$query_string}");
   }
   
+  # Returns the full list of routes.
   static function collect()
   {
     $map = ActionController_Routing::draw();
@@ -459,13 +462,13 @@ class ActionController_Routing extends Misago_Object
 # 
 # Options:
 # 
-# - `anchor`: adds an anchor to the URL.
-# - `path_only`: false to return an absolute URI, true to return the path only (defaults to true).
-# - `protocol`: overwrites the current protocol.
-# - `host`: overwrites the current host.
-# - `port`: overwrites the current port.
-# - `user`: username for HTTP login.
-# - `password`: password for HTTP login.
+# - +anchor+: adds an anchor to the URL.
+# - +path_only+: false to return an absolute URI, true to return the path only (defaults to true).
+# - +protocol+: overwrites the current protocol.
+# - +host+: overwrites the current host.
+# - +port+: overwrites the current port.
+# - +user+: username for HTTP login.
+# - +password+: password for HTTP login.
 # 
 # Example:
 # 
@@ -485,7 +488,7 @@ class ActionController_Routing extends Misago_Object
 #   url_for(array(':controller' => 'about', 'anchor' => 'me'))
 #   # => http://www.domain.com/about#me
 # 
-# Using REST resources, you may pass an ActiveRecord directly. For instance:
+# Using REST resources, you may pass an <tt>ActiveRecord</tt> directly. For instance:
 # 
 #   $product = new Product(43);
 #   $url = url_for(product);    # => http://www.domain.com/products/3
@@ -493,7 +496,7 @@ class ActionController_Routing extends Misago_Object
 # IMPROVE: url_for: handle specified options (host, protocol, etc.)
 # IMPROVE: url_for: permit for simplified calls, like url_for(array(':action' => 'index')), which shall use the current controller.
 # 
-# @namespace ActionController
+# :namespace: ActionController
 function url_for($options)
 {
   if ($options instanceof ActiveRecord_Record)

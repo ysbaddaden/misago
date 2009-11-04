@@ -6,6 +6,8 @@
 # 
 # Note: PostgreSQL client library isn't capable to switch between
 #       databases. You need to reconnect to achieve this.
+# 
+# See <tt>ActiveRecord_ConnectionAdapters_AbstractAdapter</tt> for documentation.
 class ActiveRecord_ConnectionAdapters_PostgresqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(

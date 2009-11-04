@@ -35,7 +35,6 @@ if (!isset($arguments[0]))
 }
 
 
-# @package Generator
 class Generator_Base
 {
   protected $options = array();

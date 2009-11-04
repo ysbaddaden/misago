@@ -1,7 +1,6 @@
 <?php
-/**
- * Abstract adapter to build real ActiveRecord adapters.
- */
+
+# Abstract adapter to build real <tt>ActiveRecord</tt> adapters.
 abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '"';
@@ -206,7 +205,8 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # Accepts an array, hash, or string of SQL conditions and
   # sanitizes them into a valid SQL fragment for a WHERE clause.
   # 
-  # See sanitize_sql_array() and sanitize_sql_hash() for examples.
+  # See <tt>sanitize_sql_array</tt> and <tt>sanitize_sql_hash</tt>
+  # for examples.
   # 
   function sanitize_sql_for_conditions($conditions)
   {
@@ -302,16 +302,15 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
     return new ActiveRecord_Table($table, $options, $this);
   }
   
-  /**
-   * Creates a table.
-   * 
-   * Definition:
-   * 
-   * - temporary (bool), true to create a temporary table
-   * - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
-   * - options   (string), eg: "engine = innodb"
-   * - force     (null, bool), true: drop table before create, false: create if not exists
-   */
+  # Creates a table.
+  # 
+  # Definition:
+  # 
+  # - temporary (bool), true to create a temporary table
+  # - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
+  # - options   (string), eg: "engine = innodb"
+  # - force     (null, bool), true: drop table before create, false: create if not exists
+  #
   function create_table($table, array $definition)
   {
     if (empty($definition['columns'])) {

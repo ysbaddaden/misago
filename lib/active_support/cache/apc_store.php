@@ -1,7 +1,7 @@
 <?php
 
 # A Cache Store implementation which stores data with APC.
-# See +ActiveSupport_Cache_Store+ for help.
+# See <tt>ActiveSupport_Cache_Store</tt> for help.
 class ActiveSupport_Cache_ApcStore extends ActiveSupport_Cache_Store
 {
   function read($key)

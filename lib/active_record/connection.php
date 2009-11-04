@@ -23,7 +23,7 @@ class ActiveRecord_Connection
   # Creates a singleton (one single connection object per configuration entry).
   # 
   # Shouldn't be called directly, except on a few circumstances.
-  # Use ActiveRecord_Connection::get() instead.
+  # Use +get()+ instead.
   static function create($environment)
   {
     if (!isset(self::$configurations)) {

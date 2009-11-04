@@ -5,7 +5,7 @@ class cfg
 {
   static protected $data = array();
   
-  # Gets a config variable if it exists, otherwise returns `$default`.
+  # Gets a config variable if it exists, otherwise returns +$default+.
   static function get($var, $default=null)
   {
     return isset(cfg::$data[$var]) ? cfg::$data[$var] : $default;

@@ -3,7 +3,7 @@
 # Response data.
 # 
 # This is some Misaso internal, response should never be used directly.
-# You should use methods from +ActionController_Base+ instead.
+# You should use methods from <tt>ActionController_Base</tt> instead.
 # 
 class ActionController_AbstractResponse extends Misago_Object
 {

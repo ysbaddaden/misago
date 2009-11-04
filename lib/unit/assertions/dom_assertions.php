@@ -3,22 +3,26 @@
 class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
 {
   # HTML strings must be identical, up to attributes.
+  # TODO: assert_dom_equal
   function assert_dom_equal($dom, $expected, $comment='')
   {
     
   }
   
-  # Negated form of assert_dom_equal().
+  # Negated form of <tt>assert_dom_equal</tt>.
+  # TODO: assert_dom_not_equal
   function assert_dom_not_equal($dom, $expected, $comment='')
   {
     
   }
   
+  # TODO: assert_tag
   function assert_tag($options=array(), $comment='')
   {
     
   }
   
+  # TODO: assert_no_tag
   function assert_no_tag($options=array(), $comment='')
   {
     

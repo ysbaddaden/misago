@@ -1,6 +1,6 @@
 <?php
 
-# @namespace ActiveSupport
+# :namespace: ActiveSupport
 class ActiveArray extends ArrayObject
 {
   public $model;

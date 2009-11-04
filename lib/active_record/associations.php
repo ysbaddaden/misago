@@ -7,8 +7,8 @@
 # ==belongs_to
 #
 # Represents a one-to-one relationship, in the point of view
-# of the child. The counterpart is either a `has_one` or
-# `has_many` relationship (see below).
+# of the child. The counterpart is either a has_one or
+# has_many relationship (see below).
 # 
 # ===Example: 
 # 
@@ -40,11 +40,11 @@
 # ==has_one
 # 
 # Represents a one-to-one relationship, in the point of view
-# of the parent. The counterpart is a `belongs_to` relationship.
+# of the parent. The counterpart is a belongs_to relationship.
 # 
 # The difference with a belongs_to relationship, is where the
-# foreign key is located: in this model for a `belongs_to`
-# relationship; in the related model for a `has_one` relationship.
+# foreign key is located: in this model for a belongs_to
+# relationship; in the related model for a has_one relationship.
 # 
 # ===Example:
 #
@@ -77,7 +77,7 @@
 # ==has_many
 # 
 # Represents a one-to-many relationship, in the point of view
-# of the parent. The counterpart is a `belongs_to` relationship.
+# of the parent. The counterpart is a belongs_to relationship.
 # 
 # ===Example: 
 # 
@@ -112,7 +112,7 @@
 # 
 # ===:through
 # 
-# Declares a `has_many` relationship, but through a join model.
+# Declares a has_many relationship, but through a join model.
 # 
 # [TODO]
 # 
@@ -158,9 +158,9 @@
 # with no primary key but containing foreign keys of both models.
 # 
 # The join table name is made by comparing sizes of both models'
-# name, using the '<' operator. The smaller one before. For our
+# name, using the +<+ operator. The smaller one before. For our
 # previous example, the projects-programmers relationship, the
-# join table name would be <code>programmers_projects</code>.
+# join table name would be +programmers_projects+.
 # 
 # In fact previous example requires the following table and
 # fields:
@@ -175,9 +175,9 @@
 # 
 # ==Singular associations (one-to-one)
 # 
-# Declaring a `belongs_to` or `has_one` association generates the following
-# attributes and methods (where `other` is the name of the relation, for
-# instance `invoice`, `post`, etc).
+# Declaring a +belongs_to+ or +has_one+ association generates the following
+# attributes and methods (where +other+ is the name of the relation, for
+# instance +invoice+, +post+, etc).
 # 
 # - other
 # - build_other($attributes=array())
@@ -185,9 +185,9 @@
 # 
 # ==Plural associations (one-to-many / many-to-many)
 # 
-# Declaring a `has_many` or `has_and_belongs_to_many` association generates
-# the following attributes and methods (where `others` is the name of the
-# relation, for instance `posts`, `comments`, etc).
+# Declaring a +has_many+ or +has_and_belongs_to_many+ association generates
+# the following attributes and methods (where +others+ is the name of the
+# relation, for instance +posts+, +comments+, etc).
 # 
 # - others
 # - others.build($attributes=array())
@@ -199,7 +199,7 @@
 # - others.delete_all()
 # - others.destroy_all()
 # 
-# See +ActionController_Collection+ for details.
+# See <tt>ActionController_Collection</tt> for details.
 # 
 # = Dependent relations
 # 
@@ -222,20 +222,20 @@
 # 
 # == belongs_to
 # 
-# - `destroy`: calls the `delete` method of associated object.
-# - `delete`:  calls the `destroy` method of associated object.
+# - destroy: calls the +destroy+ method of associated object.
+# - delete:  calls the +delete+ method of associated object.
 # 
 # == has_one
 # 
-# - `destroy`: calls the `delete` method of associated object.
-# - `delete`:  calls the `destroy` method of associated object.
-# - `nullify`: nullifies the foreign key of associated object.
+# - destroy: calls the +destroy+ method of associated object.
+# - delete:  calls the +delete+ method of associated object.
+# - nullify: nullifies the foreign key of associated object.
 # 
 # == has_many
 # 
-# - `destroy`:    calls the `delete_all` method of the collection.
-# - `delete_all`: calls the `destroy_all` method of the collection.
-# - `nullify`:    nullifies the foreign key on associated objects.
+# - destroy:    calls the +destroy_all+ method of the collection.
+# - delete_all: calls the +delete_all+ method of the collection.
+# - nullify:    nullifies the foreign key on associated objects.
 # 
 # =Eager Loading (include)
 #
@@ -651,7 +651,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   
   
   # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
-  # @private
+  # :private:
   protected function save_associated()
   {
     $rs = true;
@@ -674,7 +674,7 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
   }
   
   # TEST: Test delete_associated() with belongs_to, has_one & has_many relationships.
-  # @private
+  # :private:
   protected function delete_associated()
   {
     $rs = true;
@@ -685,8 +685,8 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         case 'belongs_to':
           switch($this->associations[$assoc]['dependent'])
           {
-            case 'destroy': $this->$assoc->delete(); break;
-            case 'delete':
+            case 'delete': $this->$assoc->delete(); break;
+            case 'destroy':
               $obj = new $this->associations[$assoc]['class_name']();
               $obj->destroy_all(array($this->associations[$assoc]['primary_key'] => $this->id));
             break;
@@ -696,8 +696,8 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         case 'has_many':
           switch($this->associations[$assoc]['dependent'])
           {
-            case 'destroy': $this->$assoc->delete_all(); break;
-            case 'delete_all':
+            case 'delete_all': $this->$assoc->delete_all(); break;
+            case 'destroy':
               $obj = new $this->associations[$assoc]['class_name']();
               $obj->destroy_all(array($this->associations[$assoc]['foreign_key'] => $this->id));
             break;
@@ -711,8 +711,8 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
         case 'has_one':
           switch($this->associations[$assoc]['dependent'])
           {
-            case 'destroy': $this->$assoc->delete(); break;
-            case 'delete':
+            case 'delete': $this->$assoc->delete(); break;
+            case 'destroy':
               $obj = new $this->associations[$assoc]['class_name']();
               $obj->destroy_all(array($this->associations[$assoc]['foreign_key'] => $this->id));
             break;

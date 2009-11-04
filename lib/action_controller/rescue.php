@@ -71,7 +71,7 @@ abstract class ActionController_Rescue extends Misago_Object
   }
   
   # Catches exceptions raised on production, to remote computers.
-  # Defaults to call +render_optional_error_file()+.
+  # Defaults to call <tt>render_optional_error_file()</tt>.
   function rescue_action_in_public($exception)
   {
     $status_code = ($exception instanceof MisagoException) ? $exception->getCode() : 500;
@@ -79,7 +79,7 @@ abstract class ActionController_Rescue extends Misago_Object
   }
   
   # Tries to render a static error page. At first it tries to load a localized file
-  # (for instance `500.fr.html`), then tries to load a generic file (`500.html`),
+  # (for instance +500.fr.html+), then tries to load a generic file (+500.html+),
   # and falls back to display the raw error.
   function render_optional_error_file($status_code)
   {

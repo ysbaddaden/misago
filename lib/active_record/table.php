@@ -29,10 +29,10 @@ class ActiveRecord_Table
   # 
   # Options: 
   # 
-  # - `id` (boolean): automatically create the primary key column (default)
-  # - `options`: addition to table creation (eg: 'engine=myisam')
-  # - `temporary` (bool): true to create a temporary table
-  # - `force` (null, bool): true to drop table before create, otherwise creates if not exists
+  # - +id+: true to automatically create the primary key column (default)
+  # - +options+: addition to table creation (eg: 'engine=myisam')
+  # - +temporary+: true to create a temporary table
+  # - +force+: true to drop table before create, otherwise creates if not exists
   # 
   function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $connection)
   {
@@ -52,25 +52,25 @@ class ActiveRecord_Table
   # 
   # Types:
   # 
-  # - `primary_key` (auto_increment integer, serial, ...)
-  # - `string`
-  # - `text`
-  # - `integer`
-  # - `float`
-  # - `decimal`
-  # - `date`
-  # - `time`
-  # - `datetime`
-  # - `boolean`
-  # - `binary`
+  # - +primary_key+ (auto_increment integer, serial, ...)
+  # - +string+
+  # - +text+
+  # - +integer+
+  # - +float+
+  # - +decimal+
+  # - +date+
+  # - +time+
+  # - +datetime+
+  # - +boolean+
+  # - +binary+
   # 
   # Options:
   # 
-  # - `primary_key` (boolean): column is the primary key?
-  # - `null` (boolean): can the column be null?
-  # - `limit` (integer): maximum size
-  # - `default`: default value
-  # - `signed` (boolean): is the integer/float column signed?
+  # - +primary_key+ (boolean): column is the primary key?
+  # - +null+ (boolean): can the column be null?
+  # - +limit+ (integer): maximum size
+  # - +default+: default value
+  # - +signed+ (boolean): is the integer/float column signed?
   # 
   # Examples:
   # 
@@ -97,9 +97,9 @@ class ActiveRecord_Table
   # 
   # Types:
   # 
-  # - `date`: will add `created_on` & `updated_on`.
-  # - `time`: will add `created_at` & `updated_at`.
-  # - `datetime`: will add `created_at` & `updated_at`.
+  # - +date+: will add +created_on+ & +updated_on+.
+  # - +time+: will add +created_at+ & +updated_at+.
+  # - +datetime+: will add `created_at+ & +updated_at+.
   # 
   function add_timestamps($type='datetime')
   {

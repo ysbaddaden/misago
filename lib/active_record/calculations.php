@@ -7,16 +7,17 @@ class ActiveRecord_Calculations extends ActiveRecord_Behaviors
 {
   # Generic calculation method.
   # 
-  # Use whatever mathematic SQL function. For +count+, +average+,
-  # +sum+, +minimum+ and +maximum+, use the optimized methods instead.
+  # Use whatever mathematic SQL function. For <tt>count</tt>, <tt>average</tt>,
+  # <tt>sum</tt>, <tt>minimum</tt> and <tt>maximum</tt>, use the optimized
+  # methods instead.
   # 
-  # It returns a single float/integer if no `group` option is present.
-  # otherwise returns a `column => value` pair hash.
+  # It returns a single float/integer if no +group+ option is present.
+  # otherwise returns a column => value pair hash.
   # 
   # Options:
   # 
-  # - `select`
-  # - `distinct`
+  # - select
+  # - distinct
   # 
   function calculate($operation, $column='*', $options=array())
   {

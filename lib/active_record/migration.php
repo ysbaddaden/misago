@@ -6,7 +6,7 @@ class ActiveRecord_Migration
   # Database Object.
   protected $connection;
   
-  # Alias for `$connection`.
+  # Alias for +$connection+.
   protected $db;
   protected $version;
   

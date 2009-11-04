@@ -1,7 +1,8 @@
 <?php
 # Request data.
 # 
-# CgiRequest and TestRequet proposes an actual implementation.
+# <tt>ActionController_CgiRequest</tt> and <tt>ActionController_TestRequet</tt>
+# proposes an actual implementation.
 interface ActionController_AbstractRequest
 {
 #  public $headers;

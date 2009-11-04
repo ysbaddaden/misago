@@ -14,7 +14,7 @@
 # authentification check action caching below.
 # 
 # Please note that GET parameters are overlooked by the cache, which
-# means that `/members.rss` and `/members.rss?limit=10` will share the
+# means that +/members.rss+ and +/members.rss?limit=10+ will share the
 # same cache file.
 # 
 # ==Example
@@ -34,7 +34,7 @@
 # 
 # ==Conditions
 # 
-# You may set conditions with `if` and `unless` options. Both
+# You may set conditions with +if+ and +unless+ options. Both
 # accept any parameter that might be present in path parameters.
 # 
 # 
@@ -46,8 +46,8 @@
 # only available to authenticated users for instance.
 # 
 # The cache key is made from the host (and port), the path of the
-# request and the GET parameters. Which means that `x.domain.com/list`,
-# `y.domain.com/list` and `x.domain.com/list?page=2` will be different
+# request and the GET parameters. Which means that +x.domain.com/list+,
+# +y.domain.com/list+ and +x.domain.com/list?page=2+ will be different
 # caches. This allows for subdomains personalization for instance.
 # 
 # ==Example
@@ -100,7 +100,7 @@ abstract class ActionController_Caching extends ActionController_Filters
     }
   }
   
-	# See +ActiveSupport_Cache+.
+	# See <tt>ActiveSupport_Cache</tt>.
   function cache()
   {
     if (!isset($this->cache))
@@ -113,7 +113,7 @@ abstract class ActionController_Caching extends ActionController_Filters
   }
   
   
-  # Manually caches the current request as a real file into the `public` folder.
+  # Manually caches the current request as a real file into the +public+ folder.
   function cache_page($content=null, $options=null)
   {
     $path = $this->page_cache_key($options);
@@ -185,7 +185,7 @@ abstract class ActionController_Caching extends ActionController_Filters
   }
   
   
-  # @private
+  # :private:
   protected function shall_we_cache_page()
   {
     if (isset($this->caches_page[$this->action]))
@@ -208,7 +208,7 @@ abstract class ActionController_Caching extends ActionController_Filters
     return false;
   }
   
-  # @private
+  # :private:
   protected function shall_we_cache_action()
   {
     if (isset($this->caches_page[$this->action]))
@@ -231,7 +231,7 @@ abstract class ActionController_Caching extends ActionController_Filters
     return false;
   }
   
-  # @private
+  # :private:
   protected function cache_action()
   {
     $options = array_merge(array('path_only' => false, ':format' => $this->format), $this->params);

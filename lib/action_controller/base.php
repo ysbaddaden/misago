@@ -26,29 +26,29 @@
 # 
 # An ActionController is composed of the following classes:
 # 
-# - +ActionController_Base+
-# - +ActionController_Caching+
-# - +ActionController_Filters+
-# - +ActionController_Rescue+
+# - <tt>ActionController_Base</tt>
+# - <tt>ActionController_Caching</tt>
+# - <tt>ActionController_Filters</tt>
+# - <tt>ActionController_Rescue</tt>
 # 
 # And uses some objects:
 # 
-# - `$cache`: +ActionController_Cache_Store+
-# - `$flash`: +ActionController_Flash+
-# - `$request`: +ActionController_AbstractRequest+
+# - +$cache+: <tt>ActionController_Cache_Store</tt>
+# - +$flash+: <tt>ActionController_Flash</tt>
+# - +$request+: <tt>ActionController_AbstractRequest</tt>
 # 
 # =Renders
 # 
-# Actions, by default, render a view from `app/views` using the name of
+# Actions, by default, render a view from +app/views+ using the name of
 # the controller for the folder, the name of the action for the template,
-# and the current format (default to `html`).
+# and the current format (defaults to +html+).
 # 
-# For instance calling `/posts/index` will process `PostsController::index()`
-# and render `app/views/posts/show.html.tpl`.
+# For instance calling +/posts/index+ will process +PostsController::index()+
+# and render +app/views/posts/show.html.tpl+.
 # 
 # ==Attributes
 # 
-# Any attribute your define in your action to your controller, will then be
+# Any attribute you define in your action to your controller, will then be
 # available to your view. For instance:
 #
 #   class PostsController extends ActionController_Base
@@ -58,7 +58,7 @@
 #     }
 #   }
 # 
-# Then in your view you can access `$this->post`:
+# Then in your view you can access +$this->post+:
 # 
 #   <h1><\?= $this->post->title ?\></h1>
 # 
@@ -66,7 +66,7 @@ abstract class ActionController_Base extends ActionController_Caching
 {
   public $helpers = ':all';
   
-  # See +ActionController_Flash+.
+  # See <tt>ActionController_Flash</tt>.
   public $flash;
   
   # The currently executed action.
@@ -78,14 +78,13 @@ abstract class ActionController_Base extends ActionController_Caching
   # Template folder containing views.
   public $view_path;
 	
-	# Request data. See +ActionController_AbstractRequest+.
+	# Request data. See <tt>ActionController_AbstractRequest</tt>.
   protected $request;
   
-  # Response data. See +ActionController_AbstractResponse+.
-  # @private
+  # Response data. See <tt>ActionController_AbstractResponse</tt>.
   protected $response;
   
-  # @private
+  # :private:
   protected $already_rendered = false;
 
   # True to skip rendering.
@@ -116,7 +115,7 @@ abstract class ActionController_Base extends ActionController_Caching
     return parent::__set($attr, $value);
   }
   
-  # @private
+  # :private:
   function process($request=null, $response=null)
   {
     $request_time = microtime(true);
@@ -186,7 +185,7 @@ abstract class ActionController_Base extends ActionController_Caching
     ));
   }
   
-  # @private
+  # :private:
   protected function process_action()
   {
     $this->{$this->action}();
@@ -234,8 +233,8 @@ abstract class ActionController_Base extends ActionController_Caching
   # 
   # =Layouts
   # 
-  # By default controller's layout (eg: layouts/posts.html.tpl) is used,
-  # and falls back to the generic default layout (layouts/default.html.tpl).
+  # By default controller's layout (eg: +layouts/posts.html.tpl+) is used,
+  # and falls back to the generic default layout (+layouts/default.html.tpl+).
   # 
   #   # use a particular layout:
   #   render(array('action' => 'create', 'layout' => 'admin'));
@@ -341,7 +340,7 @@ abstract class ActionController_Base extends ActionController_Caching
   }
   
   # Renders a view or exports a resource, returned as a string.
-  # See +render()+ for documentation.
+  # See <tt>render()</tt> for documentation.
   function render_to_string($options=null)
   {
     $this->render($options);

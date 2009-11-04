@@ -1,5 +1,5 @@
 <?php
-# @namespace ActiveSupport
+# :namespace: ActiveSupport
 class Time extends Misago_Object
 {
   protected $raw_time;

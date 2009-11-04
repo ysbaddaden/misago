@@ -2,9 +2,9 @@
 
 # Renders templates.
 # 
-# See +ActionController_Base::render()+ for actual help, since
+# See <tt>ActionController_Base::render()</tt> for actual help, since
 # you shall not need to use this object directly, except for
-# a few methods, like +yield+ or rendering partials.
+# a few methods, like <tt>yield</tt> or rendering partials.
 # 
 class ActionView_Base extends Misago_Object
 {
@@ -47,7 +47,7 @@ class ActionView_Base extends Misago_Object
     }
   }
   
-  # @private
+  # :private:
   protected function _find_helpers(&$helpers, $path)
   {
     $dh = opendir($path);
@@ -67,33 +67,33 @@ class ActionView_Base extends Misago_Object
   # 
   # = Generic option(s):
   # 
-  # - format: which format to use? defaults to 'html'
+  # - format: which format to use? defaults to +html+
   # 
   # = Render a view:
   # 
   #   render(array('action' => 'index'));
   # 
-  # This will render the view 'index.html.tpl'.
+  # This will render the view +index.html.tpl+.
   # 
   # = Render a view inside a layout:
   # 
   #   render(array('action' => 'index', 'layout' => 'products'));
   # 
-  # This will render the view 'index.html.tpl' inside the layout 'products.html.tpl'.
+  # This will render the view +index.html.tpl+ inside the layout +products.html.tpl+.
   # 
   # = Render a partial:
   # 
   #   render(array('partial' => 'form'));
   #   render(array('partial' => 'form', 'locals' => array('f' => $f)));
   # 
-  # This will render the partial '_form.html.tpl'.
+  # This will render the partial +_form.html.tpl+.
   # 
   # = Render a collection of partials:
   # 
   #   render(array('partial' => 'product', 'collection' => $products));
   # 
   # The collection must be an array or an iterable object.
-  # This will create the following local vars: $product and $product_counter.
+  # This will create the following local vars: +$product+ and +$product_counter+.
   # 
   # = Rendering shared partials
   # 
@@ -102,7 +102,7 @@ class ActionView_Base extends Misago_Object
   #   render(array('partial' => 'posts/post'));
   #   render(array('partial' => 'posts/post', 'collection' => $posts));
   # 
-  # This will render the partial 'posts/_post.html.tpl', regardless of
+  # This will render the partial +posts/_post.html.tpl+, regardless of
   # which controller this is being called from.
   # 
   function render($options)
@@ -228,7 +228,7 @@ class ActionView_Base extends Misago_Object
   }
   
   # Copies public vars from controller, not overriding view's own class vars.
-  # @private
+  # :private:
   protected function copy_controller_vars()
   {
     $this->params =& $this->controller->params;

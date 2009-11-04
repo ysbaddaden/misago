@@ -2,11 +2,11 @@
 
 # Abstract cache storage.
 # 
-# See +ActiveSupport_Cache_ApcStore+, +ActiveSupport_Cache_MemcacheStore+
-# or +ActiveSupport_Cache_FileStore+ for actual implementations. You may
+# See <tt>ActiveSupport_Cache_ApcStore<tt>, <tt>ActiveSupport_Cache_MemcacheStore</tt>
+# or <tt>ActiveSupport_Cache_FileStore</tt> for actual implementations. You may
 # build your own implementation, too.
 # 
-# Note: +ActiveSupport_Cache+ is meant to store strings. An implementation
+# Note: <tt>ActiveSupport_Cache</tt> is meant to store strings. Some implementations
 # may store something else (like objects), but that shouldn't be used.
 abstract class ActiveSupport_Cache_Store extends Misago_Object
 {
@@ -15,9 +15,7 @@ abstract class ActiveSupport_Cache_Store extends Misago_Object
   
   # Sets a variable.
   # 
-  # Possible options:
-  # 
-  # - `expires_in`: the number of seconds that this value may live in cache.
+  # - expires_in: the number of seconds that this value may live in cache.
   # 
   abstract function write($key, $value, $options=array());
   
@@ -30,7 +28,7 @@ abstract class ActiveSupport_Cache_Store extends Misago_Object
   # Invalidates the whole cache at once.
   abstract function clear();
   
-  # Increments a variable by `amount`.
+  # Increments a variable by +$amount+.
   function increment($key, $amount=1)
   {
     $value = $this->fetch($key, 0) + $amount;
@@ -38,7 +36,7 @@ abstract class ActiveSupport_Cache_Store extends Misago_Object
     return $value;
   }
   
-  # Decrements a variable by `amount`.
+  # Decrements a variable by +$amount+.
   function decrement($key, $amount=1)
   {
     $value = max($this->fetch($key, 0) - $amount, 0);
@@ -46,7 +44,7 @@ abstract class ActiveSupport_Cache_Store extends Misago_Object
     return $value;
   }
   
-  # Gets a variable if available, otherwise returns `default`.
+  # Gets a variable if available, otherwise returns +$default+.
   function fetch($key, $default=null)
   {
     $value = $this->read($key);

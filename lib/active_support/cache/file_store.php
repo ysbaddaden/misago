@@ -1,7 +1,7 @@
 <?php
 
 # An Cache Store implementation which stores data in files.
-# See +ActiveSupport_Cache_Store+ for help.
+# See <tt>ActiveSupport_Cache_Store</tt> for help.
 class ActiveSupport_Cache_FileStore extends ActiveSupport_Cache_Store
 {
   private $cache_dir;
