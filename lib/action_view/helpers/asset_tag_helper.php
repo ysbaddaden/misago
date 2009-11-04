@@ -1,36 +1,23 @@
 <?php
 
-# Renders HTML tags to include assets like images, stylesheets and
-# javascript files in your pages.
-# 
-# =Timestamps
-# 
-# The last modification date is always added to all local and existing
-# assets. This permits for browser-side HTTP caching. The actual HTTP
-# caching must be handled by your web server (ie. the 'compress' module
-# of LightTPD).
-# 
-class ActionView_Helpers_AssetTag_NS
-{  
-  # @private
-  static function linearize_path($base_path, $path)
-  {
-    if (is_array($path)) {
-      return url_for($path);
-    }
-    
-    $path = trim($path);
-    if (strpos($path, 'http://') !== 0)
-    {
-      if (strpos($path, '/') !== 0) {
-        $path = "$base_path/$path";
-      }
-      if (file_exists(ROOT.'/public'.$path)) {
-        $path .= '?'.filemtime(ROOT.'/public'.$path);
-      }
-    }
-    return $path;
+# :nodoc:
+function ActionView_Helpers_AssetTag_linearize_path($base_path, $path)
+{
+  if (is_array($path)) {
+    return url_for($path);
   }
+  
+  $path = trim($path);
+  if (strpos($path, 'http://') !== 0)
+  {
+    if (strpos($path, '/') !== 0) {
+      $path = "$base_path/$path";
+    }
+    if (file_exists(ROOT.'/public'.$path)) {
+      $path .= '?'.filemtime(ROOT.'/public'.$path);
+    }
+  }
+  return $path;
 }
 
 # Creates a LINK tag for an auto-detectable feed link (either RSS or ATOM).
@@ -47,7 +34,7 @@ class ActionView_Helpers_AssetTag_NS
 #   auto_discovery_link_tag('atom', blog_posts_url(array(':format' => 'xml')),
 #     array('title' => 'Subscribe to this blog'));
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function auto_discovery_link_tag($type='rss', $url=null, $attributes=array())
 {
   $attributes = array_merge(array(
@@ -65,10 +52,10 @@ function auto_discovery_link_tag($type='rss', $url=null, $attributes=array())
 #   image_path('/path/to/logo.jpg'); # /path/to/logo.jpg
 #   image_path('http://mybrand.com/path/to/logo.jpg'); # http://mybrand.com/path/to/logo.jpg
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function image_path($src)
 {
-  return ActionView_Helpers_AssetTag_NS::linearize_path('/img', $src);
+  return ActionView_Helpers_AssetTag_linearize_path('/img', $src);
 }
 
 # Linearizes a javascript path.
@@ -77,10 +64,10 @@ function image_path($src)
 #   javascript_path('/path/to/logo.js'); # /path/to/logo.js
 #   javascript_path('http://mybrand.com/logo.js'); # http://mybrand.com/logo.js
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function javascript_path($src)
 {
-  return ActionView_Helpers_AssetTag_NS::linearize_path('/js', $src);
+  return ActionView_Helpers_AssetTag_linearize_path('/js', $src);
 }
 
 # Linearizes a stylesheet path.
@@ -89,10 +76,10 @@ function javascript_path($src)
 #   stylesheet_path('/path/to/logo.css'); # /path/to/logo.css
 #   stylesheet_path('http://mybrand.com/css/logo.css'); # http://mybrand.com/css/logo.css
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function stylesheet_path($href)
 {
-  return ActionView_Helpers_AssetTag_NS::linearize_path('/css', $href);
+  return ActionView_Helpers_AssetTag_linearize_path('/css', $href);
 }
 
 # Renders an IMG tag.
@@ -101,7 +88,7 @@ function stylesheet_path($href)
 #   image_tag('logo.jpg', array('alt' => 'my logo',
 #     'title' => "Ain't my logo pretty?", 'class' => 'brand'));
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function image_tag($src, $attributes=null)
 {
   $attributes['src'] = image_path($src);
@@ -116,7 +103,7 @@ function image_tag($src, $attributes=null)
 #   javascript_include_tag('app.js');
 #   javascript_include_tag('framework.js', 'app.js');
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function javascript_include_tag($args)
 {
   $sources = func_get_args();
@@ -139,7 +126,7 @@ function javascript_include_tag($args)
 #   stylesheet_link_tag('reset.css', 'typography.css');
 #   stylesheet_link_tag('print.css', array('media' => 'print'));
 # 
-# @namespace ActionView_Helpers_AssetTag
+# :namespace: ActionView_Helpers_AssetTag
 function stylesheet_link_tag($args)
 {
   $sources = func_get_args();
