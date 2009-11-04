@@ -610,7 +610,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # Saves the record, but throws an exception on error.
   function do_save($perform_validation=true)
   {
-    if (!$this->save()) {
+    if (!$this->save($perform_validation)) {
       throw new ActiveRecord_RecordNotSaved('Record was not saved.');
     }
   }
