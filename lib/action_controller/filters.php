@@ -15,7 +15,7 @@
 # 
 # =Before filters
 # 
-# A `before_filter` method may return a boolean. In cas of false, the filters' chain
+# A +before_filter+ method may return a boolean. In cas of false, the filters' chain
 # will stop and the action won't be processed.
 # 
 abstract class ActionController_Filters extends ActionController_Rescue
@@ -32,7 +32,7 @@ abstract class ActionController_Filters extends ActionController_Rescue
   }
   
   
-  # Alias for +append_before_filter+.
+  # Alias for <tt>append_before_filter</tt>.
   protected function before_filter($filter, $options=null)
   {
     $filters = func_get_args();
@@ -52,7 +52,7 @@ abstract class ActionController_Filters extends ActionController_Rescue
   }
   
   
-  # Alias for +append_after_filter+.
+  # Alias for <tt>append_after_filter</tt>.
   protected function after_filter($filter, $options=null)
   {
     $filters = func_get_args();
@@ -108,7 +108,7 @@ abstract class ActionController_Filters extends ActionController_Rescue
   }
   
   
-  # @private
+  # :private:
   protected function process_before_filters()
   {
     foreach($this->before_filters as $filter)
@@ -126,7 +126,7 @@ abstract class ActionController_Filters extends ActionController_Rescue
     }
   }
   
-  # @private
+  # :private:
   protected function process_after_filters()
   {
     foreach($this->after_filters as $filter)
@@ -141,7 +141,7 @@ abstract class ActionController_Filters extends ActionController_Rescue
   }
 }
 
-# @private
+# :private:
 class ActionController_FailedFilter extends Exception
 {
   function __construct() {

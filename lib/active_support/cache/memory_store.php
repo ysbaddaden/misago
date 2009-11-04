@@ -1,9 +1,9 @@
 <?php
 
 # A Cache Store implementation which stores data in memory.
-# See +ActiveSupport_Cache_Store+ for help.
+# See <tt>ActiveSupport_Cache_Store</tt> for help.
 # 
-# Beware: variables aren't retained between requests with `MemoryStore`!
+# Beware: variables aren't retained between requests with +MemoryStore+!
 class ActiveSupport_Cache_MemoryStore extends ActiveSupport_Cache_Store
 {
   private $cache      = array();

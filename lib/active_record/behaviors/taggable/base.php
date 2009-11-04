@@ -24,7 +24,7 @@
 # 
 # =Find tagged with
 # 
-# Returns a collection of posts with the `javascript` tag:
+# Returns a collection of posts with the +javascript+ tag:
 # 
 #   $posts = $p->find_tagged_with('javascript');
 # 

@@ -1,7 +1,7 @@
 <?php
 # Mysql adapter.
 # 
-# See ActiveRecord_ConnectionAdapters_AbstractAdapter for documentation.
+# See <tt>ActiveRecord_ConnectionAdapters_AbstractAdapter</tt> for documentation.
 class ActiveRecord_ConnectionAdapters_MysqlAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {
   public  $COLUMN_QUOTE = '`';

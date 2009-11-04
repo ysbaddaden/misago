@@ -58,7 +58,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     return implode(', ', (array)$this);
   }
   
-  # @private
+  # :nodoc:
   function set($tags='')
   {
     if (empty($tags)) {
@@ -103,7 +103,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     $this->exchangeArray($tags);
   }
   
-  # @private
+  # :private:
   function & find_options($tags, $options=array())
   {
     $match_all = isset($options['match_all']) ? $options['match_all'] : false;
@@ -119,7 +119,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     return $this->parent->merge_options($options, $_options);
   }
   
-  # @private
+  # :private:
   function & find_conditions($tags, $match_all=false)
   {
     $tags = array_collection($tags);
@@ -150,7 +150,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     return "{$this->parent->table_name}.{$this->parent->primary_key} IN ( $conditions )";
   }
   
-  # @private
+  # :private:
   function & count_options($tags, $options)
   {
     $options = $this->find_options($tags, $options);
@@ -159,7 +159,7 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
     return $options;
   }
   
-  # @private
+  # :private:
   function & tag_count_options($options)
   {
     $_options = array(

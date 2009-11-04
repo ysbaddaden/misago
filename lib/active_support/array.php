@@ -1,7 +1,7 @@
 <?php
 
 # Checks wether an array is a hash of key/value pairs or just a list of values.
-# @namespace ActiveSupport_Array
+# :namespace: ActiveSupport\Array
 function is_hash($arr)
 {
   if (!is_array($arr)) {
@@ -22,7 +22,7 @@ function is_hash($arr)
 #   $collection = array_collection('a,b,  c, d');
 #   $collection = array_collection(array('a', ' b', 'c '));
 # 
-# @namespace ActiveSupport_Array
+# :namespace: ActiveSupport\Array
 function & array_collection($collection)
 {
   if (!is_array($collection)) {
@@ -40,7 +40,7 @@ function & array_collection($collection)
 }
 
 # Recursively merges hashes, overwriting non array/hash values.
-# @namespace ActiveSupport_Array
+# :namespace: ActiveSupport\Array
 function & hash_merge_recursive()
 {
   $hashes = func_get_args();
@@ -61,7 +61,7 @@ function & hash_merge_recursive()
 }
 
 # Recursively sorts arrays (skipping hashes).
-# @namespace ActiveSupport_Array
+# :namespace: ActiveSupport\Array
 function array_sort_recursive(&$ary)
 {
   sort($ary);
@@ -88,7 +88,8 @@ function array_sort_recursive(&$ary)
 #     'comments' => array('order' => 'created_at asc'),
 #   );
 # 
-function linearize_options_tree($ary)
+# :namespace: ActiveSupport\Array
+function linearize_option_tree($ary)
 {
   $h = array();
   foreach($ary as $k => $v)

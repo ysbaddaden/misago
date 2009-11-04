@@ -2,7 +2,7 @@
 
 # Checks wether the given URL is the current page or not.
 # 
-# Let's say we are visiting `/products?order=asc`:
+# Let's say we are visiting +/products?order=asc+:
 # 
 #   current_page('/products')
 #   # => true
@@ -19,7 +19,7 @@
 #   current_page(array(':controller' => '/products', 'order' => 'desc'))
 #   # => false
 # 
-# @namespace ActionView_Helpers_UrlHelper
+# :namespace: ActionView\Helpers\UrlHelper
 function current_page($url)
 {
   if (!$url instanceof ActionController_URL
@@ -68,9 +68,9 @@ function current_page($url)
 # 
 # Options:
 # 
-# - `confirm`: adds a JavaScript confirm dialog.
+# - confirm: adds a JavaScript confirm dialog.
 # 
-# @namespace ActionView_Helpers_UrlHelper
+# :namespace: ActionView\Helpers\UrlHelper
 function link_to($content, $url=null, $attributes=null)
 {
   if ($url === null) {
@@ -132,7 +132,7 @@ function link_to($content, $url=null, $attributes=null)
 # Renders a link unless it points to the current page. Otherwise
 # displays the content into a SPAN tag with no attributes.
 # 
-# @namespace ActionView_Helpers_UrlHelper
+# :namespace: ActionView\Helpers\UrlHelper
 function link_to_unless_current($content, $url, $attributes=null)
 {
   if (current_page($url)) {
@@ -145,10 +145,10 @@ function link_to_unless_current($content, $url, $attributes=null)
 # 
 # Special attributes:
 # 
-# - `method`: forces HTTP method
-# - `confirm`: asks for JavaScript confirmation before submitting form
+# - method: forces HTTP method
+# - confirm: asks for JavaScript confirmation before submitting form
 # 
-# @namespace ActionView_Helpers_UrlHelper
+# :namespace: ActionView\Helpers\UrlHelper
 function button_to($name, $url, $attributes=null)
 {
   if (is_array($url)) {
@@ -187,7 +187,7 @@ function button_to($name, $url, $attributes=null)
 #   mail_to('me@domain.com', 'another', array('class' => 'email'));
 #   # => <a class="email" href="mailto:me@domain.com">another</a>
 # 
-# @namespace ActionView_Helpers_UrlHelper
+# :namespace: ActionView\Helpers\UrlHelper
 function mail_to($email, $name=null, $options=null)
 {
   return link_to($name === null ? $email : $name, "mailto:$email", $options);

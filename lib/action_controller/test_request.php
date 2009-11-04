@@ -1,5 +1,5 @@
 <?php
-# @private
+# :nodoc: all
 class ActionController_TestRequest extends Misago_Object implements ActionController_AbstractRequest
 {
   public  $headers = array();

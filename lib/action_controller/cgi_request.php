@@ -8,7 +8,7 @@
 # 
 # CgiRequest handles all of that, and much more, transparently.
 # 
-# See +ActionController_AbstractRequest+ for actual documentation.
+# See <tt>ActionController_AbstractRequest</tt> for actual documentation.
 # 
 class ActionController_CgiRequest extends Misago_Object implements ActionController_AbstractRequest
 {

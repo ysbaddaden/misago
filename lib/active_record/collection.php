@@ -1,7 +1,7 @@
 <?php
 
 # Contains a collection of records.
-# Used by `has_many` and `HABTM` relationships.
+# Used by +has_many+ and +HABTM+ relationships.
 class ActiveRecord_Collection extends ActiveArray
 {
   protected $parent;
@@ -107,7 +107,7 @@ class ActiveRecord_Collection extends ActiveArray
   }
   
   
-  # @private
+  # :private:
   function _block_save()
   {
     $fk = $this->options['foreign_key'];
@@ -118,7 +118,7 @@ class ActiveRecord_Collection extends ActiveArray
     }
   }
   
-  # @private
+  # :private:
   function _block_delete()
   {
     $records = func_get_args();
@@ -136,7 +136,7 @@ class ActiveRecord_Collection extends ActiveArray
     return $removed;
   }
   
-  # @private
+  # :private:
   function _block_delete_all()
   {
     foreach($this as $record)
@@ -147,7 +147,7 @@ class ActiveRecord_Collection extends ActiveArray
     }
   }
   
-  # @private
+  # :private:
   function _block_destroy_all()
   {
     foreach($this as $record)

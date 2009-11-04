@@ -52,7 +52,7 @@ class ActionController_Flash extends ArrayObject
     }
   }
   
-  # @private
+  # :nodoc:
   function offsetSet($index, $value)
   {
     $this->hash[$index] = $value;

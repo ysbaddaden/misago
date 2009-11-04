@@ -4,11 +4,11 @@
 # 
 # Options:
 # 
-# - multipart: sets `enctype` to `multipart/form-data`;
+# - multipart: sets +enctype+ to +multipart/form-data+;
 # 
-# If method is different from GET or POST, a hidden field will be added: `_method`.
+# If method is different from GET or POST, a hidden +_method+ field will be added.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function form_tag($url, $attributes=null)
 {
   if (is_array($url)) {
@@ -32,7 +32,7 @@ function form_tag($url, $attributes=null)
     $attributes['enctype'] = "multipart/form-data";
     unset($attributes['multipart']);
   }
-  $attributes = ActionView_Helpers_TagHelper_NS::parse_attributes($attributes);
+  $attributes = ActionView_Helpers_TagHelper_parse_attributes($attributes);
   
   if ($method == 'get' or $method == 'post') {
     $str = "<form action=\"$url\" method=\"$method\"$attributes>";
@@ -47,7 +47,7 @@ function form_tag($url, $attributes=null)
 
 # Renders a form label.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function label_tag($name, $text=null, $attributes=null)
 {
   if (empty($text)) {
@@ -61,65 +61,65 @@ function label_tag($name, $text=null, $attributes=null)
 
 # Renders a hidden form field.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function hidden_field_tag($name, $value=null, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, 'hidden', $value, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, 'hidden', $value, $attributes);
   return tag('input', $attributes);
 }
 
 # Renders a text form field.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function text_field_tag($name, $value=null, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, 'text', $value, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, 'text', $value, $attributes);
   return tag('input', $attributes);
 }
 
 # Renders a text form area.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function text_area_tag($name, $content=null, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, null, null, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, null, null, $attributes);
   $content    = htmlspecialchars($content);
   return tag('textarea', $content, $attributes);
 }
 
 # Renders a password form field.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function password_field_tag($name, $value=null, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, 'password', $value, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, 'password', $value, $attributes);
   return tag('input', $attributes);
 }
 
 # Renders a file upload form field.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function file_field_tag($name, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, 'file', null, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, 'file', null, $attributes);
   return tag('input', $attributes);
 }
 
 # Renders a check box.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function check_box_tag($name, $value=1, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, 'checkbox', $value, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, 'checkbox', $value, $attributes);
   return tag('input', $attributes);
 }
 
 # Renders a radio button.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function radio_button_tag($name, $value, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, 'radio', $value, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, 'radio', $value, $attributes);
   return tag('input', $attributes);
 }
 
@@ -139,7 +139,7 @@ function radio_button_tag($name, $value, $attributes=null)
 #   $products = $post->find(':values', array('select' => 'id,name'));
 #   $html_options = options_for_select($products, 59);
 # 
-# @namespace ActionView_Helpers_FormHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function options_for_select($options, $selected=null)
 {
   if ($selected === null) {
@@ -169,7 +169,7 @@ function options_for_select($options, $selected=null)
 
 # Renders a select option field.
 # 
-# `$options` must be a string of OPTION tags. You may use +options_for_select+
+# +$options+ must be a string of OPTION tags. You may use <tt>options_for_select</tt>
 # to build it.
 # 
 # Example:
@@ -182,10 +182,10 @@ function options_for_select($options, $selected=null)
 #   $selected = 45;
 #   select_tag('type', options_for_select($options, $selected));
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function select_tag($name, $options=null, $attributes=null)
 {
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes($name, null, null, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes($name, null, null, $attributes);
   if (isset($attributes['multiple']))
   {
     if ($attributes['multiple']) {
@@ -200,7 +200,7 @@ function select_tag($name, $options=null, $attributes=null)
 
 # Renders a submit button.
 # 
-# @namespace ActionView_Helpers_FormTagHelper
+# :namespace: ActionView\Helpers\FormTagHelper
 function submit_tag($value=null, $name=null, $attributes=null)
 {
   if ($attributes === null and is_array($name))
@@ -211,7 +211,7 @@ function submit_tag($value=null, $name=null, $attributes=null)
   if ($name !== null) {
     $attributes['name'] = $name;
   }
-  $attributes = ActionView_Helpers_TagHelper_NS::input_attributes(null, 'submit', $value, $attributes);
+  $attributes = ActionView_Helpers_TagHelper_input_attributes(null, 'submit', $value, $attributes);
   return tag('input', $attributes);
 }
 

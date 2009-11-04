@@ -1,6 +1,7 @@
 <?php
 
 # parameters
+# :nodoc:
 class ServerConfig
 {
   static $environment = 'development';
@@ -107,6 +108,7 @@ echo "Hit Ctrl+c to shutdown misago\n";
 # signals (for clean shutdown)
 declare(ticks = 1);
 
+# :nodoc:
 function server_sig_handler($signo)
 {
   global $msg_queue, $fcgi_process, $http_process;

@@ -1,43 +1,41 @@
 <?php
+# This file is never actually loaded, it's just for pdoc.
 
-class ActionView_Helpers_TextHelper_NS
+# :nodoc:
+function ActionView_Helpers_TextHelper_replace_urls($match)
 {
-  # @private
-  static function preg_replace_urls($match)
-  {
-    return link_to($match[0]);
-  }
-  
-  # @private
-  static function preg_replace_email_addresses($match)
-  {
-    return mail_to($match[0]);
-  }
+  return link_to($match[0]);
+}
+
+# :nodoc:
+function ActionView_Helpers_TextHelper_replace_email_addresses($match)
+{
+  return mail_to($match[0]);
 }
 
 # Transforms all links and email addresses to clickable links.
 # 
-# - `link` limits what should be linked: all, email_addresses, urls.
+# - link: limits what should be linked (either one of all, email_addresses or urls).
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
 {
   if ($link == 'all' or $link == 'urls')
   {
     $text = preg_replace_callback('/(?:http|https|ftp|sftp|ssh):\/\/[^ ]+/',
-      array('ActionView_Helpers_TextHelper_NS', 'preg_replace_urls'), $text);
+      'ActionView_Helpers_TextHelper_replace_urls', $text);
   }
   if ($link == 'all' or $link == 'email_addresses')
   {
     $text = preg_replace_callback('/[^@ ]+\@[^ ]+/',
-      array('ActionView_Helpers_TextHelper_NS', 'preg_replace_email_addresses'), $text);
+      'ActionView_Helpers_TextHelper_replace_email_addresses', $text);
   }
   return $text;
 }
 
 # Extracts an excerpt from text that matches the first instance of phrase.
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function excerpt($text, $phrase, $radius=100, $omission='...')
 {
   $pos = strpos($text, $phrase);
@@ -55,7 +53,7 @@ function excerpt($text, $phrase, $radius=100, $omission='...')
 
 # Highlights some phrases in text using the MARK tag.
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
 {
   if (is_array($phrases))
@@ -68,9 +66,9 @@ function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
   return preg_replace('/('.$phrases.')/', $highlighter, $text);
 }
 
-# Pluralizes a word depending on `count`.
+# Pluralizes a word depending on +count+.
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function pluralize($count, $singular, $plural=null)
 {
   if ($count != 1) {
@@ -82,7 +80,7 @@ function pluralize($count, $singular, $plural=null)
 # Simple formatting of text. Two linefeeds make for a paragraph,
 # and a single linefeed makes for a line break.
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function simple_format($text)
 {
   $text = str_replace("\r", "", trim($text));
@@ -93,7 +91,7 @@ function simple_format($text)
 
 # Truncates a string if it's longer than length, and appends a truncate string to it.
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function truncate($text, $length=30, $truncate_string='...')
 {
   if (strlen($text) > $length) {
@@ -109,11 +107,11 @@ function truncate($text, $length=30, $truncate_string='...')
 # Requires PHP Markdown or PHP Markdown Extra by Michel Fortin:
 # http://michelf.com/projects/php-markdown/
 # 
-# You must strip all functions from `markdown.php`, keep defines,
-# rename the `Markdown_Parser` class to `Markdown`, and eventually
-# save it as `vendor/markdown.php`.
+# You must strip all functions from +markdown.php+, keep defines,
+# rename the +Markdown_Parser` class to +Markdown+, and eventually
+# save it as +vendor/markdown.php+.
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function markdown($text)
 {
 	$parser = new Markdown();
@@ -123,9 +121,9 @@ function markdown($text)
 # Formats text using the Textile syntax.
 # 
 # Download Textile from http://textile.thresholdstate.com/ and copy
-# `classTextile.php` to `vendor/textile.php`
+# +classTextile.php+ to +vendor/textile.php+
 # 
-# @namespace ActionView_Helpers_TextHelper
+# :namespace: ActionView\Helpers\TextHelper
 function textilize($text)
 {
   $parser = new Textile();

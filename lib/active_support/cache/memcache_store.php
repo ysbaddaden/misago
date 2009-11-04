@@ -1,7 +1,7 @@
 <?php
 
 # A Cache Store implementation which stores data with Memcached.
-# See +ActiveSupport_Cache_Store+ for help.
+# See <tt>ActiveSupport_Cache_Store</tt> for help.
 class ActiveSupport_Cache_MemcacheStore extends ActiveSupport_Cache_Store
 {
   protected $flag = null;

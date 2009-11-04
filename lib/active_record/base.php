@@ -3,14 +3,15 @@
 # Database object abstraction.
 # 
 # Permits to handle database entries like objects. It supports
-# CRUD operations (+create+, read, +update+ and +delete+).
+# CRUD operations (<tt>create</tt>, read, <tt>update</tt>
+# and <tt>delete</tt>).
 # 
 # Extends:
 # 
-# - +ActiveRecord_Record+
-# - +ActiveRecord_Associations+
-# - +ActiveRecord_Calculations+
-# - +ActiveRecord_Validations+
+# - <tt>ActiveRecord_Record</tt>
+# - <tt>ActiveRecord_Associations</tt>
+# - <tt>ActiveRecord_Calculations</tt>
+# - <tt>ActiveRecord_Validations</tt>
 # 
 # =CRUD
 # 
@@ -59,12 +60,12 @@
 #   $posts = $post->find_all_by_category('aaa');
 #   $posts = $post->find_all_by_category('aaa', array('order' => 'title asc'));
 # 
-# If no posts are found, returns an empty +ActiveArray+.
+# If no posts are found, returns an empty <tt>ActiveArray</tt>.
 # 
 # ===Find values
 # 
 # Data won't be processed into objects, and it shall return a simple hash
-# of `key => value` pairs. It's especially useful for collecting data for a
+# of key => value pairs. It's especially useful for collecting data for a
 # HTML select. for instance
 # 
 #   $post   = new Post();
@@ -74,7 +75,7 @@
 # 
 # ===Scopes
 # 
-# Scopes are predefined options for +find+ requests.
+# Scopes are predefined options for <tt>find</tt> requests.
 # 
 # ====Default scope
 # 
@@ -111,25 +112,25 @@
 #   $post = new Post(4);
 #   $post->update_attributes(array('category' => 'ddd'));
 #   
-# Check +update+, +update_attribute+ and +update_attributes+ for
-# more examples.
+# Check <tt>update</tt>, <tt>update_attribute</tt> and <tt>update_attributes</tt>
+# for more examples.
 # 
 # 
 # ==Delete
 # 
-# There are two ways to delete records: +delete+ or +destroy+.
+# There are two ways to delete records: <tt>delete</tt> or <tt>destroy</tt>.
 # 
-# The difference is that +delete+ always instanciates the record
+# The difference is that <tt>delete</tt> always instanciates the record
 # before deletion, permitting to interact with it. To delete an
 # uploaded photo when deleting an image from a web gallery for
 # instance.
 # 
-# On the contrary, +destroy+ will delete all records at once in
+# On the contrary, <tt>destroy</tt> will delete all records at once in
 # the database. There is no way to interact with the deletion
 # of a particular entry.
 # 
-# The advantage of +delete+ is to be able to interact with the
-# deletion, but the advantage of +destroy+ is it should be faster,
+# The advantage of <tt>delete</tt> is to be able to interact with the
+# deletion, but the advantage of <tt>destroy</tt> is it should be faster,
 # especially when deleting many records.
 # 
 # ===delete
@@ -178,17 +179,17 @@
 # 
 # As you can see, there are a lot of callbacks, which permits you to
 # interact with the creation process at every step of it. Same goes
-# for +update+, which has the same lifecycle, but uses particular
-# `on_update` callbacks instead of `on_create`.
+# for <tt>update</tt>, which has the same lifecycle, but uses particular
+# +on_update+ callbacks instead of +on_create+.
 # 
-# +delete+ has callbacks too, but the lifecycle is simplier:
+# <tt>delete</tt> has callbacks too, but the lifecycle is simplier:
 # 
 # - delete()
 # - [1] before_delete()
 # - *actually deletes the entry*
 # - [2] after_delete()
 # 
-# Remember that only +delete+ has callbacks, +destroy+ has no such handlers.
+# Remember that only <tt>delete</tt> has callbacks, <tt>destroy</tt> has no such handlers.
 # 
 # 
 # TEST: Test callbacks.
@@ -207,10 +208,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   
   protected $default_scope = array();
   
-  # @private
+  # :private:
   protected $attr_read = array('primary_key', 'new_record', 'table_name');
   
-  # @private
+  # :private:
   protected $behaviors = array();
   
   
@@ -302,8 +303,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   }
   
   # Returns the I18n translation of model name
-  # (in active_record.models context).
-  # Defaults to the String::humanize() method.
+  # (in +active_record.models+ context).
+  # Defaults to the <tt>String::humanize()</tt> method.
   function human_name()
   {
     $model = String::underscore(get_class($this));
@@ -312,8 +313,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   }
   
   # Returns the I18n translation of attribute name
-  # (in active_record.attributes.$model context).
-  # Defaults to the String::humanize() method.
+  # (in +active_record.attributes.$model+ context).
+  # Defaults to the <tt>String::humanize()</tt> method.
   function human_attribute_name($attribute)
   {
     $model = String::underscore(get_class($this));
@@ -361,23 +362,23 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # Methods:
   # 
-  # - `:all`    Returns all found records.
-  # - `:first`  Returns the first found record (null if nothing is found).
-  # - `:values` Returns bare values (uninstanciated).
+  # - :all    Returns all found records.
+  # - :first  Returns the first found record (null if nothing is found).
+  # - :values Returns bare values (uninstanciated).
   # 
   # Options:
   # 
-  # - `select` (collection)
-  # - `conditions` (string, array or hash)
-  # - `group` (collection)
-  # - `order` (collection)
-  # - `limit` (integer)
-  # - `page` (integer)
-  # - `include` (collection)
+  # - select (collection)
+  # - conditions (string, array or hash)
+  # - group (collection)
+  # - order (collection)
+  # - limit (integer)
+  # - page (integer)
+  # - include (collection)
   # 
   # Eager Loading:
   # 
-  # See +ActiveRecord_Associations+.
+  # See <tt>ActiveRecord_Associations</tt>.
   # 
   # TEST: Test option 'group'.
   function find($method_or_id=':all', $options=null)
@@ -456,19 +457,19 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     }
   }
   
-  # Shortcut for +find+(:all).
+  # Shortcut for <tt>find</tt>(:all).
   function all($options=null)
   {
     return $this->find(':all', $options);
   }
   
-  # Shortcut for +find+(:first).
+  # Shortcut for <tt>find</tt>(:first).
   function first($options=null)
   {
     return $this->find(':first', $options);
   }
   
-  # Shortcut for +find+(:values).
+  # Shortcut for <tt>find</tt>(:values).
   function values($options=null)
   {
     return $this->find(':values', $options);
@@ -476,7 +477,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   
   # Returns an array of ActiveRecords, using results as attributes.
   # 
-  # Use +find+ instead, unless you need special features. Be aware that
+  # Use <tt>find</tt> instead, unless you need special features. Be aware that
   # custom SQL requests may brake whenever you switch between
   # connection adapters.
   function & find_by_sql($sql)
@@ -495,7 +496,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   #   $count = $post->count_by_sql("select count(*) from posts where created_at > now()");
   # 
-  # Use +count+ instead, unless you need special features. Be aware
+  # Use <tt>count</tt> instead, unless you need special features. Be aware
   # that custom SQL requests may brake whenever you switch between
   # connection adapters.
   function count_by_sql($sql)
@@ -619,9 +620,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # You better consider this method as private.
   # Do not use unless you know what you are doing (ie. you're hacking misago).
-  # Use +ActiveRecord_Base::create()+ instead.
+  # Use <tt>create</tt> instead.
   # 
-  # @private
+  # :nodoc:
   protected function _create()
   {
     $this->before_save();
@@ -662,9 +663,9 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # You better consider this method as private.
   # Do not use unless you know what you are doing (ie. you're hacking misago).
-  # Use +ActiveRecord_Base::update()+ or +ActiveRecord_Base::update_attributes()+ instead.
+  # Use <tt>update</tt> or <tt>update_attributes</tt> instead.
   # 
-  # @private
+  # :nodoc:
   protected function _update()
   {
     $this->before_save();
@@ -727,7 +728,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return false;
   }
   
-  # Same as +create+ but throws an exception on failure.
+  # Same as <tt>create</tt> but throws an exception on failure.
   function do_create(array $attributes)
   {
     $args = func_get_args();
@@ -774,7 +775,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     }
   }
   
-  # Same as +update+ but throws an exception on failure.
+  # Same as <tt>update</tt> but throws an exception on failure.
   function do_update($id, $attributes)
   {
     $rs = $this->update($id, $attributes);
@@ -825,10 +826,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   
   # Updates many records at once.
   # 
-  # Available options:
-  # 
-  # - `limit`
-  # - `order`
+  # Available options: limit, order.
   function update_all($updates, $conditions=null, $options=null)
   {
     $options['primary_key'] = $this->primary_key;
@@ -869,7 +867,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return true;
   }
   
-  # Same as +delete+ but raises an ActiveRecord_Exception on error.
+  # Same as <tt>delete</tt> but raises an <tt>ActiveRecord_Exception</tt> on error.
   function do_delete($id=null)
   {
     if (!$this->delete($id)) {
@@ -882,10 +880,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # Each matching record are instanciated, and deletion callbacks are run.
   # 
-  # Available options:
-  # 
-  # - `limit`
-  # - `order`
+  # Available options: limit, order
   function delete_all($conditions=null, $options=null)
   {
     if (!empty($conditions)) {
@@ -916,7 +911,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return $this->connection->delete($this->table_name, $conditions);
   }
   
-  # Same as +destroy+ but raises an ActiveRecord_Exception on error.
+  # Same as <tt>destroy</tt> but raises an <tt>ActiveRecord_Exception</tt> on error.
   function do_destroy($id=null)
   {
     if (!$this->destroy($id)) {
@@ -936,8 +931,8 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   
   # Generates a cache key for this record.
   # 
-  # Produces `class_name/id-updated_at` if `update_at` exists,
-  # otherwise falls back to `class_name/id`.
+  # Produces +class_name/id-updated_at+ if +update_at+ exists,
+  # otherwise falls back to +class_name/id+.
   function cache_key()
   {
     if ($this->new_record) {

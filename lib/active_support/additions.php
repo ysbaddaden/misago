@@ -2,7 +2,7 @@
 
 # Checks wether a variable is blank or not.
 # 
-# @namespace ActiveSupport
+# :namespace: ActiveSupport
 function is_blank($var)
 {
   if (empty($var)) {

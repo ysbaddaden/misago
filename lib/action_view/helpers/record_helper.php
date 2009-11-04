@@ -1,41 +1,6 @@
 <?php
 
-# Helper object to create a HTML form associated to a record.
-# 
-# Initiate helper for a class:
-# 
-#   $f = form_for('User');
-# 
-# Initiate helper for an instance:
-# 
-#   $user = new User(456);
-#   $f = form_for($user);
-# 
-# Build a form:
-# 
-#   $f->start(update_user_path($user->id))
-#   $f->label('username');
-#   $f->text_field('username');
-#   submit_tag('Save');
-#   $f->end();
-# 
-# You may also mix records:
-# 
-#   $p = fields_for($user->profile);
-#   $f->start(update_user_path($user->id))
-#   
-#   $f->label('username');
-#   $f->text_field('username');
-#   
-#   $p->label('about');
-#   $p->text_field('about');
-#   
-#   $f->submit('Save');
-#   $f->end();
-# 
-# IMPROVE: Transparently protect against CSRF attacks (using a hash stored in a cookie/session).
-# 
-class ActionView_Helpers_RecordHelper_NS
+class ActionView_Helpers_RecordHelper_Klass
 {
   protected $object;
   protected $index;
@@ -171,6 +136,7 @@ class ActionView_Helpers_RecordHelper_NS
     return select($this->object, $column, $options, $attributes);
   }
   
+  # :private:
   protected function preparse_attributes(&$attributes)
   {
     if (!isset($attributes['index']) and isset($this->index)) {
@@ -179,14 +145,14 @@ class ActionView_Helpers_RecordHelper_NS
   }
 }
 
-# @namespace ActionView_Helpers_RecordHelper
+# :namespace: ActionView\Helpers\RecordHelper
 function fields_for($record_or_name, $args=null) {
-  return new ActionView_Helpers_RecordHelper_NS($record_or_name, $args);
+  return new ActionView_Helpers_RecordHelper_Klass($record_or_name, $args);
 }
 
-# @namespace ActionView_Helpers_RecordHelper
+# :namespace: ActionView\Helpers\RecordHelper
 function form_for($record_or_name, $args=null) {
-  return new ActionView_Helpers_RecordHelper_NS($record_or_name, $args);
+  return new ActionView_Helpers_RecordHelper_Klass($record_or_name, $args);
 }
 
 ?>
