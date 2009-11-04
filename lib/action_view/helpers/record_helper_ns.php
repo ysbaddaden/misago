@@ -1,6 +1,4 @@
 <?php
-# This file is never actually loaded, it's just for pdoc.
-
 # Helper object to create a HTML form associated to a record.
 # 
 # Initiate helper for a class:

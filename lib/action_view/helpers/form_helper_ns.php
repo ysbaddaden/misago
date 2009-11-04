@@ -1,6 +1,4 @@
 <?php
-# This file is never actually loaded, it's just for pdoc.
-
 # Helpful functions to render form fields for a model.
 # 
 #   <\? $search = new Search() ?\>

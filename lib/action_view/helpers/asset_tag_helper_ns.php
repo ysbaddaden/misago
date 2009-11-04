@@ -1,6 +1,4 @@
 <?php
-# This file is never actually loaded, it's just for pdoc.
-
 # Renders HTML tags to include assets like images, stylesheets and
 # javascript files in your pages.
 # 

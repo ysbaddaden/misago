@@ -34,7 +34,7 @@ function ActionView_Helpers_AssetTag_linearize_path($base_path, $path)
 #   auto_discovery_link_tag('atom', blog_posts_url(array(':format' => 'xml')),
 #     array('title' => 'Subscribe to this blog'));
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function auto_discovery_link_tag($type='rss', $url=null, $attributes=array())
 {
   $attributes = array_merge(array(
@@ -52,7 +52,7 @@ function auto_discovery_link_tag($type='rss', $url=null, $attributes=array())
 #   image_path('/path/to/logo.jpg'); # /path/to/logo.jpg
 #   image_path('http://mybrand.com/path/to/logo.jpg'); # http://mybrand.com/path/to/logo.jpg
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function image_path($src)
 {
   return ActionView_Helpers_AssetTag_linearize_path('/img', $src);
@@ -64,7 +64,7 @@ function image_path($src)
 #   javascript_path('/path/to/logo.js'); # /path/to/logo.js
 #   javascript_path('http://mybrand.com/logo.js'); # http://mybrand.com/logo.js
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function javascript_path($src)
 {
   return ActionView_Helpers_AssetTag_linearize_path('/js', $src);
@@ -76,7 +76,7 @@ function javascript_path($src)
 #   stylesheet_path('/path/to/logo.css'); # /path/to/logo.css
 #   stylesheet_path('http://mybrand.com/css/logo.css'); # http://mybrand.com/css/logo.css
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function stylesheet_path($href)
 {
   return ActionView_Helpers_AssetTag_linearize_path('/css', $href);
@@ -88,7 +88,7 @@ function stylesheet_path($href)
 #   image_tag('logo.jpg', array('alt' => 'my logo',
 #     'title' => "Ain't my logo pretty?", 'class' => 'brand'));
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function image_tag($src, $attributes=null)
 {
   $attributes['src'] = image_path($src);
@@ -103,7 +103,7 @@ function image_tag($src, $attributes=null)
 #   javascript_include_tag('app.js');
 #   javascript_include_tag('framework.js', 'app.js');
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function javascript_include_tag($args)
 {
   $sources = func_get_args();
@@ -126,7 +126,7 @@ function javascript_include_tag($args)
 #   stylesheet_link_tag('reset.css', 'typography.css');
 #   stylesheet_link_tag('print.css', array('media' => 'print'));
 # 
-# :namespace: ActionView_Helpers_AssetTag
+# :namespace: ActionView\Helpers\AssetTag
 function stylesheet_link_tag($args)
 {
   $sources = func_get_args();
