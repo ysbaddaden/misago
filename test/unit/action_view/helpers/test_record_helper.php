@@ -17,9 +17,9 @@ class Test_ActionView_Helpers_RecordHelper extends Unit_TestCase
   {
     $product = new Product();
     
-    $this->assert_instance_of(fields_for('Product'), 'ActionView_Helpers_RecordHelper_NS', "using a camelized string");
-    $this->assert_instance_of(fields_for('basket'), 'ActionView_Helpers_RecordHelper_NS', "using an underscored string");
-    $this->assert_instance_of(fields_for($product), 'ActionView_Helpers_RecordHelper_NS', "using an ActiveRecord");
+    $this->assert_instance_of(fields_for('Product'), 'ActionView_Helpers_RecordHelper_Klass', "using a camelized string");
+    $this->assert_instance_of(fields_for('basket'), 'ActionView_Helpers_RecordHelper_Klass', "using an underscored string");
+    $this->assert_instance_of(fields_for($product), 'ActionView_Helpers_RecordHelper_Klass', "using an ActiveRecord");
   }
   
   function test_label()
