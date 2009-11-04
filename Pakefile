@@ -1,0 +1,56 @@
+<?php
+
+desc("Builds the documentation for misago");
+task('doc', 'build_documentation');
+
+desc("Builds a PHAR archive of misago");
+task('phar', 'build_phar_archive');
+
+function build_documentation()
+{
+  chdir(dirname(__FILE__));
+  passthru("rm doc/*.html doc/*.css doc/classes/ -rf");
+  passthru("pdoc --project misago --main doc/README --exclude bin --exclude build --exclude doc --exclude templates --exclude test --exclude vendor . doc/");
+}
+
+function build_phar_archive()
+{
+#  ini_set('phar.readonly', 0);
+  chdir(dirname(__FILE__));
+  
+  build_phar_parse_dir('lib', $files);
+  build_phar_parse_dir('vendor', $files);
+  build_phar_parse_dir('templates', $files);
+  sort($files);
+  
+  $phar = new Phar('build/misago.phar', 0, 'misago.phar');
+  foreach($files as $file) {
+    $phar->addFile($file);
+  }
+  $phar->setStub('<?php __HALT_COMPILER(); ?>');
+  $phar->stopBuffering();
+  
+  echo "Built build/misago.phar\n";
+}
+
+function build_phar_parse_dir($path, &$files)
+{
+  $dh = opendir($path);
+  while(($file = readdir($dh)) !== false)
+  {
+    if ($file[0] == '.') {
+      continue;
+    }
+    $file = "$path/$file";
+    
+    if (is_file($file)) {
+      $files[] = $file;
+    }
+    elseif (is_dir($file)) {
+      build_phar_parse_dir($file, $files);
+    }
+  }
+  closedir($dh);
+}
+
+?>

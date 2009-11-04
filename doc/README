@@ -1,3 +1,4 @@
+= Documentation for Misago
 
 Misago is yet another framework for PHP that is inspired on Rails.
 
@@ -6,7 +7,7 @@ and books for Ruby on Rails, and you shall find your marks in Misago. Misago
 is still far from implementing all of Rails API (and it surely will never),
 but the one you rely on daily should be there (if not, patches are welcomed).
 
-=Getting Started
+==Getting Started
 
 Download and install misago somewhere.
 
@@ -16,19 +17,19 @@ On command line (CLI), run:
   $ cd my_project/
   $ script/server
   
-Then point your browser to `http://localhost:3000` and cheers, you're
+Then point your browser to +http://localhost:3000+ and cheers, you're
 running on misago (yes, it serves an error because there is no
-`WelcomeController`).
++WelcomeController+).
 
-=Webs servers
+==Webs servers
 
-Only LightTPD is supported by `script/server` for the moment.
+Only LightTPD is supported by +script/server+ for the moment.
 
 You may use another Web server by pointing the FastCGI process to
-`myapp/public/index.php` and you shall use the 404 handler (see
-`myapp/config/lighttpd.conf` for examples).
++myapp/public/index.php+ and you shall use the 404 handler (see
++myapp/config/lighttpd.conf+ for examples).
 
-=Shell
+==Shell
 
 Download and install PHPSH, then run in CLI:
 
@@ -40,33 +41,33 @@ with anything from your application directly. For instance :
   php> $post = new Post(45);
   php> $post->delete();
 
-=Contents
+==Contents
 
-- `app/` => contains your application
-- `app/controllers/` => contains your controllers (+ActionController+)
-- `app/models/` => contains your models and mailers (+ActiveRecord+ & +ActionView+)
-- `app/views/` => contains your views (+ActionView+)
-- `app/views/layouts/` => contains your layouts
-- `config/` => contains configuration files for your app
-- `config/environments/` => particular configuration per environment
-- `config/locales/` => contains your locales (+I18n+)
-- `db/` => anything related to your database (+ActiveRecord_Migration+)
-- `lib/` => application specific libraries
-- `log/` => application logs
-- `public/` => the root of webserver
-- `public/css/` => stylesheet files
-- `public/js/` => JavaScript files
-- `scripts/` => useful command line scripts
-- `scripts/db/` => database related scripts (eg: running migrations)
-- `test/fixtures/` => sample data for your tests
-- `test/functional/` => tests for your controllers (+ActionController_TestCase+)
-- `test/unit/` => tests for your models, librairies, etc. (+Unit_TestCase+)
-- `vendor/` => external libraries, not specific to your project
+- +app/+ => contains your application
+- +app/controllers/+ => contains your controllers (<tt>ActionController</tt>)
+- +app/models/+ => contains your models and mailers (<tt>ActiveRecord</tt> & <tt>ActionView</tt>)
+- +app/views/+ => contains your views (<tt>ActionView</tt>)
+- +app/views/layouts/+ => contains your layouts
+- +config/+ => contains configuration files for your app
+- +config/environments/+ => particular configuration per environment
+- +config/locales/+ => contains your locales (<tt>I18n</tt>)
+- +db/+ => anything related to your database (<tt>ActiveRecord_Migration</tt>)
+- +lib/+ => application specific libraries
+- +log/+ => application logs
+- +public/+ => the root of webserver
+- +public/css/+ => stylesheet files
+- +public/js/+ => JavaScript files
+- +scripts/+ => useful command line scripts
+- +scripts/db/+ => database related scripts (eg: running migrations)
+- +test/fixtures/+ => sample data for your tests
+- +test/functional/+ => tests for your controllers (<tt>ActionController_TestCase</tt>)
+- +test/unit/+ => tests for your models, librairies, etc. (<tt>Unit_TestCase</tt>)
+- +vendor/+ => external libraries, not specific to your project
 
-== Autoloading
+=== Autoloading
 
 It's possible to autoload classes. You must use the following syntax if you
 wish to use it (recommended):
 
-- `MyNamespace_SubNamespace_MyClass` => `my_namespace/sub_namespace/my_class.php`
+- +MyNamespace_SubNamespace_MyClass+ => +my_namespace/sub_namespace/my_class.php+
 
