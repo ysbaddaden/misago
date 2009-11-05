@@ -4,8 +4,9 @@ Misago is yet another framework for PHP that is inspired on Rails.
 
 It tries to mimic or implement most of Rails' API, so you may follow guides
 and books for Ruby on Rails, and you shall find your marks in Misago. Misago
-is still far from implementing all of Rails API (and it surely will never),
-but the one you rely on daily should be there (if not, patches are welcomed).
+is far from implementing all of Rails API, and will surely never (it's not a
+copycat), but the things you rely on daily should be there. If not, patches
+are welcomed.
 
 ==Getting Started
 
@@ -17,7 +18,7 @@ On command line (CLI), run:
   $ cd my_project/
   $ script/server
   
-Then point your browser to +http://localhost:3000+ and cheers, you're
+Then point your browser to http://localhost:3000 and cheers, you're
 running on misago (yes, it serves an error because there is no
 +WelcomeController+).
 
