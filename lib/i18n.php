@@ -37,9 +37,9 @@ function l($obj)
 # 
 # You may specify a particular context to search the translation in.
 # Either as passing the 'context' option, or by prepending the
-# string in the following way: `context.string`
+# string in the following way: +context.string+
 # 
-# You may have subcontexts, like: `active_record.error.messages.empty`
+# You may have subcontexts, like: +active_record.error.messages.empty+
 # 
 # =Pluralization [todo, specification unfinished]
 # 
@@ -58,7 +58,7 @@ function l($obj)
 # 
 # =Interpolation
 # 
-# Any other option, plus the `count` option, will be used for interpolating
+# Any other option, plus the +count+ option, will be used for interpolating
 # variables in the string.
 # 
 # Example:

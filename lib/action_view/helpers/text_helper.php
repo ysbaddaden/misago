@@ -108,7 +108,7 @@ function truncate($text, $length=30, $truncate_string='...')
 # http://michelf.com/projects/php-markdown/
 # 
 # You must strip all functions from +markdown.php+, keep defines,
-# rename the +Markdown_Parser` class to +Markdown+, and eventually
+# rename the +Markdown_Parser+ class to +Markdown+, and eventually
 # save it as +vendor/markdown.php+.
 # 
 # :namespace: ActionView\Helpers\TextHelper

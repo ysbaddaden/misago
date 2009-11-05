@@ -199,7 +199,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # Database object.
   protected $connection;
   
-  # Alias for `$connection`.
+  # Alias for +$connection+.
   protected $db;
   
   # Name of database's tables.

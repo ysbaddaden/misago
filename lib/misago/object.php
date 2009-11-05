@@ -21,7 +21,7 @@
 # 
 # =Read-only attributes.
 # 
-# You may define a list of `protected` attributes that may be accessible on get.
+# You may define a list of +protected+ attributes that may be accessible on get.
 # 
 #   $o = new MyClass();
 #   $o->table_name          => returns 'classes'

@@ -1,7 +1,7 @@
 <?php
 
-# Parses attributes for form input fields. Creates `id` from `name`;
-# quotes the `value` attribute; parses the `disabled` and `checked`
+# Parses attributes for form input fields. Creates +id+ from +name+;
+# quotes the +value+ attribute; parses the +disabled+ and +checked+
 # options, etc.
 # 
 # :nodoc:

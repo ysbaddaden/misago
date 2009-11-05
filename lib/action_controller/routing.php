@@ -3,7 +3,7 @@
 # Routing is what connects HTTP requests to your application's controllers,
 # parsing actions an parameters too.
 # 
-# You do configure your application's routes in `config/routes.php`.
+# You do configure your application's routes in +config/routes.php+.
 # A basic route config file looks like this:
 # 
 #   $map = ActionController_Routing::draw();
