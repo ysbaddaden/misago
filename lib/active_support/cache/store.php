@@ -2,7 +2,7 @@
 
 # Abstract cache storage.
 # 
-# See <tt>ActiveSupport_Cache_ApcStore<tt>, <tt>ActiveSupport_Cache_MemcacheStore</tt>
+# See <tt>ActiveSupport_Cache_ApcStore</tt>, <tt>ActiveSupport_Cache_MemcacheStore</tt>
 # or <tt>ActiveSupport_Cache_FileStore</tt> for actual implementations. You may
 # build your own implementation, too.
 # 

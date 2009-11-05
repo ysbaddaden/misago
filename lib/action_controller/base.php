@@ -33,7 +33,7 @@
 # 
 # And uses some objects:
 # 
-# - +$cache+: <tt>ActionController_Cache_Store</tt>
+# - +$cache+: <tt>ActiveSupport_Cache_Store</tt>
 # - +$flash+: <tt>ActionController_Flash</tt>
 # - +$request+: <tt>ActionController_AbstractRequest</tt>
 # 
