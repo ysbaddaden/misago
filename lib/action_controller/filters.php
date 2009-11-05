@@ -84,7 +84,7 @@ abstract class ActionController_Filters extends ActionController_Rescue
       $options = null;
     }
     
-    array_reverse($filters);
+    $filters = array_reverse($filters);
     foreach($filters as $filter) {
       array_unshift($this->$to, array($filter, $options));
     }
