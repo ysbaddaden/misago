@@ -33,9 +33,9 @@
 # 
 # And uses some objects:
 # 
-# - +$cache+: <tt>ActiveSupport_Cache_Store</tt>
-# - +$flash+: <tt>ActionController_Flash</tt>
-# - +$request+: <tt>ActionController_AbstractRequest</tt>
+# [+$cache+]   <tt>ActiveSupport_Cache_Store</tt>
+# [+$flash+]   <tt>ActionController_Flash</tt>
+# [+$request+] <tt>ActionController_AbstractRequest</tt>
 # 
 # =Renders
 # 
@@ -270,16 +270,16 @@ abstract class ActionController_Base extends ActionController_Caching
   # 
   # =Available options:
   # 
-  # - action: render the view associated to the current action.
-  # - format: use this particular format.
-  # - json: export resource as JSON.
-  # - layout: use a particular layout (false for no layout).
-  # - locals: pass some variables to be available in template's scope.
-  # - location: set HTTP location header.
-  # - status: set HTTP status header.
-  # - template: renders a template, from template root path (eg: 'errors/404').
-  # - text: render some text, with no processing --useful for pushing cached html.
-  # - xml: export resource as XML.
+  # - +action+ -   render the view associated to the current action.
+  # - +format+ -   use this particular format.
+  # - +json+ -     export resource as JSON.
+  # - +layout+ -   use a particular layout (false for no layout).
+  # - +locals+ -   pass some variables to be available in template's scope.
+  # - +location+ - set HTTP location header.
+  # - +status+ -   set HTTP status header.
+  # - +template+ - renders a template, from template root path (eg: 'errors/404').
+  # - +text+ -     render some text, with no processing --useful for pushing cached html.
+  # - +xml+ -      export resource as XML.
   # 
   # TODO: render(:partial => 'xx/yy') => app/views/xx/_yy.html.tpl (no layout)
   # TODO: render(:file => '/xx/yy/zz.html.tpl') => /xx/yy/zz.html.tpl (no layout)
@@ -354,7 +354,7 @@ abstract class ActionController_Base extends ActionController_Caching
   #   redirect_to(show_article_url($account->id));
   #   redirect_to(array(':controller' => 'contact', ':action' => 'thanks'));
   # 
-  # By default a '302 Moved' header status in sent, but you may customize it:
+  # By default a '302 Moved' header status is sent, but you may customize it:
   # 
   #   redirect_to('/posts/45.xml', 301); # found
   #   redirect_to('/posts/45.xml', 201); # created
