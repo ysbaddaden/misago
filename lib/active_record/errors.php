@@ -44,13 +44,13 @@ class ActiveRecord_Errors
     $this->messages[$attribute][] = $msg;
   }
   
-  # Shortcut for +add($attribute, ':blank')+.
+  # Shortcut for +<tt>add</tt>($attribute, ':blank')+.
   function add_on_blank($attribute)
   {
     $this->add($attribute, ':blank');
   }
   
-  # Shortcut for +add($attribute, ':empty')+.
+  # Shortcut for +<tt>add</tt>($attribute, ':empty')+.
   function add_on_empty($attribute)
   {
     $this->add($attribute, ':empty');

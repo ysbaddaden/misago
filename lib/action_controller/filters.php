@@ -2,6 +2,8 @@
 
 # Filters permit to handle a request before and after executing an action.
 # 
+# Example: 
+# 
 #   class PostsController extends ApplicationController
 #   {
 #     protected __construct()
@@ -15,8 +17,24 @@
 # 
 # =Before filters
 # 
-# A +before_filter+ method may return a boolean. In cas of false, the filters' chain
-# will stop and the action won't be processed.
+# Before filters are processed before processing the action. If a +before_filter+
+# method returns false, the filters' chain will stop and the action won't be processed.
+# This is useful for handling pages where the user must be authenticated, for instance.
+# 
+# = After filters
+# 
+# After filters are run 
+# 
+# = Skip filters
+# 
+# After filters are run 
+# 
+# = Options:
+# 
+# All filters have the following options:
+# 
+# - +only+   - a list of actions that must process the filter.
+# - +except+ - a list of actions where not to process the filter (others will process the filter).
 # 
 abstract class ActionController_Filters extends ActionController_Rescue
 {

@@ -8,13 +8,13 @@
 # 
 #   $map = ActionController_Routing::draw();
 #   
-#   # basic route: connects +/login+ to +AccountsController::login()+
+#   # basic route: connects /login to AccountsController::login()
 #   $map->connect('login', array(
 #     ':controller' => 'accounts',
 #     ':action'     => 'login'
 #   ));
 #   
-#   # landing page: +/+ => +HomeController::index()+
+#   # landing page: / => HomeController::index()
 #   $map->root(array(':controller' => 'home'));
 #   
 #   # default route

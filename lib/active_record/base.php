@@ -362,19 +362,19 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   # 
   # Methods:
   # 
-  # - :all    Returns all found records.
-  # - :first  Returns the first found record (null if nothing is found).
-  # - :values Returns bare values (uninstanciated).
+  # - +:all+    - Returns all found records.
+  # - +:first+  - Returns the first found record (null if nothing is found).
+  # - +:values+ - Returns bare values (uninstanciated).
   # 
   # Options:
   # 
-  # - select (collection)
-  # - conditions (string, array or hash)
-  # - group (collection)
-  # - order (collection)
-  # - limit (integer)
-  # - page (integer)
-  # - include (collection)
+  # - +select+ - (collection)
+  # - +conditions+ - (string, array or hash)
+  # - +group+ - (collection)
+  # - +order+ - (collection)
+  # - +limit+ - (integer)
+  # - +page+ - (integer)
+  # - +include+ - (collection)
   # 
   # Eager Loading:
   # 

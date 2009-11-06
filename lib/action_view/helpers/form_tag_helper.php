@@ -4,7 +4,7 @@
 # 
 # Options:
 # 
-# - multipart: sets +enctype+ to +multipart/form-data+;
+# - +multipart+ - sets +enctype+ to +multipart/form-data+;
 # 
 # If method is different from GET or POST, a hidden +_method+ field will be added.
 # 
@@ -129,8 +129,8 @@ function radio_button_tag($name, $value, $attributes=null)
 # 
 #   $options = array(
 #     'Keyboard' => 45,
-#     'Mouse' => 72,
-#     'Scanner' => 59,
+#     'Mouse'    => 72,
+#     'Scanner'  => 59,
 #   );
 #   $html_options = options_for_select($options, 45);
 # 
@@ -176,8 +176,8 @@ function options_for_select($options, $selected=null)
 # 
 #   $options = array(
 #     'Keyboard' => 45,
-#     'Mouse' => 72,
-#     'Scanner' => 59,
+#     'Mouse'    => 72,
+#     'Scanner'  => 59,
 #   );
 #   $selected = 45;
 #   select_tag('type', options_for_select($options, $selected));

@@ -24,9 +24,9 @@ function ActionView_Helpers_AssetTag_linearize_path($base_path, $path)
 # 
 # Available options:
 # 
-# - rel: defaults to alternate
-# - type: mime-type
-# - title: specify the title (defaults to the type)
+# - +rel+   - defaults to alternate
+# - +type+  - mime-type
+# - +title+ - specify the title (defaults to the type)
 # 
 # Examples:
 # 

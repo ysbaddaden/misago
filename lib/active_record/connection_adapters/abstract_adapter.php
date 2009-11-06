@@ -293,9 +293,9 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   #
   # Available options:
   # 
-  # - temporary (bool), true to create a temporary table
-  # - id        (bool), true to automatically add an auto incrementing id column
-  # - options   (string), eg: "engine = innodb"
+  # - +temporary+ - true to create a temporary table
+  # - +id+        - true to automatically add an auto incrementing id column
+  # - +options+   - additional string (eg: "engine = innodb")
   # 
   function new_table($table, array $options=null)
   {
@@ -306,10 +306,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # 
   # Definition:
   # 
-  # - temporary (bool), true to create a temporary table
-  # - columns   (array), eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
-  # - options   (string), eg: "engine = innodb"
-  # - force     (null, bool), true: drop table before create, false: create if not exists
+  # - +temporary - true to create a temporary table
+  # - +columns   - eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
+  # - +options   - eg: "engine = innodb"
+  # - +force     - true: drop table before create, false: create if not exists
   #
   function create_table($table, array $definition)
   {
@@ -349,7 +349,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # 
   # Options:
   # 
-  # - temporary (bool), true if table to drop is a temporary table.
+  # - +temporary+ - true if table to drop is a temporary table.
   # 
   function drop_table($table, array $options=null)
   {
@@ -419,13 +419,13 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   
   # Adds an index to a table column.
   # 
-  # By default the index is named "$table_$column_idx" or "$table_$column_uniq".
+  # By default the index is named +$table_$column_idx+ or +$table_$column_uniq+.
   # 
   # Available options:
   # 
-  # - type: null or unique
-  # - name: manual naming of the index
-  # - size: specified size of the index, in case of a blob/text. 
+  # - +type+ - null or unique
+  # - +name+ - manual naming of the index
+  # - +size+ - specified size of the index, in case of a blob/text. 
   # 
   # IMPROVE: Support indices on multiple columns.
   function add_index($table, $column, $options=null)
@@ -508,10 +508,11 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # 
   # Available actions:
   # 
-  # - begin: starts a transaction
-  # - commit: ends a transaction and commits statements to the database.
-  # - rollback: ends a transaction and drops statements (nothing is recorded in the database).
+  # - +begin+    - starts a transaction
+  # - +commit+   - ends a transaction and commits statements to the database.
+  # - +rollback+ - ends a transaction and drops statements (nothing is recorded in the database).
   # 
+  # Note: prefer using <tt>ActiveRecord::transaction()</tt> instead.
   function transaction($action)
   {
     switch(strtolower($action))

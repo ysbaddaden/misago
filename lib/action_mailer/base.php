@@ -51,9 +51,9 @@
 # 
 # You may set the following configuration options (using +cfg::set()+).
 # 
-# - +mailer_perform_deliveries+: set to false to prevent all email from being sent. Set to true otherwise (default).
-# - +mailer_delivery_method+: defines a delivery method, either 'sendmail' or 'test'.
-# - +mailer_return_path+: you may define a default return-path for all your emails.
+# - +mailer_perform_deliveries+ - set to false to prevent all email from being sent. Set to true otherwise (default).
+# - +mailer_delivery_method+ - defines a delivery method, either 'sendmail' or 'test'.
+# - +mailer_return_path+ - you may define a default return-path for all your emails.
 # 
 class ActionMailer_Base extends Misago_Object
 {

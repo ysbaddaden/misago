@@ -67,7 +67,7 @@ class ActionView_Base extends Misago_Object
   # 
   # = Generic option(s):
   # 
-  # - format: which format to use? defaults to +html+
+  # - +format+ - which format to use? defaults to +html+
   # 
   # = Render a view:
   # 

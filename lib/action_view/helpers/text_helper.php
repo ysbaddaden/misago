@@ -15,7 +15,7 @@ function ActionView_Helpers_TextHelper_replace_email_addresses($match)
 
 # Transforms all links and email addresses to clickable links.
 # 
-# - link: limits what should be linked (either one of all, email_addresses or urls).
+# - +link+ - limits what should be linked (either one of all, email_addresses or urls).
 # 
 # :namespace: ActionView\Helpers\TextHelper
 function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
