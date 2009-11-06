@@ -306,10 +306,10 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   # 
   # Definition:
   # 
-  # - +temporary - true to create a temporary table
-  # - +columns   - eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
-  # - +options   - eg: "engine = innodb"
-  # - +force     - true: drop table before create, false: create if not exists
+  # - +temporary+ - true to create a temporary table
+  # - +columns+   - eg: {:name => {:type, :limit, :null, :default, :signed, :primary_key}}
+  # - +options+   - eg: "engine = innodb"
+  # - +force+     - true: drop table before create, false: create if not exists
   #
   function create_table($table, array $definition)
   {
