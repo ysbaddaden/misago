@@ -56,7 +56,7 @@ class ActionView_Base extends Misago_Object
       while(($file = readdir($dh)) !== false)
       {
         if (is_file($path.$file) and !strpos($file, '_helper_ns.php')) {
-          $helpers[] = str_replace('_helper.php', '', $file);
+          $helpers[] = $path.'/'.str_replace('_helper.php', '', $file);
         }
       }
       closedir($dh);
