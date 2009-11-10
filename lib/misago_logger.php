@@ -150,6 +150,7 @@ class Logger
   }
 }
 
+# TODO: Rename/move to Misago_Logger
 class MisagoLogger extends Logger
 {
   static private $singleton;

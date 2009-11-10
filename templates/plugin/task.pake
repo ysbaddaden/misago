@@ -1,0 +1,10 @@
+<?php
+
+#desc('description for task_name');
+#task('task_name', 'task_func');
+#function task_func($arg1, $arg2)
+#{
+#  #task code
+#}
+
+?>
