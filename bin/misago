@@ -131,6 +131,11 @@ class Misago
     self::create_dir_unless_exists("$path_to/test/functional");
     self::create_dir_unless_exists("$path_to/test/fixtures");
     self::create_dir_unless_exists("$path_to/vendor");
+    self::create_dir_unless_exists("$path_to/vendor/plugin");
+    self::create_dir_unless_exists("$path_to/tmp");
+    self::create_dir_unless_exists("$path_to/tmp/cache");
+    self::create_dir_unless_exists("$path_to/tmp/pids");
+    self::create_dir_unless_exists("$path_to/tmp/sockets");
   }
   
   private static function configure_files($path_to)
