@@ -290,6 +290,13 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
     parent::__construct($arg);
   }
   
+  # Returns an association's configuration. Returns null if no such
+  # association exists.
+  function association($assoc)
+  {
+    return isset($this->associations[$assoc]) ? $this->associations[$assoc] : null;
+  }
+  
   private function configure_associations()
   {
     $apc_key = TMP.'/cache/active_records/associations_'.get_class($this);

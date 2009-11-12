@@ -20,16 +20,12 @@ class SomeOtherObject extends Misago_Object
 
 class SomeObject extends Misago_Object
 {
-  protected $new_record  = false;
-  protected $table_name  = 'some_objects';
-  protected $primary_key = 'private';
+  protected $include_modules = array('SomeOtherObject');
+  protected $new_record      = false;
+  protected $table_name      = 'some_objects';
+  protected $primary_key     = 'private';
   
-  private $id = 'a';
-  
-  function __construct()
-  {
-    $this->include_module('SomeOtherObject');
-  }
+  private   $id = 'a';
   
   function id()
   {

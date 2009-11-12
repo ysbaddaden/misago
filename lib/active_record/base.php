@@ -243,7 +243,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     
     # parents
     ActiveRecord_Associations::__construct();
-    ActiveRecord_Behaviors::__construct();
+    Misago_Object::__construct();
     
     # args
     if ($arg !== null)
@@ -297,7 +297,7 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   }
   
   function table_name() {
-    return $this->primary_key;
+    return $this->table_name;
   }
   
   # Returns an array of column names.

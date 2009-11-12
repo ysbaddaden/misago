@@ -43,7 +43,15 @@
 # directly, since it may be renamed someday.
 abstract class Misago_Object
 {
-  private $_mapped_methods = array();
+  protected $include_modules = array();
+  private   $_mapped_methods = array();
+  
+  function __construct()
+  {
+    foreach($this->include_modules as $module) {
+      $this->include_module($module);
+    }
+  }
   
   function __get($property)
   {

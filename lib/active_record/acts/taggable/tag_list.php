@@ -1,8 +1,8 @@
 <?php
 
 # FIXME: Do not select tags if parent ID is null or new_record!
-# IMPROVE: Cache the list into parent's column 'tags_cached' (if column exists).
-class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
+# IMPROVE: Cache the list into parent's column +tags_cached+ (if column exists).
+class ActiveRecord_Acts_Taggable_TagList extends ArrayObject
 {
   private $parent;
   private $collection;
@@ -176,6 +176,39 @@ class ActiveRecord_Behaviors_Taggable_TagList extends ArrayObject
       $_options = $this->parent->merge_options($assoc->taggable_scope, $_options);
     }
     return $this->parent->merge_options($options, $_options);
+  }
+  
+  # :private:
+  function find_tagged_with($tags, $options=array())
+  {
+    $tags = array_collection($tags);
+    if (!empty($tags))
+    {
+      $options = $this->find_options($tags, $options);
+      return $this->parent->find(':all', $options);
+    }
+    return new ActiveArray(array(), get_class($this->parent));
+  }
+  
+  # :private:
+  function count_tagged_with($tags, $options=array())
+  {
+    $tags = array_collection($tags);
+    if (!empty($tags))
+    {
+      $options = $this->count_options($tags, $options);
+      return $this->parent->count($options);
+    }
+    return 0;
+  }
+  
+  # :private:
+  function & tag_count($options=array())
+  {
+    $options = $this->tag_count_options($options);
+    $tags = $this->parent->count($options);
+    ksort($tags);
+    return $tags;
   }
 }
 

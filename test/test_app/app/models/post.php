@@ -2,8 +2,8 @@
 
 class Post extends ActiveRecord_Base
 {
-  protected $has_many  = array('tags');
-  protected $behaviors = array('taggable' => array('tags'));
+  protected $include_modules = array('ActiveRecord_Acts_Taggable_Base');
+  protected $has_many        = array('tags');
 }
 
 ?>

@@ -3,7 +3,7 @@
 # Calculates with data.
 # 
 # 
-class ActiveRecord_Calculations extends ActiveRecord_Behaviors
+class ActiveRecord_Calculations extends ActiveRecord_Validations
 {
   # Generic calculation method.
   # 

@@ -4,13 +4,12 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
 
-# TEST: Attribute & method names must be built from the association's name (ie. category_list, find_with_categories, etc).
-class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
+class Test_ActiveRecord_Acts_Taggable extends Unit_TestCase
 {
   function test_tag_list()
   {
     $post = new Post();
-    $this->assert_instance_of($post->tag_list, 'ActiveRecord_Behaviors_Taggable_TagList');
+    $this->assert_instance_of($post->tag_list, 'ActiveRecord_Acts_Taggable_TagList');
     
     # assigning & casting
     $post->tag_list = array('aaa', 'bbb', 'ccc');
@@ -123,6 +122,6 @@ class Test_ActiveRecord_Behaviors_Taggable extends Unit_TestCase
   }
 }
 
-new Test_ActiveRecord_Behaviors_Taggable();
+new Test_ActiveRecord_Acts_Taggable();
 
 ?>
