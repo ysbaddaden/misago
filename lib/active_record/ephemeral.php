@@ -6,7 +6,6 @@
 # (record, validation), without the need to store data. 
 abstract class ActiveRecord_Ephemeral extends ActiveRecord_Validations
 {
-  protected $attr_read = array('new_record', 'table_name');
   protected $behaviors = array();
   protected $columns   = array();
   

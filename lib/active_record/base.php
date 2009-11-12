@@ -209,9 +209,6 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
   protected $default_scope = array();
   
   # :private:
-  protected $attr_read = array('primary_key', 'new_record', 'table_name');
-  
-  # :private:
   protected $behaviors = array();
   
   
@@ -293,6 +290,14 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
       return $this->id = parent::__set($this->primary_key, $value);
     }
     return parent::__set($attribute, $value);
+  }
+  
+  function primary_key() {
+    return $this->primary_key;
+  }
+  
+  function table_name() {
+    return $this->primary_key;
   }
   
   # Returns an array of column names.

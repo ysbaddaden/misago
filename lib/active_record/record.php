@@ -44,9 +44,6 @@ abstract class ActiveRecord_Record extends Misago_Object implements Iterator
   protected $__original_attributes = array();
   protected $new_record            = true;
   
-  protected $attr_read = array('new_record');
-  
-  
   function __construct($attributes=null)
   {
     if (!empty($attributes))
@@ -54,6 +51,10 @@ abstract class ActiveRecord_Record extends Misago_Object implements Iterator
       $this->set_attributes($attributes);
       $this->__original_attributes = $this->__attributes;
     }
+  }
+  
+  function new_record() {
+    return $this->new_record;
   }
   
   # Sets record's attributes.

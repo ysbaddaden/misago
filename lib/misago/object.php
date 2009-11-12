@@ -6,37 +6,109 @@
 # 
 #   class MyClass extends Misago_Object
 #   {
-#     protected $id;
-#     protected $table_name = 'classes';
-#     protected $attr_read = array('table_name');
+#     protected $id         = 1;
+#     private   $new_record = false;
 #     
-#     function id($id=null)
-#     {
-#       if ($id !== null) {
-#         $this->id = $id;
-#       }
+#     function new_record() {
+#       return $this->new_record;
+#     }
+#     
+#     function id() {
 #       return $this->id;
+#     }
+#     
+#     function id_set($id) {
+#       return $this->id = $id;
 #     }
 #   }
 # 
-# =Read-only attributes.
+# =Getters and setters methods as attributes
 # 
-# You may define a list of `protected` attributes that may be accessible on get.
-# 
-#   $o = new MyClass();
-#   $o->table_name          => returns 'classes'
-#   $o->table_name = 'aaa'  => error: protected attribute
-# 
-# =Get/set methods as attributes
-# 
-# +Object+ permits to use get/set methods like standard attributes.
+# You may define a list of non public properties that may be
+# accessible on read, by using a public method named just like
+# the property:
 # 
 #   $o = new MyClass();
-#   $o->id = 4  # sets attribute throught the id() method.
-#   $o->id      # gets attribute throught the id() method (thus returns 4).
+#   $o->new_record         # => returns false
+#   $o->new_record = true  # => error: protected attribute
 # 
+# You may also have setters, using this time a +property_set()+
+# method:
+# 
+#   $o = new MyClass();
+#   $o->id = 4  # sets property throught the +id_set()+ method.
+#   $o->id      # returns 4 (using the +id()+ method).
+# 
+# Note: it is recommended to never call the +property_set+ method
+# directly, since it may be renamed someday.
 abstract class Misago_Object
 {
+  private $_mapped_methods = array();
+  
+  function __get($property)
+  {
+    # attribute as method
+    if (method_exists($this, $property)) {
+      return $this->$property();
+    }
+    
+    # default
+    return null;
+  }
+  
+  function __set($property, $value)
+  {
+    # attribute as method
+    $method = "{$property}_set";
+    if (method_exists($this, $method)) {
+      return $this->$method($value);
+    }
+    
+    # default
+    return $this->$property = $value;
+  }
+  
+  function __call($method, $args)
+  {
+    # mapped method?
+    if (isset($this->_mapped_methods[$method])) {
+      return call_user_func_array($this->_mapped_methods[$method], $args);
+    }
+    
+    # error
+    trigger_error("No such method ".get_class($this)."::$method().", E_USER_ERROR);
+  }
+  
+  # Maps an external class methods as instance methods
+  # for this class.
+  protected function include_module($module)
+  {
+    $object  = new $module($this);
+    $methods = $object->methods;
+    if (empty($methods))
+    {
+      $methods = get_class_methods($module);
+      $parent  = get_parent_class($module);
+      if (!empty($parent)) {
+        $methods = array_diff($methods, get_class_methods($parent));
+      }
+    }
+    
+    foreach($methods as $method)
+    {
+      if (strpos($method, '__') === 0) continue;
+      $this->map_method($object, $method, $method);
+    }
+  }
+  
+  # Maps a callback as an instance method.
+  function map_method($object, $method, $as=null)
+  {
+    if ($as === null) $as = $method;
+    $this->_mapped_methods[$as] = array($object, $method);
+  }
+  
+  /*
   # A collection of attributes that must be accessible read-only (they must be protected).
   protected $attr_read = array();
   
@@ -87,7 +159,7 @@ abstract class Misago_Object
       $this->__mapped_methods[$mapped] = array($behavior, $func);
     }
   }
-  
+  */
   function to_s()
   {
     return $this->__toString();

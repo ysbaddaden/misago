@@ -6,14 +6,46 @@ class Time extends Misago_Object
   protected $timestamp;
   protected $type;
   
-  protected $attr_read = array('type');
-  
   function __construct($time=null, $type='datetime')
   {
     $this->raw_time  = $time;
     $this->timestamp = is_string($time) ? strtotime($time) :
       ($time === null ? time() : $time);
     $this->type = $type;
+  }
+    
+  function __get($attr)
+  {
+    switch($attr)
+    {
+      case 'year':  return date('Y', $this->timestamp); break;
+      case 'month': return date('m', $this->timestamp); break;
+      case 'day':   return date('d', $this->timestamp); break;
+      case 'hour':  return date('H', $this->timestamp); break;
+      case 'min':   return date('i', $this->timestamp); break;
+      case 'sec':   return date('s', $this->timestamp); break;
+    }
+    return parent::__get($attr);
+#    trigger_error("Unknown attribute: Time::$attr", E_USER_WARNING);
+  }
+  
+  function __toString()
+  {
+    if ($this->timestamp === false) {
+      return empty($this->raw_time) ? '' : (string)$this->raw_time;
+    }
+    switch($this->type)
+    {
+      case 'datetime': return date('Y-m-d H:i:s', $this->timestamp);
+      case 'date':     return date('Y-m-d', $this->timestamp);
+      case 'time':     return date('H:i:s', $this->timestamp);
+    }
+    return '';
+  }
+  
+  function type()
+  {
+    return $this->type;
   }
   
   function is_past()
@@ -54,35 +86,6 @@ class Time extends Misago_Object
     return (date('Y', $this->timestamp) == date('Y'));
   }
   
-  function __get($attr)
-  {
-    switch($attr)
-    {
-      case 'year':  return date('Y', $this->timestamp); break;
-      case 'month': return date('m', $this->timestamp); break;
-      case 'day':   return date('d', $this->timestamp); break;
-      case 'hour':  return date('H', $this->timestamp); break;
-      case 'min':   return date('i', $this->timestamp); break;
-      case 'sec':   return date('s', $this->timestamp); break;
-    }
-    return parent::__get($attr);
-#    trigger_error("Unknown attribute: Time::$attr", E_USER_WARNING);
-  }
-  
-  function __toString()
-  {
-    if ($this->timestamp === false) {
-      return empty($this->raw_time) ? '' : (string)$this->raw_time;
-    }
-    switch($this->type)
-    {
-      case 'datetime': return date('Y-m-d H:i:s', $this->timestamp);
-      case 'date':     return date('Y-m-d', $this->timestamp);
-      case 'time':     return date('H:i:s', $this->timestamp);
-    }
-    return '';
-  }
-    
   function format($str)
   {
     return strftime($str, $this->timestamp);
