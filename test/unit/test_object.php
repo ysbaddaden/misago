@@ -88,6 +88,7 @@ class TestObject extends Unit_Test
   {
     $o = new SomeObject();
     $this->assert_equal($o->module_method(), 'e');
+    $this->assert_equal($o->module_method, 'e');
   }
 }
 

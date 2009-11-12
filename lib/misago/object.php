@@ -48,7 +48,7 @@ abstract class Misago_Object
   function __get($property)
   {
     # attribute as method
-    if (method_exists($this, $property)) {
+    if (method_exists($this, $property) or isset($this->_mapped_methods[$property])) {
       return $this->$property();
     }
     
@@ -60,7 +60,7 @@ abstract class Misago_Object
   {
     # attribute as method
     $method = "{$property}_set";
-    if (method_exists($this, $method)) {
+    if (method_exists($this, $method) or isset($this->_mapped_methods[$method])) {
       return $this->$method($value);
     }
     
