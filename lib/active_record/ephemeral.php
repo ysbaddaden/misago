@@ -20,9 +20,19 @@ abstract class ActiveRecord_Ephemeral extends ActiveRecord_Validations
           case 'integer': $value = (int)$value;    break;
           case 'float':   $value = (double)$value; break;
           case 'boolean': $value = (bool)$value;   break;
-          case 'date': case 'datetime': case 'time':
-            if (!($value instanceof Time)) {
-              $value = new Time($value, $this->columns[$attribute]['type']);
+          case 'datetime':
+            if (!($value instanceof ActiveSupport_DateTime)) {
+              $value = new ActiveSupport_Datetime($value);
+            }
+          break;
+          case 'date':
+            if (!($value instanceof ActiveSupport_Date)) {
+              $value = new ActiveSupport_Date($value);
+            }
+          break;
+          case 'time':
+            if (!($value instanceof ActiveSupport_Time)) {
+              $value = new ActiveSupport_Time($value);
             }
           break;
         }

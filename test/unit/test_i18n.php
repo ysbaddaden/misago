@@ -51,6 +51,12 @@ class Test_I18n extends Unit_Test
     $this->assert_equal(t('interpolation', array('bar' => 'baz')), "foo baz");
   }
   
+  function test_pluralize()
+  {
+    $this->assert_equal(t('there_are_x_messages', array('count' => 1)), 'there is one message');
+    $this->assert_equal(t('there_are_x_messages', array('count' => 5)), 'there are 5 messages');
+  }
+  
   function test_t_in_context()
   {
     $this->assert_equal(t('empty', array('context' => 'active_record.errors.messages')), "{{attribute}} can't be empty");
@@ -62,13 +68,17 @@ class Test_I18n extends Unit_Test
     # with interpolation
     $this->assert_equal(t('foo', array('context' => 'messages', 'bar' => 'baz')), "foo baz");
     $this->assert_equal(t('messages.foo', array('bar' => 'bad')), "foo bad");
+    
+    # plural
+    $this->assert_equal(t('x_minutes', array('context' => 'plural', 'count' => 1)),  'a minute');
+    $this->assert_equal(t('x_minutes', array('context' => 'plural', 'count' => 24)), '24 minutes');
   }
   
-  function test_l()
+  function test_localize()
   {
-    $this->assert_equal(l(new Time('2009-08-12', 'date')), '08/12/2009');
-    $this->assert_equal(l(new Time('13:45:36', 'time')), '13:45');
-    $this->assert_equal(l(new Time('2009-06-12 00:12:36', 'datetime')), '06/12/2009 00:12');
+    $this->assert_equal(l(new ActiveSupport_Datetime('2009-06-12 00:12:36')), '06/12/2009');
+    $this->assert_equal(l(new ActiveSupport_Date('2009-08-12')), '08/12/2009');
+    $this->assert_equal(l(new ActiveSupport_Time('13:45:36')), '13:45');
   }
 }
 

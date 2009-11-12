@@ -13,7 +13,7 @@ class Time extends Misago_Object
       ($time === null ? time() : $time);
     $this->type = $type;
   }
-    
+  
   function __get($attr)
   {
     switch($attr)
@@ -93,7 +93,7 @@ class Time extends Misago_Object
   
   function to_s($type=null)
   {
-    if ($type = 'number')
+    if ($type == 'number')
     {
       switch($this->type)
       {

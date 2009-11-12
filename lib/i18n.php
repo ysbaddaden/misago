@@ -17,16 +17,12 @@ function t($str, $options=null)
 }
 
 # Localizes certain objects like dates.
-function l($obj)
+function l($obj, $options=array())
 {
-  return I18n::localize($obj);
+  return I18n::localize($obj, $options);
 }
 
-# Handles translations of strings.
-# 
-# FIXME: Missing interpolation when translation isn't found. eg: t('this is my {{name}}', array('name' => $name)).
-# TODO: Implement pluralization.
-# IMPROVE: Possibility to separate translations in a directory structure (ie. following the context).
+# Handles translation of strings.
 # 
 # =Translating a string
 # 
@@ -41,21 +37,6 @@ function l($obj)
 # 
 # You may have subcontexts, like: +active_record.error.messages.empty+
 # 
-# =Pluralization [todo, specification unfinished]
-# 
-# In case there are many translations available, depending on
-# a particular number, you may use the 'count' option to
-# determine which one is to be used.
-# 
-# Example:
-# 
-#   $strings = array(
-#     'There is {{count}} message',
-#     'There are {{count}} messages',
-#   );
-#   t($strings, array('count' => 1));  # => There is 1 message
-#   t($strings, array('count' => 29)); # => There are 29 messages
-# 
 # =Interpolation
 # 
 # Any other option, plus the +count+ option, will be used for interpolating
@@ -66,6 +47,34 @@ function l($obj)
 #   t('{{user_name}} sent you a message', array('user_name' => 'James'));
 #   # => James sent you a message
 # 
+# =Pluralization [todo, specification unfinished]
+# 
+# There must multiple translations in your YAML file for a single message.
+# In fact as many translations as there are possible results to the above
+# computing. Eventually, you need to pass a +count+ interpolation variable,
+# that will determine which translation to use.
+# 
+# Depending on your locale, a computing is done to determine which translation
+# must be selected based on the +count+ variable. The algorythm is the same
+# than the one used by +gettext+.
+# 
+# Examples:
+# 
+#   en:
+#     x_minutes:
+#       0: "a minute"
+#       1: "{{count}} minutes"
+#     there_are_x_messages:
+#       "There is {{count}} message"
+#       "There are {{count}} messages"
+#   
+#   t('x_minutes', array('count' => 1));   # => 'a minute'
+#   t('x_minutes', array('count' => 12));  # => '12 minutes'
+#   t('there_are_x_messages', array('count' => 0));   # => There are 0 messages
+#   t('there_are_x_messages', array('count' => 1));   # => There is 1 message
+#   t('there_are_x_messages', array('count' => 29));  # => There are 29 messages
+# 
+# IMPROVE: Add possibility to separate translations in a directory structure (ie. use context as subpath).
 class I18n
 {
   static public  $locale       = 'en';
@@ -98,9 +107,10 @@ class I18n
     return self::$locale;
   }
   
-  # Finds the translation for a string.
+  # Finds the translation for a string. Returns the string unstranslated
+  # if no translation is found.
   # 
-  # Returns the string unstranslated if no translation is found.
+  # FIXME: Missing interpolation when translation isn't found. eg: t('this is my {{name}}', array('name' => $name)).
   static function translate($str, $options=null)
   {
     $translation = self::do_translate($str, $options);
@@ -108,16 +118,27 @@ class I18n
   }
   
   # Same as <tt>translate</tt>, but returns null if no translation is found.
-  static function do_translate($str, $options=null)
+  static function do_translate($str, $options=array())
   {
     $ctx = isset($options['context']) ? $options['context'] : null;
     $key = empty($ctx) ? $str : "$ctx.$str";
     
     if (isset(self::$translations[self::$locale][$key]))
     {
-      $translation = self::$translations[self::$locale][$key];
+      # translation exists
+      if (is_array(self::$translations[self::$locale][$key]))
+      {
+        # plural
+        $n = self::plural($options['count']);
+        $translation = self::$translations[self::$locale][$key][$n];
+      }
+      else
+      {
+        # singular
+        $translation = self::$translations[self::$locale][$key];
+      }
       
-      if (is_array($options))
+      if (!empty($options))
       {
         # interpolation
         $vars = array();
@@ -126,20 +147,25 @@ class I18n
         }
         return strtr($translation, $vars);
       }
+      
       return $translation;
     }
     return null;
   }
   
   # Localizes certain objects like dates.
-  static function localize($obj)
+  static function localize($obj, $options=array())
   {
     switch(get_class($obj))
     {
+      case 'ActiveSupport_Datetime':
+      case 'ActiveSupport_Date': return $obj->format(self::translate(isset($options['format']) ? $options['format'] : 'default', array('context' => 'date.formats')));
+      case 'ActiveSupport_Time': return $obj->format(self::translate(isset($options['format']) ? $options['format'] : 'default', array('context' => 'time.formats')));
       case 'Time': return $obj->format(self::translate($obj->type, array('context' => 'localize')));
-      default:     return (string)$obj;
+      default: return (string)$obj;
     }
   }
+  
   
   static private function load_translations($locale)
   {
@@ -176,6 +202,14 @@ class I18n
   {
     static $hash = array();
     
+    # plural translation is an array
+    if (!is_hash($ary))
+    {
+      $hash[rtrim($parent, '.')] = $ary;
+      return $hash;
+    }
+    
+    # we flatten hashes
     foreach($ary as $k => $v)
     {
       if (is_array($v)) {
@@ -185,9 +219,17 @@ class I18n
         $hash["$parent$k"] = $v;
       }
     }
-    
     return $hash;
-  } 
+  }
+  
+  static private function plural($n)
+  {
+    switch(self::$locale)
+    {
+      case 'fr': return ($n > 1)  ? 1 : 0;
+      case 'en': return ($n != 1) ? 1 : 0;
+    }
+  }
 }
 
 ?>

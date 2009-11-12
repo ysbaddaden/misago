@@ -38,4 +38,13 @@ en:
   interpolation: "foo {{bar}}"
   messages:
     foo: "foo {{bar}}"
+  
+  plural:
+    x_minutes:
+      0: "a minute"
+      1: "{{count}} minutes"
+  
+  there_are_x_messages:
+    0: "there is one message"
+    1: "there are {{count}} messages"
 

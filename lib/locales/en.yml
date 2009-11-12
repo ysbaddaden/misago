@@ -16,4 +16,10 @@ en:
     date: "%m/%d/%Y"
     time: "%H:%M"
     datetime: "%m/%d/%Y %H:%M"
+  date:
+    formats:
+      default: "m/d/Y"
+  time:
+    formats:
+      default: "H:i"
 

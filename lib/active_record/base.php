@@ -278,9 +278,19 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
           case 'integer': $value = (int)$value;    break;
           case 'float':   $value = (double)$value; break;
           case 'boolean': $value = (bool)$value;   break;
-          case 'date': case 'datetime': case 'time':
-            if (!($value instanceof Time)) {
-              $value = new Time($value, $this->columns[$attribute]['type']);
+          case 'datetime':
+            if (!($value instanceof ActiveSupport_Datetime)) {
+              $value = new ActiveSupport_Datetime($value);
+            }
+          break;
+          case 'date':
+            if (!($value instanceof ActiveSupport_Date)) {
+              $value = new ActiveSupport_Date($value);
+            }
+          break;
+          case 'time':
+            if (!($value instanceof ActiveSupport_Time)) {
+              $value = new ActiveSupport_Time($value);
             }
           break;
         }
@@ -635,10 +645,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     
     # timestamps
     if (array_key_exists('created_at', $this->columns) and empty($this->created_at)) {
-      $this->created_at = new Time(null, 'datetime');
+      $this->created_at = new ActiveSupport_Datetime();
     }
     if (array_key_exists('created_on', $this->columns) and empty($this->created_on)) {
-      $this->created_on = new Time(null, 'date');
+      $this->created_on = new ActiveSupport_Date();
     }
     
     # create
@@ -683,10 +693,10 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     
     # timestamps
     if (array_key_exists('updated_at', $this->columns) and empty($this->updated_at)) {
-      $this->updated_at = new Time(null, 'datetime');
+      $this->updated_at = new ActiveSupport_Datetime();
     }
     if (array_key_exists('updated_on', $this->columns) and empty($this->updated_on)) {
-      $this->updated_on = new Time(null, 'date');
+      $this->updated_on = new ActiveSupport_Date();
     }
     
     # update

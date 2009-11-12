@@ -233,23 +233,23 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     switch(gettype($this->$attribute))
     {
       case 'object':
-        if ($this->$attribute instanceof Time)
+        if ($this->$attribute instanceof ActiveSupport_Datetime)
         {
           $length = $this->$attribute->to_timestamp();
           if (isset($options['minimum']))
           {
-            $t = new Time($options['minimum']);
-            $options['minimum'] = $t->to_timestamp();
+            $t = new ActiveSupport_Datetime($options['minimum']);
+            $options['minimum'] = $t->getTimestamp();
           }
           if (isset($options['maximum']))
           {
-            $t = new Time($options['maximum']);
-            $options['maximum'] = $t->to_timestamp();
+            $t = new ActiveSupport_Datetime($options['maximum']);
+            $options['maximum'] = $t->getTimestamp();
           }
           if (isset($options['is']))
           {
-            $t = new Time($options['is']);
-            $options['is'] = $t->to_timestamp();
+            $t = new ActiveSupport_Datetime($options['is']);
+            $options['is'] = $t->getTimestamp();
           }
         }
         else {

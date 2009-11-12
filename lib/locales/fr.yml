@@ -16,4 +16,10 @@ fr:
     date: "%d/%m/%Y"
     time: "%H:%M"
     datetime: "%d/%m/%Y %H:%M"
+  date:
+    formats:
+      default: "d/m/Y"
+  time:
+    formats:
+      default: "H:i"
 
