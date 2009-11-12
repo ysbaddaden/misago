@@ -7,7 +7,7 @@ class ActiveRecord_Connection
   public  static $configurations;
   private static $adapters = array();
   
-  # Loads configurations from config/database.yml.
+  # Loads configurations from +config/database.yml+.
   static function load_configuration()
   {
     $apc_key = TMP.'/cache/database.serialized.php';

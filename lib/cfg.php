@@ -1,6 +1,7 @@
 <?php
 
 # Handles configuration across the framework and application.
+# TODO: use cfg_set() and cfg_get() functions instead of cfg class.
 class cfg
 {
   static protected $data = array();

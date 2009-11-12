@@ -93,7 +93,7 @@
 #   
 #   $post = new Post(123);
 #   foreach($post->tags as $tag) {
-#	    echo $tag->name.", ";
+#     echo $tag->name.", ";
 #   }
 # 
 # ===Options for has_many
@@ -199,7 +199,7 @@
 # - others.delete_all()
 # - others.destroy_all()
 # 
-# See <tt>ActionController_Collection</tt> for details.
+# See <tt>ActiveRecord_Collection</tt> for details.
 # 
 # = Dependent relations
 # 
@@ -222,20 +222,20 @@
 # 
 # == belongs_to
 # 
-# - destroy: calls the +destroy+ method of associated object.
-# - delete:  calls the +delete+ method of associated object.
+# - +destroy+ - calls the +destroy+ method of associated object.
+# - +delete+  - calls the +delete+ method of associated object.
 # 
 # == has_one
 # 
-# - destroy: calls the +destroy+ method of associated object.
-# - delete:  calls the +delete+ method of associated object.
-# - nullify: nullifies the foreign key of associated object.
+# - +destroy+ - calls the +destroy+ method of associated object.
+# - +delete+  -  calls the +delete+ method of associated object.
+# - +nullify+ - nullifies the foreign key of associated object.
 # 
 # == has_many
 # 
-# - destroy:    calls the +destroy_all+ method of the collection.
-# - delete_all: calls the +delete_all+ method of the collection.
-# - nullify:    nullifies the foreign key on associated objects.
+# - +destroy+    - calls the +destroy_all+ method of the collection.
+# - +delete_all+ - calls the +delete_all+ method of the collection.
+# - +nullify+    - nullifies the foreign key on associated objects.
 # 
 # =Eager Loading (include)
 #
@@ -620,8 +620,8 @@ abstract class ActiveRecord_Associations extends ActiveRecord_Record
 
   # Creates a SQL join fragment for a given association (related to this).
   # 
-  # - $association: the association to build the SQL join fragment with.
-  # - $type: inner, outer, left, left outer, etc.
+  # - +$association+ - the association to build the SQL join fragment with.
+  # - +$type+ - inner, outer, left, left outer, etc.
   # 
   function build_join_for($association, $type="inner")
   {

@@ -29,10 +29,10 @@ class ActiveRecord_Table
   # 
   # Options: 
   # 
-  # - +id+: true to automatically create the primary key column (default)
-  # - +options+: addition to table creation (eg: 'engine=myisam')
-  # - +temporary+: true to create a temporary table
-  # - +force+: true to drop table before create, otherwise creates if not exists
+  # - +id+        - true to automatically create the primary key column (default)
+  # - +options+   - addition to table creation (eg: 'engine=myisam')
+  # - +temporary+ - true to create a temporary table
+  # - +force+     - true to drop table before create, otherwise creates if not exists
   # 
   function __construct($name, array $options=null, ActiveRecord_ConnectionAdapters_AbstractAdapter $connection)
   {
@@ -66,11 +66,11 @@ class ActiveRecord_Table
   # 
   # Options:
   # 
-  # - +primary_key+ (boolean): column is the primary key?
-  # - +null+ (boolean): can the column be null?
-  # - +limit+ (integer): maximum size
-  # - +default+: default value
-  # - +signed+ (boolean): is the integer/float column signed?
+  # - +primary_key+ - true if column is the primary key
+  # - +null+    - can the column be null? (default: true)
+  # - +limit+   - maximum size
+  # - +default+ - default value
+  # - +signed+  - is the integer/float column signed?
   # 
   # Examples:
   # 
@@ -97,9 +97,9 @@ class ActiveRecord_Table
   # 
   # Types:
   # 
-  # - +date+: will add +created_on+ & +updated_on+.
-  # - +time+: will add +created_at+ & +updated_at+.
-  # - +datetime+: will add `created_at+ & +updated_at+.
+  # - +date+ - will add +created_on+ & +updated_on+.
+  # - +time+ - will add +created_at+ & +updated_at+.
+  # - +datetime+ - will add +created_at+ & +updated_at+.
   # 
   function add_timestamps($type='datetime')
   {

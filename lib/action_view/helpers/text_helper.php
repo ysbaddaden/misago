@@ -15,7 +15,7 @@ function ActionView_Helpers_TextHelper_replace_email_addresses($match)
 
 # Transforms all links and email addresses to clickable links.
 # 
-# - link: limits what should be linked (either one of all, email_addresses or urls).
+# - +link+ - limits what should be linked (either one of all, email_addresses or urls).
 # 
 # :namespace: ActionView\Helpers\TextHelper
 function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
@@ -108,7 +108,7 @@ function truncate($text, $length=30, $truncate_string='...')
 # http://michelf.com/projects/php-markdown/
 # 
 # You must strip all functions from +markdown.php+, keep defines,
-# rename the +Markdown_Parser` class to +Markdown+, and eventually
+# rename the +Markdown_Parser+ class to +Markdown+, and eventually
 # save it as +vendor/markdown.php+.
 # 
 # :namespace: ActionView\Helpers\TextHelper

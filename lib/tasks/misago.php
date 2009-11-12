@@ -10,6 +10,24 @@ while(($f = $d->read()) != false)
 }
 $d->close();
 
+# plugins' tasks
+$plugins = Plugin::list_plugins();
+foreach($plugins as $plugin)
+{
+  $path = ROOT."/vendor/plugins/$plugin/tasks";
+  if (is_dir($path))
+  {
+    $d = dir($path);
+    while(($f = $d->read()) != false)
+    {
+      if (strpos($f, '.pake')) {
+        include "$path/$f";
+      }
+    }
+    $d->close();
+  }
+}
+
 # app's tasks
 if (is_dir(ROOT.'/lib/tasks'))
 {

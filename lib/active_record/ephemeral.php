@@ -2,7 +2,7 @@
 
 # Ephemeral Record.
 # 
-# This is for tableless records. You get all the joys of an ActiveRecord
+# This is for tableless records. You get all the joys of an <tt>ActiveRecord</tt>
 # (record, validation), without the need to store data. 
 abstract class ActiveRecord_Ephemeral extends ActiveRecord_Validations
 {

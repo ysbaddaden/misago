@@ -145,8 +145,8 @@ function link_to_unless_current($content, $url, $attributes=null)
 # 
 # Special attributes:
 # 
-# - method: forces HTTP method
-# - confirm: asks for JavaScript confirmation before submitting form
+# - +method+  - forces HTTP method
+# - +confirm+ - asks for JavaScript confirmation before submitting form
 # 
 # :namespace: ActionView\Helpers\UrlHelper
 function button_to($name, $url, $attributes=null)
