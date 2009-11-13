@@ -7,16 +7,14 @@ Misago is yet another framework for PHP that is inspired on Rails.
 
 I wanted to learn more about the insides of a framework. I was eager to know how the least bit thing did work. I thus started hacking some frameworks. For fun and for real use in the end (ie. http://webcomics.fr).
 
-I also couldn't find a PHP framework as simple as Rails can be. I'm not saying Rails is easy, I'm just saying PHP frameworks that I gave a look at were far too complicated or outdated (ie. made for PHP 4). Reading throught the tutorials, I didn't understand anything: why do I have to do so many complicated things just to create a stupid model and start using it?
+I also couldn't find a PHP framework that pleases me, and that is as simple as Rails can be. I'm not saying Rails is easy, I'm just saying PHP frameworks that I gave a look at were far too complicated and/or outdated (ie. made for PHP 4). Reading throught the tutorials I didn't understand the least bit thing: why do I have to do so many complicated things just to create a stupid model and start using it?
 
-In the end I just wanted the Rails API. I thus decided in early 2009 to study the API, and reproduce it somehow in PHP, to learn more about it and understand why they chosed this idea and not another. 
-
-Finally I'm strating to use Misago in real projects. I also feel quite confident about using Rails directly (since I learned a lot).
+In the end I just wanted the Rails API. I thus decided early 2009 to study the API, and reproduce it somehow in PHP, to learn more about it and understand why they chosed this idea and not another. 
 
 
 === Why not use Ruby?
 
-I've been using PHP for years, and I like it. It's a challenge to create an object oriented framework for PHP too. Trying to get over the limitations, etc. PHP 5 introduced a usable model object, and PHP 5.3 introduces new features quite interesting (LSB, closures, etc.) which shall leverage the problematics, and boost overall performances. 
+I've been using PHP for years, and I like it. It's a challenge to create an object oriented framework for PHP too. Trying to get over the limitations, etc. PHP 5 introduced a usable model object, and PHP 5.3 introduces new features quite interesting (LSB, closures, etc.) which shall leverage the problematics, and boost overall performances (even thought PHP 5.3 is still very limited).
 
 One may also use Misago as a transition from PHP to Rails. Why not?
 
@@ -27,22 +25,28 @@ Misago requires PHP 5.2 (any previous 5.x version may work but is unsupported). 
 
 The CURL and mb_string extensions are required. APC and Memcache are optional but recommended, since they're both used to boost caching performances. Depending on your database of choice, the mysql or pgsql extension is required, too.
 
-Misago may start a webserver for you (using script/server). You must have LightTPD and the CGI version of PHP installed. nginx shall come someday as an alternative. Apache isn't supported, but may work (you will have to write the configuration).
+Misago may start a webserver for you (using script/server). You must have LightTPD and the CGI version of PHP installed. nginx shall come someday as an alternative. Apache isn't supported, but may work (you will have to write the configuration yourself).
 
 
 == Operating Systems
 
-Misago has only been tested on Linux systems. It should work on any *nix and Mac OS X systems thought, but Microsoft Windows ones may require a few modifications to most scripts (you may some success using cygwin for the shell and GNU tools).
+Misago has only been tested on Linux systems. It should work on any *nix and Mac OS X systems thought, but Microsoft Windows ones may require some modifications to Misago. You may have some luck using cygwin or GIT's shell. 
 
-Of course patches are welcome!
+Of course patches are welcome.
 
 
 == Documentation
 
 Check out 'pdoc' from http://github.com/ysbaddaden/pdoc and run inside misago's root directory:
 
-  $ pdoc --project misago lib/ -o doc/ 
+  $ pdoc --project misago lib/ -o doc/
 
+
+== Tasks
+
+Misago uses +pake+ from http://github.com/ysbaddaden/pdoc to handle most tasks. A +Pakefile+ is automatically generated when you generate your application.
+
+To add your own tasks (some CRONs for instance), just create a +.pake+ file into the +lib/tasks+ directory. For instance: +lib/tasks/crons.pake+ and they shall be available automatically.
 
 == Authors
 
