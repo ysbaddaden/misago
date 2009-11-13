@@ -233,24 +233,8 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
     switch(gettype($this->$attribute))
     {
       case 'object':
-        if ($this->$attribute instanceof ActiveSupport_Datetime)
-        {
-          $length = $this->$attribute->getTimestamp();
-          if (isset($options['minimum']))
-          {
-            $t = new ActiveSupport_Datetime($options['minimum']);
-            $options['minimum'] = $t->getTimestamp();
-          }
-          if (isset($options['maximum']))
-          {
-            $t = new ActiveSupport_Datetime($options['maximum']);
-            $options['maximum'] = $t->getTimestamp();
-          }
-          if (isset($options['is']))
-          {
-            $t = new ActiveSupport_Datetime($options['is']);
-            $options['is'] = $t->getTimestamp();
-          }
+        if ($this->$attribute instanceof ActiveSupport_Datetime) {
+          $length = $this->$attribute;
         }
         else {
           trigger_error("Unsupported object type: ".get_class($this->$attribute), E_USER_WARNING);

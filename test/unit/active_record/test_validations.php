@@ -1,11 +1,8 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
 class Test_ActiveRecord_Validations extends Unit_TestCase
 {
