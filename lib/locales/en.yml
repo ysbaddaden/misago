@@ -22,4 +22,40 @@ en:
   time:
     formats:
       default: "H:i"
+  number:
+    datetime:
+      distance_in_words:
+        less_than_x_minutes:
+          0: "less than a minute"
+          1: "less than {{count}} minutes"
+        x_minutes:
+          0: "a minute"
+          1: "{{count}} minutes"
+        about_x_minutes:
+          0: "about a minute"
+          1: "about {{count}} minutes"
+        x_hours:
+          0: "an hour"
+          1: "{{count}} hours"
+        about_x_hours:
+          0: "about an hour"
+          1: "about {{count}} hours"
+        x_days:
+          0: "a day"
+          1: "{{count}} days"
+        about_x_days:
+          0: "about a day"
+          1: "about {{count}} days"
+        x_months:
+          0: "a month"
+          1: "{{count}} month"
+        about_x_months:
+          0: "about a month"
+          1: "about {{count}} months"
+        x_years:
+          0: "a year"
+          1: "{{count}} years"
+        over_x_years:
+          0: "over a year"
+          1: "over {{count}} years"
 
