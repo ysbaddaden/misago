@@ -42,19 +42,19 @@ class Misago_Plugin
     
     self::copy_plugin($url, $path);
     
-#    if (file_exists("$path/install.php")) {
-#      include "$path/install.php";
-#    }
+    if (file_exists("$path/install.php")) {
+      include "$path/install.php";
+    }
   }
   
-  static function update($url)
+  static function update($name_or_url)
   {
     $name = basename($name_or_url);
     $path = ROOT."/vendor/plugins/$name";
     if (!file_exists($path)) {
-      die("Fatal error: no such plugin $name\n");
+      die("Fatal error: no such plugin $name.\n");
     }
-    self::copy_plugin($url, $path);
+    self::copy_plugin($name_or_url, $path);
   }
   
   static function uninstall($name_or_url)
@@ -62,14 +62,14 @@ class Misago_Plugin
     $name = basename($name_or_url);
     $path = ROOT."/vendor/plugins/$name";
     if (!file_exists($path)) {
-      die("Skipped unknown plugin $name.");
+      die("Skipped unknown plugin $name.\n");
     }
     
-#    if (file_exists("$path/uninstall.php")) {
-#      include "$path/uninstall.php";
-#    }
+    if (file_exists("$path/uninstall.php")) {
+      include "$path/uninstall.php";
+    }
     
-    rmdir_recursive($tmp);
+    rmdir_recursive($path);
   }
   
   private static function copy_plugin($source, $dest)
@@ -79,10 +79,13 @@ class Misago_Plugin
       $type = 'git';
       $cmd  = "git clone $source";
     }
-    elseif (preg_match('/^(svn|http|https):\/\//'))
+    elseif (preg_match('/^(svn|http|https):\/\//', $source))
     {
       $type = 'svn';
       $cmd  = "svn checkout $source";
+    }
+    else {
+      $type = null;
     }
     
     if ($type == 'svn' or $type == 'git')

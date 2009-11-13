@@ -71,6 +71,13 @@ function rmdir_recursive($path)
       unlink($pathfile);
     }
   }
+  
+  if (is_dir($path)) {
+    rmdir($path);
+  }
+  else {
+    unlink($path);
+  }
 }
 
 # Similar to http://php.net/copy but recursive.
