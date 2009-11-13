@@ -55,6 +55,9 @@ fr:
         x_years:
           0: "un an"
           1: "{{count}} ans"
+        about_x_years:
+          0: "environ un an"
+          1: "environ {{count}} ans"
         over_x_years:
           0: "plus d'un an"
           1: "plus de {{count}} ans"

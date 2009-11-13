@@ -48,13 +48,16 @@ en:
           1: "about {{count}} days"
         x_months:
           0: "a month"
-          1: "{{count}} month"
+          1: "{{count}} months"
         about_x_months:
           0: "about a month"
           1: "about {{count}} months"
         x_years:
           0: "a year"
           1: "{{count}} years"
+        about_x_years:
+          0: "about a year"
+          1: "about {{count}} years"
         over_x_years:
           0: "over a year"
           1: "over {{count}} years"

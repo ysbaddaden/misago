@@ -37,6 +37,7 @@ class ActiveSupport_Datetime extends DateTime
     switch($method)
     {
       case 'getTimestamp': return $this->format('U');
+      default: trigger_error("Unknown method ".get_class($this)."::$method().", E_USER_ERROR);
     }
   }
   
@@ -44,7 +45,7 @@ class ActiveSupport_Datetime extends DateTime
   function distance($datetime)
   {
     if (!$datetime instanceof DateTime) $datetime = new DateTime($datetime);
-    return $datetime->to_format('U') - $this->to_format('U');
+    return $datetime->getTimestamp() - $this->getTimestamp();
   }
   
   function is_valid()

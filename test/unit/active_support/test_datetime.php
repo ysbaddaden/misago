@@ -64,6 +64,14 @@ class Test_ActiveSupport_Datetime extends Unit_Test
     $date = new ActiveSupport_Datetime('1968-05-01 15:12:00', 'Asia/Tokyo');
     $this->assert_equal($date->to_rfc2822(), 'Wed, 01 May 1968 15:12:00 +0900');
   }
+  
+  function test_distance()
+  {
+    $date = new ActiveSupport_Datetime('1995-01-01 15:05:00');
+    $this->assert_equal($date->distance('1995-01-01 15:05:05'), 5);
+    $this->assert_equal($date->distance('1995-01-01 19:05:05'), 14405);
+    $this->assert_equal($date->distance('1994-05-01 19:05:05'), -21153595);
+  }
 }
 
 new Test_ActiveSupport_Datetime();
