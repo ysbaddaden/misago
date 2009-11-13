@@ -19,8 +19,8 @@ class Test_ActiveSupport_Cache_Store extends Unit_Test
     $this->cache->write('var', 'value');
     $this->assert_equal($this->cache->read('var'), 'value');
     
-    # APC has a bug: http://pecl.php.net/bugs/bug.php?id=13331
-    if (get_class($this) != 'Test_ActiveSupport_Cache_ApcStore')
+    # APC supports +expires_in+ but it has a bug: http://pecl.php.net/bugs/bug.php?id=13331
+    if (get_class($this) == 'Test_ActiveSupport_Cache_MemcacheStore')
     {
       # caching second var (with ttl)
       $this->cache->write('other_var', '23', array('expires_in' => 2));

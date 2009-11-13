@@ -6,8 +6,7 @@
 # Beware: variables aren't retained between requests with +MemoryStore+!
 class ActiveSupport_Cache_MemoryStore extends ActiveSupport_Cache_Store
 {
-  private $cache      = array();
-  private $expires_at = array();
+  private $cache = array();
   
   function read($key)
   {
@@ -17,7 +16,6 @@ class ActiveSupport_Cache_MemoryStore extends ActiveSupport_Cache_Store
   function write($key, $value, $options=array())
   {
     $this->cache[$key] = $value;
-    $this->expires_at[$key] = isset($options['expires_in']) ? time() + $options['expires_in'] : 0;
   }
   
   function delete($key)
@@ -27,22 +25,12 @@ class ActiveSupport_Cache_MemoryStore extends ActiveSupport_Cache_Store
   
   function exists($key)
   {
-    if (isset($this->cache[$key]))
-    {
-      if ($this->expires_at[$key] == 0
-        or $this->expires_at[$key] > time())
-      {
-        return true;
-      }
-      $this->delete($key);
-    }
-    return false;
+    return isset($this->cache[$key]);
   }
   
   function clear()
   {
-    $this->cache      = array();
-    $this->expires_at = array();
+    $this->cache = array();
   }
 }
 

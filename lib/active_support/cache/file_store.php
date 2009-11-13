@@ -23,32 +23,20 @@ class ActiveSupport_Cache_FileStore extends ActiveSupport_Cache_Store
   {
     $file = $this->file($key);
     file_put_contents($file, $value);
-    file_put_contents("$file.expires", isset($options['expires_in']) ?
-      time() + $options['expires_in'] : 0);
   }
   
   function delete($key)
   {
     $file = $this->file($key);
-    if (file_exists($file))
-    {
+    if (file_exists($file)) {
       unlink($file);
-      unlink("$file.expires");
     }
   }
   
   function exists($key)
   {
     $file = $this->file($key);
-    if (file_exists($file))
-    {
-      $expires_at = file_get_contents("$file.expires");
-      if ($expires_at == 0 or $expires_at > time()) {
-        return true;
-      }
-      $this->delete($key);
-    }
-    return false;
+    return file_exists($file);
   }
   
   function clear()
