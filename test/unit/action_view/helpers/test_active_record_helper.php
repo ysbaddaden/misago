@@ -1,11 +1,8 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
 require_once MISAGO."/lib/action_view/helpers/tag_helper.php";
 require_once MISAGO."/lib/action_view/helpers/form_tag_helper.php";
 require_once MISAGO."/lib/action_view/helpers/active_record_helper.php";
