@@ -11,7 +11,7 @@ while(($f = $d->read()) != false)
 $d->close();
 
 # plugins' tasks
-$plugins = Plugin::list_plugins();
+$plugins = Misago_Plugin::list_plugins();
 foreach($plugins as $plugin)
 {
   $path = ROOT."/vendor/plugins/$plugin/tasks";

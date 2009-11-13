@@ -310,6 +310,12 @@ abstract class ActiveRecord_Base extends ActiveRecord_Calculations
     return $this->table_name;
   }
   
+  # Returns the configuration of a given column.
+  function & column($column)
+  {
+    return $this->columns[$column];
+  }
+  
   # Returns an array of column names.
   function & column_names()
   {

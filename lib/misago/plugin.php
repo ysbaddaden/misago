@@ -23,7 +23,7 @@ class Misago_Plugin
     {
       $plugins = self::list_plugins();
       foreach($plugins as $i => $plugin) {
-        $plugins[$i] = "$plugin/lib";
+        $plugins[$i] = ROOT."/vendor/plugins/$plugin/lib";
       }
       $path = implode(PATH_SEPARATOR, $plugins);
       apc_store(TMP."/plugin_lib_paths", $path);

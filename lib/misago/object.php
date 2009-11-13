@@ -92,7 +92,7 @@ abstract class Misago_Object
   protected function include_module($module)
   {
     $object  = new $module($this);
-    $methods = $object->methods;
+    $methods = isset($object->methods) ? $object->methods : array();
     if (empty($methods))
     {
       $methods = get_class_methods($module);
