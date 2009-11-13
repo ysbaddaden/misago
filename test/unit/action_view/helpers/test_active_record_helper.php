@@ -8,18 +8,18 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 require_once "$location/test/test_app/config/boot.php";
 require_once MISAGO."/lib/action_view/helpers/tag_helper.php";
 require_once MISAGO."/lib/action_view/helpers/form_tag_helper.php";
+require_once MISAGO."/lib/action_view/helpers/active_record_helper.php";
 require_once MISAGO."/lib/action_view/helpers/form_helper.php";
-require_once MISAGO."/lib/action_view/helpers/record_helper.php";
 
-class Test_ActionView_Helpers_RecordHelper extends Unit_TestCase
+class Test_ActionView_Helpers_ActiveRecordHelper extends Unit_TestCase
 {
   function test_fields_for()
   {
     $product = new Product();
     
-    $this->assert_instance_of(fields_for('Product'), 'ActionView_Helpers_RecordHelper_Klass', "using a camelized string");
-    $this->assert_instance_of(fields_for('basket'), 'ActionView_Helpers_RecordHelper_Klass', "using an underscored string");
-    $this->assert_instance_of(fields_for($product), 'ActionView_Helpers_RecordHelper_Klass', "using an ActiveRecord");
+    $this->assert_instance_of(fields_for('Product'), 'ActionView_Helpers_FormHelper_FormBuilder', "using a camelized string");
+    $this->assert_instance_of(fields_for('basket'), 'ActionView_Helpers_FormHelper_FormBuilder',  "using an underscored string");
+    $this->assert_instance_of(fields_for($product), 'ActionView_Helpers_FormHelper_FormBuilder',  "using an ActiveRecord");
   }
   
   function test_label()
@@ -172,6 +172,6 @@ class Test_ActionView_Helpers_RecordHelper extends Unit_TestCase
   }
 }
 
-new Test_ActionView_Helpers_RecordHelper();
+new Test_ActionView_Helpers_ActiveRecordHelper();
 
 ?>

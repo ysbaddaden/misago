@@ -1,4 +1,5 @@
 <?php
+
 # Helpful functions to render form fields for a model.
 # 
 #   <\? $search = new Search() ?\>

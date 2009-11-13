@@ -34,6 +34,6 @@
 # 
 # IMPROVE: Transparently protect against CSRF attacks (using a hash stored in a cookie/session).
 # 
-namespace ActionView\Helpers\RecordHelper;
+namespace ActionView\Helpers\ActiveRecordHelper;
 
 ?>

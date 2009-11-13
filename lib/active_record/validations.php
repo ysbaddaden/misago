@@ -235,7 +235,7 @@ abstract class ActiveRecord_Validations extends ActiveRecord_Associations
       case 'object':
         if ($this->$attribute instanceof ActiveSupport_Datetime)
         {
-          $length = $this->$attribute->to_timestamp();
+          $length = $this->$attribute->getTimestamp();
           if (isset($options['minimum']))
           {
             $t = new ActiveSupport_Datetime($options['minimum']);

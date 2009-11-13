@@ -1,5 +1,6 @@
 <?php
 
+# :namespace: ActionView\Helpers\ActiveRecordHelper
 function error_message_on($object, $column, $all)
 {
   if ($object->errors->is_invalid($column))
@@ -22,6 +23,7 @@ function error_message_on($object, $column, $all)
   }
 }
 
+# :namespace: ActionView\Helpers\ActiveRecordHelper
 function error_messages_for($object)
 {
   $objects = func_get_args();
