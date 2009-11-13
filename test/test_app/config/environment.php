@@ -22,6 +22,6 @@ cfg::set('mailer_perform_deliveries', false);
 #cfg::set('mailer_return_path', 'postmaster@domain.com');
 
 # cache
-cfg::set('cache_store', 'apc_store');
+cfg::set('cache_store', 'memory_store');
 
 ?>

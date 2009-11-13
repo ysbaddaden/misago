@@ -105,7 +105,7 @@ abstract class ActionController_Caching extends ActionController_Filters
   {
     if (!isset($this->cache))
     {
-      $cache_store = cfg::is_set('cache_store') ? cfg::get('cache_store') : 'apc_store';
+      $cache_store = cfg::is_set('cache_store') ? cfg::get('cache_store') : 'memory_store';
       $CacheStoreClassName = 'ActiveSupport_Cache_'.String::camelize($cache_store);
       $this->cache = new $CacheStoreClassName();
     }

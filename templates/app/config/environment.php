@@ -23,6 +23,6 @@ date_default_timezone_set('UTC');
 #cfg::set('mailer_default_from', 'me <contact@domain.com>');
 
 # cache
-cfg::set('cache_store', 'apc_store');
+cfg::set('cache_store', 'memory_store');
 
 ?>

@@ -1,36 +1,33 @@
 <?php
 
-# A Cache Store implementation which stores data in memory.
+# A Cache Store implementation which stores data with APC.
 # See <tt>ActiveSupport_Cache_Store</tt> for help.
-# 
-# Beware: variables aren't retained between requests with +MemoryStore+!
 class ActiveSupport_Cache_MemoryStore extends ActiveSupport_Cache_Store
 {
-  private $cache = array();
-  
   function read($key)
   {
-    return $this->exists($key) ? $this->cache[$key] : false;
+    return apc_fetch($key);
   }
   
   function write($key, $value, $options=array())
   {
-    $this->cache[$key] = $value;
+    $ttl = isset($options['expires_in']) ? $options['expires_in'] : 0;
+    apc_store($key, $value, $ttl);
   }
   
   function delete($key)
   {
-    unset($this->cache[$key]);
+    apc_delete($key);
   }
   
   function exists($key)
   {
-    return isset($this->cache[$key]);
+    return (apc_fetch($key) === false);
   }
   
   function clear()
   {
-    $this->cache = array();
+    apc_clear_cache('user');
   }
 }
 

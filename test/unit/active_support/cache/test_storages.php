@@ -51,8 +51,7 @@ class Test_ActiveSupport_Cache_Store extends Unit_Test
 
 class Test_ActiveSupport_Cache_MemoryStore extends Test_ActiveSupport_Cache_Store
 {
-  function setup()
-  {
+  function setup() {
     $this->cache = new ActiveSupport_Cache_MemoryStore();
   }
 }
@@ -60,28 +59,17 @@ new Test_ActiveSupport_Cache_MemoryStore();
 
 class Test_ActiveSupport_Cache_FileStore extends Test_ActiveSupport_Cache_Store
 {
-  function setup()
-  {
+  function setup() {
     $this->cache = new ActiveSupport_Cache_FileStore();
   }
 }
 new Test_ActiveSupport_Cache_FileStore();
 
-class Test_ActiveSupport_Cache_ApcStore extends Test_ActiveSupport_Cache_Store
-{
-  function setup()
-  {
-    $this->cache = new ActiveSupport_Cache_ApcStore();
-  }
-}
-new Test_ActiveSupport_Cache_ApcStore();
-
 if (class_exists('Memcache', false))
 {
   class Test_ActiveSupport_Cache_MemcacheStore extends Test_ActiveSupport_Cache_Store
   {
-    function setup()
-    {
+    function setup() {
       $this->cache = new ActiveSupport_Cache_MemcacheStore();
     }
   }
