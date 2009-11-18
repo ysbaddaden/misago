@@ -8,15 +8,12 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   
   protected $fixtures = ':all';
   
-  
-  function __construct()
+  protected function run_tests()
   {
-    $this->logger = MisagoLogger::singleton();
-    
     self::create_database();
     $this->load_fixtures();
     
-    parent::__construct();
+    parent::run_tests();
     
     $this->truncate($this->fixtures);
     self::drop_database();

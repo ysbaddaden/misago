@@ -11,15 +11,21 @@ class Unit_Test
   private $time;
   private $running_test;
   
-  public function __construct()
+  function __construct()
+  {
+    $this->logger = MisagoLogger::singleton();
+    $this->run_tests();
+  }
+  
+  protected function run_tests()
   {
     $methods = get_class_methods($this);
     
+    # started
     printf("\nLoaded suite %s\n", Terminal::colorize(get_class($this), 'BOLD'));
     $this->setup();
     
     $this->time = microtime(true);
-    
     foreach($methods as $method)
     {
       if (strpos($method, 'test_') !== 0)
@@ -32,16 +38,14 @@ class Unit_Test
       $this->count_tests += 1;
       echo ".";
       
-      misago_log("------- $method:\n");
+      $this->logger->info("------- $method:\n");
       
       $this->run_test($method);
     }
     
-    $this->unsetup();
-    
     # finished
-    misago_log("-------\n");
-    
+    $this->unsetup();
+    $this->logger->info("-------\n");
     printf("\nFinished in %f seconds.\n", microtime(true) - $this->time);
     
     $text  = sprintf("%d tests, %d assertions, %d failures, %d errors",
