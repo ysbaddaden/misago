@@ -1,5 +1,6 @@
 #! /usr/bin/php -d phar.readonly=0
 <?php
+# DEPRECATED: use 'pake phar' instead.
 
 parse_dir(dirname(__FILE__).'/../lib', $files);
 parse_dir(dirname(__FILE__).'/../vendor', $files);

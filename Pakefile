@@ -15,7 +15,11 @@ function build_documentation()
 
 function build_phar_archive()
 {
-#  ini_set('phar.readonly', 0);
+  if (ini_get('phar.readonly') == 1)
+  {
+    passthru("php -d phar.readonly=0 {$_SERVER['argv'][0]} phar");
+    exit;
+  }
   chdir(dirname(__FILE__));
   
   build_phar_parse_dir('lib', $files);
