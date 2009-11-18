@@ -41,6 +41,20 @@ class ActiveSupport_Datetime extends DateTime
     }
   }
   
+  function __get($property)
+  {
+    switch($property)
+    {
+      case 'year':  return $this->format('Y'); break;
+      case 'month': return $this->format('m'); break;
+      case 'day':   return $this->format('d'); break;
+      case 'hour':  return $this->format('H'); break;
+      case 'min':   return $this->format('i'); break;
+      case 'sec':   return $this->format('s'); break;
+      default: trigger_error("Unknonwn property ActiveSupport_Datetime::$property.", E_USER_WARNING);
+    }
+  }
+  
   # Returns the distance between 2 dates as seconds.
   function distance($datetime)
   {
@@ -84,12 +98,6 @@ class ActiveSupport_Datetime extends DateTime
       case 'number': return preg_replace('/[^0-9]/', '', $this->__toString());
       default: return $this->__toString();
     }
-  }
-  
-  # TODO: ActiveSupport_Datetime::ago().
-  function ago()
-  {
-    
   }
 }
 

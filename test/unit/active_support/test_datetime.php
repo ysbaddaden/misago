@@ -72,6 +72,17 @@ class Test_ActiveSupport_Datetime extends Unit_Test
     $this->assert_equal($date->distance('1995-01-01 19:05:05'), 14405);
     $this->assert_equal($date->distance('1994-05-01 19:05:05'), -21153595);
   }
+  
+  function test_properties()
+  {
+    $date = new ActiveSupport_Datetime('1995-01-06 15:05:00');
+    $this->assert_equal($date->year,  '1995');
+    $this->assert_equal($date->month, '01');
+    $this->assert_equal($date->day,   '06');
+    $this->assert_equal($date->hour,  '15');
+    $this->assert_equal($date->min,   '05');
+    $this->assert_equal($date->sec,   '00');
+  }
 }
 
 new Test_ActiveSupport_Datetime();
