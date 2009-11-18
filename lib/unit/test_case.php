@@ -45,8 +45,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
       
       # creates database & migrates
       self::$connection->create_database($dbname);
-      require MISAGO."/lib/commands/db/migrate.php";
-      #passthru('PAKE_DIR='.ROOT.' MISAGO_ENV='.$_SERVER['MISAGO_ENV'].' pake db:migrate');
+      passthru('PAKE_HOME='.ROOT.' MISAGO_ENV='.$_SERVER['MISAGO_ENV'].' pake db:migrate 2>&1 1>/dev/null');
     }
   }
   

@@ -16,7 +16,7 @@ class Unit_Test
     $methods = get_class_methods($this);
     
     printf("\nLoaded suite %s\n", Terminal::colorize(get_class($this), 'BOLD'));
-#    echo "Started\n";
+    $this->setup();
     
     $this->time = microtime(true);
     
@@ -37,6 +37,8 @@ class Unit_Test
       $this->run_test($method);
     }
     
+    $this->unsetup();
+    
     # finished
     misago_log("-------\n");
     
@@ -45,6 +47,16 @@ class Unit_Test
     $text  = sprintf("%d tests, %d assertions, %d failures, %d errors",
       $this->count_tests, $this->count_assertions, $this->count_failures, $this->count_errors);
     echo Terminal::colorize($text, ($this->count_failures + $this->count_errors) ? 'RED' : 'GREEN')."\n";
+  }
+  
+  protected function setup()
+  {
+    
+  }
+  
+  protected function unsetup()
+  {
+    
   }
   
   protected function run_test($method)
