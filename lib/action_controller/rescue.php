@@ -11,7 +11,7 @@ abstract class ActionController_Rescue extends Misago_Object
   
   function __construct()
   {
-    $this->logger = MisagoLogger::singleton();
+    $this->logger = Misago_Logger::singleton();
     
     if ($_SERVER['MISAGO_ENV'] == 'production') {
       set_error_handler(array($this, 'rescue_php_error'));

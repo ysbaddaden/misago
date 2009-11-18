@@ -35,7 +35,6 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 
 require 'active_support/active_support.php';
 require 'action_controller/action_controller.php';
-
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
 

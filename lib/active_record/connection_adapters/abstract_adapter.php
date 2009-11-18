@@ -15,7 +15,7 @@ abstract class ActiveRecord_ConnectionAdapters_AbstractAdapter
   function __construct(array $config)
   {
     $this->config = $config;
-    $this->logger = MisagoLogger::singleton();
+    $this->logger = Misago_Logger::singleton();
   }
   
   function __destruct()

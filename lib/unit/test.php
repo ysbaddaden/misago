@@ -13,7 +13,7 @@ class Unit_Test
   
   function __construct()
   {
-    $this->logger = MisagoLogger::singleton();
+    $this->logger = Misago_Logger::singleton();
     $this->run_tests();
   }
   
