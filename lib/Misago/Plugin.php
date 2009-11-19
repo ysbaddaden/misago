@@ -1,6 +1,7 @@
 <?php
+namespace Misago;
 
-class Misago_Plugin
+class Plugin
 {
   static function & list_plugins()
   {

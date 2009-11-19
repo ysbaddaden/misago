@@ -25,7 +25,7 @@ class CachingController extends ApplicationController
   
   function error()
   {
-    throw new MisagoException('An error occured', 500);
+    throw new \Misago\Exception('An error occured', 500);
   }
 }
 

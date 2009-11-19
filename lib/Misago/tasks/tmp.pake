@@ -1,0 +1,41 @@
+<?php
+
+desc('creates tmp subdirectories');
+task('tmp:create', function()
+{
+  Pake_FileUtils::mkdir(ROOT.'/tmp');
+  Pake_FileUtils::mkdir(ROOT.'/tmp/cache');
+  Pake_FileUtils::mkdir(ROOT.'/tmp/pids');
+  Pake_FileUtils::mkdir(ROOT.'/tmp/sockets');
+});
+
+desc('clears tmp');
+task('tmp:clear', function($what=null)
+{
+  pake('tmp:clear:cache');
+  pake('tmp:clear:pids');
+  pake('tmp:clear:sockets');
+});
+
+desc('clears all files and directories in tmp/cache');
+task('tmp:clear:cache', function()
+{
+  Pake_FileUtils::rmdir(ROOT.'/tmp/cache');
+  echo "Cleared cache\n";
+});
+
+desc('clears all files in tmp/pids');
+task('tmp:clear:pids', function()
+{
+  Pake_FileUtils::rmdir(ROOT.'/tmp/pids');
+  echo "Cleared PIDs\n";
+});
+
+desc('clears all files in tmp/sockets');
+task('tmp:clear:sockets', function()
+{
+  Pake_FileUtils::rmdir(ROOT.'/tmp/sockets');
+  echo "Cleared sockets\n";
+});
+
+?>

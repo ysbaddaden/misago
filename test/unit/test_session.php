@@ -11,13 +11,13 @@ class Test_Session extends Unit_Test
 {
   function test_initial_use()
   {
-    Session::destroy();
+    Misago\Session::destroy();
     $this->assert_false(isset($_SESSION));
     
-    Session::start();
+    Misago\Session::start();
     $this->assert_true(isset($_SESSION));
     
-    Session::destroy();
+    Misago\Session::destroy();
     $this->assert_false(isset($_SESSION));
   }
   
@@ -25,7 +25,7 @@ class Test_Session extends Unit_Test
   {
     $session_id = Session::start('azerty');
     $this->assert_not_equal($session_id, 'azerty');
-    Session::destroy('azerty');
+    Misago\Session::destroy('azerty');
   }
 }
 

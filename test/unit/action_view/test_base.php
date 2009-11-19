@@ -45,7 +45,7 @@ class Test_ActionView_Base extends Unit_Test
       $view->render(array('template' => 'say/missing_action'));
       $result = true;
     }
-    catch(MisagoException $e) {
+    catch(\Misago\Exception $e) {
       $result = false;
     }
     $this->assert_false($result, 'rendered a view template');
@@ -55,7 +55,7 @@ class Test_ActionView_Base extends Unit_Test
       $view->render(array('partial' => 'missing_partial'));
       $result = true;
     }
-    catch(MisagoException $e) {
+    catch(\Misago\Exception $e) {
       $result = false;
     }
     $this->assert_false($result, 'rendered a partial template');

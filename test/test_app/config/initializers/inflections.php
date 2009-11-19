@@ -1,5 +1,5 @@
 <?php
-
+namespace Misago\ActiveSupport;
 class Inflections
 {
   static protected $constants = array('wiki');

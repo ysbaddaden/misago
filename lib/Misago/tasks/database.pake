@@ -1,0 +1,171 @@
+<?php
+
+desc('creates the database for current environment');
+task('db:create', function()
+{
+  $db = \Misago\ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
+  $db->connect();
+  
+  $dbname = $db->config('database');
+  if ($db->create_database($dbname, array('charset' => 'utf8'))) {
+    echo "Created database $dbname.\n";
+  }
+  else {
+    echo "Database $dbname wasn't created.\n";
+  }
+});
+
+desc('drops database for current environment');
+task('db:drop', function()
+{
+  $db = \Misago\ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
+  $db->connect();
+
+  $dbname = $db->config('database');
+  if ($db->drop_database($dbname, array('charset' => 'utf8'))) {
+    echo "Destroyed database $dbname.\n";
+  }
+  else {
+    echo "Database $dbname wasn't destroyed.\n";
+  }
+});
+
+desc('migrates the database for current environment (for help check db:migrate help)');
+task('db:migrate', function($cmd='')
+{
+  switch($cmd)
+  {
+    case 'up':
+      echo "Notice: db:migrate up VERSION=XXX is unsupported for now.\n";
+    break;
+    
+    case 'down':
+      echo "Notice: db:migrate down VERSION=XXX is unsupported for now.\n";
+    break;
+    
+    case 'redo':
+      $migrations   = \Misago\ActiveRecord\Migration::migrations();
+      if (!isset($_SERVER['STEP'])) $_SERVER['STEP'] = 1;
+      
+      if ($_SERVER['STEP'] > 0)
+      {
+        # migrates down x steps
+        $migration = end($migrations);
+        for ($i = 0; $i < $_SERVER['STEP']; $i++)
+        {
+          \Misago\ActiveRecord\Migration::run($migration, 'down');
+          $migration = prev($migrations);
+        }
+        
+        # migrates up x steps
+        for ($i = 0; $i < $_SERVER['STEP']; $i++) {
+          \Misago\ActiveRecord\Migration::run(next($migrations), 'up');
+        }
+      }
+    break;
+    
+    case '':
+      $from_version = \Misago\ActiveRecord\Migration::get_version();
+      $migrations   = \Misago\ActiveRecord\Migration::migrations();
+      
+      if (empty($_SERVER['VERSION']))
+      {
+        $last = end($migrations);
+        $_SERVER['VERSION'] = $last['version'];
+      }
+      
+      if ($from_version < $_SERVER['VERSION'])
+      {
+        foreach($migrations as $migration)
+        {
+          if ($migration['version'] > $from_version
+            and $migration['version'] <= $_SERVER['VERSION'])
+          {
+            \Misago\ActiveRecord\Migration::run($migration, 'up');
+          }
+        }
+      }
+      elseif ($from_version > $_SERVER['VERSION'])
+      {
+        $migration = end($migrations);
+        while($migration !== false)
+        {
+          if ($migration['version'] <= $from_version
+            and $migration['version'] > $_SERVER['VERSION'])
+          {
+            \Misago\ActiveRecord\Migration::run($migration, 'down');
+          }
+          $migration = prev($migrations);
+        }
+      }
+      else {
+        echo "Database is up to date.\n";
+      }
+    break;
+    
+    case 'help':
+    default:
+      echo "$ pake db:migrate\n";
+      echo "   => will run all required migrations up to the latest one.\n";
+      echo "\n";
+      echo "$ pake db:migrate VERSION=XXX\n";
+      echo "   => will run all required migrations (up or down) until the target\n";
+      echo "      is reached. On up the target migration is runned. On down the\n";
+      echo "      target migration isn't.\n";
+      echo "\n";
+      echo "$ pake db:migrate redo\n";
+      echo "   => will migrate down the last migration, before migrating up again.\n";
+      echo "\n";
+      echo "$ pake db:migrate redo STEP=2\n";
+      echo "   => will migrate down the last 2 migrations, before migrating up again.\n";
+      echo "\n";
+    break;
+  }
+}
+);
+
+desc('migrates down the last runned migration (use STEP=X to specify more)');
+task('db:rollback', function()
+{
+  $from_version = \Misago\ActiveRecord\Migration::get_version();
+  $migrations   = \Misago\ActiveRecord\Migration::migrations();
+  
+  if (!isset($_SERVER['STEP'])) $_SERVER['STEP'] = 1;
+  
+  if ($_SERVER['STEP'] > 0)
+  {
+    $migration = reset($migrations);
+    while($migration !== false)
+    {
+      if ($migration['version'] == $from_version)
+      {
+        for($i = 0; $i < $_SERVER['STEP']; $i++)
+        {
+          \Misago\ActiveRecord\Migration::run($migration, 'down');
+          $migration = prev($migrations);
+          if ($migration === false) break;
+        }
+        break;
+      }
+      $migration = next($migrations);
+    }
+  }
+});
+
+desc('drops the current database, then recreates it, before migrating up again');
+task('db:reset', function()
+{
+  pake("db:drop");
+  pake("db:create");
+  pake("db:migrate");
+});
+
+desc('loads fixtures into current environment');
+task('db:fixtures', function($cmd='load')
+{
+  if ($cmd == 'load') {
+    \Misago\Fixtures::insert();
+  }
+});
+
+?>

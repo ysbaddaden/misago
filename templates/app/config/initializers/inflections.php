@@ -1,4 +1,5 @@
 <?php
+namespace Misago\ActiveSupport;
 
 # IMPROVE: Use a YAML file instead of a PHP class.
 class Inflections

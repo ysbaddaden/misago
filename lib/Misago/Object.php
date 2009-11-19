@@ -1,10 +1,11 @@
 <?php
+namespace Misago;
 
 # Generic object, to share methods between all misago's classes.
 # 
 # Example class:
 # 
-#   class MyClass extends Misago_Object
+#   class MyClass extends Misago\Object
 #   {
 #     protected $id         = 1;
 #     private   $new_record = false;
@@ -41,7 +42,7 @@
 # 
 # Note: it is recommended to never call the +property_set+ method
 # directly, since it may be renamed someday.
-abstract class Misago_Object
+abstract class Object
 {
   protected $include_modules = array();
   private   $_mapped_methods = array();

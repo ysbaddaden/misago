@@ -5,5 +5,5 @@ define('MISAGO', ROOT.'/../..');
 define('PUBLIC', ROOT.'/public');
 define('TMP',    ROOT.'/tmp');
 
-require MISAGO.'/lib/boot.php';
+require MISAGO.'/lib/Misago/boot.php';
 ?>
