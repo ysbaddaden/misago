@@ -11,27 +11,26 @@ class Generator_Plugin extends Generator_Base
     }
     $this->options = $options;
     
-    $name = String::underscore($args[0]);
-    $vars = array(
-      'name'  => $name,
-      'Class' => String::camelize($name),
+    $Class = String::camelize($args[0]);
+    $name  = String::underscore($args[0]);
+    $vars  = array(
+      'Class' => $Class,
     );
     
     $this->create_directory("vendor/plugins");
-    $this->create_directory("vendor/plugins/$name");
+    $this->create_directory("vendor/plugins/$Class");
     
-#    $this->create_file_from_template("vendor/plugins/$name/init.php",      'plugin/init.php',     $vars);
-#    $this->create_file_from_template("vendor/plugins/$name/install.php",   'plugin/install.php',   $vars);
-#    $this->create_file_from_template("vendor/plugins/$name/uninstall.php", 'plugin/uninstall.php', $vars);
+    $this->create_file_from_template("vendor/plugins/$Class/install.php",   'plugin/install.php',   $vars);
+    $this->create_file_from_template("vendor/plugins/$Class/uninstall.php", 'plugin/uninstall.php', $vars);
     
-    $this->create_directory("vendor/plugins/$name/lib");
-    $this->create_file_from_template("vendor/plugins/$name/lib/$name.php", 'plugin/lib.php', $vars);
+    $this->create_directory("vendor/plugins/$Class/lib");
+    $this->create_file_from_template("vendor/plugins/$Class/lib/$Class.php", 'plugin/lib.php', $vars);
     
-    $this->create_directory("vendor/plugins/$name/tasks");
-    $this->create_file_from_template("vendor/plugins/$name/tasks/$name.pake", 'plugin/task.pake', $vars);
+    $this->create_directory("vendor/plugins/$Class/tasks");
+    $this->create_file_from_template("vendor/plugins/$Class/tasks/$name.pake", 'plugin/task.pake', $vars);
     
-    $this->create_directory("vendor/plugins/$name/test");
-    $this->create_file_from_template("vendor/plugins/$name/test/test_$name.php", 'plugin/test.php', $vars);
+    $this->create_directory("vendor/plugins/$Class/test");
+    $this->create_file_from_template("vendor/plugins/$Class/test/Test$Class.php", 'plugin/test.php', $vars);
   }
 }
 

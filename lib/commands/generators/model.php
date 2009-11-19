@@ -11,14 +11,12 @@ class Generator_Model extends Generator_Base
     }
     $this->options = $options;
     
-    $filename = String::underscore($args[0]);
-    $class    = String::camelize($args[0]);
-    $table    = String::pluralize($filename);
+    $Class = String::camelize($args[0]);
+    $table = String::pluralize($filename);
     
     $vars = array(
-      'filename' => $filename,
-      'Class'    => $class,
-      'table'    => $table,
+      'Class' => $Class,
+      'table' => $table,
     );
     
     # directories
@@ -27,20 +25,19 @@ class Generator_Model extends Generator_Base
     $this->create_directory('test/fixtures');
     
     # files
-    $test = $this->create_file_from_template("app/models/{$filename}.php", 'model/model.php', $vars);
-    $this->create_file_from_template("test/unit/test_{$filename}.php", 'model/test.php', $vars);
+    $this->create_file_from_template("app/models/{$Class}.php",    'model/model.php',   $vars);
+    $this->create_file_from_template("test/unit/Test{$Class}.php", 'model/test.php',    $vars);
     $this->create_file_from_template("test/fixtures/{$table}.yml", 'model/fixture.yml', $vars);
     
     # migrations
-    $filename = gmdate('YmdHis').'_create_'.$table;
+    $migration = gmdate('YmdHis').'_create_'.$table;
     $vars = array(
-      'filename' => $filename,
-      'Class'    => 'Create'.$class,
-      'Model'    => $class,
+      'Class'    => 'Create'.$Class,
+      'Model'    => $Class,
       'table'    => $table,
     );
     $this->create_directory('db/migrate');
-    $this->create_file_from_template("db/migrate/{$filename}.php", 'model/migration.php', $vars);
+    $this->create_file_from_template("db/migrate/{$migration}.php", 'model/migration.php', $vars);
   }
 }
 

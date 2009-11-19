@@ -44,7 +44,7 @@ class #{Controller}Controller extends ApplicationController
     
     if ($this->#{model}->save())
     {
-      $this->flash['notice'] = '#{Model} was successfully created.';
+      $this->flash['notice'] = t('#{Model} was successfully created.', '#{controller}.create');
       
       switch($this->format)
       {
@@ -73,7 +73,7 @@ class #{Controller}Controller extends ApplicationController
     
     if ($this->#{model}->update_attributes($this->params['#{model}']))
     {
-      $this->flash['notice'] = '#{Model} was successfully updated.';
+      $this->flash['notice'] = t('#{Model} was successfully updated.', '#{controller}.create');
       
       switch($this->format)
       {
@@ -99,7 +99,7 @@ class #{Controller}Controller extends ApplicationController
     $#{model} = new #{Model}();
     if ($#{model}->delete($this->params[':id']))
     {
-      $this->flash['notice'] = '#{Model} was successfully deleted.';
+      $this->flash['notice'] = t('#{Model} was successfully deleted.', '#{controller}.create');
       switch($this->format)
       {
         case 'html': $this->redirect_to(#{model}s_path()); break;

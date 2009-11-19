@@ -3,7 +3,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
-require_once ROOT."/app/controllers/application.php";
+require_once ROOT."/app/controllers/Application.php";
 
 class Test_ActionView_Base extends Unit_Test
 {

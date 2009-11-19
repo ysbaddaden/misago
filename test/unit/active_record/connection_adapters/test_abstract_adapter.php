@@ -6,7 +6,6 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require_once "$location/test/test_app/config/boot.php";
-require_once 'active_record/exception.php';
 
 class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
 {

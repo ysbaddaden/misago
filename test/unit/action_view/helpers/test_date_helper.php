@@ -3,7 +3,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
-require_once MISAGO."/lib/action_view/helpers/date_helper.php";
+require_once MISAGO."/lib/ActionView/Helpers/DateHelper.php";
 
 class Test_ActionView_Helpers_DateHelper extends Unit_TestCase
 {

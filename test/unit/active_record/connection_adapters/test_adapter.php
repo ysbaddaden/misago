@@ -6,8 +6,6 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require_once "$location/test/test_app/config/boot.php";
-require_once "$location/lib/active_record/exception.php";
-require_once "$location/lib/active_record/connection_adapters/postgresql_adapter.php";
 
 class Test_ConnectionAdapter_Adapter extends Unit_TestCase
 {

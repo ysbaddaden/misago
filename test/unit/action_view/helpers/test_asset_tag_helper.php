@@ -6,8 +6,8 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/tag_helper.php";
-require_once MISAGO."/lib/action_view/helpers/asset_tag_helper.php";
+require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/ActionView/Helpers/AssetTagHelper.php";
 
 class Test_ActionView_Helper_AssetTagHelper extends Unit_Test
 {

@@ -1,5 +1,0 @@
-#! /usr/bin/php
-<?php
-require dirname(__FILE__).'/../../config/boot.php';
-require 'commands/db/fixtures.php';
-?>

@@ -1,18 +1,30 @@
 <?php
 
-function __autoload($class)
+# http://groups.google.com/group/php-standards/web/psr-0-final-proposal
+function __autoload($className)
 {
-  $path = str_replace('_', '/', $class);
-  $path = preg_replace('/(?<=\w)([A-Z])/', ' \1', $path);
-  $path = str_replace(' ', '_', strtolower($path));
+  $className = ltrim($className, '\\');
+  $fileName  = '';
+  $namespace = '';
   
-  if (!include "$path.php")
+  if ($lastNsPos = strripos($className, '\\'))
   {
-    echo "\nError: an error occured while loading $path.php\n";
+    $namespace = substr($className, 0, $lastNsPos);
+    $className = substr($className, $lastNsPos + 1);
+    $fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+  }
+  $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+#  $fileName = str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
+  
+  if (!require $fileName)
+  {
+    echo "\nOops. An error occured while loading $path.php\n";
     debug_print_backtrace();
     exit;
   }
 }
+
+require 'cfg.php';
 
 if (!function_exists('apc_store')) {
   require MISAGO.'/lib/fake_apc.php';
@@ -33,8 +45,8 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'development';
 }
 
-require 'active_support/active_support.php';
-require 'action_controller/action_controller.php';
+require 'ActiveSupport.php';
+require 'ActionController.php';
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
 

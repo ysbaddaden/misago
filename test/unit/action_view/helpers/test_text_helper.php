@@ -3,9 +3,9 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
-require_once MISAGO."/lib/action_view/helpers/tag_helper.php";
-require_once MISAGO."/lib/action_view/helpers/url_helper.php";
-require_once MISAGO."/lib/action_view/helpers/text_helper.php";
+require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/ActionView/Helpers/UrlHelper.php";
+require_once MISAGO."/lib/ActionView/Helpers/TextHelper.php";
 
 class TestTextHelper extends Unit_Test
 {

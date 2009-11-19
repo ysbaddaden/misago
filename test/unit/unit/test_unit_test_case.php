@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
-require_once dirname(__FILE__)."/../../../lib/unit/test_case.php";
+require_once dirname(__FILE__)."/../../../lib/Unit/TestCase.php";
 
 
 class Test_Unit_TestCase extends Unit_TestCase

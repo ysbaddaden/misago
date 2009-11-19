@@ -11,22 +11,21 @@ class Generator_Mailer extends Generator_Base
     }
     $this->options = $options;
     
-    $filename = String::underscore($args[0]);
-    $class    = String::camelize($args[0]);
-    $table    = String::pluralize($filename);
+    $Class     = String::camelize($args[0]);
+    $view_path = String::underscore($class);
     
     $vars = array(
-      'filename' => $filename,
-      'Class'    => $class,
-      'table'    => $table,
+      'Class'     => $Class,
+      'filename'  => $filename,
+      'view_path' => $view_path,
     );
     
     $this->create_directory('app/models');
-    $this->create_directory('app/views/'.$filename);
+    $this->create_directory('app/views/'.String::underscore($filename));
     $this->create_directory('test/unit');
     
-    $test = $this->create_file_from_template("app/models/{$filename}.php", 'mailer/model.php', $vars);
-    $this->create_file_from_template("test/unit/test_{$filename}.php", 'mailer/test.php', $vars);
+    $this->create_file_from_template("app/models/{$Class}.php",    'mailer/model.php', $vars);
+    $this->create_file_from_template("test/unit/Test{$Class}.php", 'mailer/test.php',  $vars);
   }
 }
 

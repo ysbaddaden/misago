@@ -6,9 +6,9 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 
 require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/action_view/helpers/tag_helper.php";
-require_once MISAGO."/lib/action_view/helpers/form_tag_helper.php";
-require_once MISAGO."/lib/action_view/helpers/form_helper.php";
+require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/ActionView/Helpers/FormTagHelper.php";
+require_once MISAGO."/lib/ActionView/Helpers/FormHelper.php";
 
 class Test_ActionView_Helpers_FormHelper extends Unit_TestCase
 {
