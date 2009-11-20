@@ -1,15 +1,12 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/FormTagHelper.php";
 
-require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
-require_once MISAGO."/lib/ActionView/Helpers/FormTagHelper.php";
-
-class Test_ActionView_Helpers_FormTagHelper extends Unit_Test
+class Test_ActionView_Helpers_FormTagHelper extends Misago\Unit\Test
 {
   function test_form_tag()
   {
@@ -29,11 +26,11 @@ class Test_ActionView_Helpers_FormTagHelper extends Unit_Test
   
   function test_form_tag_with_named_routes()
   {
-    $this->assert_equal(form_tag(new ActionController_Path('POST', 'accounts'), array('multipart' => true)),
+    $this->assert_equal(form_tag(new Misago\ActionController\Path('POST', 'accounts'), array('multipart' => true)),
       '<form action="/accounts" method="post" enctype="multipart/form-data">');
-    $this->assert_equal(form_tag(new ActionController_Path('GET', 'accounts')),
+    $this->assert_equal(form_tag(new Misago\ActionController\Path('GET', 'accounts')),
       '<form action="/accounts" method="get">');
-    $this->assert_equal(form_tag(new ActionController_Path('PUT', 'profiles')),
+    $this->assert_equal(form_tag(new Misago\ActionController\Path('PUT', 'profiles')),
       '<form action="/profiles" method="post"><input type="hidden" name="_method" value="put"/>');
   }
   

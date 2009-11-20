@@ -12,14 +12,14 @@ class RunAllTests
     $this->find(dirname(__FILE__).'/unit', $test_files);
     #$this->find(dirname(__FILE__).'/functional', $test_files);
     
-    Unit_TestCase::$batch_run = true;
-    Unit_TestCase::create_database(true);
+    Misago\Unit\TestCase::$batch_run = true;
+    Misago\Unit\TestCase::create_database(true);
     
     foreach($test_files as $test_file) {
       include $test_file;
     }
     
-    Unit_TestCase::drop_database(true);
+    Misago\Unit\TestCase::drop_database(true);
   }
   
   function find($path, &$files)

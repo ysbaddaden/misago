@@ -1,6 +1,6 @@
 <?php
 
-class #{Class} extends ActiveRecord_Migration
+class #{Class} extends Misago\ActiveRecord\Migration
 {
   function up()
   {

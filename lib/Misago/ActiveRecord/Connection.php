@@ -1,6 +1,6 @@
 <?php
 namespace Misago\ActiveRecord;
-require_once 'ActiveRecord/Exception.php';
+require_once 'Misago/ActiveRecord/Exception.php';
 
 # Handles database connections.
 class Connection
@@ -40,7 +40,7 @@ class Connection
       throw new AdapterNotSpecified("Adapter not specified in configuration: $environment.");
     }
     
-    $class = "ActiveRecord_ConnectionAdapters_".String::camelize($config['adapter']).'Adapter';
+    $class = "Misago\ActiveRecord\ConnectionAdapters\\".\Misago\ActiveSupport\String::camelize($config['adapter']).'Adapter';
     return new $class($config);
   }
   

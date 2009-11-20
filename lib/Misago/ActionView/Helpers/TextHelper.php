@@ -1,19 +1,5 @@
 <?php
-namespace Misago\Misago\ActionView\Helpers\TextHelper
-{
-  # :nodoc:
-  function replace_urls($match)
-  {
-    return link_to($match[0]);
-  }
-
-  # :nodoc:
-  function replace_email_addresses($match)
-  {
-    return mail_to($match[0]);
-  }
-}
-
+require __DIR__.'/TextHelper_ns.php';
 
 # Transforms all links and email addresses to clickable links.
 # 
@@ -25,12 +11,12 @@ function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
   if ($link == 'all' or $link == 'urls')
   {
     $text = preg_replace_callback('/(?:http|https|ftp|sftp|ssh):\/\/[^ ]+/',
-      'Misago\Misago\ActionView\Helpers\TextHelper\replace_urls', $text);
+      'Misago\ActionView\Helpers\TextHelper\replace_urls', $text);
   }
   if ($link == 'all' or $link == 'email_addresses')
   {
     $text = preg_replace_callback('/[^@ ]+\@[^ ]+/',
-      'Misago\Misago\ActionView\Helpers\TextHelper\replace_email_addresses', $text);
+      'Misago\ActionView\Helpers\TextHelper\replace_email_addresses', $text);
   }
   return $text;
 }
@@ -74,7 +60,7 @@ function highlight($text, $phrases, $highlighter='<mark>\1</mark>')
 function pluralize($count, $singular, $plural=null)
 {
   if ($count != 1) {
-    return ($plural === null) ? String::pluralize($singular) : $plural;
+    return ($plural === null) ? Misago\ActiveSupport\String::pluralize($singular) : $plural;
   }
   return $singular;
 }

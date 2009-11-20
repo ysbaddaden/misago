@@ -3,12 +3,13 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+use Misago\ActiveRecord;
 
-class Orphan extends ActiveRecord_Base {
+class Orphan extends ActiveRecord\Base {
   
 }
 
-class Test_ActiveRecord_Base extends Unit_TestCase
+class Test_ActiveRecord_Base extends Misago\Unit\TestCase
 {
   protected $fixtures = array();
   
@@ -19,10 +20,10 @@ class Test_ActiveRecord_Base extends Unit_TestCase
       new Orphan();
       $test = false;
     }
-    catch(ActiveRecord_StatementInvalid $e) {
+    catch(ActiveRecord\StatementInvalid $e) {
       $test = true;
     }
-    $this->assert_true($test, "Must throw an ActiveRecord_StatementInvalid exception (no such table)");
+    $this->assert_true($test, "Must throw an ActiveRecord\StatementInvalid exception (no such table)");
   }
   
   function test_column_names()
@@ -40,8 +41,8 @@ class Test_ActiveRecord_Base extends Unit_TestCase
   {
     $product = new Product();
     $this->assert_equal(get_class($product), 'Product');
-    $this->assert_instance_of($product, 'ActiveRecord_Base');
-    $this->assert_instance_of($product, 'ActiveRecord_Record');
+    $this->assert_instance_of($product, 'Misago\ActiveRecord\Base');
+    $this->assert_instance_of($product, 'Misago\ActiveRecord\Record');
     
     $product = new Product(array('name' => 'azerty', 'price' => 18.99));
     $this->assert_equal($product->name, 'azerty');

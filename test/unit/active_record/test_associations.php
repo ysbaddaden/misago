@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
-class Test_ActiveRecord_Associations extends Unit_TestCase
+class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
 {
   protected $fixtures = array('products', 'orders', 'baskets', 'invoices', 'programmers', 'projects', 'programmers_projects');
   
@@ -28,7 +28,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   function test_has_many_relationship()
   {
     $order = new Order(1);
-    $this->assert_instance_of($order->baskets, 'ActiveRecord_Collection');
+    $this->assert_instance_of($order->baskets, 'Misago\ActiveRecord\Collection');
     $this->assert_equal($order->baskets->count(), 3);
     
     $basket = $order->baskets->build();
@@ -38,7 +38,7 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
   function test_has_and_belongs_to_many_relationship()
   {
     $programmer = new Programmer(1);
-    $this->assert_instance_of($programmer->projects, 'ActiveRecord_Collection');
+    $this->assert_instance_of($programmer->projects, 'Misago\ActiveRecord\Collection');
     $this->assert_equal($programmer->projects->count(), 2);
     
     $project = $programmer->projects->build();
@@ -56,13 +56,13 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $this->assert_null($tag->post->id, 'belongs_to: fresh object');
     
     $post = new Post();
-    $this->assert_instance_of($post->tags, 'ActiveRecord_Collection', 'has_many');
+    $this->assert_instance_of($post->tags, 'Misago\ActiveRecord\Collection', 'has_many');
     $this->assert_equal($post->tags->count(), 0);
     $tag = $post->tags->build(array('tag' => 'aaa'));
     $this->assert_instance_of($tag, 'Tag');
     
     $programmer = new Programmer();
-    $this->assert_instance_of($programmer->projects, 'ActiveRecord_Collection', 'HABTM');
+    $this->assert_instance_of($programmer->projects, 'Misago\ActiveRecord\Collection', 'HABTM');
     $this->assert_equal($programmer->projects->count(), 0);
     $project = $programmer->projects->build(array('name' => 'aaa'));
     $this->assert_instance_of($project, 'Project');
@@ -103,9 +103,9 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $orders = $order->find(':all', array('include' => 'baskets'));
     $this->assert_true(isset($orders[0]->baskets));
     $this->assert_true(isset($orders[1]->baskets));
-    $this->assert_instance_of($orders[0]->baskets, 'ActiveRecord_Collection');
+    $this->assert_instance_of($orders[0]->baskets, 'Misago\ActiveRecord\Collection');
     $this->assert_instance_of($orders[0]->baskets[0], 'Basket', "instance of relation");
-    $this->assert_instance_of($orders[2]->baskets, 'ActiveRecord_Collection', "instance of empty relation");
+    $this->assert_instance_of($orders[2]->baskets, 'Misago\ActiveRecord\Collection', "instance of empty relation");
   }
 
   function test_eager_loading_for_has_and_belongs_to_many()
@@ -114,9 +114,9 @@ class Test_ActiveRecord_Associations extends Unit_TestCase
     $programmers = $programmer->find(':all', array('include' => 'projects'));
     $this->assert_true(isset($programmers[0]->projects));
     $this->assert_true(isset($programmers[1]->projects));
-    $this->assert_instance_of($programmers[0]->projects, 'ActiveRecord_Collection');
+    $this->assert_instance_of($programmers[0]->projects, 'Misago\ActiveRecord\Collection');
     $this->assert_instance_of($programmers[1]->projects[0], 'Project', "instance of relation");
-    $this->assert_instance_of($programmers[2]->projects, 'ActiveRecord_Collection', "instance of empty relation");
+    $this->assert_instance_of($programmers[2]->projects, 'Misago\ActiveRecord\Collection', "instance of empty relation");
   }
   
   

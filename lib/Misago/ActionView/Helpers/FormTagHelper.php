@@ -51,7 +51,7 @@ function form_tag($url, $attributes=null)
 function label_tag($name, $text=null, $attributes=null)
 {
   if (empty($text)) {
-    $text = String::humanize($name);
+    $text = Misago\ActiveSupport\String::humanize($name);
   }
   if (!isset($attributes['for'])) {
     $attributes['for'] = $name;

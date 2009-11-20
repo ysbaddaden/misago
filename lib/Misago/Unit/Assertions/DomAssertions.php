@@ -1,6 +1,7 @@
 <?php
+namespace Misago\Unit\Assertions;
 
-class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
+class DomAssertions extends ModelAssertions
 {
   # HTML strings must be identical, up to attributes.
   # TODO: assert_dom_equal
@@ -75,6 +76,7 @@ class Unit_Assertions_DomAssertions extends Unit_Assertions_ModelAssertions
 }
 
 # CSS selector is derived from SelectorDom Copyright TJ Holowaychuk <tj@vision-media.ca>
+# :nodoc:
 class DOMSelector
 {
   function __construct($html)
@@ -85,9 +87,9 @@ class DOMSelector
     # drops XMLNS definitions because XPATH evaluates nothing when XMLNS are defined
     $html = preg_replace('/(<.*)xmlns="(?:.+?)"(.*>)/', '\1\2', $html);
     
-    $this->dom = new DOMDocument();
+    $this->dom = new \DOMDocument();
     $this->dom->loadXML(html_entity_decode($html, ENT_NOQUOTES, 'UTF-8'));
-    $this->xpath = new DOMXpath($this->dom);
+    $this->xpath = new \DOMXpath($this->dom);
   }
   
   function select($selector)

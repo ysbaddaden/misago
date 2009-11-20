@@ -1,16 +1,13 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/FormTagHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/FormHelper.php";
 
-require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
-require_once MISAGO."/lib/ActionView/Helpers/FormTagHelper.php";
-require_once MISAGO."/lib/ActionView/Helpers/FormHelper.php";
-
-class Test_ActionView_Helpers_FormHelper extends Unit_TestCase
+class Test_ActionView_Helpers_FormHelper extends Misago\Unit\TestCase
 {
   function test_options_for_select()
   {

@@ -2,18 +2,15 @@
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
-require_once dirname(__FILE__)."/../../../lib/Unit/TestCase.php";
 
-
-class Test_Unit_TestCase extends Unit_TestCase
+class Test_Misago_Unit_TestCase extends Misago\Unit\TestCase
 {
   protected $fixtures = array();
   
   function test_load_fixtures()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $db = Misago\ActiveRecord\Connection::get($_SERVER['MISAGO_ENV']);
     
     $data = $db->select_values('select id from products order by id asc;');
     $this->assert_equal($data, array(), "products must be empty");
@@ -39,6 +36,6 @@ class Test_Unit_TestCase extends Unit_TestCase
   }
 }
 
-new Test_Unit_TestCase();
+new Test_Misago_Unit_TestCase();
 
 ?>

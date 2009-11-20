@@ -1,7 +1,11 @@
 <?php
+namespace Misago\Unit;
+use Misago\ActiveRecord;
+use Misago\Fixtures;
+
 $_SERVER['migrate_debug'] = 0;
 
-class Unit_TestCase extends Unit_Assertions_ResponseAssertions
+class TestCase extends Assertions\ResponseAssertions
 {
   static public  $batch_run = false;
   static private $connection;
@@ -30,7 +34,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   {
     if (!self::$batch_run or $force)
     {
-      self::$connection = ActiveRecord_Connection::create($_SERVER['MISAGO_ENV']);
+      self::$connection = ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
       self::$connection->connect();
       
       $dbname = self::$connection->config('database');
@@ -50,7 +54,7 @@ class Unit_TestCase extends Unit_Assertions_ResponseAssertions
   {
     if (!self::$batch_run or $force)
     {
-      ActiveRecord_Connection::get($_SERVER['MISAGO_ENV'])->disconnect();
+      ActiveRecord\Connection::get($_SERVER['MISAGO_ENV'])->disconnect();
       self::$connection->drop_database(self::$connection->config('database'));
     }
   }

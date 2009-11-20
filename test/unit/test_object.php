@@ -5,7 +5,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
-class SomeOtherObject extends Misago_Object
+class SomeOtherObject extends \Misago\Object
 {
   function __construct()
   {
@@ -18,7 +18,7 @@ class SomeOtherObject extends Misago_Object
   }
 }
 
-class SomeObject extends Misago_Object
+class SomeObject extends \Misago\Object
 {
   protected $include_modules = array('SomeOtherObject');
   protected $new_record      = false;
@@ -48,7 +48,7 @@ class SomeObject extends Misago_Object
   }
 }
 
-class TestObject extends Unit_Test
+class TestObject extends Misago\Unit\Test
 {
   function test_attributes_as_methods()
   {

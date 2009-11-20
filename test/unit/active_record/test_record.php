@@ -1,13 +1,10 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
-require_once "$location/test/test_app/config/boot.php";
-
-class FakeRecord extends ActiveRecord_Record
+class FakeRecord extends Misago\ActiveRecord\Record
 {
   protected $columns = array(
     'id'    => array(),
@@ -15,9 +12,8 @@ class FakeRecord extends ActiveRecord_Record
   );
 }
 
-# TEST: Test dirty objects.
 # TEST: Test attributes().
-class Test_ActiveRecord_Record extends Unit_TestCase
+class Test_ActiveRecord_Record extends Misago\Unit\TestCase
 {
   function test_new()
   {

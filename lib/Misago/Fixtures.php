@@ -1,5 +1,5 @@
 <?php
-namespace \Misago;
+namespace Misago;
 
 class Fixtures
 {

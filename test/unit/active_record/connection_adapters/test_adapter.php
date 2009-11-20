@@ -1,18 +1,15 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
 
-require_once "$location/test/test_app/config/boot.php";
-
-class Test_ConnectionAdapter_Adapter extends Unit_TestCase
+class Test_ConnectionAdapter_Adapter extends Misago\Unit\TestCase
 {
   /*
   function test_connect()
   {
-    $db = new ActiveRecord_ConnectionAdapters_PostgresqlAdapter(array(
+    $db = new Misago\ActiveRecord\ConnectionAdapters\PostgresqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'wrong_user',
       'password' => 'wrong_password',
@@ -27,7 +24,7 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
     }
     $this->assert_true("Connection failed.", $failed);
   
-    $db = new ActiveRecord_ConnectionAdapters_PostgresqlAdapter(array(
+    $db = new Misago\ActiveRecord\ConnectionAdapters\PostgresqlAdapter(array(
       'host'     => 'localhost',
       'username' => 'postgres',
       'password' => '',
@@ -47,7 +44,7 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
       $rs = $this->db->select_database('misago_fake_test');
       $rs = true;
     }
-    catch(ActiveRecord_StatementInvalid $e) {
+    catch(Misago\ActiveRecord\StatementInvalid $e) {
       $rs = false;
     }
     $this->assert_false($rs, "database doesn't exists");
@@ -57,9 +54,9 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
   }
   */
   
-  function test_before()
+  function setup()
   {
-    $this->db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $this->db = Misago\ActiveRecord\Connection::get($_SERVER['MISAGO_ENV']);
   }
   
   function test_execute()
@@ -111,7 +108,7 @@ class Test_ConnectionAdapter_Adapter extends Unit_TestCase
       $columns = $this->db->columns('some_unknown_table');
       $failed  = false;
     }
-    catch(ActiveRecord_StatementInvalid $e) {
+    catch(\Misago\ActiveRecord\StatementInvalid $e) {
       $failed = true;
     }
     $this->assert_true($failed);

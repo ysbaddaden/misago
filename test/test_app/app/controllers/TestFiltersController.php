@@ -1,6 +1,6 @@
 <?php
 
-class TestFiltersController extends ActionController_Base
+class TestFiltersController extends ApplicationController
 {
   public $var_a;
   public $var_c;
@@ -10,7 +10,7 @@ class TestFiltersController extends ActionController_Base
   
   function __construct($type)
   {
-    ActionController_Base::__construct();
+    parent::__construct();
     
     switch($type)
     {

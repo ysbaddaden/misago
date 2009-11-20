@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../../../test_app/config/boot.php";
 
-class Test_ActiveSupport_Cache_Store extends Unit_Test
+class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
 {
   function test_storage()
   {
@@ -20,6 +20,7 @@ class Test_ActiveSupport_Cache_Store extends Unit_Test
     $this->assert_equal($this->cache->read('var'), 'value');
     
     # APC supports +expires_in+ but it has a bug: http://pecl.php.net/bugs/bug.php?id=13331
+    # And only Memcache supports expires_at.
     if (get_class($this) == 'Test_ActiveSupport_Cache_MemcacheStore')
     {
       # caching second var (with ttl)
@@ -52,7 +53,7 @@ class Test_ActiveSupport_Cache_Store extends Unit_Test
 class Test_ActiveSupport_Cache_MemoryStore extends Test_ActiveSupport_Cache_Store
 {
   function setup() {
-    $this->cache = new ActiveSupport_Cache_MemoryStore();
+    $this->cache = new Misago\ActiveSupport\Cache\MemoryStore();
   }
 }
 new Test_ActiveSupport_Cache_MemoryStore();
@@ -60,17 +61,17 @@ new Test_ActiveSupport_Cache_MemoryStore();
 class Test_ActiveSupport_Cache_FileStore extends Test_ActiveSupport_Cache_Store
 {
   function setup() {
-    $this->cache = new ActiveSupport_Cache_FileStore();
+    $this->cache = new Misago\ActiveSupport\Cache\FileStore();
   }
 }
 new Test_ActiveSupport_Cache_FileStore();
 
-if (class_exists('Memcache', false))
+if (class_exists('\Memcache', false))
 {
   class Test_ActiveSupport_Cache_MemcacheStore extends Test_ActiveSupport_Cache_Store
   {
     function setup() {
-      $this->cache = new ActiveSupport_Cache_MemcacheStore();
+      $this->cache = new Misago\ActiveSupport\Cache\MemcacheStore();
     }
   }
   new Test_ActiveSupport_Cache_MemcacheStore();

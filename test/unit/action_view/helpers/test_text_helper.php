@@ -3,11 +3,11 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
-require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
-require_once MISAGO."/lib/ActionView/Helpers/UrlHelper.php";
-require_once MISAGO."/lib/ActionView/Helpers/TextHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/UrlHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/TextHelper.php";
 
-class TestTextHelper extends Unit_Test
+class TestTextHelper extends Misago\Unit\Test
 {
   function test_auto_link()
   {

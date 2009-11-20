@@ -1,6 +1,6 @@
 <?php
 
-class CreateProduct extends ActiveRecord_Migration
+class CreateProduct extends Misago\ActiveRecord\Migration
 {
   function up()
   {

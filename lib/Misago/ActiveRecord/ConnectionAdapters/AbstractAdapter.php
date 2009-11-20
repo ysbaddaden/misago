@@ -17,7 +17,7 @@ abstract class AbstractAdapter
   function __construct(array $config)
   {
     $this->config = $config;
-    $this->logger = Misago_Logger::singleton();
+    $this->logger = \Misago\Logger::singleton();
   }
   
   function __destruct()

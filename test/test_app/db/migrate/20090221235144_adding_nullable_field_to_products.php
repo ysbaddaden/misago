@@ -1,6 +1,6 @@
 <?php
 
-class AddingNullableFieldToProduct extends ActiveRecord_Migration
+class AddingNullableFieldToProduct extends Misago\ActiveRecord\Migration
 {
   function up()
   {

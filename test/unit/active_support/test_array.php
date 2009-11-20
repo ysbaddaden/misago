@@ -1,11 +1,10 @@
 <?php
-
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
-class Test_ActiveSupport_Array extends Unit_Test
+class Test_ActiveSupport_Array extends Misago\Unit\Test
 {
   function test_is_hash()
   {

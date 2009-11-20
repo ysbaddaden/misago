@@ -9,5 +9,5 @@ if [ -z "$shell" ] ; then
 fi
 
 root=$(dirname `dirname $0`)
-phpsh $root/config/boot.php
+phpsh "$root/config/boot.php"
 

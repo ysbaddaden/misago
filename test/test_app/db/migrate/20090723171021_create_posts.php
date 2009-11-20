@@ -1,6 +1,6 @@
 <?php
 
-class CreatePost extends ActiveRecord_Migration
+class CreatePost extends Misago\ActiveRecord\Migration
 {
   function up()
   {

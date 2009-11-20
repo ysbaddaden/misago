@@ -1,6 +1,6 @@
 <?php
 
-class Order extends ActiveRecord_Base
+class Order extends Misago\ActiveRecord\Base
 {
 #  protected $has_many = array('products' => array('throught' => 'basket'));
   protected $has_many = array('baskets' => array('dependent' => 'delete_all'));

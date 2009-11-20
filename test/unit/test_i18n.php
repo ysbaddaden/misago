@@ -4,8 +4,10 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
+use Misago\I18n;
+use Misago\ActiveSupport;
 
-class Test_I18n extends Unit_Test
+class Test_I18n extends Misago\Unit\Test
 {
   function test_translate()
   {
@@ -76,9 +78,9 @@ class Test_I18n extends Unit_Test
   
   function test_localize()
   {
-    $this->assert_equal(l(new ActiveSupport_Datetime('2009-06-12 00:12:36')), '06/12/2009');
-    $this->assert_equal(l(new ActiveSupport_Date('2009-08-12')), '08/12/2009');
-    $this->assert_equal(l(new ActiveSupport_Time('13:45:36')), '13:45');
+    $this->assert_equal(l(new ActiveSupport\Datetime('2009-06-12 00:12:36')), '06/12/2009');
+    $this->assert_equal(l(new ActiveSupport\Date('2009-08-12')), '08/12/2009');
+    $this->assert_equal(l(new ActiveSupport\Time('13:45:36')), '13:45');
   }
 }
 

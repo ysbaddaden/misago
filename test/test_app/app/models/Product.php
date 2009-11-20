@@ -1,6 +1,6 @@
 <?php
 
-class Product extends ActiveRecord_Base
+class Product extends Misago\ActiveRecord\Base
 {
   protected $has_many = array('baskets' => array('dependent' => 'nullify'));
   

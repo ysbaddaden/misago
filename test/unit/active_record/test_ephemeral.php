@@ -5,7 +5,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../test_app/config/boot.php';
 
-class Test_ActiveRecord_Ephemeral extends Unit_TestCase
+class Test_ActiveRecord_Ephemeral extends Misago\Unit\TestCase
 {
   function test_construct()
   {

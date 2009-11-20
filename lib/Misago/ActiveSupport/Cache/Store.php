@@ -1,5 +1,5 @@
 <?php
-namespace ActiveSupport\Cache;
+namespace Misago\ActiveSupport\Cache;
 
 # Abstract cache storage.
 # 

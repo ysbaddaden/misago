@@ -13,6 +13,6 @@ define('MISAGO', ROOT.'/lib/misago');
 #define('MISAGO', 'phar://misago.phar');
 #require ROOT.'/lib/misago.phar';
 
-require MISAGO.'/lib/boot.php';
+require MISAGO.'/lib/Misago/boot.php';
 
 ?>

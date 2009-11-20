@@ -1,6 +1,7 @@
 <?php
 namespace Misago\ActionMailer;
-use ActionView;
+use Misago\ActionView;
+use Misago\ActiveSupport\String;
 
 # Delivers emails.
 # 

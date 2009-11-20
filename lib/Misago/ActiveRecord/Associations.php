@@ -1,5 +1,6 @@
 <?php
 namespace Misago\ActiveRecord;
+use Misago\ActiveSupport\String;
 
 # Model object relationships.
 # 

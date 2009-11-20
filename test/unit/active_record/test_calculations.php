@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
-class Test_ActiveRecord_Calculations extends Unit_TestCase
+class Test_ActiveRecord_Calculations extends Misago\Unit\TestCase
 {
   function test_simple_count()
   {

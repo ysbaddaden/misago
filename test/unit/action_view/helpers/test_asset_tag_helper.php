@@ -1,15 +1,12 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
+require_once MISAGO."/lib/Misago/ActionView/Helpers/AssetTagHelper.php";
 
-require_once "$location/test/test_app/config/boot.php";
-require_once MISAGO."/lib/ActionView/Helpers/TagHelper.php";
-require_once MISAGO."/lib/ActionView/Helpers/AssetTagHelper.php";
-
-class Test_ActionView_Helper_AssetTagHelper extends Unit_Test
+class Test_ActionView_Helper_AssetTagHelper extends Misago\Unit\Test
 {
   function test_image_path()
   {

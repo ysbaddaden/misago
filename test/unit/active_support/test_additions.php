@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
-class Test_Additions extends Unit_Test
+class Test_Additions extends Misago\Unit\Test
 {
   function test_is_blank()
   {

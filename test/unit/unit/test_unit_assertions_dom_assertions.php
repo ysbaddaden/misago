@@ -5,7 +5,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 
-class Test_Unit_Assertions_DomAssertions extends Unit_TestCase
+class Test_Unit_Assertions_DomAssertions extends Misago\Unit\TestCase
 {
   function test_assert_select()
   {

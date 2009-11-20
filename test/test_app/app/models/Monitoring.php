@@ -1,6 +1,6 @@
 <?php
 
-class Monitoring extends ActiveRecord_Base
+class Monitoring extends Misago\ActiveRecord\Base
 {
   protected function validate()
   {

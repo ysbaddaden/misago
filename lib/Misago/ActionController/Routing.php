@@ -1,5 +1,6 @@
 <?php
 namespace Misago\ActionController;
+use Misago\ActiveSupport\String;
 
 # Routing is what connects HTTP requests to your application's controllers,
 # parsing actions an parameters too.
@@ -58,8 +59,8 @@ namespace Misago\ActionController;
 #   $this->connect('login', array(':controller' => 'accounts', ':action' => 'login',
 #     'conditions' => array('method' => 'POST')));
 # 
-# Using named routes with conditions, returned URL will be an <tt>ActionController_Url</tt>
-# or <tt>ActionController_Path</tt> object, that will be transparently handled by view's
+# Using named routes with conditions, returned URL will be an <tt>Misago\ActionController\Url</tt>
+# or <tt>Misago\ActionController\Path</tt> object, that will be transparently handled by view's
 # helpers to generate links and forms that will use the correct HTTP method.
 # 
 # =RESTful routes
@@ -389,7 +390,7 @@ class Routing extends \Misago\Object
     $method = isset($route['mapping']['conditions']['method']) ?
       $route['mapping']['conditions']['method'] : 'GET';
     $path = self::named_function($route, $keys);
-    return new ActionController_Path($method, $path);
+    return new Path($method, $path);
   }
   
   # :nodoc:
@@ -398,7 +399,7 @@ class Routing extends \Misago\Object
     $method = isset($route['mapping']['conditions']['method']) ?
       $route['mapping']['conditions']['method'] : 'GET';
     $path = self::named_function($route, $keys);
-    return new ActionController_Url($method, $path);
+    return new Url($method, $path);
   }
   
   static private function named_function(&$route, $keys)

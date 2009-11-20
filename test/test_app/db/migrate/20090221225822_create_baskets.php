@@ -1,6 +1,6 @@
 <?php
 
-class CreateBasket extends ActiveRecord_Migration
+class CreateBasket extends Misago\ActiveRecord\Migration
 {
   function up()
   {

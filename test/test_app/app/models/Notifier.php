@@ -1,10 +1,10 @@
 <?php
 
-class Notifier extends ActionMailer_Base
+class Notifier extends Misago\ActionMailer\Base
 {
   function monitoring_alert($server)
   {
-    $mail = new ActionMailer_Mail('monitoring_alert');
+    $mail = new Misago\ActionMailer\Mail('monitoring_alert');
     
     $mail->from('Misago <misago@domain.com>');
     $mail->recipient("{$server->title} <{$server->email}>");

@@ -4,8 +4,9 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+use Misago\ActiveSupport\String;
 
-class Test_String extends Unit_Test
+class Test_String extends Misago\Unit\Test
 {
   function test_is_symbol()
   {

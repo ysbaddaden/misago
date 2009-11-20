@@ -1,6 +1,7 @@
 <?php
+namespace Misago\Unit\Assertions;
 
-class Unit_Assertions_ResponseAssertions extends Unit_Assertions_DomAssertions
+class ResponseAssertions extends DomAssertions
 {
   protected $response = array();
   

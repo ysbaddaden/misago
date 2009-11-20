@@ -1,5 +1,4 @@
 <?php
-
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
@@ -8,7 +7,7 @@ require_once dirname(__FILE__)."/../../test_app/config/boot.php";
 class FakeClass  { }
 class FakeClass2 { }
 
-class Test_Unit_Test extends Unit_Test
+class Test_Misago_Unit_Test extends Misago\Unit\Test
 {
   function test_assert_true()
   {
@@ -98,6 +97,6 @@ class Test_Unit_Test extends Unit_Test
   }
 }
 
-new Test_Unit_Test();
+new Test_Misago_Unit_Test();
 
 ?>

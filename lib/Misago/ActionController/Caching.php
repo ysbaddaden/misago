@@ -1,5 +1,5 @@
 <?php
-namespace Misago\ActionController\Caching;
+namespace Misago\ActionController;
 use Misago\ActiveSupport;
 
 # Caching.
@@ -108,7 +108,7 @@ abstract class Caching extends Filters
     if (!isset($this->cache))
     {
       $cache_store = cfg_get('cache_store', 'memory_store');
-      $CacheStoreClassName = 'ActiveSupport\Cache\\'.String::camelize($cache_store);
+      $CacheStoreClassName = 'Misago\ActiveSupport\Cache\\'.ActiveSupport\String::camelize($cache_store);
       $this->cache = new $CacheStoreClassName();
     }
     return $this->cache;

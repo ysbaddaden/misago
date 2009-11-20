@@ -3,7 +3,7 @@
 # Priority is based upon order of creation.
 #
 
-$map = ActionController_Routing::draw();
+$map = Misago\ActionController\Routing::draw();
 
 # regular route:
 #   $map->connect('products/:id', array(':controller' => 'catalog', ':action' => 'view'));

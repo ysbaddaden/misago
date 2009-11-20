@@ -1,26 +1,26 @@
 <?php
-
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
-$location = dirname(__FILE__).'/../../..';
-require_once "$location/test/test_app/config/boot.php";
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+use Misago\ActiveSupport\String;
+use Misago\ActiveRecord;
 
-class Test_ActiveRecord_Connection extends Unit_TestCase
+class Test_ActiveRecord_Connection extends Misago\Unit\TestCase
 {
   function test_create()
   {
-    $db = ActiveRecord_Connection::create('production');
+    $db = ActiveRecord\Connection::create('production');
     $adapter = $db->config('adapter');
-    $klass = "ActiveRecord_ConnectionAdapters_".String::camelize($adapter)."Adapter";
+    $klass = "Misago\ActiveRecord\ConnectionAdapters\\".String::camelize($adapter)."Adapter";
     $this->assert_true($db instanceof $klass);
   }
   
   function test_get()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $db = ActiveRecord\Connection::get($_SERVER['MISAGO_ENV']);
     $adapter = $db->config('adapter');
-    $klass = "ActiveRecord_ConnectionAdapters_".String::camelize($adapter)."Adapter";
+    $klass = "Misago\ActiveRecord\ConnectionAdapters\\".String::camelize($adapter)."Adapter";
     $this->assert_true($db instanceof $klass);
   }
 }

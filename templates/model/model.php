@@ -1,6 +1,6 @@
 <?php
 
-class #{Class} extends ActiveRecord_Base
+class #{Class} extends Misago\ActiveRecord\Base
 {
   
 }

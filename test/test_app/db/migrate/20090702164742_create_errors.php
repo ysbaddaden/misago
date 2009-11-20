@@ -1,6 +1,6 @@
 <?php
 
-class CreateError extends ActiveRecord_Migration
+class CreateError extends Misago\ActiveRecord\Migration
 {
   function up()
   {

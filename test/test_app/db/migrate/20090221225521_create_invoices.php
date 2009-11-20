@@ -1,6 +1,6 @@
 <?php
 
-class CreateInvoice extends ActiveRecord_Migration
+class CreateInvoice extends Misago\ActiveRecord\Migration
 {
   function up()
   {

@@ -4,12 +4,13 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 require_once ROOT."/app/controllers/Application.php";
+use Misago\ActionView;
 
-class Test_ActionView_Base extends Unit_Test
+class Test_ActionView_Base extends Misago\Unit\Test
 {
   function test_render_template()
   {
-    $view = new ActionView_Base();
+    $view = new ActionView\Base();
     $view->view_path = 'say';
     
     $html = $view->render(array('template' => 'say/hello', 'format' => 'html', 'layout' => false));
@@ -23,7 +24,7 @@ class Test_ActionView_Base extends Unit_Test
   
   function test_render_view_with_layout()
   {
-    $view = new ActionView_Base();
+    $view = new ActionView\Base();
     $view->view_path = 'say';
     
     $xml = $view->render(array(
@@ -37,7 +38,7 @@ class Test_ActionView_Base extends Unit_Test
   
   function test_template_not_found()
   {
-    $view = new ActionView_Base();
+    $view = new ActionView\Base();
     $view->view_path = 'say';
     
     try
@@ -45,7 +46,7 @@ class Test_ActionView_Base extends Unit_Test
       $view->render(array('template' => 'say/missing_action'));
       $result = true;
     }
-    catch(\Misago\Exception $e) {
+    catch(Misago\Exception $e) {
       $result = false;
     }
     $this->assert_false($result, 'rendered a view template');
@@ -55,7 +56,7 @@ class Test_ActionView_Base extends Unit_Test
       $view->render(array('partial' => 'missing_partial'));
       $result = true;
     }
-    catch(\Misago\Exception $e) {
+    catch(Misago\Exception $e) {
       $result = false;
     }
     $this->assert_false($result, 'rendered a partial template');
@@ -69,7 +70,7 @@ class Test_ActionView_Base extends Unit_Test
     ));
     $controller->hello_who();
     
-    $view = new ActionView_Base($controller);
+    $view = new ActionView\Base($controller);
     $view->render(array(
       'template' => 'say/hello_who',
       'format'   => 'html',
@@ -79,14 +80,14 @@ class Test_ActionView_Base extends Unit_Test
   
   function test_yield()
   {
-    $view = new ActionView_Base();
+    $view = new ActionView\Base();
     $view->yield('content', 'some content');
     $this->assert_equal($view->yield('content'), 'some content');
   }
   
   function test_render_partial()
   {
-    $view = new ActionView_Base();
+    $view = new ActionView\Base();
     $view->view_path = 'say';
     $view->render(array('template' => 'say/hello'));
     

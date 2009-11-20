@@ -1,29 +1,6 @@
 <?php
-
-# Shortcut for I18n::translate();
-# 
-# Examples:
-# 
-#   t($string, $context);
-#   t($string, array('context' => $context));
-#   t("foor {{bar}}", array('context' => $context, 'bar' => 'baz'));
-# 
-function t($str, $options=null)
-{
-  if (!is_array($options) and !empty($options)) {
-    $options = array('context' => $options);
-  }
-  return I18n::translate($str, $options);
-}
-
-# Localizes certain objects like dates.
-function l($obj, $options=array())
-{
-  return I18n::localize($obj, $options);
-}
-
-
 namespace Misago;
+require 'I18n_shortcuts.php';
 
 # Handles translation of strings.
 # 
@@ -185,7 +162,7 @@ class I18n
     if ($success === false)
     {
       # misago's translations
-      $contents     = file_get_contents(MISAGO."/lib/locales/$locale.yml");
+      $contents     = file_get_contents(MISAGO."/lib/Misago/locales/$locale.yml");
       $translations = yaml_decode($contents);
 
       # app's translations

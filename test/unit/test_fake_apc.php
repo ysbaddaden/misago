@@ -5,7 +5,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
-class TestFakeApc extends Unit_Test
+class TestFakeApc extends Misago\Unit\Test
 {
   function test_apc_store()
   {

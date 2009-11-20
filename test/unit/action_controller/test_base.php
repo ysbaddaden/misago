@@ -3,8 +3,9 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
 require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+use Misago\ActionController;
 
-class Test_ActionController_Base extends Unit_TestCase
+class Test_ActionController_Base extends Misago\Unit\TestCase
 {
   /*
   function test_params()
@@ -31,10 +32,10 @@ class Test_ActionController_Base extends Unit_TestCase
   function test_execute_and_render()
   {
     $controller = new SayController();
-    $response   = new ActionController_AbstractResponse();
+    $response   = new ActionController\AbstractResponse();
     
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(
+    $controller->process(new ActionController\TestRequest(array(
       ':method'     => 'GET',
       ':controller' => 'say',
       ':action'     => 'hello',
@@ -43,7 +44,7 @@ class Test_ActionController_Base extends Unit_TestCase
     )), $response);
     $this->assert_equal(trim($response->body), "<html><head></head><body><p>Hello world!</p></body></html>");
     
-    $controller->process(new ActionController_TestRequest(array(
+    $controller->process(new ActionController\TestRequest(array(
       ':method'     => 'GET',
       ':controller' => 'say',
       ':action'     => 'hello_who',
@@ -56,11 +57,11 @@ class Test_ActionController_Base extends Unit_TestCase
   
   function test_render()
   {
-    $response   = new ActionController_AbstractResponse();
+    $response   = new ActionController\AbstractResponse();
     $controller = new SayController();
     
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(':controller' => 'say', ':action' => 'hello')));
+    $controller->process(new ActionController\TestRequest(array(':controller' => 'say', ':action' => 'hello')));
     ob_get_clean();
     
     $html = $controller->render_to_string('hello');
@@ -75,10 +76,10 @@ class Test_ActionController_Base extends Unit_TestCase
   
   function test_render_with_layout()
   {
-    $response   = new ActionController_AbstractResponse();
+    $response   = new ActionController\AbstractResponse();
     $controller = new SayController();
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(':controller' => 'say', ':action' => 'hello')));
+    $controller->process(new ActionController\TestRequest(array(':controller' => 'say', ':action' => 'hello')));
     ob_get_clean();
     
     $html = $controller->render_to_string(array('layout' => 'basic'));
@@ -86,7 +87,7 @@ class Test_ActionController_Base extends Unit_TestCase
     
     $controller = new ProductsController();
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(':controller' => 'products')));
+    $controller->process(new ActionController\TestRequest(array(':controller' => 'products')));
     ob_get_clean();
     
     $html = $controller->render_to_string('index');
@@ -100,7 +101,7 @@ class Test_ActionController_Base extends Unit_TestCase
     
     $controller = new ProductsController();
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(':controller' => 'products')));
+    $controller->process(new ActionController\TestRequest(array(':controller' => 'products')));
     ob_get_clean();
     $xml = $controller->render_to_string(array('xml' => new Product(3)));
     $this->assert_equal($xml, "<?xml version=\"1.0\"?><product><id>3</id><name><![CDATA[azerty]]></name><price>6.95</price><created_at></created_at><updated_at></updated_at><in_stock>1</in_stock><description></description></product>", "single resource as XML");
@@ -116,7 +117,7 @@ class Test_ActionController_Base extends Unit_TestCase
     $product    = new Product();
     $controller = new ProductsController();
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(':controller' => 'products')));
+    $controller->process(new ActionController\TestRequest(array(':controller' => 'products')));
     ob_get_clean();
     
     $json = $controller->render_to_string(array('json' => new Product(3)));
@@ -131,7 +132,7 @@ class Test_ActionController_Base extends Unit_TestCase
   {
     $controller = new SayController();
     ob_start();
-    $controller->process(new ActionController_TestRequest(array(':controller' => 'say', ':action' => 'hello')));
+    $controller->process(new ActionController\TestRequest(array(':controller' => 'say', ':action' => 'hello')));
     ob_get_clean();
     
     $html = $controller->render_to_string(array('template' => 'errors/404'));

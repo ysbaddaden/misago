@@ -1,17 +1,15 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+use Misago\ActiveRecord;
 
-require_once "$location/test/test_app/config/boot.php";
-
-class Test_ActiveRecord_Errors extends Unit_TestCase
+class Test_ActiveRecord_Errors extends Misago\Unit\TestCase
 {
   function test_add()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     
     $errors->add('id');
     $this->assert_equal($errors->messages, array('id' => array(':invalid')));
@@ -31,7 +29,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_add_on_blank()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     
     $errors->add_on_blank('id');
     $this->assert_equal($errors->messages, array('id' => array(':blank')));
@@ -39,7 +37,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_add_on_empty()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     
     $errors->add_on_empty('id');
     $this->assert_equal($errors->messages, array('id' => array(':empty')));
@@ -47,7 +45,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_add_to_base()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     
     $errors->add_to_base('error message');
     $this->assert_equal($errors->base_messages, array('error message'));
@@ -58,7 +56,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_count()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_equal($errors->count(), 0);
     
     $errors->add('id');
@@ -79,7 +77,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_clear()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_equal($errors->count(), 0);
     
     $errors->add('id');
@@ -92,7 +90,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_is_empty()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_true($errors->is_empty());
     
     $errors->add('id');
@@ -109,7 +107,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_is_invalid()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_false($errors->is_invalid('title'));
     
     $errors->add('title');
@@ -121,7 +119,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_on()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_type($errors->on('title'), 'NULL');
     
     $errors->add('title');
@@ -136,7 +134,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_on_base()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_type($errors->on_base(), 'NULL');
     
     $errors->add_to_base('error msg');
@@ -151,7 +149,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_full_messages()
   {
-    $errors = new ActiveRecord_Errors();
+    $errors = new ActiveRecord\Errors();
     $this->assert_equal($errors->full_messages(), array());
     
     $errors->add_to_base('generic error msg');
@@ -169,7 +167,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_translated_error_messages()
   {
-    $errors = new ActiveRecord_Errors(new Monitoring());
+    $errors = new ActiveRecord\Errors(new Monitoring());
     
     $errors->add('title2', ':required');
     $this->assert_equal($errors->on('title2'), 'please fill this', 'attribute as its own translation');
@@ -180,7 +178,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
   
   function test_translated_full_messages()
   {
-    $errors = new ActiveRecord_Errors(new Monitoring());
+    $errors = new ActiveRecord\Errors(new Monitoring());
     
     $errors->add('title2', ':required');
     $errors->add('title3', ':required');
@@ -196,7 +194,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
       'title' => 'my title',
       'subtitle' => 'my sub-title',
     ));
-    $errors = new ActiveRecord_Errors($error);
+    $errors = new ActiveRecord\Errors($error);
     
     $errors->add('title', ':taken');
     $this->assert_equal($errors->on('title'), "Title 'my title' is already taken");
@@ -215,7 +213,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
       'title' => 'my title',
       'domain' => '',
     ));
-    $errors = new ActiveRecord_Errors($error);
+    $errors = new ActiveRecord\Errors($error);
     $errors->add_to_base('Error on record');
     $errors->add('title', ':taken');
     $errors->add('domain', ':reserved');
@@ -236,7 +234,7 @@ class Test_ActiveRecord_Errors extends Unit_TestCase
       'title' => 'my title',
       'domain' => '',
     ));
-    $errors = new ActiveRecord_Errors($error);
+    $errors = new ActiveRecord\Errors($error);
     $errors->add_to_base('Error on record');
     $errors->add('title', ':taken');
     $errors->add('domain', ':reserved');

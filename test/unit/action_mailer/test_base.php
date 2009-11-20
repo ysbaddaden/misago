@@ -1,13 +1,10 @@
 <?php
-
-$location = dirname(__FILE__).'/../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
-require_once "$location/test/test_app/config/boot.php";
-
-class Test_ActionMailer_Base extends Unit_TestCase
+class Test_ActionMailer_Base extends Misago\Unit\TestCase
 {
   function test_render()
   {
@@ -40,5 +37,4 @@ class Test_ActionMailer_Base extends Unit_TestCase
 }
 
 new Test_ActionMailer_Base();
-
 ?>

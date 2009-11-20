@@ -1,9 +1,10 @@
 <?php
+use Misago\ActiveRecord;
 
 desc('creates the database for current environment');
 task('db:create', function()
 {
-  $db = \Misago\ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
+  $db = ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
   $db->connect();
   
   $dbname = $db->config('database');
@@ -18,7 +19,7 @@ task('db:create', function()
 desc('drops database for current environment');
 task('db:drop', function()
 {
-  $db = \Misago\ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
+  $db = ActiveRecord\Connection::create($_SERVER['MISAGO_ENV']);
   $db->connect();
 
   $dbname = $db->config('database');
@@ -44,7 +45,7 @@ task('db:migrate', function($cmd='')
     break;
     
     case 'redo':
-      $migrations   = \Misago\ActiveRecord\Migration::migrations();
+      $migrations   = ActiveRecord\Migration::migrations();
       if (!isset($_SERVER['STEP'])) $_SERVER['STEP'] = 1;
       
       if ($_SERVER['STEP'] > 0)
@@ -53,20 +54,20 @@ task('db:migrate', function($cmd='')
         $migration = end($migrations);
         for ($i = 0; $i < $_SERVER['STEP']; $i++)
         {
-          \Misago\ActiveRecord\Migration::run($migration, 'down');
+          ActiveRecord\Migration::run($migration, 'down');
           $migration = prev($migrations);
         }
         
         # migrates up x steps
         for ($i = 0; $i < $_SERVER['STEP']; $i++) {
-          \Misago\ActiveRecord\Migration::run(next($migrations), 'up');
+          ActiveRecord\Migration::run(next($migrations), 'up');
         }
       }
     break;
     
     case '':
-      $from_version = \Misago\ActiveRecord\Migration::get_version();
-      $migrations   = \Misago\ActiveRecord\Migration::migrations();
+      $from_version = ActiveRecord\Migration::get_version();
+      $migrations   = ActiveRecord\Migration::migrations();
       
       if (empty($_SERVER['VERSION']))
       {
@@ -81,7 +82,7 @@ task('db:migrate', function($cmd='')
           if ($migration['version'] > $from_version
             and $migration['version'] <= $_SERVER['VERSION'])
           {
-            \Misago\ActiveRecord\Migration::run($migration, 'up');
+            ActiveRecord\Migration::run($migration, 'up');
           }
         }
       }
@@ -93,7 +94,7 @@ task('db:migrate', function($cmd='')
           if ($migration['version'] <= $from_version
             and $migration['version'] > $_SERVER['VERSION'])
           {
-            \Misago\ActiveRecord\Migration::run($migration, 'down');
+            ActiveRecord\Migration::run($migration, 'down');
           }
           $migration = prev($migrations);
         }
@@ -127,8 +128,8 @@ task('db:migrate', function($cmd='')
 desc('migrates down the last runned migration (use STEP=X to specify more)');
 task('db:rollback', function()
 {
-  $from_version = \Misago\ActiveRecord\Migration::get_version();
-  $migrations   = \Misago\ActiveRecord\Migration::migrations();
+  $from_version = ActiveRecord\Migration::get_version();
+  $migrations   = ActiveRecord\Migration::migrations();
   
   if (!isset($_SERVER['STEP'])) $_SERVER['STEP'] = 1;
   
@@ -141,7 +142,7 @@ task('db:rollback', function()
       {
         for($i = 0; $i < $_SERVER['STEP']; $i++)
         {
-          \Misago\ActiveRecord\Migration::run($migration, 'down');
+          ActiveRecord\Migration::run($migration, 'down');
           $migration = prev($migrations);
           if ($migration === false) break;
         }

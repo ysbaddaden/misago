@@ -1,6 +1,6 @@
 <?php
 
-class Tag extends ActiveRecord_Base
+class Tag extends Misago\ActiveRecord\Base
 {
   protected $belongs_to = array('post');
 }

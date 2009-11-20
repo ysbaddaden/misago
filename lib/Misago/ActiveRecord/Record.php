@@ -200,7 +200,7 @@ abstract class Record extends \Misago\Object implements \Iterator
       }
       $xml .= "<$k>$v</$k>";
     }
-    $model = String::underscore(get_class($this));
+    $model = \Misago\ActiveSupport\String::underscore(get_class($this));
     return "<$model>$xml</$model>";
   }
   

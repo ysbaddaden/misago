@@ -1,5 +1,5 @@
 <?php
-namespace ActiveSupport\Cache;
+namespace Misago\ActiveSupport\Cache;
 
 # An Cache Store implementation which stores data in files.
 # See <tt>Store</tt> for help.

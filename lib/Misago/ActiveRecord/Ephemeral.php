@@ -1,5 +1,5 @@
 <?php
-require_once 'ActiveRecord/Exception.php';
+namespace Misago\ActiveRecord;
 use Misago\ActiveSupport;
 use Misago\ActiveSupport\String;
 use Misago\I18n;

@@ -1,6 +1,6 @@
 <?php
 
-class Error extends ActiveRecord_Base
+class Error extends Misago\ActiveRecord\Base
 {
   
 }

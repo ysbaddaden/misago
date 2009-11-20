@@ -4,6 +4,5 @@ define('APP',    ROOT.'/app');
 define('MISAGO', ROOT.'/../..');
 define('PUBLIC', ROOT.'/public');
 define('TMP',    ROOT.'/tmp');
-
 require MISAGO.'/lib/Misago/boot.php';
 ?>

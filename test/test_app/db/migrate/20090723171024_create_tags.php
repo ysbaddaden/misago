@@ -1,6 +1,6 @@
 <?php
 
-class CreateTag extends ActiveRecord_Migration
+class CreateTag extends Misago\ActiveRecord\Migration
 {
   function up()
   {

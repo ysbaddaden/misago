@@ -1,5 +1,5 @@
 #! /usr/bin/php
 <?php
 require dirname(__FILE__).'/../config/boot.php';
-require 'commands/plugin.php';
+require 'Misago/commands/plugin.php';
 ?>

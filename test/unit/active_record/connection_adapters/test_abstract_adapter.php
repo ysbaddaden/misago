@@ -1,13 +1,10 @@
 <?php
-
-$location = dirname(__FILE__).'/../../../..';
 if (!isset($_SERVER['MISAGO_ENV'])) {
   $_SERVER['MISAGO_ENV'] = 'test';
 }
+require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
 
-require_once "$location/test/test_app/config/boot.php";
-
-class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
+class FakeAdapter extends Misago\ActiveRecord\ConnectionAdapters\AbstractAdapter
 {
   public  $NATIVE_DATABASE_TYPES = array(
     'primary_key' => "SERIAL",
@@ -56,7 +53,7 @@ class FakeAdapter extends ActiveRecord_ConnectionAdapters_AbstractAdapter
   function database_exists($database) {}
 }
 
-class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
+class Test_ConnectionAdapter_AbstractAdapter extends Misago\Unit\Test
 {
   function test_quote_table()
   {
@@ -180,7 +177,7 @@ class Test_ConnectionAdapter_AbstractAdapter extends Unit_Test
     $db = new FakeAdapter(array());
     
     $t = $db->new_table('products');
-    $this->assert_true($t instanceof ActiveRecord_Table);
+    $this->assert_true($t instanceof Misago\ActiveRecord\Table);
     $this->assert_equal($t->columns, array('id' => array('type' => 'primary_key')));
     
     $t = $db->new_table('products', array('primary_key' => "isbn"));

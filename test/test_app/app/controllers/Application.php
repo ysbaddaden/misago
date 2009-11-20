@@ -1,6 +1,6 @@
 <?php
 
-class ApplicationController extends ActionController_Base
+class ApplicationController extends Misago\ActionController\Base
 {
   
 }

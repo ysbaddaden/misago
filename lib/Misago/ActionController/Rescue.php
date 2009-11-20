@@ -1,6 +1,7 @@
 <?php
 namespace Misago\ActionController;
 use Misago\Terminal;
+use Misago\I18n;
 
 # You may overwrite any of these methods to handle errors and exceptions
 # raised within your application.

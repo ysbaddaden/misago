@@ -23,7 +23,7 @@ class Migration
   # It's used to store the latest migration timestamps.
   static private function information_schema_exists()
   {
-    $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+    $db = Connection::get($_SERVER['MISAGO_ENV']);
     return $db->table_exists('misago_information_schema');
   }
   
@@ -32,7 +32,7 @@ class Migration
   {
     if (self::information_schema_exists())
     {
-      $db = ActiveRecord_Connection::get($_SERVER['MISAGO_ENV']);
+      $db = Connection::get($_SERVER['MISAGO_ENV']);
       
       return $db->select_value("SELECT version
         FROM misago_information_schema
@@ -97,7 +97,7 @@ class Migration
         case 'up': $version = $migration['version']; break;
         case 'down':
           $version = 0;
-          foreach(array_keys(Migration::migrations()) as $v)
+          foreach(array_keys(self::migrations()) as $v)
           {
             if ($v == $migration['version']) {
               break;
@@ -106,10 +106,10 @@ class Migration
           }
         break;
       }
-      Migration::save_version($version);
+      self::save_version($version);
     }
     else {
-      throw new Exception("An error occured.");
+      throw new \Misago\Exception("An error occured.");
     }
   }
   

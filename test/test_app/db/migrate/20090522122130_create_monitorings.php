@@ -1,6 +1,6 @@
 <?php
 
-class CreateMonitoring extends ActiveRecord_Migration
+class CreateMonitoring extends Misago\ActiveRecord\Migration
 {
   function up()
   {

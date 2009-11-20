@@ -1,6 +1,6 @@
 <?php
 
-class CreateOrder extends ActiveRecord_Migration
+class CreateOrder extends Misago\ActiveRecord\Migration
 {
   function up()
   {

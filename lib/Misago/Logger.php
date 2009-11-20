@@ -8,13 +8,13 @@ class Logger extends \Logger
   
   function __construct()
   {
-    Logger::__construct(ROOT."/log/{$_SERVER['MISAGO_ENV']}.log");
+    parent::__construct(ROOT."/log/{$_SERVER['MISAGO_ENV']}.log");
     switch(cfg_get('log_level', ($_SERVER['MISAGO_ENV'] == 'production') ? 'info' : 'debug'))
     {
-      case 'error': $this->level = \Logger::ERROR; break;
-      case 'warn':  $this->level = \Logger::WARN;  break;
-      case 'info':  $this->level = \Logger::INFO;  break;
-      case 'debug': $this->level = \Logger::DEBUG; break;
+      case 'error': $this->level = static::ERROR; break;
+      case 'warn':  $this->level = static::WARN;  break;
+      case 'info':  $this->level = static::INFO;  break;
+      case 'debug': $this->level = static::DEBUG; break;
     }
   }
   

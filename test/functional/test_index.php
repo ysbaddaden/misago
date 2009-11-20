@@ -4,7 +4,7 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 }
 require_once dirname(__FILE__).'/../test_app/config/boot.php';
 
-class TestIndexController extends ActionController_TestCase
+class TestIndexController extends Misago\ActionController\TestCase
 {
   function test_query_string_parse()
   {

@@ -1,6 +1,6 @@
 <?php
 
-class Contact extends ActiveRecord_Ephemeral
+class Contact extends Misago\ActiveRecord\Ephemeral
 {
   protected $columns = array(
     'subject'    => array('type' => 'string', 'limit' => 100),

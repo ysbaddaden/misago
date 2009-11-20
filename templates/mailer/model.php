@@ -1,6 +1,6 @@
 <?php
 
-class #{Class} extends ActionMailer_Base
+class #{Class} extends Misago\ActionMailer\Base
 {
   
 }

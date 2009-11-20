@@ -34,7 +34,7 @@ class Base extends \Misago\Object
       if ($success === false)
       {
         $helpers = array();
-        $this->_find_helpers($helpers, MISAGO.'/lib/ActionView/Helpers/');
+        $this->_find_helpers($helpers, __DIR__.'/Helpers/');
         $this->_find_helpers($helpers, ROOT.'/app/helpers/');
         apc_store(TMP.'/list_of_helpers', $helpers, strtotime('+24 hours'));
       }

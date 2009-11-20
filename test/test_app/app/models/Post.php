@@ -1,6 +1,6 @@
 <?php
 
-class Post extends ActiveRecord_Base
+class Post extends Misago\ActiveRecord\Base
 {
   protected $has_many = array('tags');
 }

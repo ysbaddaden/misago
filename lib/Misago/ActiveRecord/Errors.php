@@ -1,6 +1,7 @@
 <?php
 namespace Misago\ActiveRecord;
 use Misago\ActiveSupport\String;
+use Misago\I18n;
 
 # Handles errors for a given record.
 # 
