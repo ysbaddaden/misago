@@ -12,7 +12,6 @@ class FakeRecord extends Misago\ActiveRecord\Record
   );
 }
 
-# TEST: Test attributes().
 class Test_ActiveRecord_Record extends Misago\Unit\TestCase
 {
   function test_new()

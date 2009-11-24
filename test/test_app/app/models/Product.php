@@ -4,17 +4,12 @@ class Product extends Misago\ActiveRecord\Base
 {
   protected $has_many = array('baskets' => array('dependent' => 'nullify'));
   
-  function new_record()
+  protected function init()
   {
-    return $this->new_record;
+    #$this->has_many('baskets', array('dependent' => 'nullify'));
   }
   
-  function columns()
-  {
-    return $this->columns;
-  }
-  
-  function validate()
+  protected function validate()
   {
     if (empty($this->name)) {
       $this->errors->add_on_empty('name');

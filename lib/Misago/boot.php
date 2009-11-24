@@ -1,9 +1,9 @@
 <?php
 
 # http://groups.google.com/group/php-standards/web/psr-0-final-proposal
-function __autoload($className)
+function __autoload($origClassName)
 {
-  $className = ltrim($className, '\\');
+  $className = ltrim($origClassName, '\\');
   $fileName  = '';
   $namespace = '';
   
@@ -15,13 +15,15 @@ function __autoload($className)
   }
   $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className).'.php';
 
-#  debug_print_backtrace();
-  
   if (!include $fileName)
   {
     echo "\nOops. An error occured while loading $fileName\n";
     debug_print_backtrace();
     exit;
+  }
+  
+  if (method_exists($origClassName, '__constructStatic')) {
+    $origClassName::__constructStatic();
   }
 }
 

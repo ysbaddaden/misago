@@ -6,7 +6,8 @@ require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
 class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
 {
-  protected $fixtures = array('products', 'orders', 'baskets', 'invoices', 'programmers', 'projects', 'programmers_projects');
+  protected $fixtures = array('products', 'orders', 'baskets', 'invoices',
+    'programmers', 'projects', 'programmers_projects');
   
   function test_belongs_to_relationship()
   {

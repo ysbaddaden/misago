@@ -416,9 +416,9 @@ abstract class Associations extends Record
             'page'       => '',
             'include'    => '',
           ));
-          $def['find_options']['joins'] = "inner join ".$this->connection->quote_table($def['join_table']).
-            " on ".$this->connection->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
-            " = ".$this->connection->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
+          $def['find_options']['joins'] = "inner join ".static::$connection->quote_table($def['join_table']).
+            " on ".static::$connection->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
+            " = ".static::$connection->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
         break;
       }
       $this->associations[$name] = $def;
@@ -450,7 +450,7 @@ abstract class Associations extends Record
         if ($found)
         {
           # association exists
-	        return $this->$attribute = ($found instanceof \ArrayAccess) ?
+	        return $this->$attribute = ($found instanceof \Misago\ActiveSupport\ActiveArray) ?
 	          new Collection($this, $found, $assoc) : $found;
         }
       }
@@ -637,23 +637,23 @@ abstract class Associations extends Record
     switch($assoc['type'])
     {
       case 'belongs_to':
-        return "$type join ".$this->connection->quote_table($assoc['table_name']).
-          " on ".$this->connection->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
-          " = ".$this->connection->quote_column("{$this->table_name}.{$assoc['foreign_key']}");
+        return "$type join ".static::$connection->quote_table($assoc['table_name']).
+          " on ".static::$connection->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
+          " = ".static::$connection->quote_column("{$this->table_name}.{$assoc['foreign_key']}");
       
       case 'has_one':
       case 'has_many':
-        return "$type join ".$this->connection->quote_table($assoc['table_name']).
-          " on ".$this->connection->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
-          " = ".$this->connection->quote_column("{$this->table_name}.{$this->primary_key}");
+        return "$type join ".static::$connection->quote_table($assoc['table_name']).
+          " on ".static::$connection->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
+          " = ".static::$connection->quote_column("{$this->table_name}.{$this->primary_key}");
       
       case 'has_and_belongs_to_many':
-        return "$type join ".$this->connection->quote_table($assoc['join_table']).
-          " on ".$this->connection->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
-          " = ".$this->connection->quote_column("{$this->table_name}.{$this->primary_key}").
-          " $type join ".$this->connection->quote_table($assoc['table_name']).
-          " on ".$this->connection->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
-          " = ".$this->connection->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
+        return "$type join ".static::$connection->quote_table($assoc['join_table']).
+          " on ".static::$connection->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
+          " = ".static::$connection->quote_column("{$this->table_name}.{$this->primary_key}").
+          " $type join ".static::$connection->quote_table($assoc['table_name']).
+          " on ".static::$connection->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
+          " = ".static::$connection->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
     }
   }
   

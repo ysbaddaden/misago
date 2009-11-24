@@ -7,46 +7,51 @@ require_once dirname(__FILE__)."/../test_app/config/boot.php";
 
 class SomeOtherObject extends \Misago\Object
 {
-  function __construct()
+  private $object;
+  
+  function __construct($object)
   {
-    
+    $this->object = $object;
   }
   
-  function module_method()
-  {
-    return 'e';
+  function module_method() {
+    return $this->object->id();
+  }
+  
+  static function module_static_method() {
+    return 'f';
   }
 }
 
 class SomeObject extends \Misago\Object
 {
-  protected $include_modules = array('SomeOtherObject');
-  protected $new_record      = false;
-  protected $table_name      = 'some_objects';
-  protected $primary_key     = 'private';
+  protected $new_record  = false;
+  protected $table_name  = 'some_objects';
+  protected $primary_key = 'private';
   
   private   $id = 'a';
   
-  function id()
-  {
+  static function __constructStatic() {
+    static::include_module('SomeOtherObject');
+  }
+  
+  function id() {
     return $this->id;
   }
   
-  function id_set($id)
-  {
+  function id_set($id) {
     return $this->id = $id;
   }
   
-  function new_record()
-  {
+  function new_record() {
     return $this->new_record;
   }
   
-  function table_name()
-  {
+  function table_name() {
     return $this->table_name;
   }
 }
+SomeObject::__constructStatic();
 
 class TestObject extends Misago\Unit\Test
 {
@@ -64,27 +69,16 @@ class TestObject extends Misago\Unit\Test
     $this->assert_equal($o->id, 'b', 'value has been set');
   }
   
-  function test_map_method()
-  {
-    $o = new SomeObject();
-    $o->map_method($this, 'method_to_map');
-    $o->map_method($this, 'method_to_map', 'meth');
-    
-    $this->assert_equal($o->method_to_map(), 'c');
-    $this->assert_equal($o->meth(), 'c');
-    $this->assert_equal($o->meth('d'), 'd');
-  }
-  
-  function method_to_map($value=null)
-  {
-    return ($value === null) ? 'c' : $value;
-  }
-  
   function test_include_module()
   {
     $o = new SomeObject();
-    $this->assert_equal($o->module_method(), 'e');
-    $this->assert_equal($o->module_method, 'e');
+    $this->assert_equal($o->module_method(), 'a');
+    $this->assert_equal($o->module_method, 'a');
+    
+    $o->id = 12;
+    $this->assert_equal($o->module_method(), 12);
+    
+    $this->assert_equal(SomeObject::module_static_method(), 'f');
   }
 }
 

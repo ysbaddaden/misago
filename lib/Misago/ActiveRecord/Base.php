@@ -201,10 +201,10 @@ use Misago\I18n;
 abstract class Base extends Calculations
 {
   # Database object.
-  protected $connection;
+  protected static $connection;
   
   # Alias for +$connection+.
-  protected $db;
+  protected static $db;
   
   # Name of database's tables.
   protected $table_name;
@@ -223,15 +223,19 @@ abstract class Base extends Calculations
     if (empty($this->table_name)) {
       $this->table_name = String::underscore(String::pluralize(get_class($this)));
     }
-    $this->connection = Connection::get($_SERVER['MISAGO_ENV']);
-    $this->db = $this->connection;
     
+    if (!isset(static::$connection))
+    {
+      static::$connection = Connection::get($_SERVER['MISAGO_ENV']);
+      static::$db = static::$connection;
+    }
+
     # columns' definition
     $apc_key = TMP.'/cache/active_records/columns_'.$this->table_name;
     $this->columns = apc_fetch($apc_key, $success);
     if ($success === false)
     {
-      $this->columns = $this->connection->columns($this->table_name);
+      $this->columns = static::$connection->columns($this->table_name);
       apc_store($apc_key, $this->columns);
     }
     
@@ -261,6 +265,11 @@ abstract class Base extends Calculations
       }
       Record::__construct($arg);
     }
+  }
+  
+  static function __constructStatic()
+  {
+    // ...
   }
   
   function __get($attribute)
@@ -314,25 +323,25 @@ abstract class Base extends Calculations
     return $this->table_name;
   }
   
-  # Returns the configuration of a given column.
-  function & column($column)
+  # Returns the list of columns with definition.
+  static function columns()
   {
-    return $this->columns[$column];
+    return static::instance()->columns;
   }
   
   # Returns an array of column names.
-  function & column_names()
+  static function & column_names()
   {
-    $column_names = array_keys($this->columns);
+    $column_names = array_keys(static::instance()->columns);
     return $column_names;
   }
   
   # Returns the I18n translation of model name
   # (in +active_record.models+ context).
   # Defaults to the <tt>String::humanize()</tt> method.
-  function human_name()
+  static function human_name()
   {
-    $model = String::underscore(get_class($this));
+    $model = String::underscore(get_called_class());
     $human_name = I18n::translate($model, array('context' => "active_record.models"));
     return String::humanize($human_name);
   }
@@ -340,9 +349,9 @@ abstract class Base extends Calculations
   # Returns the I18n translation of attribute name
   # (in +active_record.attributes.$model+ context).
   # Defaults to the <tt>String::humanize()</tt> method.
-  function human_attribute_name($attribute)
+  static function human_attribute_name($attribute)
   {
-    $model = String::underscore(get_class($this));
+    $model = String::underscore(get_called_class());
     $human_name = I18n::translate($attribute, array('context' => "active_record.attributes.$model"));
     return String::humanize($human_name);
   }
@@ -351,16 +360,16 @@ abstract class Base extends Calculations
   # 
   # Examples:
   # 
-  #   $user  = $user->find_by_id();
-  #   $post  = $post->find_first_by_tag($tag);
-  #   $posts = $post->find_all_by_category_id($category_id);
-  function __call($func, $args)
+  #   $user  = User::find_by_id();
+  #   $post  = Post::find_first_by_tag($tag);
+  #   $posts = Post::find_all_by_category_id($category_id);
+  static function __callStatic($method, $args)
   {
-    if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $func, $match))
+    if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $method, $match))
     {
       if (!empty($match[2]))
       {
-        if (!in_array($match[2], array_keys($this->columns)))
+        if (!in_array($match[2], array_keys(static::instance()->columns)))
         {
           trigger_error("No such column '{$match[2]}'.", E_USER_WARNING);
           return;
@@ -377,10 +386,10 @@ abstract class Base extends Calculations
         $options = isset($args[0]) ? $args[0] : array();
       }
       
-      $method = empty($match[1]) ? ':first' : ':'.$match[1];
-      return $this->find($method, $options);
+      $scope = empty($match[1]) ? ':first' : ':'.$match[1];
+      return static::find($scope, $options);
     }
-    return parent::__call($func, $args);
+    return parent::__callStatic($method, $args);
   }
   
   # Finds records in database.
@@ -406,8 +415,10 @@ abstract class Base extends Calculations
   # See <tt>Misago\ActiveRecord\Associations</tt>.
   # 
   # TEST: Test option 'group'.
-  function find($method_or_id=':all', $options=null)
+  static function find($method_or_id=':all', $options=null)
   {
+    $instance = static::instance();
+    
     # arguments
     if (!is_symbol($method_or_id))
     {
@@ -419,7 +430,7 @@ abstract class Base extends Calculations
       else
       {
         $options = array(
-          'conditions' => array($this->primary_key => $method_or_id),
+          'conditions' => array($instance->primary_key => $method_or_id),
         );
         $method = ':first';
       }
@@ -430,7 +441,7 @@ abstract class Base extends Calculations
     
     # default scope
     $options = is_array($options) ?
-      hash_merge_recursive($this->default_scope, $options) : $this->default_scope;
+      hash_merge_recursive($instance->default_scope, $options) : $instance->default_scope;
     
     # optimization(s)
     if ($method == ':first' and !isset($options['limit'])) {
@@ -438,32 +449,31 @@ abstract class Base extends Calculations
     }
     
     # queries then creates objects
-    $sql = $this->build_sql_from_options($options);
+    $sql = $instance->build_sql_from_options($options);
     
-    $model = get_class($this);
     switch($method)
     {
       case ':all':
-        $results = $this->connection->select_all($sql);
+        $results = static::$connection->select_all($sql);
         $records = array();
         foreach($results as $result)
         {
-          $record = new $model($result);
+          $record = new static($result);
           $record->new_record = false;
           $records[] = $record;
         }
-        $records = new ActiveSupport\ActiveArray($records, $model);
+        $records = new ActiveSupport\ActiveArray($records, get_called_class());
         if (!empty($options['include'])) {
-          $this->eager_loading($records, $options['include']);
+          $instance->eager_loading($records, $options['include']);
         }
         return $records;
       break;
       
       case ':first':
-        $result = $this->connection->select_one($sql);
+        $result = static::$connection->select_one($sql);
         if ($result)
         {
-          $record = new $model($result);
+          $record = new static($result);
           $record->new_record = false;
         }
         else {
@@ -473,7 +483,7 @@ abstract class Base extends Calculations
       break;
       
       case ':values':
-        $results = $this->connection->select_all($sql);
+        $results = static::$connection->select_all($sql);
         foreach($results as $i => $values) {
           $results[$i] = array_values($results[$i]);
         }
@@ -483,21 +493,21 @@ abstract class Base extends Calculations
   }
   
   # Shortcut for <tt>find</tt>(:all).
-  function all($options=null)
+  static function all($options=null)
   {
-    return $this->find(':all', $options);
+    return static::find(':all', $options);
   }
   
   # Shortcut for <tt>find</tt>(:first).
-  function first($options=null)
+  static function first($options=null)
   {
-    return $this->find(':first', $options);
+    return static::find(':first', $options);
   }
   
   # Shortcut for <tt>find</tt>(:values).
-  function values($options=null)
+  static function values($options=null)
   {
-    return $this->find(':values', $options);
+    return static::find(':values', $options);
   }
   
   # Returns an array of ActiveRecords, using results as attributes.
@@ -505,13 +515,12 @@ abstract class Base extends Calculations
   # Use <tt>find</tt> instead, unless you need special features. Be aware that
   # custom SQL requests may brake whenever you switch between
   # connection adapters.
-  function & find_by_sql($sql)
+  static function & find_by_sql($sql)
   {
-    $class = get_class($this);
-    $rows  = $this->connection->select_all($sql);
+    $rows = static::$connection->select_all($sql);
     
     foreach(array_keys($rows) as $i) {
-      $rows[$i] = new $class($rows[$i]);
+      $rows[$i] = new static($rows[$i]);
     }
     return $rows;
   }
@@ -524,29 +533,28 @@ abstract class Base extends Calculations
   # Use <tt>count</tt> instead, unless you need special features. Be aware
   # that custom SQL requests may brake whenever you switch between
   # connection adapters.
-  function count_by_sql($sql)
+  static function count_by_sql($sql)
   {
-    $class = get_class($this);
-    $rows  = $this->connection->select_values($sql);
+    $rows = static::$connection->select_values($sql);
     return (int)$rows[0];
   }
   
   # Checks wether a given record exists or not.
-  function exists($id)
+  static function exists($id)
   {
     if (empty($id) and strlen($id) == 0) {
       return false;
     }
-    $options = array('conditions' => array($this->primary_key => $id));
-    return (bool)$this->count($options);
+    $options = array('conditions' => array(static::instance()->primary_key => $id));
+    return (bool)static::count($options);
   }
   
   # Returns full SQL string from given options.
   function build_sql_from_options($options)
   {
     # builds SQL
-    $table  = $this->connection->quote_table($this->table_name);
-    $select = empty($options['select']) ? '*' : $this->connection->quote_columns($options['select']);
+    $table  = static::$connection->quote_table($this->table_name);
+    $select = empty($options['select']) ? '*' : static::$connection->quote_columns($options['select']);
     $where  = '';
     $group  = '';
     $order  = '';
@@ -565,18 +573,18 @@ abstract class Base extends Calculations
       $joins = implode(' ', $joins);
     }
     if (!empty($options['conditions'])) {
-      $where = 'WHERE '.$this->connection->sanitize_sql_for_conditions($options['conditions']);
+      $where = 'WHERE '.static::$connection->sanitize_sql_for_conditions($options['conditions']);
     }
     if (!empty($options['group'])) {
-      $group = 'GROUP BY '.$this->connection->sanitize_order($options['group']);
+      $group = 'GROUP BY '.static::$connection->sanitize_order($options['group']);
     }
     if (!empty($options['order'])) {
-      $order = 'ORDER BY '.$this->connection->sanitize_order($options['order']);
+      $order = 'ORDER BY '.static::$connection->sanitize_order($options['order']);
     }
     if (isset($options['limit']))
     {
       $page  = isset($options['page']) ? $options['page'] : null;
-      $limit = $this->connection->sanitize_limit($options['limit'], $page);
+      $limit = static::$connection->sanitize_limit($options['limit'], $page);
     }
     
     return "SELECT $select FROM $table $joins $where $group $order $limit";
@@ -584,7 +592,7 @@ abstract class Base extends Calculations
   
   function merge_conditions($a, $b)
   {
-    return $this->connection->merge_conditions($a, $b);
+    return static::$connection->merge_conditions($a, $b);
   }
   
   function & merge_options($a, $b)
@@ -604,23 +612,25 @@ abstract class Base extends Calculations
   # If no exception is raised, transacted queries will be
   # commited to the database, and it returns the executed
   # function's result.
-  function transaction($func, array $args=array())
+  static function transaction($callback, array $args=array())
   {
-    if (is_string($func)) {
-      $func = array($this, $func);
+    $instance = static::instance();
+    
+    if (is_string($callback)) {
+      $callback = array($this, $callback);
     }
-    $this->connection->transaction('begin');
+    static::$connection->transaction('begin');
     
     try {
-      $rs = call_user_func_array($func, $args);
+      $rs = call_user_func_array($callback, $args);
     }
     catch(Exception $e)
     {
-      $this->connection->transaction('rollback');
+      static::$connection->transaction('rollback');
       return false;
     }
     
-    $this->connection->transaction('commit');
+    static::$connection->transaction('commit');
     return $rs;
   }
   
@@ -663,7 +673,7 @@ abstract class Base extends Calculations
     
     # create
     $attributes = $this->attributes();
-    $id = $this->connection->insert($this->table_name, $attributes, $this->primary_key);
+    $id = static::$connection->insert($this->table_name, $attributes, $this->primary_key);
     if ($id)
     {
       $this->new_record = false;
@@ -677,7 +687,7 @@ abstract class Base extends Calculations
       $this->after_save();
       
       # dirty object:
-      $this->__original_attributes = $this->__attributes;
+      $this->reset_original_attributes();
       
       return $id;
     }
@@ -715,7 +725,7 @@ abstract class Base extends Calculations
     if (empty($updates)) {
       return true;
     }
-    $rs = $this->connection->update($this->table_name, $updates, $conditions);
+    $rs = static::$connection->update($this->table_name, $updates, $conditions);
     
     if ($rs !== false)
     {
@@ -725,7 +735,7 @@ abstract class Base extends Calculations
       $this->after_save();
       
       # dirty object:
-      $this->__original_attributes = $this->__attributes;
+      $this->reset_original_attributes();
       
       return $rs;
     }
@@ -734,44 +744,42 @@ abstract class Base extends Calculations
   
   # Creates a new record.
   # 
-  #   $user  = $user->create(array('name' => 'John'));
-  #   $users = $user->create(array('name' => 'Jane'), array('name' => 'Billy'));
-  function create(array $attributes)
+  #   $user  = User::create(array('name' => 'John'));
+  #   $users = User::create(array('name' => 'Jane'), array('name' => 'Billy'));
+  static function create(array $attributes)
   {
     if (func_num_args() == 1)
     {
-      $class  = get_class($this);
-      $record = new $class($attributes);
+      $record = new static($attributes);
       $record->save();
       return $record;
     }
     else
     {
-      $args = func_get_args();
-      return $this->transaction('_block_create', $args);
+      $static = get_called_class();
+      $args   = func_get_args();
+      
+      return static::transaction(function() use($static, $args)
+      {
+        $records = array();
+        foreach($args as $attributes) {
+          $records[] = $static::do_create($attributes);
+        }
+        return $records;
+      });
     }
     return false;
   }
   
   # Same as <tt>create</tt> but throws an exception on failure.
-  function do_create(array $attributes)
+  static function do_create(array $attributes)
   {
     $args = func_get_args();
-    $rs   = call_user_func_array(array($this, 'create'), $args);
+    $rs   = forward_static_call_array(array(get_called_class(), 'create'), $args);
     if ($rs === false) {
       throw new RecordNotSaved;
     }
     return $rs;
-  }
-  
-  private function _block_create()
-  {
-    $args = func_get_args();
-    $records = array();
-    foreach($args as $attributes) {
-      $records[] = $this->do_create($attributes);
-    }
-    return $records;
   }
   
   # Updates one or many records.
@@ -784,41 +792,40 @@ abstract class Base extends Calculations
   #     1 => array('name' => 'Polly'),
   #     2 => array('name' => 'Jean')
   #   );
-  #   $users = $user->update(array_keys($people), array_values($people));
-  function update($id, $attributes)
+  #   $users = User::update(array_keys($people), array_values($people));
+  static function update($id, $attributes)
   {
     if (!is_array($id))
     {
-      $class = get_class($this);
-      $record = new $class($id);
-      $record->set_attributes($attributes);
+      $record = new static($id);
+      $record->attributes = $attributes;
       $record->save();
       return $record;
     }
-    else {
-      return $this->transaction('_block_update', array($id, $attributes));
+    else
+    {
+      $static = get_called_class();
+      return static::transaction(function($ids, $attributes) use ($static)
+      {
+        $records = array();
+        foreach($ids as $i => $id)
+        {
+          $records[] = $static::do_update($id, $attributes[$i]);
+          $i++;
+        }
+        return $records;
+      }, array($id, $attributes));
     }
   }
   
   # Same as <tt>update</tt> but throws an exception on failure.
-  function do_update($id, $attributes)
+  static function do_update($id, $attributes)
   {
-    $rs = $this->update($id, $attributes);
+    $rs = static::update($id, $attributes);
     if ($rs === false) {
       throw new RecordNotSaved;
     }
     return $rs;
-  }
-  
-  private function _block_update($ids, $attributes)
-  {
-    $records = array();
-    foreach($ids as $i => $id)
-    {
-      $records[] = $this->do_update($id, $attributes[$i]);
-      $i++;
-    }
-    return $records;
   }
   
   # Updates a single attribute of record, without going throught
@@ -845,17 +852,18 @@ abstract class Base extends Calculations
   #   ));
   function update_attributes($updates)
   {
-    $this->set_attributes($updates);
+    $this->attributes = $updates;
     return $this->save();
   }
   
   # Updates many records at once.
   # 
   # Available options: limit, order.
-  function update_all($updates, $conditions=null, $options=null)
+  static function update_all($updates, $conditions=null, $options=null)
   {
-    $options['primary_key'] = $this->primary_key;
-    return $this->connection->update($this->table_name, $updates, $conditions, $options);
+    $instance = static::instance();
+    $options['primary_key'] = $instance->primary_key;
+    return static::$connection->update($instance->table_name, $updates, $conditions, $options);
   }
   
   # Deletes a record.
@@ -868,22 +876,15 @@ abstract class Base extends Calculations
   #   $post->delete();
   function delete($id=null)
   {
-    if ($id === null) {
-      $record = $this;
-    }
-    else
-    {
-      $class  = get_class($this);
-      $record = new $class($id);
-    }
+    $record = ($id === null) ? $this : new static($id);
     
     if (!$record->new_record)
     {
       $record->before_delete();
       $record->delete_associated();
       
-      $conditions = array($this->primary_key => $record->id);
-      if (!$this->connection->delete($this->table_name, $conditions)) {
+      $conditions = array($record->primary_key => $record->id);
+      if (!static::$connection->delete($record->table_name, $conditions)) {
         return false;
       }
       
@@ -906,18 +907,20 @@ abstract class Base extends Calculations
   # Each matching record are instanciated, and deletion callbacks are run.
   # 
   # Available options: limit, order
-  function delete_all($conditions=null, $options=null)
+  static function delete_all($conditions=null, $options=null)
   {
+    $instance = static::instance();
+    
     if (!empty($conditions)) {
       $options['conditions'] = $conditions;
     }
     
-    $sql = $this->build_sql_from_options($options);
-    $ids = $this->connection->select_values($sql);
+    $sql = $instance->build_sql_from_options($options);
+    $ids = static::$connection->select_values($sql);
     
     foreach($ids as $id)
     {
-      if (!$this->delete($id[0])) {
+      if (!$instance->delete($id[0])) {
         return false;
       }
     }
@@ -933,7 +936,7 @@ abstract class Base extends Calculations
       $id = $this->id;
     }
     $conditions = array($this->primary_key => $id);
-    return $this->connection->delete($this->table_name, $conditions);
+    return static::$connection->delete($this->table_name, $conditions);
   }
   
   # Same as <tt>destroy</tt> but raises an <tt>ActiveRecord_Exception</tt> on error.
@@ -948,10 +951,11 @@ abstract class Base extends Calculations
   # Destroys many records at once.
   # 
   # Records aren't instanciated, and deletion callbacks aren't run.
-  function destroy_all($conditions=null, $options=null)
+  static function destroy_all($conditions=null, $options=null)
   {
-    $options['primary_key'] = $this->primary_key;
-    return $this->connection->delete($this->table_name, $conditions, $options);
+    $instance = static::instance();
+    $options['primary_key'] = $instance->primary_key;
+    return static::$connection->delete($instance->table_name, $conditions, $options);
   }
   
   # Generates a cache key for this record.

@@ -1,9 +1,7 @@
 <?php
 namespace Misago\ActiveRecord;
 
-# Calculates with data.
-# 
-# 
+# Computes data.
 class Calculations extends Validations
 {
   # Generic calculation method.
@@ -17,10 +15,10 @@ class Calculations extends Validations
   # 
   # Options:
   # 
-  # - select
-  # - distinct
+  # - +select+
+  # - +distinct+
   # 
-  function calculate($operation, $column='*', $options=array())
+  static function calculate($operation, $column='*', $options=array())
   {
     if (isset($options['select'])) {
       $column = $options['select'];
@@ -38,25 +36,25 @@ class Calculations extends Validations
     }
     
     if (isset($options['group'])) {
-      return $this->execute_grouped_calculation($operation, $column, $options);
+      return static::execute_grouped_calculation($operation, $column, $options);
     }
-    return $this->execute_simple_calculation($operation, $column, $options);
+    return static::execute_simple_calculation($operation, $column, $options);
   }
   
-  function average($column, $options=array())
+  static function average($column, $options=array())
   {
-    return $this->calculate('average', $column, $options);
+    return static::calculate('average', $column, $options);
   }
   
   # Counts rows.
   # 
-  #   $people->count()
-  #   $people->count('date')
-  #   $people->count(array('conditions' => 'age = 26'))
-  #   $people->count('id', array('conditions' => 'age = 26'))
+  #   People::count()
+  #   People::count('date')
+  #   People::count(array('conditions' => 'age = 26'))
+  #   People::count('id', array('conditions' => 'age = 26'))
   # 
   # Returned value is always is an integer.
-  function count()
+  static function count()
   {
     $column  = '*';
     $options = array();
@@ -66,30 +64,31 @@ class Calculations extends Validations
       case 1: is_array($args[0]) ? $options = $args[0] : $column = $args[0]; break;
       case 2: list($column, $options) = $args; break;
     }
-    return $this->calculate('count', $column, $options);
+    return static::calculate('count', $column, $options);
   }
   
-  function sum($column, $options=array())
+  static function sum($column, $options=array())
   {
-    return $this->calculate('sum', $column, $options);
+    return static::calculate('sum', $column, $options);
   }
   
-  function minimum($column, $options=array())
+  static function minimum($column, $options=array())
   {
-    return $this->calculate('minimum', $column, $options);
+    return static::calculate('minimum', $column, $options);
   }
   
-  function maximum($column, $options=array())
+  static function maximum($column, $options=array())
   {
-    return $this->calculate('maximum', $column, $options);
+    return static::calculate('maximum', $column, $options);
   }
   
-  
-  private function execute_grouped_calculation($operation, $column, &$options)
+  private static function execute_grouped_calculation($operation, $column, &$options)
   {
+    $instance = static::instance();
+    
     $options['select'] = "{$options['group']}, {$options['select']}";
-    $sql     = $this->build_sql_from_options($options);
-    $results = $this->connection->select_all($sql);
+    $sql     = $instance->build_sql_from_options($options);
+    $results = $instance->connection->select_all($sql);
     
     $values = array();
     foreach($results as $rs)
@@ -100,10 +99,10 @@ class Calculations extends Validations
     return $values;
   }
   
-  private function execute_simple_calculation($operation, $column, &$options)
+  private static function execute_simple_calculation($operation, $column, &$options)
   {
-    $sql = $this->build_sql_from_options($options);
-    $rs  = $this->connection->select_value($sql);
+    $sql = static::instance()->build_sql_from_options($options);
+    $rs  = static::$connection->select_value($sql);
     return ($operation == 'count') ? (int)$rs : $rs;
   }
 }

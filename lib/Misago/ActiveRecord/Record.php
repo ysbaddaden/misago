@@ -38,84 +38,50 @@ namespace Misago\ActiveRecord;
 #   $product->changed          # => false
 #   $product->title_changed    # => false
 #   $product->title_change     # => null
-abstract class Record extends \Misago\Object implements \Iterator
+abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorAggregate
 {
-  protected $columns               = array();
-  protected $__attributes          = array();
-  protected $__original_attributes = array();
-  protected $new_record            = true;
+  protected $columns    = array();
+  protected $new_record = true;
+  
+  private   $_attributes          = array();
+  private   $_original_attributes = array();
+  
+  private static $_instances = array();
+  
   
   function __construct($attributes=null)
   {
     if (!empty($attributes))
     {
-      $this->set_attributes($attributes);
-      $this->__original_attributes = $this->__attributes;
+      $this->attributes = $attributes;
+      $this->reset_original_attributes();
     }
   }
   
-  function new_record() {
-    return $this->new_record;
+  protected function init()
+  {
+    
   }
   
-  # Sets record's attributes.
-  function set_attributes($arg)
+  # :private:
+  protected static function instance()
   {
-    foreach($arg as $attribute => $value) {
-      $this->$attribute = $value;
-    }
-  }
-  
-  # Returns current attributes.
-  function attributes()
-  {
-    return $this->__attributes;
-  }
-  
-  # List of attributes with unsaved changes.
-  function & changed()
-  {
-    $changes = $this->changes();
-    $changed = array_keys($changes);
-    return $changed;
-  }
-  
-  # Returns the list of changed attributes, with associated values.
-  function & changes()
-  {
-    $changes = array_diff_assoc($this->__attributes, $this->__original_attributes);
-    return $changes;
-  }
-  
-  private function attribute_changed($attribute)
-  {
-    if (isset($this->__attributes[$attribute])) {
-      return ($this->__attributes[$attribute] !== $this->__original_attributes[$attribute]);
-    }
-    return false;
-  }
-  
-  private function attribute_was($attribute)
-  {
-    return isset($this->__original_attributes[$attribute]) ?
-      $this->__original_attributes[$attribute] : null;
-  }
-  
-  private function attribute_change($attribute)
-  {
-    if (isset($this->__attributes[$attribute])
-      and $this->__attributes[$attribute] !== $this->__original_attributes[$attribute])
+    if (!isset(self::$_instances[get_called_class()]))
     {
-      return array($this->__attributes[$attribute], $this->__original_attributes[$attribute]);
+      $obj = new static();
+      #$obj->init();
+      self::$_instances[get_called_class()] = $obj;
     }
-    return null;
+    return self::$_instances[get_called_class()];
   }
   
   
   function __get($attribute)
   {
-    if (isset($this->columns[$attribute])) {
-      return isset($this->__attributes[$attribute]) ? $this->__attributes[$attribute] : null;
+    if (isset($this->columns[$attribute]))
+    {
+      return isset($this->_attributes[$attribute]) ?
+        $this->_attributes[$attribute] : null;
     }
     elseif ($attribute == 'changed')
     {
@@ -133,50 +99,114 @@ abstract class Record extends \Misago\Object implements \Iterator
   function __set($attribute, $value)
   {
     if (isset($this->columns[$attribute])) {
-      return $this->__attributes[$attribute] = $value;
+      return $this->_attributes[$attribute] = $value;
     }
     return parent::__set($attribute, $value);
   }
   
   function __isset($attribute) {
-    return isset($this->__attributes[$attribute]);
+    return isset($this->_attributes[$attribute]);
   }
   
   function __unset($attribute) {
-    unset($this->__attributes[$attribute]);
+    unset($this->_attributes[$attribute]);
   }
-  /*
-  function __call($func, $args)
+  
+  
+  function new_record() {
+    return $this->new_record;
+  }
+  
+
+  # Returns current attributes.
+  function attributes()
   {
-    $class = get_class($this);
-    trigger_error("No such method: $class::$func().", E_USER_ERROR);
-  }
-  */
-  
-  function rewind() {
-    return reset($this->__attributes);
+    return $this->_attributes;
   }
   
-  function current() {
-    return current($this->__attributes);
+  # :private:
+  protected function attributes_set($attributes)
+  {
+    foreach($attributes as $k => $v) {
+      $this->$k = $v;
+    }
   }
   
-  function key() {
-    return key($this->__attributes);
+  # :private:
+  protected function reset_original_attributes() {
+    $this->_original_attributes = $this->_attributes;
   }
   
-  function next() {
-    return next($this->__attributes);
+  
+  # List of attributes with unsaved changes.
+  function & changed()
+  {
+    $changes = $this->changes();
+    $changed = array_keys($changes);
+    return $changed;
   }
   
-  function valid() {
-    return ($this->current() !== false);
+  # Returns the list of changed attributes, with associated values.
+  function & changes()
+  {
+    $changes = array_diff_assoc($this->_attributes, $this->_original_attributes);
+    return $changes;
+  }
+  
+  private function attribute_changed($attribute)
+  {
+    if (isset($this->_attributes[$attribute])) {
+      return ($this->_attributes[$attribute] !== $this->_original_attributes[$attribute]);
+    }
+    return false;
+  }
+  
+  private function attribute_was($attribute)
+  {
+    return isset($this->_original_attributes[$attribute]) ?
+      $this->_original_attributes[$attribute] : null;
+  }
+  
+  private function attribute_change($attribute)
+  {
+    if (isset($this->_attributes[$attribute])
+      and $this->_attributes[$attribute] !== $this->_original_attributes[$attribute])
+    {
+      return array($this->_attributes[$attribute], $this->_original_attributes[$attribute]);
+    }
+    return null;
+  }
+  
+  
+  function offsetExists($offset)
+  {
+    return isset($this->_attributes[$offset]);
+  }
+
+  function offsetGet($offset)
+  {
+    return isset($this->_attributes[$offset]) ? $this->_attributes : null;
+  }
+
+  function offsetUnset($offset)
+  {
+    unset($this->_attributes[$offset]);
+  }
+
+  function offsetSet($offset, $value)
+  {
+    return $this->_attributes[$offset] = $value;
+  }
+
+  function getIterator()
+  {
+    return new \ArrayIterator($this->_attributes);
   }
   
   
   function __sleep()
   {
-  	return array_keys($this->__attributes);
+  	return array_keys($this->_attributes);
   }
   
   function __wakeup()
