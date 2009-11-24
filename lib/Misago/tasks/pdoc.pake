@@ -1,0 +1,15 @@
+<?php
+
+desc("Builds pdoc documentation");
+task('pdoc', function()
+{
+  pake('pdoc:clean');
+  passthru("pdoc --project ".basename(ROOT)." --main doc/README --exclude config --exclude db --exclude doc --exclude log --exclude test --exclude tmp . doc/");
+});
+
+desc("Removes pdoc documentation");
+task('pdoc:clean', function() {
+  passthru("rm doc/*.html doc/*.css doc/classes/ -rf");
+});
+
+?>

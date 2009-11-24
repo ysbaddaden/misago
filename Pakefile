@@ -3,7 +3,7 @@
 desc("Builds the documentation for misago");
 task('pdoc', function()
 {
-  passthru("rm doc/*.html doc/*.css doc/classes/ -rf");
+  pake('pdoc:clean');
   passthru("pdoc --project misago --main doc/README --exclude bin --exclude build --exclude doc --exclude templates --exclude test --exclude vendor . doc/");
 });
 
