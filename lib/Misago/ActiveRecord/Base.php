@@ -210,7 +210,6 @@ abstract class Base extends Calculations
   protected $new_record    = true;
   
   
-  
   # IMPROVE: Check if columns do not conflict with object class attributes.
   function __construct($arg=null)
   {
@@ -240,10 +239,6 @@ abstract class Base extends Calculations
     }
   }
   
-  static function __constructStatic()
-  {
-    // ...
-  }
   
   function __set($attribute, $value)
   {
@@ -309,27 +304,21 @@ abstract class Base extends Calculations
     return $this->{$this->primary_key} = $value;
   }
   
-  # Returns the list of columns with definition.
-  static function & columns()
+  # Returns the list of columns with definitions.
+  static function columns()
   {
-    $columns = static::instance()->columns;
-    return $columns;
-  }
-  
-  # Returns an array of column names.
-  static function & column_names()
-  {
-    $column_names = array_keys(static::columns());
-    return $column_names;
-  }
-  
-  function column_for_attribute($attribute)
-  {
-    $columns = static::columns();
-    if (!isset($columns['attributes'])) {
-      trigger_error("No such column: '$attribute'.", E_USER_WARNING);
+    if (!isset(self::$_columns[get_called_class()]))
+    {
+      $apc_key = TMP.'/cache/active_records/columns_'.static::table_name();
+      $columns = apc_fetch($apc_key, $success);
+      if ($success === false)
+      {
+        $columns = static::connection()->columns(static::table_name());
+        apc_store($apc_key, $columns);
+      }
+      static::$_columns[get_called_class()] = $columns;
     }
-    return $columns[$attribute];
+    return static::$_columns[get_called_class()];
   }
   
   # Returns the I18n translation of model name
@@ -365,7 +354,7 @@ abstract class Base extends Calculations
     {
       if (!empty($match[2]))
       {
-        if (!in_array($match[2], array_keys(static::instance()->columns)))
+        if (!in_array($match[2], array_keys(static::columns())))
         {
           trigger_error("No such column '{$match[2]}'.", E_USER_WARNING);
           return;
@@ -540,7 +529,7 @@ abstract class Base extends Calculations
     if (empty($id) and strlen($id) == 0) {
       return false;
     }
-    $options = array('conditions' => array(static::instance()->primary_key => $id));
+    $options = array('conditions' => array(static::primary_key() => $id));
     return (bool)static::count($options);
   }
   

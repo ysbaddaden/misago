@@ -40,12 +40,11 @@ namespace Misago\ActiveRecord;
 #   $product->title_change     # => null
 abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorAggregate
 {
-  protected $columns              = array();
+  private $_attributes          = array();
+  private $_original_attributes = array();
   
-  private   $_attributes          = array();
-  private   $_original_attributes = array();
-  
-  private static $_instances = array();
+  private   static $_instances = array();
+  protected static $_columns = array();
   
   
   function __construct($attributes=null)
@@ -71,7 +70,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   
   function __get($attribute)
   {
-    if (isset($this->columns[$attribute]))
+    if (static::has_column($attribute))
     {
       return isset($this->_attributes[$attribute]) ?
         $this->_attributes[$attribute] : null;
@@ -91,7 +90,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   
   function __set($attribute, $value)
   {
-    if (isset($this->columns[$attribute])) {
+    if (static::has_column($attribute)) {
       return $this->_attributes[$attribute] = $value;
     }
     return parent::__set($attribute, $value);
@@ -103,6 +102,35 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   
   function __unset($attribute) {
     unset($this->_attributes[$attribute]);
+  }
+  
+  static function columns()
+  {
+    
+  }
+  
+  # Checks if a column exists.
+  static function has_column($column_name)
+  {
+    $columns = static::columns();
+    return isset($columns[$column_name]);
+  }
+  
+  # Returns an array of column names.
+  static function column_names()
+  {
+    $columns = array_keys(static::columns());
+    return $columns;
+  }
+  
+  # Returns the column definition for an attribute;
+  function column_for_attribute($attribute)
+  {
+    $columns = static::columns();
+    if (!isset($columns[$attribute])) {
+      trigger_error("No such column: '$attribute'.", E_USER_WARNING);
+    }
+    return $columns[$attribute];
   }
   
   

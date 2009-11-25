@@ -10,12 +10,9 @@ use Misago\I18n;
 # (record, validation), without the need to store data. 
 abstract class Ephemeral extends Validations
 {
-  protected $behaviors = array();
-  protected $columns   = array();
-  
   function __set($attribute, $value)
   {
-    if (isset($this->columns[$attribute]))
+    if (static::has_column($attribute))
     {
       if ($value !== null)
       {
@@ -43,13 +40,6 @@ abstract class Ephemeral extends Validations
       }
     }
     return parent::__set($attribute, $value);
-  }
-  
-  # Returns an array of column names.
-  function & column_names()
-  {
-    $column_names = array_keys($this->columns);
-    return $column_names;
   }
   
   # Returns the I18n translation of model name

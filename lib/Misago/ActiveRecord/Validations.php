@@ -236,9 +236,12 @@ abstract class Validations extends Associations
   private function call_validation($action, $attribute, $options)
   {
     if (!isset($options['allow_null'])
-      and isset($this->columns[$attribute], $this->columns[$attribute]['null']))
+      and static::has_column($attribute))
     {
-      $options['allow_null'] = $this->columns[$attribute]['null'];
+      $column = static::column_for_attribute($attribute);
+      if (isset($column['null'])) {
+        $options['allow_null'] = $column['null'];
+      }
     }
     
     if (isset($options['allow_null'])
@@ -274,8 +277,12 @@ abstract class Validations extends Associations
       $options['minimum'] = $match[1];
       $options['maximum'] = $match[2];
     }
-    if (!isset($options['maximum']) and !empty($this->columns[$attribute]['limit'])) {
-      $options['maximum'] = $this->columns[$attribute]['limit'];
+    if (!isset($options['maximum']))
+    {
+      $column = static::column_for_attribute($attribute);
+      if (!empty($column['limit'])) {
+        $options['maximum'] = $column['limit'];
+      }
     }
     
     # length depends on var type

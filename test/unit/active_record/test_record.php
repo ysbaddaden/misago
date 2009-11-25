@@ -6,10 +6,13 @@ require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
 
 class FakeRecord extends Misago\ActiveRecord\Record
 {
-  protected $columns = array(
-    'id'    => array(),
-    'title' => array()
-  );
+  static function columns()
+  {
+    return array(
+      'id'    => array(),
+      'title' => array()
+    );
+  }
 }
 
 class Test_ActiveRecord_Record extends Misago\Unit\TestCase
