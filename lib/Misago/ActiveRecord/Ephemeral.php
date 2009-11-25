@@ -16,7 +16,9 @@ abstract class Ephemeral extends Validations
     {
       if ($value !== null)
       {
-        switch($this->columns[$attribute]['type'])
+        $column = static::column_for_attribute($attribute);
+        
+        switch($column['type'])
         {
           case 'integer': $value = (int)$value;    break;
           case 'float':   $value = (double)$value; break;

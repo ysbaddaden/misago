@@ -17,7 +17,7 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
   {
     try
     {
-      new Orphan();
+      Orphan::columns();
       $test = false;
     }
     catch(ActiveRecord\StatementInvalid $e) {

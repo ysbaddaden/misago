@@ -196,6 +196,7 @@ use Misago\I18n;
 # Remember that only <tt>delete</tt> has callbacks, <tt>destroy</tt> has no such handlers.
 # 
 # 
+# IMPROVE: Check if columns do not conflict with object class attributes.
 # TEST: Test callbacks.
 # 
 abstract class Base extends Calculations
@@ -209,28 +210,15 @@ abstract class Base extends Calculations
   
   protected $new_record    = true;
   
-  
-  # IMPROVE: Check if columns do not conflict with object class attributes.
   function __construct($arg=null)
   {
-    # columns
-    $apc_key = TMP.'/cache/active_records/columns_'.static::table_name();
-    $this->columns = apc_fetch($apc_key, $success);
-    if ($success === false)
-    {
-      $this->columns = static::connection()->columns(static::table_name());
-      apc_store($apc_key, $this->columns);
-    }
-    
-    # parents
     \Misago\Object::__construct();
     
-    # args
     if ($arg !== null)
     {
       if (!is_array($arg))
       {
-        $arg = $this->find($arg);
+        $arg = static::find($arg);
         if ($arg !== null) {
           $this->new_record = false;
         }
@@ -242,11 +230,12 @@ abstract class Base extends Calculations
   
   function __set($attribute, $value)
   {
-    if (isset($this->columns[$attribute]))
+    if (static::has_column($attribute))
     {
       if ($value !== null)
       {
-        switch($this->columns[$attribute]['type'])
+        $column = static::column_for_attribute($attribute);
+        switch($column['type'])
         {
           case 'integer': $value = (int)$value;    break;
           case 'float':   $value = (double)$value; break;
@@ -354,7 +343,7 @@ abstract class Base extends Calculations
     {
       if (!empty($match[2]))
       {
-        if (!in_array($match[2], array_keys(static::columns())))
+        if (!in_array($match[2], static::column_names()))
         {
           trigger_error("No such column '{$match[2]}'.", E_USER_WARNING);
           return;
@@ -650,10 +639,11 @@ abstract class Base extends Calculations
     $this->before_create();
     
     # timestamps
-    if (array_key_exists('created_at', $this->columns) and empty($this->created_at)) {
+    $column_names = static::column_names();
+    if (in_array('created_at', $column_names) and empty($this->created_at)) {
       $this->created_at = new ActiveSupport\Datetime();
     }
-    if (array_key_exists('created_on', $this->columns) and empty($this->created_on)) {
+    if (in_array('created_on', $column_names) and empty($this->created_on)) {
       $this->created_on = new ActiveSupport\Date();
     }
     
@@ -698,10 +688,11 @@ abstract class Base extends Calculations
     }
     
     # timestamps
-    if (array_key_exists('updated_at', $this->columns) and empty($this->updated_at)) {
+    $column_names = static::column_names();
+    if (in_array('updated_at', $column_names) and empty($this->updated_at)) {
       $this->updated_at = new ActiveSupport\Datetime();
     }
-    if (array_key_exists('updated_on', $this->columns) and empty($this->updated_on)) {
+    if (in_array('updated_on', $column_names) and empty($this->updated_on)) {
       $this->updated_on = new ActiveSupport\Date();
     }
     
@@ -949,10 +940,10 @@ abstract class Base extends Calculations
     if ($this->new_record) {
       return String::underscore(String::pluralize(get_called_class())).'/new';
     }
-    elseif (isset($this->columns['updated_at'])) {
+    elseif (static::has_column('updated_at')) {
       return String::underscore(get_called_class()).'/'.$this->id.'-'.$this->updated_at->to_s('number');
     }
-    elseif (isset($this->columns['updated_on'])) {
+    elseif (static::has_column('updated_on')) {
       return String::underscore(get_called_class()).'/'.$this->id.'-'.$this->updated_on->to_s('number');
     }
     else {
