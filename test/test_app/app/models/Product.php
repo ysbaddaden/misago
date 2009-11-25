@@ -2,11 +2,11 @@
 
 class Product extends Misago\ActiveRecord\Base
 {
-  protected $has_many = array('baskets' => array('dependent' => 'nullify'));
+#  protected $has_many = array('baskets' => array('dependent' => 'nullify'));
   
-  protected function init()
+  static function __constructStatic()
   {
-    #$this->has_many('baskets', array('dependent' => 'nullify'));
+    static::has_many('baskets', array('dependent' => 'nullify'));
   }
   
   protected function validate()

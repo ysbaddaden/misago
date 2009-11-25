@@ -47,12 +47,12 @@ abstract class Validations extends Associations
 {
   protected $validates_associated = array();
   
-  function __get($attribute)
+  function errors()
   {
-    if ($attribute == 'errors') {
-      return $this->errors = new Errors($this);
+    if (!isset($this->errors)) {
+      $this->errors = new Errors($this);
     }
-    return parent::__get($attribute);
+    return $this->errors;
   }
   
   function save_with_validation($perform_validation=true)

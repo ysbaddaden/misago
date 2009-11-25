@@ -279,32 +279,29 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   
   function test_build_join_for()
   {
-    $order = new Order();
-    $this->assert_equal(str_replace('`', '"', $order->build_join_for('invoice')),
+    $this->assert_equal(str_replace('`', '"', Order::build_join_for('invoice')),
       'inner join "invoices" on "invoices"."order_id" = "orders"."id"', 'join with has_one relationship');
     
-    $this->assert_equal(str_replace('`', '"', $order->build_join_for('invoice', 'left outer')),
+    $this->assert_equal(str_replace('`', '"', Order::build_join_for('invoice', 'left outer')),
       'left outer join "invoices" on "invoices"."order_id" = "orders"."id"', 'left outer join');
     
-    $this->assert_equal(str_replace('`', '"', $order->build_join_for('baskets')),
+    $this->assert_equal(str_replace('`', '"', Order::build_join_for('baskets')),
       'inner join "baskets" on "baskets"."order_id" = "orders"."id"', 'join with has_many relationship');
     
-    $this->assert_equal(str_replace('`', '"', $order->build_join_for('baskets', 'left')),
+    $this->assert_equal(str_replace('`', '"', Order::build_join_for('baskets', 'left')),
       'left join "baskets" on "baskets"."order_id" = "orders"."id"');
     
-    $basket = new Basket();
-    $this->assert_equal(str_replace('`', '"', $basket->build_join_for('product')),
+    $this->assert_equal(str_replace('`', '"', Basket::build_join_for('product')),
       'inner join "products" on "products"."id" = "baskets"."product_id"', 'join with belongs_to relationship');
     
-    $this->assert_equal(str_replace('`', '"', $basket->build_join_for('product', 'inner')),
+    $this->assert_equal(str_replace('`', '"', Basket::build_join_for('product', 'inner')),
       'inner join "products" on "products"."id" = "baskets"."product_id"');
     
-    $programmer = new Programmer();
-    $this->assert_equal(str_replace('`', '"', $programmer->build_join_for('projects')),
+    $this->assert_equal(str_replace('`', '"', Programmer::build_join_for('projects')),
       'inner join "programmers_projects" on "programmers_projects"."programmer_id" = "programmers"."id" '.
       'inner join "projects" on "projects"."id" = "programmers_projects"."project_id"', 'join with HATBM relationship');
     
-    $this->assert_equal(str_replace('`', '"', $programmer->build_join_for('projects', 'outer')),
+    $this->assert_equal(str_replace('`', '"', Programmer::build_join_for('projects', 'outer')),
       'outer join "programmers_projects" on "programmers_projects"."programmer_id" = "programmers"."id" '.
       'outer join "projects" on "projects"."id" = "programmers_projects"."project_id"');
   }
@@ -381,38 +378,78 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   }
 }
 
+
 class NullifyOrder extends Order
 {
-  protected $table_name = "orders";
-  protected $has_one  = array('invoice' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
-  protected $has_many = array('baskets' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+  protected static $table_name = "orders";
+#  protected $has_one  = array('invoice' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+#  protected $has_many = array('baskets' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+  
+  static function __constructStatic()
+  {
+    static::has_one('invoice',  array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+    static::has_many('baskets', array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
+  }
 }
+NullifyOrder::__constructStatic();
+
 
 class DeleteOrder extends Order
 {
-  protected $table_name = "orders";
-  protected $has_one  = array('invoice' => array('dependent' => 'delete', 'foreign_key' => 'order_id'));
-  protected $has_many = array('baskets' => array('dependent' => 'delete_all', 'foreign_key' => 'order_id'));
+  protected static $table_name = "orders";
+#  protected $has_one  = array('invoice' => array('dependent' => 'delete',     'foreign_key' => 'order_id'));
+#  protected $has_many = array('baskets' => array('dependent' => 'delete_all', 'foreign_key' => 'order_id'));
+  
+  static function __constructStatic()
+  {
+    static::has_one('invoice',  array('dependent' => 'delete',     'foreign_key' => 'order_id'));
+    static::has_many('baskets', array('dependent' => 'delete_all', 'foreign_key' => 'order_id'));
+  }
 }
+DeleteOrder::__constructStatic();
+
 
 class DestroyOrder extends Order
 {
-  protected $table_name = "orders";
-  protected $has_one  = array('invoice' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
-  protected $has_many = array('baskets' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+  protected static $table_name = "orders";
+#  protected $has_one  = array('invoice' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+#  protected $has_many = array('baskets' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+  
+  static function __constructStatic()
+  {
+    static::has_one('invoice',  array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+    static::has_many('baskets', array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
+  }
 }
+DestroyOrder::__constructStatic();
+
 
 class DeleteInvoice extends Invoice
 {
-  protected $table_name = "invoices";
-  protected $belongs_to = array('order' => array('dependent' => 'delete'));
+  protected static $table_name = "invoices";
+#  protected $belongs_to = array('order' => array('dependent' => 'delete'));
+  
+  static function __constructStatic()
+  {
+    static::belongs_to('order', array('dependent' => 'delete'));
+  }
+
 }
+DeleteInvoice::__constructStatic();
+
 
 class DestroyInvoice extends Invoice
 {
-  protected $table_name = "invoices";
-  protected $belongs_to = array('order' => array('dependent' => 'destroy'));
+  protected static $table_name = "invoices";
+#  protected $belongs_to = array('order' => array('dependent' => 'destroy'));
+  
+  static function __constructStatic()
+  {
+    static::belongs_to('order', array('dependent' => 'destroy'));
+  }
 }
+DestroyInvoice::__constructStatic();
+
 
 new Test_ActiveRecord_Associations();
 

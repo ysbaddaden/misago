@@ -40,8 +40,7 @@ namespace Misago\ActiveRecord;
 #   $product->title_change     # => null
 abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorAggregate
 {
-  protected $columns    = array();
-  protected $new_record = true;
+  protected $columns              = array();
   
   private   $_attributes          = array();
   private   $_original_attributes = array();
@@ -58,18 +57,12 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     }
   }
   
-  protected function init()
-  {
-    
-  }
-  
   # :private:
   protected static function instance()
   {
     if (!isset(self::$_instances[get_called_class()]))
     {
       $obj = new static();
-      #$obj->init();
       self::$_instances[get_called_class()] = $obj;
     }
     return self::$_instances[get_called_class()];
@@ -113,11 +106,6 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   }
   
   
-  function new_record() {
-    return $this->new_record;
-  }
-  
-
   # Returns current attributes.
   function attributes()
   {

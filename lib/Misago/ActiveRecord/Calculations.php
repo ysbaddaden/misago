@@ -84,11 +84,9 @@ class Calculations extends Validations
   
   private static function execute_grouped_calculation($operation, $column, &$options)
   {
-    $instance = static::instance();
-    
     $options['select'] = "{$options['group']}, {$options['select']}";
-    $sql     = $instance->build_sql_from_options($options);
-    $results = $instance->connection->select_all($sql);
+    $sql     = static::build_sql_from_options($options);
+    $results = static::connection()->select_all($sql);
     
     $values = array();
     foreach($results as $rs)
@@ -101,8 +99,8 @@ class Calculations extends Validations
   
   private static function execute_simple_calculation($operation, $column, &$options)
   {
-    $sql = static::instance()->build_sql_from_options($options);
-    $rs  = static::$connection->select_value($sql);
+    $sql = static::build_sql_from_options($options);
+    $rs  = static::connection()->select_value($sql);
     return ($operation == 'count') ? (int)$rs : $rs;
   }
 }

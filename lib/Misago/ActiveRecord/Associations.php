@@ -7,7 +7,7 @@ use Misago\ActiveSupport\String;
 # =Relationships
 # 
 # ==belongs_to
-#
+# 
 # Represents a one-to-one relationship, in the point of view
 # of the child. The counterpart is either a has_one or
 # has_many relationship (see below).
@@ -261,8 +261,7 @@ use Misago\ActiveSupport\String;
 # 
 # Only 3 SQL requests will be issued (instead of 301):
 # 
-#   $post = new Post();
-#   $posts = $post->find(':all', array(
+#   $posts = Post::find(':all', array(
 #     'limit'   => 100,
 #     'order'   => 'created_at desc',
 #     'include' => 'tags, authors',
@@ -279,159 +278,175 @@ use Misago\ActiveSupport\String;
 # TODO: Implement has_many/has_one :through association.
 abstract class Associations extends Record
 {
-  protected $belongs_to = array();
-  protected $has_one    = array();
-  protected $has_many   = array();
-  protected $has_and_belongs_to_many = array();
+  protected static $_associations;
   
-  protected $associations = array();
-  
-  function __construct($arg=null)
-  {
-    $this->configure_associations();
-    parent::__construct($arg);
-  }
   
   # Returns an association's configuration. Returns null if no such
   # association exists.
-  function association($assoc)
+  static function & association($assoc)
   {
-    return isset($this->associations[$assoc]) ? $this->associations[$assoc] : null;
+    $options = isset(static::$_associations[get_called_class()][$assoc]) ?
+      static::$_associations[get_called_class()][$assoc] : null;
+    return $options;
   }
   
-  private function configure_associations()
+  static function has_association($assoc)
   {
-    $apc_key = TMP.'/cache/active_records/associations_'.get_class($this);
-    $this->associations = apc_fetch($apc_key, $success);
-    if ($success === false)
-    {
-      $this->associations = array();
-      $this->_configure_associations('belongs_to');
-      $this->_configure_associations('has_one');
-      $this->_configure_associations('has_many');
-      $this->_configure_associations('has_and_belongs_to_many');
-      apc_store($apc_key, $this->associations);
+    return isset(static::$_associations[get_called_class()][$assoc]);
+  }
+  
+  # Returns the list of associations, with configuration.
+  static function & get_associations()
+  {
+    $associations = isset(static::$_associations[get_called_class()]) ?
+      static::$_associations[get_called_class()] : array();
+    return $associations;
+  }
+  
+  # Returns the list of associations, with configuration.
+  static function & association_names()
+  {
+    $associations = isset(static::$_associations[get_called_class()]) ?
+      array_keys(static::$_associations[get_called_class()]) : array();
+    return $associations;
+  }
+  
+  private static function set_association($type, $name, $options)
+  {
+    $options['type'] = $type;
+    $options['name'] = $name;
+    static::$_associations[get_called_class()][$name] = $options;
+  }
+  
+  private static function prepare_association_options($name, &$options)
+  {
+    if (empty($options['class_name'])) {
+      $options['class_name'] = String::camelize(String::singularize(String::underscore($name)));
+    }
+    $class_name = $options['class_name'];
+    
+    if (empty($options['table_name'])) {
+      $options['table_name'] = $class_name::table_name();
+    }
+    if (empty($options['primary_key'])) {
+      $options['primary_key'] = $class_name::primary_key();
     }
   }
   
-  private function _configure_associations($type)
+  
+  protected static function belongs_to($name, $options=array())
   {
-    foreach($this->$type as $i => $assoc)
-    {
-      if (is_integer($i))
-      {
-        $name = $assoc;
-        unset($this->$type[$i]);
-        $def = array();
-      }
-      else
-      {
-        $name = $i;
-        $def  = $this->{$type}[$name];
-      }
-      $def['name'] = $name;
-      $def['type'] = $type;
-      
-      if (empty($def['class_name'])) {
-        $def['class_name'] = String::camelize(String::singularize(String::underscore($name)));
-      }
-      if (empty($def['table_name'])) {
-        $def['table_name'] = String::pluralize(String::singularize(String::underscore($name)));
-      }
-      if (empty($def['primary_key'])) {
-        $def['primary_key'] = 'id';
-      }
-      if (empty($def['foreign_key']))
-      {
-        $def['foreign_key'] = ($type == 'belongs_to') ?
-          String::underscore($def['class_name']).'_id' :
-          String::underscore(get_class($this)).'_id';
-      }
-      
-      if ($type != 'has_and_belongs_to_many'
-        and !isset($def['dependent']))
-      {
-        $def['dependent'] = null;
-      }
-      
-      switch($type)
-      {
-        case 'belongs_to':
-          $def['find_key']     = $this->primary_key;
-          $def['find_scope']   = ':first';
-          $def['find_options'] = array_intersect_key($def, array(
-            'select'     => '',
-            'conditions' => '',
-            'include'    => '',
-          ));
-        break;
-        
-        case 'has_one':
-          $def['find_key']     = $def['foreign_key'];
-          $def['find_scope']   = ':first';
-          $def['find_options'] = array_intersect_key($def, array(
-            'select'     => '',
-            'conditions' => '',
-            'include'    => '',
-            'order'      => '',
-          ));
-        break;
-        
-        case 'has_many':
-          $def['find_key']     = $def['foreign_key'];
-          $def['find_scope']   = ':all';
-          $def['find_options'] = array_intersect_key($def, array(
-            'select'     => '',
-            'conditions' => '',
-            'order'      => '',
-            'limit'      => '',
-            'page'       => '',
-            'group'      => '',
-            'include'    => '',
-          ));
-        break;
-        
-        case 'has_and_belongs_to_many':
-          if (empty($def['join_table']))
-          {
-            $def['join_table'] = ($this->table_name < $def['table_name']) ?
-              $this->table_name.'_'.$def['table_name'] : $def['table_name'].'_'.$this->table_name;
-          }
-          if (empty($def['association_primary_key'])) {
-            $def['association_primary_key'] = 'id';
-          }
-          if (empty($def['association_foreign_key'])) {
-            $def['association_foreign_key'] = String::underscore($def['class_name']).'_id';
-          }
-          
-          $def['find_key']   = "{$def['join_table']}.{$def['foreign_key']}";
-          $def['find_scope'] = ':all';
-          $def['find_options'] = array_intersect_key($def, array(
-            'select'     => '',
-            'conditions' => '',
-            'group'      => '',
-#            'having'     => '',
-            'order'      => '',
-            'limit'      => '',
-            'page'       => '',
-            'include'    => '',
-          ));
-          $def['find_options']['joins'] = "inner join ".static::$connection->quote_table($def['join_table']).
-            " on ".static::$connection->quote_column("{$def['join_table']}.{$def['association_foreign_key']}").
-            " = ".static::$connection->quote_column("{$def['table_name']}.{$def['association_primary_key']}");
-        break;
-      }
-      $this->associations[$name] = $def;
+    static::prepare_association_options($name, $options);
+    
+    if (empty($options['foreign_key'])) {
+      $options['foreign_key'] = String::underscore($options['class_name']).'_id';
     }
+    $options['find_key']     = static::primary_key();
+    $options['find_scope']   = ':first';
+    $options['find_options'] = array_intersect_key($options, array(
+      'select'     => '',
+      'conditions' => '',
+      'include'    => '',
+    ));
+    static::set_association('belongs_to', $name, $options);
+  }
+  
+  
+  protected static function has_one($name, $options=array())
+  {
+    static::prepare_association_options($name, $options);
+    
+    if (empty($options['foreign_key'])) {
+      $options['foreign_key'] = String::underscore(get_called_class()).'_id';
+    }
+    $options['find_key']     = $options['foreign_key'];
+    $options['find_scope']   = ':first';
+    $options['find_options'] = array_intersect_key($options, array(
+      'select'     => '',
+      'conditions' => '',
+      'include'    => '',
+      'order'      => '',
+    ));
+    static::set_association('has_one', $name, $options);
+  }
+  
+  
+  protected static function has_many($name, $options=array())
+  {
+    static::prepare_association_options($name, $options);
+    
+    if (empty($options['foreign_key'])) {
+      $options['foreign_key'] = String::underscore(get_called_class()).'_id';
+    }
+    $options['find_key']     = $options['foreign_key'];
+    $options['find_scope']   = ':all';
+    $options['find_options'] = array_intersect_key($options, array(
+      'select'     => '',
+      'conditions' => '',
+      'order'      => '',
+      'limit'      => '',
+      'page'       => '',
+      'group'      => '',
+      'include'    => '',
+    ));
+    static::set_association('has_many', $name, $options);
+  }
+  
+  
+  protected static function has_and_belongs_to_many($name, $options=array())
+  {
+    static::prepare_association_options($name, $options);
+    
+    if (empty($options['foreign_key'])) {
+      $options['foreign_key'] = String::underscore(get_called_class()).'_id';
+    }
+    if (empty($options['join_table']))
+    {
+      $table_name = static::table_name();
+      $options['join_table'] = ($table_name < $options['table_name']) ?
+        $table_name.'_'.$options['table_name'] :
+        $options['table_name'].'_'.$table_name;
+    }
+    if (empty($options['association_primary_key'])) {
+      $options['association_primary_key'] = 'id';
+    }
+    if (empty($options['association_foreign_key'])) {
+      $options['association_foreign_key'] = String::underscore($options['class_name']).'_id';
+    }
+    
+    $connection = static::connection();
+    
+    $options['find_key']   = "{$options['join_table']}.{$options['foreign_key']}";
+    $options['find_scope'] = ':all';
+    $options['find_options'] = array_intersect_key($options, array(
+      'select'     => '',
+      'conditions' => '',
+      'group'      => '',
+#     'having'     => '',
+      'order'      => '',
+      'limit'      => '',
+      'page'       => '',
+      'include'    => '',
+    ));
+    $options['find_options']['joins'] = "inner join ".$connection->quote_table($options['join_table']).
+      " on ".$connection->quote_column("{$options['join_table']}.{$options['association_foreign_key']}").
+      " = ".$connection->quote_column("{$options['table_name']}.{$options['association_primary_key']}");
+    
+    static::set_association('has_and_belongs_to_many', $name, $options);
+  }
+  
+  # Shortcut for +has_and_belongs_to_many+.
+  protected static function habtm($name, $options=array()) {
+    return static::has_and_belongs_to_many($name, $options);
   }
   
   function __get($attribute)
   {
   	# association?
-		if (array_key_exists($attribute, $this->associations))
+		if (static::has_association($attribute))
 		{
-		  $assoc =& $this->associations[$attribute];
-      $model = $assoc['class_name'];
+		  $assoc = static::association($attribute);
+      $class_name = $assoc['class_name'];
       
 		  if (!$this->new_record)
 		  {
@@ -442,10 +457,9 @@ abstract class Associations extends Record
 			    array($assoc['find_key'] => $this->{$assoc['foreign_key']}) :
   		    array($assoc['find_key'] => $this->id);
 			  $options['conditions'] = empty($options['conditions']) ? $conditions :
-		      $this->merge_conditions($options['conditions'], $conditions);
+		      static::merge_conditions($options['conditions'], $conditions);
 		    
-			  $record = new $model();
-			  $found  = $record->find($assoc['find_scope'], $options);
+			  $found = $class_name::find($assoc['find_scope'], $options);
         
         if ($found)
         {
@@ -456,8 +470,10 @@ abstract class Associations extends Record
       }
       
       # association doesn't exists
-      if ($assoc['type'] == 'belongs_to' or $assoc['type'] == 'has_one') {
-        return $this->$attribute = new $model();
+      if ($assoc['type'] == 'belongs_to'
+        or $assoc['type'] == 'has_one')
+      {
+        return $this->$attribute = new $class_name();
       }
       return $this->$attribute = new Collection($this, array(), $assoc);
 		}
@@ -467,22 +483,23 @@ abstract class Associations extends Record
 		{
 		  $assoc_name = String::pluralize($match[1]);
 		  
-		  if (isset($this->associations[$assoc_name]) and
-		    ($this->associations[$assoc_name]['type'] == 'has_many'
-		      or $this->associations[$assoc_name]['type'] == 'has_and_belongs_to_many'))
+		  if (static::has_association($assoc_name))
 		  {
-		    $assoc  =& $this->associations[$assoc_name];
-        $model  = $assoc['class_name'];
-		    $record = new $model();
-		    
-		    $conditions = array($assoc['find_key'] => $this->id);
-		    $options['conditions'] = empty($options['conditions']) ? $conditions :
-		      $this->merge_conditions($options['conditions'], $conditions);
-		    $options['select'] = $record->primary_key;
-	      
-		    $sql = $record->build_sql_from_options($options);
-		    return $record->connection->select_values($sql);
-		  }
+		    $assoc = static::association($assoc_name);
+		    if ($assoc['type'] == 'has_many'
+		      or $assoc['type'] == 'has_and_belongs_to_many')
+		    {
+          $class_name = $assoc['class_name'];
+		      
+		      $conditions = array($assoc['find_key'] => $this->id);
+		      $options['conditions'] = empty($options['conditions']) ? $conditions :
+		        static::merge_conditions($options['conditions'], $conditions);
+		      $options['select'] = $class_name::primary_key();
+	        
+          $sql = $class_name::build_sql_from_options($options);
+		      return $class_name::connection()->select_values($sql);
+		    }
+	    }
 		}
   	
     # another kind of attribute
@@ -493,27 +510,29 @@ abstract class Associations extends Record
   {
     if (preg_match('/^(create|build)_(.+)$/', $fn, $match))
     {
-      $assoc = $match[2];
+      $assoc_name = $match[2];
       
-      if (isset($this->associations[$assoc])
-        and ($this->associations[$assoc]['type'] == 'belongs_to'
-        or $this->associations[$assoc]['type'] == 'has_one'))
+      if (static::has_association($assoc_name))
       {
-        $class = $this->associations[$assoc]['class_name'];
-        $fk    = $this->associations[$assoc]['foreign_key'];
-        $attributes = isset($args[0]) ? $args[0] : $args;
-        
-        switch ($this->associations[$assoc]['type'])
+        $assoc = static::association($assoc_name);
+        if ($assoc['type'] == 'belongs_to'
+          or $assoc['type'] == 'has_one')
         {
-          case 'belongs_to': $attributes[$this->primary_key] = $this->$fk; break;
-          case 'has_one':    $attributes[$fk] = $this->id; break;
+          $class_name  = $assoc['class_name'];
+          $attributes  = isset($args[0]) ? $args[0] : $args;
+          
+          switch ($assoc['type'])
+          {
+            case 'belongs_to': $attributes[static::primary_key()] = $this->{$assoc['foreign_key']}; break;
+            case 'has_one':    $attributes[$assoc['foreign_key']] = $this->id; break;
+          }
+          $this->$assoc_name = new $class_name($attributes);
+          
+          if ($match[1] == 'create') {
+            $this->$assoc_name->save();
+          }
+          return $this->$assoc_name;
         }
-        $this->$assoc = new $class($attributes);
-        
-        if ($match[1] == 'create') {
-          $this->$assoc->save();
-        }
-        return $this->$assoc;
       }
     }
     return parent::__call($fn, $args);
@@ -521,20 +540,15 @@ abstract class Associations extends Record
   
   function __sleep()
   {
-  	$attributes = parent::__sleep();
-  	foreach(array_keys($this->associations) as $k)
+  	$attributes   = parent::__sleep();
+  	$associations = static::association_names();
+  	foreach($associations as $k)
   	{
   		if (property_exists($this, $k)) {
   			$attributes[] = $k;
   		}
   	}
   	return $attributes;
-  }
-  
-  function __wakeup()
-  {
-  	$this->configure_associations();
-  	parent::__wakeup();
   }
   
   protected function eager_loading($records, $includes)
@@ -545,15 +559,15 @@ abstract class Associations extends Record
     
     foreach(array_collection($includes) as $include)
     {
-      $find_key = $this->associations[$include]['find_key'];
-      $model    = $this->associations[$include]['class_name'];
+      $assoc      = static::association($include);
+      $find_key   = $assoc['find_key'];
       
       # ids
       $ids = array();
-      if ($this->associations[$include]['type'] == 'belongs_to')
+      if ($assoc['type'] == 'belongs_to')
       {
         foreach($records as $record) {
-          $ids[] = $record->{$this->associations[$include]['foreign_key']};
+          $ids[] = $record->{$assoc['foreign_key']};
         }
       }
       else
@@ -562,27 +576,26 @@ abstract class Associations extends Record
           $ids[] = $record->id;
         }
       }
+      $ids = array_unique($ids);
       
       # options
-			$options = isset($this->associations[$include]['find_options']) ?
-			  $this->associations[$include]['find_options'] : array();
-		  
-      $conditions = array($find_key => array_unique($ids));
+			$options    = isset($assoc['find_options']) ? $assoc['find_options'] : array();
+      $conditions = array($find_key => $ids);
 		  $options['conditions'] = empty($options['conditions']) ? $conditions :
 		    $this->merge_conditions($options['conditions'], $conditions);
 	    
 	    # find
-      $assoc   = new $model();
-      $results = $assoc->find(':all', $options);
+      $class_name = $assoc['class_name'];
+      $results    = $class_name::find(':all', $options);
       
       # dispatch
-      switch($this->associations[$include]['type'])
+      switch($assoc['type'])
       {
         case 'belongs_to':
         case 'has_one':
-          if ($this->associations[$include]['type'] == 'belongs_to')
+          if ($assoc['type'] == 'belongs_to')
           {
-            $record_key = $this->associations[$include]['foreign_key'];
+            $record_key = $assoc['foreign_key'];
             $rs_key = 'id';
           }
           else
@@ -608,7 +621,7 @@ abstract class Associations extends Record
         
         case 'has_many':
         case 'has_and_belongs_to_many':
-          $assoc_key = $record->associations[$include]['foreign_key'];
+          $assoc_key = $assoc['foreign_key'];
           
           foreach($records as $record)
           {
@@ -619,7 +632,7 @@ abstract class Associations extends Record
                 $_results[] = $rs;
               }
             }
-            $record->$include = new Collection($record, $_results, $this->associations[$include]);
+            $record->$include = new Collection($record, $_results, $assoc);
           }
         break;
       }
@@ -631,49 +644,62 @@ abstract class Associations extends Record
   # - +$association+ - the association to build the SQL join fragment with.
   # - +$type+ - inner, outer, left, left outer, etc.
   # 
-  function build_join_for($association, $type="inner")
+  static function build_join_for($association, $type="inner")
   {
-    $assoc = $this->associations[$association];
+    $connection = static::connection();
+    $assoc      = static::association($association);
+    
     switch($assoc['type'])
     {
       case 'belongs_to':
-        return "$type join ".static::$connection->quote_table($assoc['table_name']).
-          " on ".static::$connection->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
-          " = ".static::$connection->quote_column("{$this->table_name}.{$assoc['foreign_key']}");
+        return "$type join ".$connection->quote_table($assoc['table_name']).
+          " on ".$connection->quote_column("{$assoc['table_name']}.{$assoc['primary_key']}").
+          " = ".$connection->quote_column(static::table_name().".{$assoc['foreign_key']}");
       
       case 'has_one':
       case 'has_many':
-        return "$type join ".static::$connection->quote_table($assoc['table_name']).
-          " on ".static::$connection->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
-          " = ".static::$connection->quote_column("{$this->table_name}.{$this->primary_key}");
+        return "$type join ".$connection->quote_table($assoc['table_name']).
+          " on ".$connection->quote_column("{$assoc['table_name']}.{$assoc['foreign_key']}").
+          " = ".$connection->quote_column(static::table_name().".".static::primary_key());
       
       case 'has_and_belongs_to_many':
-        return "$type join ".static::$connection->quote_table($assoc['join_table']).
-          " on ".static::$connection->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
-          " = ".static::$connection->quote_column("{$this->table_name}.{$this->primary_key}").
-          " $type join ".static::$connection->quote_table($assoc['table_name']).
-          " on ".static::$connection->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
-          " = ".static::$connection->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
+        return "$type join ".$connection->quote_table($assoc['join_table']).
+          " on ".$connection->quote_column("{$assoc['join_table']}.{$assoc['foreign_key']}").
+          " = ".$connection->quote_column(static::table_name().".".static::primary_key()).
+          " $type join ".$connection->quote_table($assoc['table_name']).
+          " on ".$connection->quote_column("{$assoc['table_name']}.{$assoc['association_primary_key']}").
+          " = ".$connection->quote_column("{$assoc['join_table']}.{$assoc['association_foreign_key']}");
     }
   }
   
-  
+  # TODO: save_associated() should save HABTM relationships?
   # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
   # :private:
   protected function save_associated()
   {
     $rs = true;
-    foreach(array_keys($this->associations) as $assoc)
+    foreach(static::get_associations() as $assoc)
     {
-      if (isset($this->$assoc))
+      if (isset($this->{$assoc['name']}))
       {
-        $fk = $this->associations[$assoc]['foreign_key'];
-        switch($this->associations[$assoc]['type'])
+        switch($assoc['type'])
         {
-          case 'belongs_to': $this->$assoc->{$this->primary_key} = $this->$fk; break;
-          case 'has_one':    $this->$assoc->$fk = $this->$fk; break;
-          case 'has_many':   break;
-#          case 'has_and_belongs_to_many': break;
+          case 'belongs_to':
+            $this->$assoc->{$assoc['primary_key']} =
+              $this->{$assoc['foreign_key']};
+          break;
+          
+          case 'has_one':
+            $primary_key = static::primary_key();
+            $this->$assoc->{$assoc['foreign_key']} =
+              $this->$primary_key;
+          break;
+          
+          case 'has_many':
+          break;
+          
+          #case 'has_and_belongs_to_many':
+          #break;
         }
         $rs &= $this->$assoc->save();
       }
@@ -681,52 +707,57 @@ abstract class Associations extends Record
     return $rs;
   }
   
-  # TEST: Test delete_associated() with belongs_to, has_one & has_many relationships.
   # :private:
   protected function delete_associated()
   {
     $rs = true;
-    foreach(array_keys($this->associations) as $assoc)
+    foreach(static::get_associations() as $assoc_name => $assoc)
     {
-      switch($this->associations[$assoc]['type'])
+      if (empty($assoc['dependent'])) {
+        continue;
+      }
+      
+      switch($assoc['type'])
       {
         case 'belongs_to':
-          switch($this->associations[$assoc]['dependent'])
+          switch($assoc['dependent'])
           {
-            case 'delete': $this->$assoc->delete(); break;
+            case 'delete': $this->$assoc_name->delete(); break;
             case 'destroy':
-              $obj = new $this->associations[$assoc]['class_name']();
-              $obj->destroy_all(array($this->associations[$assoc]['primary_key'] => $this->id));
+              $obj = new $assoc['class_name']();
+              $obj->destroy_all(array($assoc['primary_key'] => $this->id));
             break;
           }
         break;
         
         case 'has_many':
-          switch($this->associations[$assoc]['dependent'])
+          switch($assoc['dependent'])
           {
-            case 'delete_all': $this->$assoc->delete_all(); break;
+            case 'delete_all': $this->$assoc_name->delete_all(); break;
             case 'destroy':
-              $obj = new $this->associations[$assoc]['class_name']();
-              $obj->destroy_all(array($this->associations[$assoc]['foreign_key'] => $this->id));
+              $obj = new $assoc['class_name']();
+              $obj->destroy_all(array($assoc['foreign_key'] => $this->id));
             break;
             case 'nullify':
-              $obj = new $this->associations[$assoc]['class_name']();
-              $obj->update_all(array($this->associations[$assoc]['foreign_key'] => null), array($this->associations[$assoc]['foreign_key'] => $this->id));
+              $obj = new $assoc['class_name']();
+              $obj->update_all(array($assoc['foreign_key'] => null),
+                array($assoc['foreign_key'] => $this->id));
             break;
           }
         break;
         
         case 'has_one':
-          switch($this->associations[$assoc]['dependent'])
+          switch($assoc['dependent'])
           {
-            case 'delete': $this->$assoc->delete(); break;
+            case 'delete': $this->$assoc_name->delete(); break;
             case 'destroy':
-              $obj = new $this->associations[$assoc]['class_name']();
-              $obj->destroy_all(array($this->associations[$assoc]['foreign_key'] => $this->id));
+              $obj = new $assoc['class_name']();
+              $obj->destroy_all(array($assoc['foreign_key'] => $this->id));
             break;
             case 'nullify':
-              $obj = new $this->associations[$assoc]['class_name']();
-              $obj->update_all(array($this->associations[$assoc]['foreign_key'] => null), array($this->associations[$assoc]['foreign_key'] => $this->id));
+              $obj = new $assoc['class_name']();
+              $obj->update_all(array($assoc['foreign_key'] => null),
+                array($assoc['foreign_key'] => $this->id));
             break;
           }
         break;

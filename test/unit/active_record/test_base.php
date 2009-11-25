@@ -474,36 +474,34 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
   
   function test_merge_options()
   {
-    $programmer = new Programmer();
-    
     $a = array();
     $b = array();
-    $c = $programmer->merge_options($a, $b);
+    $c = Programmer::merge_options($a, $b);
     $this->assert_equal($c, array());
     
     $a = array('limit' => 10, 'select' => 'a.*');
     $b = array();
-    $c = $programmer->merge_options($a, $b);
+    $c = Programmer::merge_options($a, $b);
     $this->assert_equal($c, array('limit' => 10, 'select' => 'a.*'));
     
     $a = array();
     $b = array('conditions' => 'a = 1', 'limit' => 100);
-    $c = $programmer->merge_options($a, $b);
+    $c = Programmer::merge_options($a, $b);
     $this->assert_equal($c, array('conditions' => 'a = 1', 'limit' => 100));
     
     $a = array('conditions' => "b <> 'aze'");
     $b = array('conditions' => 'a = 1', 'limit' => 100);
-    $c = $programmer->merge_options($a, $b);
+    $c = Programmer::merge_options($a, $b);
     $this->assert_equal($c, array('conditions' => "(b <> 'aze') AND (a = 1)", 'limit' => 100));
     
     $a = array('conditions' => "b <> 'aze'");
     $b = array('conditions' => array('a = :a', array('a' => 12)), 'limit' => 100);
-    $c = $programmer->merge_options($a, $b);
+    $c = Programmer::merge_options($a, $b);
     $this->assert_equal($c, array('conditions' => "(b <> 'aze') AND (a = '12')", 'limit' => 100));
     
     $a = array('order' => 'created_at asc');
     $b = array('order' => 'created_at desc');
-    $c = $programmer->merge_options($a, $b);
+    $c = Programmer::merge_options($a, $b);
     $this->assert_equal($c, array('order' => 'created_at desc'));
   }
   
