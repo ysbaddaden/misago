@@ -66,14 +66,38 @@ class Collection extends ActiveSupport\ActiveArray
   # Saves the collection.
   function save()
   {
-    return $this->klass->transaction(array($this, '_block_save'));
+    $self = $this;
+    return $this->klass->transaction(function() use($self)
+    {
+      $fk = $self->options['foreign_key'];
+      foreach($self as $record)
+      {
+        $record->{$fk} = $self->parent->id;
+        $record->do_save();
+      }
+    });
   }
   
   # Deletes the given records. They are removed from the collection, too.
   function delete($record)
   {
     $records = func_get_args();
-    $removed = $this->klass->transaction(array($this, '_block_delete'), $records);
+    $self    = $this;
+    $removed = $this->klass->transaction(function() use($records, $self)
+    {
+      $removed = array();
+      foreach($self as $i => $record)
+      {
+        if (in_array($record, $records))
+        {
+          if (!$record->new_record) {
+            $record->do_delete();
+          }
+          $removed[] = $i;
+        }
+      }
+      return $removed;
+    });
     
     if ($removed === false) {
       return false;
@@ -89,7 +113,16 @@ class Collection extends ActiveSupport\ActiveArray
   # Deletes all records. They're removed from the collection, too.
   function delete_all()
   {
-    $this->klass->transaction(array($this, '_block_delete_all'));
+    $self = $this;
+    $this->klass->transaction(function() use($self)
+    {
+      foreach($self as $record)
+      {
+        if (!$record->new_record) {
+          $record->do_delete();
+        }
+      }
+    });
     $this->clear();
     return true;
   }
@@ -97,7 +130,16 @@ class Collection extends ActiveSupport\ActiveArray
   # Destroys all records (object callbacks aren't). They're removed from the collection, too.
   function destroy_all()
   {
-    $this->klass->transaction(array($this, '_block_destroy_all'));
+    $self = $this;
+    $this->klass->transaction(function() use ($self)
+    {
+      foreach($self as $record)
+      {
+        if (!$record->new_record) {
+          $record->do_destroy();
+        }
+      }
+    });
     $this->clear();
     return true;
   }
@@ -106,58 +148,6 @@ class Collection extends ActiveSupport\ActiveArray
   function clear()
   {
     $this->exchangeArray(array());
-  }
-  
-  
-  # :private:
-  function _block_save()
-  {
-    $fk = $this->options['foreign_key'];
-    foreach($this as $record)
-    {
-      $record->{$fk} = $this->parent->id;
-      $record->do_save();
-    }
-  }
-  
-  # :private:
-  function _block_delete()
-  {
-    $records = func_get_args();
-    $removed = array();
-    foreach($this as $i => $record)
-    {
-      if (in_array($record, $records))
-      {
-        if (!$record->new_record) {
-          $record->do_delete();
-        }
-        $removed[] = $i;
-      }
-    }
-    return $removed;
-  }
-  
-  # :private:
-  function _block_delete_all()
-  {
-    foreach($this as $record)
-    {
-      if (!$record->new_record) {
-        $record->do_delete();
-      }
-    }
-  }
-  
-  # :private:
-  function _block_destroy_all()
-  {
-    foreach($this as $record)
-    {
-      if (!$record->new_record) {
-        $record->do_destroy();
-      }
-    }
   }
 }
 
