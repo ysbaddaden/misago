@@ -8,14 +8,10 @@ use Misago\ActiveSupport;
 # 
 #   class User extends Misago\ActiveRecord\Base
 #   {
-#     protected function validate()
+#     static function __constructStatic()
 #     {
-#       $this->assert_uniqueness_of('user_name');
-#     }
-#     
-#     protected function validate_on_create()
-#     {
-#       $this->assert_length_of('user_name', array('minimum' => 3, 'maximum' => 20));
+#       static::validates_uniqueness_of('user_name');
+#       static::validates_length_of('user_name', array('minimum' => 3, 'maximum' => 20));
 #     }
 #   }
 # 
@@ -45,6 +41,8 @@ use Misago\ActiveSupport;
 # IMPROVE: On update only validate changed attributes (check new record).
 abstract class Validations extends Associations
 {
+  private static $_validations = array();
+  
   protected $validates_associated = array();
   
   function errors()
@@ -83,6 +81,8 @@ abstract class Validations extends Associations
     $this->before_validation();
     $this->$before_validation_on();
     
+    $this->run_validations();
+    
     $this->validate();
     $this->$validate_on();
     
@@ -107,14 +107,15 @@ abstract class Validations extends Associations
     return isset($rs) ? $rs : true;
   }
   
+  
   # Validates the presence of an attribute.
   # The attribute must be present and it cannot be blank.
   # 
   # Options:
   # 
   # - +message+: the error message
-  protected function validate_presence_of($attribute, $options=null) {
-    $this->_validate_presence_of($attribute, $options);
+  protected static function validates_presence_of($attribute, $options=array()) {
+    static::set_validation('validate_presence_of', $attribute, $options);
   }
   
   # Validates the length of an attribute.
@@ -131,8 +132,8 @@ abstract class Validations extends Associations
   # - +too_short+    - error message when length < minimum.
   # - +too_long+     - error message when length > maximum.
   # - +wrong_length+ - error message when length isn't exactly the +is+ size.
-  protected function validate_length_of($attribute, $options=null) {
-    $this->call_validation('validate_length_of', $attribute, $options);
+  protected static function validates_length_of($attribute, $options=array()) {
+    static::set_validation('validate_length_of', $attribute, $options);
   }
   
   # Validates the format of an attribute, using a regular expression.
@@ -143,8 +144,8 @@ abstract class Validations extends Associations
   # - +allow_blank+ - allows the attribute to be blank (defaults to false).
   # - +message+     - error message.
   # - +with+        - the regular expression to use.
-  protected function validate_format_of($attribute, $options=null) {
-    $this->call_validation('validate_format_of', $attribute, $options);
+  protected static function validates_format_of($attribute, $options=array()) {
+    static::set_validation('validate_format_of', $attribute, $options);
   }
   
   # Validates if an attribute is within a list of values.
@@ -155,8 +156,8 @@ abstract class Validations extends Associations
   # - +allow_blank+ - allows the attribute to be blank (defaults to false).
   # - +message+     - error message.
   # - +in+          - an enumerable list of values.
-  protected function validate_inclusion_of($attribute, $options=null) {
-    $this->call_validation('validate_inclusion_of', $attribute, $options);
+  protected static function validates_inclusion_of($attribute, $options=array()) {
+    static::set_validation('validate_inclusion_of', $attribute, $options);
   }
   
   # Validates if an attribute isn't within a list of values.
@@ -167,8 +168,8 @@ abstract class Validations extends Associations
   # - +allow_blank+ - allows the attribute to be blank (defaults to false).
   # - +message+     - error message.
   # - +in+          - an enumerable list of values.
-  protected function validate_exclusion_of($attribute, $options=null) {
-    $this->call_validation('validate_exclusion_of', $attribute, $options);
+  protected static function validates_exclusion_of($attribute, $options=array()) {
+    static::set_validation('validate_exclusion_of', $attribute, $options);
   }
   
   # Validates if a column is unique.
@@ -181,36 +182,81 @@ abstract class Validations extends Associations
   # - +allow_null+  - allows the attribute to be null (defaults to nullity in DB).
   # - +allow_blank+ - allows the attribute to be blank (defaults to false).
   # - +message+     - error message.
-  protected function validate_uniqueness_of($attribute, $options=null) {
+  protected static function validates_uniqueness_of($attribute, $options=array()) {
+    static::set_validation('validate_uniqueness_of', $attribute, $options);
+  }
+  
+  private static function set_validation() {
+    self::$_validations[get_called_class()][] = func_get_args();
+  }
+  
+  
+  protected function validate_presence_of($attribute, $options=array()) {
+    $this->_validate_presence_of($attribute, $options);
+  }
+  
+  protected function validate_length_of($attribute, $options=array()) {
+    $this->call_validation('validate_length_of', $attribute, $options);
+  }
+  
+  protected function validate_format_of($attribute, $options=array()) {
+    $this->call_validation('validate_format_of', $attribute, $options);
+  }
+  
+  protected function validate_inclusion_of($attribute, $options=array()) {
+    $this->call_validation('validate_inclusion_of', $attribute, $options);
+  }
+  
+  protected function validate_exclusion_of($attribute, $options=array()) {
+    $this->call_validation('validate_exclusion_of', $attribute, $options);
+  }
+  
+  protected function validate_uniqueness_of($attribute, $options=array()) {
     $this->call_validation('validate_uniqueness_of', $attribute, $options);
   }
   
   
-  # Validates record's attributes on creation as well as on update.
-  protected function validate() {}
-	
-  # Validates record's attributes on creation only.
-  protected function validate_on_create() {}
-	
-  # Validates record's attributes on update only.
-  protected function validate_on_update() {}
+  private function run_validations()
+  {
+    if (!empty(self::$_validations[get_called_class()]))
+    {
+      foreach(self::$_validations[get_called_class()] as $test)
+      {
+        list($action, $attribute, $options) = $test;
+        if ($action == 'validate_presence_of') {
+          $this->_validate_presence_of($attribute, $options);
+        }
+        else {
+          $this->call_validation($action, $attribute, $options);
+        }
+      }
+    }
+  }
   
-  
-  private function call_validation($action, $attribute, $options=null)
+  private function call_validation($action, $attribute, $options)
   {
     if (!isset($options['allow_null'])
       and isset($this->columns[$attribute], $this->columns[$attribute]['null']))
     {
       $options['allow_null'] = $this->columns[$attribute]['null'];
     }
-    if (isset($options['allow_null']) and $options['allow_null'] and !isset($this->$attribute)) {
+    
+    if (isset($options['allow_null'])
+      and $options['allow_null']
+      and !isset($this->$attribute))
+    {
       return;
     }
-    if (isset($options['allow_blank']) and $options['allow_blank'] and is_blank($this->$attribute)) {
+    
+    if (isset($options['allow_blank'])
+      and $options['allow_blank']
+      and is_blank($this->$attribute))
+    {
       return;
     }
-    $action = "_$action";
-    $this->$action($attribute, $options);
+    
+    $method = "_$action";
+    $this->$method($attribute, $options);
   }
   
   private function _validate_presence_of($attribute, $options=null)
@@ -323,6 +369,15 @@ abstract class Validations extends Associations
 			$this->errors->add($attribute, isset($options['message']) ? $options['message'] : ":taken");
 		}
   }
+  
+  # Manual validations.
+  protected function validate() {}
+	
+  # Manual validations on creation only.
+  protected function validate_on_create() {}
+	
+  # Manual validations on update only.
+  protected function validate_on_update() {}
   
   protected function before_validation() {}
   protected function before_validation_on_create() {}

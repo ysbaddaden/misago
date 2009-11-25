@@ -278,36 +278,36 @@ use Misago\ActiveSupport\String;
 # TODO: Implement has_many/has_one :through association.
 abstract class Associations extends Record
 {
-  protected static $_associations;
+  private static $_associations;
   
   
   # Returns an association's configuration. Returns null if no such
   # association exists.
   static function & association($assoc)
   {
-    $options = isset(static::$_associations[get_called_class()][$assoc]) ?
-      static::$_associations[get_called_class()][$assoc] : null;
+    $options = isset(self::$_associations[get_called_class()][$assoc]) ?
+      self::$_associations[get_called_class()][$assoc] : null;
     return $options;
   }
   
   static function has_association($assoc)
   {
-    return isset(static::$_associations[get_called_class()][$assoc]);
+    return isset(self::$_associations[get_called_class()][$assoc]);
   }
   
   # Returns the list of associations, with configuration.
   static function & get_associations()
   {
-    $associations = isset(static::$_associations[get_called_class()]) ?
-      static::$_associations[get_called_class()] : array();
+    $associations = isset(self::$_associations[get_called_class()]) ?
+      self::$_associations[get_called_class()] : array();
     return $associations;
   }
   
   # Returns the list of associations, with configuration.
   static function & association_names()
   {
-    $associations = isset(static::$_associations[get_called_class()]) ?
-      array_keys(static::$_associations[get_called_class()]) : array();
+    $associations = isset(self::$_associations[get_called_class()]) ?
+      array_keys(self::$_associations[get_called_class()]) : array();
     return $associations;
   }
   
@@ -315,7 +315,7 @@ abstract class Associations extends Record
   {
     $options['type'] = $type;
     $options['name'] = $name;
-    static::$_associations[get_called_class()][$name] = $options;
+    self::$_associations[get_called_class()][$name] = $options;
   }
   
   private static function prepare_association_options($name, &$options)

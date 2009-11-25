@@ -10,17 +10,17 @@ class Contact extends Misago\ActiveRecord\Ephemeral
     'empty'      => array('type' => 'string', 'limit' => 0),
   );
   
-  protected function validate()
+  static function __constructStatic()
   {
-    $this->validate_presence_of('subject');
-    $this->validate_presence_of('message');
-    $this->validate_presence_of('from_name');
-    $this->validate_presence_of('from_email');
+    static::validates_presence_of('subject');
+    static::validates_presence_of('message');
+    static::validates_presence_of('from_name');
+    static::validates_presence_of('from_email');
     
-    $this->validate_length_of('subject');
-    $this->validate_length_of('from_name');
-    $this->validate_length_of('from_email');
-    $this->validate_length_of('empty');
+    static::validates_length_of('subject');
+    static::validates_length_of('from_name');
+    static::validates_length_of('from_email');
+    static::validates_length_of('empty');
   }
 }
 

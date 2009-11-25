@@ -2,8 +2,6 @@
 
 class Product extends Misago\ActiveRecord\Base
 {
-#  protected $has_many = array('baskets' => array('dependent' => 'nullify'));
-  
   static function __constructStatic()
   {
     static::has_many('baskets', array('dependent' => 'nullify'));
