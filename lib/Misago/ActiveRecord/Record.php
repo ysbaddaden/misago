@@ -106,7 +106,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   
   static function columns()
   {
-    
+    trigger_error("ActiveRecord\Record::columns() static method must be overwritten by child class.", E_USER_ERROR);
   }
   
   # Checks if a column exists.
