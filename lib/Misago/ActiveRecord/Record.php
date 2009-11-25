@@ -133,6 +133,15 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     return $columns[$attribute];
   }
   
+  function has_attribute($attribute)
+  {
+    return array_key_exists($attribute, $this->_attributes);
+  }
+  
+  function attribute_names()
+  {
+    return array_keys($this->_attributes);
+  }
   
   # Returns current attributes.
   function attributes()
