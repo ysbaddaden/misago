@@ -711,21 +711,19 @@ abstract class Associations extends Record
   protected function save_associated()
   {
     $rs = true;
-    foreach(static::get_associations() as $assoc)
+    foreach(static::get_associations() as $assoc_name => $assoc)
     {
       if (isset($this->{$assoc['name']}))
       {
         switch($assoc['type'])
         {
           case 'belongs_to':
-            $this->$assoc->{$assoc['primary_key']} =
-              $this->{$assoc['foreign_key']};
+            $this->$assoc_name->{$assoc['primary_key']} = $this->{$assoc['foreign_key']};
           break;
           
           case 'has_one':
             $primary_key = static::primary_key();
-            $this->$assoc->{$assoc['foreign_key']} =
-              $this->$primary_key;
+            $this->$assoc_name->{$assoc['foreign_key']} = $this->$primary_key;
           break;
           
           case 'has_many':
@@ -734,7 +732,7 @@ abstract class Associations extends Record
           #case 'has_and_belongs_to_many':
           #break;
         }
-        $rs &= $this->$assoc->save();
+        $rs &= $this->$assoc_name->save();
       }
     }
     return $rs;

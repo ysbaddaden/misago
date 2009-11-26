@@ -107,7 +107,7 @@ abstract class Validations extends Associations
   
   
   # Defines a list of associations to be validated when validating this object.
-  protected function validates_associated($assoc_name)
+  protected static function validates_associated($assoc_name)
   {
     $args = func_get_args();
     foreach($args as $assoc_name) {

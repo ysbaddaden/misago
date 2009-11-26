@@ -140,12 +140,12 @@ abstract class Object
   }
   
   # Maps an external callback as class method.
-  private function map_method($callback, $as) {
+  function map_method($callback, $as) {
     $this->_mapped_methods[$as] =& $callback;
   }
   
   # Maps an external callback as class static method.
-  private static function map_static_method($callback, $as) {
+  static function map_static_method($callback, $as) {
     self::$_mapped_statics[get_called_class()][$as] =& $callback;
   }
   

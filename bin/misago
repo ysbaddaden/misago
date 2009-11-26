@@ -1,6 +1,7 @@
 #! /usr/bin/php
 <?php
-require_once dirname(__FILE__).'/../lib/terminal.php';
+require_once dirname(__FILE__).'/../lib/Misago/Terminal.php';
+use Misago\Terminal;
 
 $options     = array();
 $path_to_app = '';
