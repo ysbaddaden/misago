@@ -46,10 +46,10 @@ use Misago\I18n;
 # they all return the same post (in these examples):
 # 
 #   $post = new Post(1);
-#   $post = $post->find(1);
-#   $post = $post->find(':first', array('conditions' => array('id' => 1)));
-#   $post = $post->find(':first', array('conditions' => 'id = 1'));
-#   $post = $post->find_by_id(1);
+#   $post = Post::find(1);
+#   $post = Post::find(':first', array('conditions' => array('id' => 1)));
+#   $post = Post::find(':first', array('conditions' => 'id = 1'));
+#   $post = Post::find_by_id(1);
 # 
 # If no post is found, returns null.
 # 
@@ -58,11 +58,11 @@ use Misago\I18n;
 # The following methods will return a collection of posts:
 # 
 #   $post  = new Post();
-#   $posts = $post->find();
-#   $posts = $post->find(':all');
-#   $posts = $post->find(':all', array('order' => 'created_at desc', 'limit' => 25));
-#   $posts = $post->find_all_by_category('aaa');
-#   $posts = $post->find_all_by_category('aaa', array('order' => 'title asc'));
+#   $posts = Post::find();
+#   $posts = Post::find(':all');
+#   $posts = Post::find(':all', array('order' => 'created_at desc', 'limit' => 25));
+#   $posts = Post::find_all_by_category('aaa');
+#   $posts = Post::find_all_by_category('aaa', array('order' => 'title asc'));
 # 
 # If no posts are found, returns an empty <tt>ActiveArray</tt>.
 # 
@@ -72,8 +72,7 @@ use Misago\I18n;
 # of key => value pairs. It's especially useful for collecting data for a
 # HTML select. for instance
 # 
-#   $post   = new Post();
-#   $values = $post->find(':first', array('select' => 'id, title'));
+#   $values = Post::find(':first', array('select' => 'id, title'));
 #   # => array('id' => '1', 'title' => 'my post')
 # 
 # 
@@ -88,7 +87,7 @@ use Misago\I18n;
 # 
 #   class Comment extends Misago\ActiveRecord\Base
 #   {
-#     protected $default_scope = array('order' => 'created_at asc');
+#     protected static $default_scope = array('order' => 'created_at asc');
 #   }
 # 
 # Attention:
@@ -106,8 +105,7 @@ use Misago\I18n;
 # 
 # There are several ways to update a record.
 # 
-#   $post = new Post();
-#   $updated_post = $post->update(3, array('category' => 'ccc'));
+#   $updated_post = Post::update(3, array('category' => 'ccc'));
 #   
 #   $post = new Post(2);
 #   $post->title = 'abcd';
@@ -122,7 +120,7 @@ use Misago\I18n;
 # 
 # ==Delete
 # 
-# There are two ways to delete records: <tt>delete</tt> or <tt>destroy</tt>.
+# There are two ways to delete records: <tt>delete</tt> and <tt>destroy</tt>.
 # 
 # The difference is that <tt>destroy</tt> always instanciates the record
 # before deletion, permitting to interact with it. To delete an
@@ -130,36 +128,39 @@ use Misago\I18n;
 # instance.
 # 
 # On the contrary, <tt>delete</tt> will delete all records at once in
-# the database. There is no way to interact with the deletion
-# of a particular entry.
+# the database throught a SQL +DELETE+ statement. There is no way to interact
+# with the deletion of a particular entry.
 # 
-# The advantage of <tt>destroy</tt> is to be able to interact with the
-# deletion, but the advantage of <tt>delete</tt> is it should be faster,
+# The advantage of <tt>destroy</tt> is the ability to interact with the
+# deletion; while the advantage of <tt>delete</tt> is it should be faster,
 # especially when deleting many records.
+# 
+# Implementation detail: there is actually no +delete+ and +destroy+ methods,
+# since PHP 5 disallows +$this+ in a static method, which disallows to use the
+# same method for a static and an instance call. The actual methods are
+# <tt>_delete</tt>, <tt>_static_delete</tt>, <tt>_destroy</tt> and
+# <tt>_static_destroy</tt>. You must *never* call them directly.
 # 
 # ===delete
 #
-#   $post = new Post(5);
-#   $post->delete();
+#   Post::delete(5);
 # 
 #   $post = new Post();
 #   $post->delete(3);
 # 
-#   $post = new Post();
-#   $post->delete_all(array('category' => 'aaa'));
-#   $post->delete_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
+#   Post::delete_all(array('category' => 'aaa'));
+#   Post::delete_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
 # 
 # ===destroy
 # 
-#   $post = new Post(5);
-#   $post->destroy();
+#   Post::destroy(5);
 # 
 #   $post = new Post();
 #   $post->destroy(3);
 # 
 #   $post = new Post();
-#   $post->destroy_all(array('category' => 'aaa'));
-#   $post->destroy_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
+#   Post::destroy_all(array('category' => 'aaa'));
+#   Post::destroy_all(array('category' => 'bbb', array('limit' => 5, 'order' => 'created_at desc'));
 # 
 # ==Callbacks
 # 
@@ -184,7 +185,7 @@ use Misago\I18n;
 # As you can see, there are a lot of callbacks, which permits you to
 # interact with the creation process at every step of it. Same goes
 # for <tt>update</tt>, which has the same lifecycle, but uses particular
-# +on_update+ callbacks instead of +on_create+.
+# +*_on_update+ callbacks instead of +*_on_create+.
 # 
 # <tt>destroy</tt> has callbacks too, but the lifecycle is simplier:
 # 

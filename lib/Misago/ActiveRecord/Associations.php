@@ -16,12 +16,20 @@ use Misago\ActiveSupport\String;
 # 
 # A comment belongs to a blog post.
 # 
-#   class Post Extends Misago\ActiveRecord\Base {
-#     protected $has_many = array('comments');
+#   class Post Extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::has_many('comments');
+#     }
 #   }
 #   
-#   class Comment Extends Misago\ActiveRecord\Base {
-#     protected $belongs_to = array('post');
+#   class Comment Extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::belongs_to('post');
+#     }
 #   }
 #   
 #   $comment    = new Comment(456);
@@ -52,12 +60,20 @@ use Misago\ActiveSupport\String;
 #
 # An order has one invoice.
 # 
-#   class Order extends Misago\ActiveRecord\Base {
-#     public $has_one = 'invoice';
+#   class Order extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::has_one('invoice');
+#     }
 #   }
 #   
-#   class Invoice extends Misago\ActiveRecord\Base {
-#     public $belongs_to = 'order';
+#   class Invoice extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::belongs_to('order');
+#     }
 #   }
 #   
 #   $order = new Order(456);
@@ -85,12 +101,20 @@ use Misago\ActiveSupport\String;
 # 
 # A post may have many tags.
 # 
-#   class Post Extends Misago\ActiveRecord\Base {
-#     protected $has_many = array('tags');
+#   class Post Extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::has_many('tags');
+#     }
 #   }
 #   
-#   class Tag Extends Misago\ActiveRecord\Base {
-#     protected $belongs_to = array('post');
+#   class Tag Extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::belongs_to('post');
+#     }
 #   }
 #   
 #   $post = new Post(123);
@@ -129,12 +153,20 @@ use Misago\ActiveSupport\String;
 # A programmer may have many projects, and a project may belong to
 # (or have) many programmers.
 # 
-#   class Programmer extends Misago\ActiveRecord\Base {
-#     protected $has_and_belongs_to_many = array('projects');
+#   class Programmer extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::has_and_belongs_to_many('projects');
+#     }
 #   }
 # 
-#   class Project extends Misago\ActiveRecord\Base {
-#     protected $has_and_belongs_to_many = array('programmers');
+#   class Project extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::has_and_belongs_to_many('programmers');
+#     }
 #   }
 # 
 # ===Options for has_and_belongs_to_many
@@ -213,10 +245,11 @@ use Misago\ActiveSupport\String;
 # 
 #   class Post extends Misago\ActiveRecord\Base
 #   {
-#     protected $has_many = array(
-#       'comments' => array('dependent' => 'delete_all'),
-#       'tags'     => array('dependent' => 'delete_all')
-#     );
+#     static function __constructStatic()
+#     {
+#       static::has_to_many('projects', array('dependent' => 'destroy_all'));
+#       static::has_to_many('comments', array('dependent' => 'delete_all'));
+#     }
 #   } 
 # 
 # Depending on the type of relation, you will have access to different
@@ -230,12 +263,12 @@ use Misago\ActiveSupport\String;
 # == has_one
 # 
 # - +destroy+ - calls the +destroy+ method of associated object.
-# - +delete+  -  calls the +delete+ method of associated object.
+# - +delete+  - calls the +delete+ method of associated object.
 # - +nullify+ - nullifies the foreign key of associated object.
 # 
 # == has_many
 # 
-# - +destroy+    - calls the +destroy_all+ method of the collection.
+# - +destroy+    - calls the +destroy+ method of all associated objects.
 # - +delete_all+ - calls the +delete_all+ method of the collection.
 # - +nullify+    - nullifies the foreign key on associated objects.
 # 

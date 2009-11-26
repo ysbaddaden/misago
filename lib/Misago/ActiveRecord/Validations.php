@@ -24,13 +24,24 @@ use Misago\ActiveSupport;
 # = Error object
 # 
 # All validation errors are accessible throught the +errors+ attribute,
-# which is an instance of <tt>Misago\ActiveRecord\Errors</tt>. You may also manually add
-# errors throught that same object.
+# which is an instance of <tt>Misago\ActiveRecord\Errors</tt>. You may also
+# manually add errors throught that same object.
 # 
 # = Associations
 # 
-# Dependent associated records are also validated before saving. If any dependent
-# record's validation fails, this record's validation will fail.
+# Dependent associated records are also validated before saving. If any
+# dependent record's validation fails, this record's validation will fail.
+# 
+# You must specify the associations to be validated:
+# 
+#   class Post extends Misago\ActiveRecord\Base
+#   {
+#     static function __constructStatic()
+#     {
+#       static::has_many('tags');
+#       static::validates_associated('tags');
+#     }
+#   }
 # 
 # = Callbacks
 # 
@@ -41,9 +52,8 @@ use Misago\ActiveSupport;
 # IMPROVE: On update only validate changed attributes (check new record).
 abstract class Validations extends Associations
 {
-  private static $_validations = array();
-  
-  protected $validates_associated = array();
+  private static $_validations          = array();
+  private static $_validates_associated = array();
   
   function errors()
   {
@@ -95,10 +105,24 @@ abstract class Validations extends Associations
     return $this->errors->is_empty();
   }
   
+  
+  # Defines a list of associations to be validated when validating this object.
+  protected function validates_associated($assoc_name)
+  {
+    $args = func_get_args();
+    foreach($args as $assoc_name) {
+      self::$_validates_associated[get_called_class()][] = $assoc_name;
+    }
+  }
+  
   # Validates given associations.
   private function validate_associated()
   {
-    foreach($this->validates_associated as $assoc)
+    if (empty(self::$_validates_associated[get_called_class()])) {
+      return true;
+    }
+    
+    foreach(self::$_validates_associated[get_called_class()] as $assoc)
     {
       if (isset($this->$assoc) and !$this->$assoc->is_valid()) {
         $rs = false;
