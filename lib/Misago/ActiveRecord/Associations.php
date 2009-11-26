@@ -551,7 +551,7 @@ abstract class Associations extends Record
   	return $attributes;
   }
   
-  protected function eager_loading($records, $includes)
+  protected static function eager_loading($records, $includes)
   {
     if (count($records) == 0) {
       return;
@@ -559,8 +559,8 @@ abstract class Associations extends Record
     
     foreach(array_collection($includes) as $include)
     {
-      $assoc      = static::association($include);
-      $find_key   = $assoc['find_key'];
+      $assoc    = static::association($include);
+      $find_key = $assoc['find_key'];
       
       # ids
       $ids = array();
@@ -582,7 +582,7 @@ abstract class Associations extends Record
 			$options    = isset($assoc['find_options']) ? $assoc['find_options'] : array();
       $conditions = array($find_key => $ids);
 		  $options['conditions'] = empty($options['conditions']) ? $conditions :
-		    $this->merge_conditions($options['conditions'], $conditions);
+		    static::merge_conditions($options['conditions'], $conditions);
 	    
 	    # find
       $class_name = $assoc['class_name'];

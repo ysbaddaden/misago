@@ -124,17 +124,17 @@ use Misago\I18n;
 # 
 # There are two ways to delete records: <tt>delete</tt> or <tt>destroy</tt>.
 # 
-# The difference is that <tt>delete</tt> always instanciates the record
+# The difference is that <tt>destroy</tt> always instanciates the record
 # before deletion, permitting to interact with it. To delete an
 # uploaded photo when deleting an image from a web gallery for
 # instance.
 # 
-# On the contrary, <tt>destroy</tt> will delete all records at once in
+# On the contrary, <tt>delete</tt> will delete all records at once in
 # the database. There is no way to interact with the deletion
 # of a particular entry.
 # 
-# The advantage of <tt>delete</tt> is to be able to interact with the
-# deletion, but the advantage of <tt>destroy</tt> is it should be faster,
+# The advantage of <tt>destroy</tt> is to be able to interact with the
+# deletion, but the advantage of <tt>delete</tt> is it should be faster,
 # especially when deleting many records.
 # 
 # ===delete
@@ -186,14 +186,14 @@ use Misago\I18n;
 # for <tt>update</tt>, which has the same lifecycle, but uses particular
 # +on_update+ callbacks instead of +on_create+.
 # 
-# <tt>delete</tt> has callbacks too, but the lifecycle is simplier:
+# <tt>destroy</tt> has callbacks too, but the lifecycle is simplier:
 # 
-# - delete()
-# - [1] before_delete()
+# - destroy()
+# - [1] before_destroy()
 # - *actually deletes the entry*
-# - [2] after_delete()
+# - [2] after_destroy()
 # 
-# Remember that only <tt>delete</tt> has callbacks, <tt>destroy</tt> has no such handlers.
+# Remember that only <tt>destroy</tt> has callbacks, <tt>delete</tt> has no such handlers.
 # 
 # 
 # IMPROVE: Check if columns do not conflict with object class attributes.
@@ -201,14 +201,13 @@ use Misago\I18n;
 # 
 abstract class Base extends Calculations
 {
-  # Database object.
+  # The connection to the database (see <tt>Misago\ActiveRecord\Connection</tt>).
   protected static $connection;
-  
   protected static $table_name;
   protected static $primary_key;
-  protected $default_scope = array();
+  protected static $default_scope = array();
   
-  protected $new_record    = true;
+  protected $new_record = true;
   
   function __construct($arg=null)
   {
@@ -363,7 +362,24 @@ abstract class Base extends Calculations
       $scope = empty($match[1]) ? ':first' : ':'.$match[1];
       return static::find($scope, $options);
     }
+    elseif ($method == 'delete') {
+      return forward_static_call_array(array(get_called_class(), '_static_delete'), $args);
+    }
+    elseif ($method == 'destroy') {
+      return forward_static_call_array(array(get_called_class(), '_static_destroy'), $args);
+    }
     return parent::__callStatic($method, $args);
+  }
+  
+  function __call($method, $args)
+  {
+    if ($method == 'delete') {
+      return call_user_func_array(array($this, '_delete'), $args);
+    }
+    elseif ($method == 'destroy') {
+      return call_user_func_array(array($this, '_destroy'), $args);
+    }
+    return parent::__call($method, $args);
   }
   
   # Finds records in database.
@@ -391,8 +407,6 @@ abstract class Base extends Calculations
   # TEST: Test option 'group'.
   static function find($method_or_id=':all', $options=null)
   {
-    $instance = static::instance();
-    
     # arguments
     if (!is_symbol($method_or_id))
     {
@@ -415,7 +429,8 @@ abstract class Base extends Calculations
     
     # default scope
     $options = is_array($options) ?
-      hash_merge_recursive($instance->default_scope, $options) : $instance->default_scope;
+      hash_merge_recursive(static::default_scope(), $options) :
+      static::default_scope();
     
     # optimization(s)
     if ($method == ':first' and !isset($options['limit'])) {
@@ -438,7 +453,7 @@ abstract class Base extends Calculations
         }
         $records = new ActiveSupport\ActiveArray($records, get_called_class());
         if (!empty($options['include'])) {
-          $instance->eager_loading($records, $options['include']);
+          static::eager_loading($records, $options['include']);
         }
         return $records;
       break;
@@ -464,6 +479,11 @@ abstract class Base extends Calculations
         return $results;
       break;
     }
+  }
+  
+  static function default_scope()
+  {
+    return static::$default_scope;
   }
   
   # Shortcut for <tt>find</tt>(:all).
@@ -841,21 +861,67 @@ abstract class Base extends Calculations
     return $this->save();
   }
   
-  # Deletes a record.
+  # Deletes the record from database using a SQL +DELETE+ statement.
+  # The record isn't instanciated, and callbacks aren't runned. This
+  # is faster than the +destroy+ method.
   # 
-  #   # deletes a given record
-  #   $post->delete(123);
-  #   
-  #   # deletes current record
-  #   $post = new Post(456);
-  #   $post->delete();
-  function delete($id=null)
+  #   Post::delete(1);
+  #   Post::delete(array(1, 2, 3));
+  # 
+  static function _static_delete($id)
   {
-    $record = ($id === null) ? $this : new static($id);
+    $conditions = array(static::primary_key() => $id);
+    return static::connection()->delete(static::table_name(), $conditions);
+  }
+  
+  # Deletes the record from database using a SQL +DELETE+ statement.
+  # The record isn't instanciated, and callbacks aren't runned. This
+  # is faster than the +destroy+ method.
+  # 
+  #   $post = new Post(456);
+  #   $post->delete();       # => delete from posts where id = 456;
+  # 
+  function _delete()
+  {
+    if (!$this->new_record)
+    {
+      $conditions = array(static::primary_key() => $this->id);
+      return static::connection()->delete(static::table_name(), $conditions);
+    }
+    return true;
+  }
+  
+  # :nodoc:
+  function do_delete()
+  {
+    if (!$this->delete()) {
+      throw new Exception();
+    }
+  }
+  
+  # Deletes many records at once using a single SQL +DELETE+ statement. Records
+  # aren't instanciated and deletion callbacks aren't runned. This is faster
+  # than the <tt>destroy_all</tt> method.
+  # 
+  # Available options: +limit+, +order+
+  static function delete_all($conditions=null, $options=null)
+  {
+    $options['primary_key'] = static::primary_key();
+    return static::connection()->delete(static::table_name(), $conditions, $options);
+  }
+  
+  # Deletes the record from database. The record is instanciated and callbacks
+  # are processed. This is slower than the +delete+ method.
+  # 
+  #   Post::destroy(1);
+  # 
+  static function _static_destroy($id)
+  {
+    $record = new static($id);
     
     if (!$record->new_record)
     {
-      $record->before_delete();
+      $record->before_destroy();
       $record->delete_associated();
       
       $conditions = array(static::primary_key() => $record->id);
@@ -863,26 +929,51 @@ abstract class Base extends Calculations
         return false;
       }
       
-      $record->after_delete();
+      $record->after_destroy();
     }
     return true;
   }
   
-  # Same as <tt>delete</tt> but raises an <tt>ActiveRecord_Exception</tt> on error.
-  function do_delete($id=null)
+  # Deletes the record from database. The record is instanciated, and callbacks
+  # (<tt>before_destroy</tt>, <tt>after_destroy</tt>) are processed. This is slower
+  # than the <tt>delete</tt> method, but it permits to interact with the
+  # deletion (ie. do some cleanup).
+  # 
+  #   $post = new Post(456);
+  #   $post->destroy();
+  # 
+  function _destroy()
   {
-    if (!$this->delete($id)) {
+    if (!$this->new_record)
+    {
+      $this->before_destroy();
+      $this->delete_associated();
+
+      $conditions = array(static::primary_key() => $this->id);
+      if (!static::connection()->delete(static::table_name(), $conditions)) {
+        return false;
+      }
+      
+      $this->after_destroy();
+    }
+    return true;
+  }
+  
+  # :nodoc:
+  function do_destroy()
+  {
+    if (!$this->destroy()) {
       throw new Exception();
     }
-    return true;
   }
   
-  # Deletes many records at once.
+  # Destroys many records at once. Each matching record is instanciated, and
+  # deletion callbacks (<tt>before_destroy</tt>, <tt>after_destroy</tt>)are run.
+  # This is slower than the <tt>delete_all</tt> method, but it permits to clean
+  # up things.
   # 
-  # Each matching record are instanciated, and deletion callbacks are run.
-  # 
-  # Available options: limit, order
-  static function delete_all($conditions=null, $options=null)
+  # Available options: +limit+, +order+
+  static function destroy_all($conditions=null, $options=null)
   {
     if (!empty($conditions)) {
       $options['conditions'] = $conditions;
@@ -891,44 +982,13 @@ abstract class Base extends Calculations
     $sql = static::build_sql_from_options($options);
     $ids = static::connection()->select_values($sql);
     
-    $instance = static::instance();
     foreach($ids as $id)
     {
-      if (!$instance->delete($id[0])) {
+      if (!static::destroy($id[0])) {
         return false;
       }
     }
     return true;
-  }
-  
-  # Destroys a record.
-  # 
-  # Record isn't instanciated, and deletion callbacks aren't run.
-  function destroy($id=null)
-  {
-    if ($id === null) {
-      $id = $this->id;
-    }
-    $conditions = array(static::primary_key() => $id);
-    return static::connection()->delete(static::table_name(), $conditions);
-  }
-  
-  # Same as <tt>destroy</tt> but raises an <tt>ActiveRecord_Exception</tt> on error.
-  function do_destroy($id=null)
-  {
-    if (!$this->destroy($id)) {
-      throw new Exception();
-    }
-    return true;
-  }
-  
-  # Destroys many records at once.
-  # 
-  # Records aren't instanciated, and deletion callbacks aren't run.
-  static function destroy_all($conditions=null, $options=null)
-  {
-    $options['primary_key'] = static::primary_key();
-    return static::connection()->delete(static::table_name(), $conditions, $options);
   }
   
   # Generates a cache key for this record.
@@ -960,8 +1020,8 @@ abstract class Base extends Calculations
   protected function before_update() {}
   protected function after_update()  {}
 
-  protected function before_delete() {}
-  protected function after_delete()  {}
+  protected function before_destroy() {}
+  protected function after_destroy()  {}
 }
 
 ?>

@@ -5,7 +5,7 @@ require_once 'Misago/ActiveRecord/Exception.php';
 # Handles database connections.
 class Connection
 {
-  public  static $configurations;
+  private static $configurations;
   private static $adapters = array();
   
   # Loads configurations from +config/database.yml+.

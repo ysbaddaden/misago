@@ -273,12 +273,12 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
   {
     $this->fixtures('products');
     
-    $product = new Product(1);
-    $product->delete();
-    $this->assert_equal($product->find(1), null);
+    Product::delete(1);
+    $this->assert_equal(product::find(1), null);
     
-    $product->delete(2);
-    $this->assert_equal($product->find(2), null);
+    $product = new Product(2);
+    $product->delete();
+    $this->assert_equal(product::find(2), null);
   }
   
   function test_delete_all()
@@ -313,33 +313,32 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
     $this->fixtures('products');
     $product = new Product();
     
+    Product::destroy(2);
+    $this->assert_equal(Product::find(2), null);
+    
     $product = new Product(1);
     $product->destroy();
-    $this->assert_equal($product->find(1), null);
-    
-    $product->destroy(2);
-    $this->assert_equal($product->find(2), null);
+    $this->assert_equal(Product::find(1), null);
   }
   
   function test_destroy_all()
   {
     $this->fixtures('products');
-    $product = new Product();
     
-    $product->destroy_all();
-    $products = $product->all();
+    Product::destroy_all();
+    $products = Product::all();
     $this->assert_equal(count($products), 0);
     
     $this->fixtures('products');
     
-    $product->destroy_all('id = 1');
-    $product = $product->first(array('order' => 'id asc'));
+    Product::destroy_all('id = 1');
+    $product = Product::first(array('order' => 'id asc'));
     $this->assert_equal($product->name, 'qwerty', 'with conditions');
     
     $this->fixtures('products');
     
-    $product->destroy_all(null, array('limit' => 1));
-    $products = $product->all();
+    Product::destroy_all(null, array('limit' => 1));
+    $products = Product::all();
     $this->assert_equal(count($products), 2, 'with limit');
     
     $this->fixtures('products');

@@ -2,7 +2,7 @@
 
 class Basket extends Misago\ActiveRecord\Base
 {
-  protected $default_scope = array('order' => 'baskets.created_at asc');
+  protected static $default_scope = array('order' => 'baskets.created_at asc');
   
   static function __constructStatic()
   {

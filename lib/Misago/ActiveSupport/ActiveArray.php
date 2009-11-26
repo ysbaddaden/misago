@@ -18,7 +18,7 @@ class ActiveArray extends \ArrayObject
       $klass = $this->model;
       return $this->klass = new $klass;
     }
-    trigger_error('Unknown attribute: '.get_class($this).'::'.$attr.'.', E_USER_WARNING);
+    trigger_error('Unknown attribute: '.get_called_class().'->'.$attr.'.', E_USER_WARNING);
   }
   
   # Exports to a JSON string.

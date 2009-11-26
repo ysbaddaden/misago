@@ -178,12 +178,15 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   
   function test_others_delete_one()
   {
-    $order = new Order(1);
+    $order     = new Order(1);
+    $basket_id = $order->baskets[0]->id;
+    
     $order->baskets->delete($order->baskets[0]);
     $this->assert_equal($order->baskets->count(), 2, 'collection has been reduced by 1');
     
-    $order = new Order(1);
-    $this->assert_equal($order->baskets->count(), 2, 'record must have been deleted from database');
+    $basket = new Basket($basket_id);
+    $this->assert_true(Basket::exists($basket_id), 'object still exists');
+    $this->assert_null($basket->order_id, 'the foreign key has been nullified');
     
     $this->fixtures('baskets');
   }
@@ -193,9 +196,6 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order = new Order(1);
     $order->baskets->delete($order->baskets[0], $order->baskets[2]);
     $this->assert_equal($order->baskets->count(), 1, 'collection has been reduced by 2');
-
-    $order = new Order(1);
-    $this->assert_equal($order->baskets->count(), 1, 'the 2 records must have been deleted from database');
     
     $this->fixtures('baskets');
   }
@@ -309,7 +309,7 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   function test_dependent_nullifying()
   {
     $order = new NullifyOrder(2);
-    $order->delete();
+    $order->destroy();
     
     $invoice = new Invoice(2);
     $this->assert_null($invoice->order_id, 'has one foreign key has been nullified');
@@ -317,20 +317,22 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $invoice = new Invoice(1);
     $this->assert_equal($invoice->order_id, 1, "must have nullified associated object only");
     
+    
     $basket = new Basket(4);
     $this->assert_null($basket->order_id, 'has many foreign key has been nullified');
     
     $basket = new Basket(5);
     $this->assert_equal($basket->order_id, 3, "must have nullified associated objects only");
     
+    
     $order = new NullifyOrder(1);
-    $order->destroy();
+    $order->delete();
 
     $invoice = new Invoice(1);
-    $this->assert_equal($invoice->order_id, 1, "has one foreign key isn't nullified on destroy");
+    $this->assert_equal($invoice->order_id, 1, "has one foreign key isn't nullified on delete");
     
     $basket = new Basket(2);
-    $this->assert_equal($basket->order_id, 1, "has many foreign key isn't nullified on destroy");
+    $this->assert_equal($basket->order_id, 1, "has many foreign key isn't nullified on delete");
     
     $this->fixtures('orders', 'invoices', 'baskets');
   }
@@ -338,19 +340,19 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   function test_dependent_destroy()
   {
     $order = new DestroyOrder(1);
-    $order->delete();
+    $order->destroy();
     $this->assert_false($order->invoice->exists(1), 'invoice was destroyed');
     $this->assert_null($order->baskets->find(1), 'baskets were destroyed');
     
     $order = new DestroyOrder(2);
-    $order->destroy();
+    $order->delete();
     $this->assert_true($order->invoice->exists(2), 'invoice was not destroyed');
     $this->assert_equal($order->baskets->find(4)->id, 4, 'baskets were not destroyed');
     
     $this->fixtures('orders', 'invoices');
     
     $invoice = new DestroyInvoice(1);
-    $invoice->delete();
+    $invoice->destroy();
     $this->assert_false($invoice->order->exists(1), 'order was destroyed');
     
     $this->fixtures('orders', 'invoices', 'baskets');
@@ -359,19 +361,19 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   function test_dependent_delete()
   {
     $order = new DeleteOrder(1);
-    $order->delete();
+    $order->destroy();
     $this->assert_false($order->invoice->exists(1), 'invoice was deleted');
     $this->assert_null($order->baskets->find(1), 'baskets were deleted');
     
     $order = new DeleteOrder(2);
-    $order->destroy();
+    $order->delete();
     $this->assert_true($order->invoice->exists(2), 'invoice was not destroyed');
     $this->assert_equal($order->baskets->find(4)->id, 4, 'baskets were not destroyed');
 
     $this->fixtures('orders', 'invoices');
     
     $invoice = new DeleteInvoice(1);
-    $invoice->delete();
+    $invoice->destroy();
     $this->assert_false($invoice->order->exists(1), 'order was destroyed');
     
     $this->fixtures('orders', 'invoices', 'baskets');
@@ -382,8 +384,6 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
 class NullifyOrder extends Order
 {
   protected static $table_name = "orders";
-#  protected $has_one  = array('invoice' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
-#  protected $has_many = array('baskets' => array('dependent' => 'nullify', 'foreign_key' => 'order_id'));
   
   static function __constructStatic()
   {
@@ -397,8 +397,6 @@ NullifyOrder::__constructStatic();
 class DeleteOrder extends Order
 {
   protected static $table_name = "orders";
-#  protected $has_one  = array('invoice' => array('dependent' => 'delete',     'foreign_key' => 'order_id'));
-#  protected $has_many = array('baskets' => array('dependent' => 'delete_all', 'foreign_key' => 'order_id'));
   
   static function __constructStatic()
   {
@@ -412,8 +410,6 @@ DeleteOrder::__constructStatic();
 class DestroyOrder extends Order
 {
   protected static $table_name = "orders";
-#  protected $has_one  = array('invoice' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
-#  protected $has_many = array('baskets' => array('dependent' => 'destroy', 'foreign_key' => 'order_id'));
   
   static function __constructStatic()
   {
@@ -427,7 +423,6 @@ DestroyOrder::__constructStatic();
 class DeleteInvoice extends Invoice
 {
   protected static $table_name = "invoices";
-#  protected $belongs_to = array('order' => array('dependent' => 'delete'));
   
   static function __constructStatic()
   {
@@ -441,7 +436,6 @@ DeleteInvoice::__constructStatic();
 class DestroyInvoice extends Invoice
 {
   protected static $table_name = "invoices";
-#  protected $belongs_to = array('order' => array('dependent' => 'destroy'));
   
   static function __constructStatic()
   {

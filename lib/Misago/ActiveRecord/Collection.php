@@ -11,9 +11,17 @@ class Collection extends ActiveSupport\ActiveArray
   
   function __construct($parent, $childs, $options)
   {
-    $this->parent  =  $parent;
-    $this->options =& $options;
+    $this->parent  = $parent;
+    $this->options = $options;
     parent::__construct($childs, $this->options['class_name']);
+  }
+  
+  function __get($attr)
+  {
+    if ($attr == 'options') {
+      return $this->options;
+    }
+    return parent::__get($attr);
   }
   
   function find()
@@ -78,60 +86,53 @@ class Collection extends ActiveSupport\ActiveArray
     });
   }
   
-  # Deletes the given records. They are removed from the collection, too.
+  # Removes the given records from the collection by nullifying their
+  # association. This does not destroy the objects.
   function delete($record)
   {
     $records = func_get_args();
     $self    = $this;
-    $removed = $this->klass->transaction(function() use($records, $self)
+    
+    return $this->klass->transaction(function() use($records, $self)
     {
-      $removed = array();
-      foreach($self as $i => $record)
+      foreach((array)$self as $i => $record)
       {
         if (in_array($record, $records))
         {
           if (!$record->new_record) {
-            $record->do_delete();
+            $record->update_attribute($self->options['foreign_key'], null);
           }
-          $removed[] = $i;
+          $self->offsetUnset($i);
         }
       }
-      return $removed;
+      return true;
     });
-    
-    if ($removed === false) {
-      return false;
-    }
-    
-    # removes deleted records from collection
-    foreach($removed as $i) {
-      $this->offsetUnset($i);
-    }
-    return true;
   }
   
-  # Deletes all records. They're removed from the collection, too.
+  # Deletes all records (object callbacks aren't processed).
+  # They're removed from the collection, too.
   function delete_all()
   {
-    $self = $this;
-    $this->klass->transaction(function() use($self)
+    $ids = array();
+    foreach($this as $record) {
+      $ids[] = $record->id;
+    }
+    
+    $class_name = $this->options['class_name'];
+    if ($class_name::delete($ids))
     {
-      foreach($self as $record)
-      {
-        if (!$record->new_record) {
-          $record->do_delete();
-        }
-      }
-    });
-    $this->clear();
-    return true;
+      $this->clear();
+      return true;
+    }
+    return false;
   }
   
-  # Destroys all records (object callbacks aren't). They're removed from the collection, too.
+  # Destroys all records (object callbacks are processed).
+  # They're removed from the collection, too.
   function destroy_all()
   {
     $self = $this;
-    $this->klass->transaction(function() use ($self)
+    $rs = $this->klass->transaction(function() use ($self)
     {
       foreach($self as $record)
       {
@@ -139,9 +140,15 @@ class Collection extends ActiveSupport\ActiveArray
           $record->do_destroy();
         }
       }
+      return true;
     });
-    $this->clear();
-    return true;
+    
+    if ($rs)
+    {
+      $this->clear();
+      return true;
+    }
+    return false;
   }
   
   # Clears the collection. This doesn't delete the associated records.
