@@ -21,6 +21,9 @@ class Collection extends ActiveSupport\ActiveArray
     if ($attr == 'options') {
       return $this->options;
     }
+    elseif ($attr == 'parent') {
+      return $this->parent;
+    }
     return parent::__get($attr);
   }
   
@@ -101,6 +104,27 @@ class Collection extends ActiveSupport\ActiveArray
         {
           if (!$record->new_record) {
             $record->update_attribute($self->options['foreign_key'], null);
+          }
+          $self->offsetUnset($i);
+        }
+      }
+      return true;
+    });
+  }
+  
+  function destroy($record)
+  {
+    $records = func_get_args();
+    $self    = $this;
+    
+    return $this->klass->transaction(function() use($records, $self)
+    {
+      foreach((array)$self as $i => $record)
+      {
+        if (in_array($record, $records))
+        {
+          if (!$record->new_record) {
+            $record->destroy();
           }
           $self->offsetUnset($i);
         }

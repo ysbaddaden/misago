@@ -124,7 +124,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   }
   
   # Returns the column definition for an attribute;
-  function column_for_attribute($attribute)
+  static function column_for_attribute($attribute)
   {
     $columns = static::columns();
     if (!isset($columns[$attribute])) {
