@@ -1,7 +1,5 @@
 #! /usr/bin/php
 <?php
-
 require dirname(__FILE__).'/../config/boot.php';
-require 'commands/server.php';
-
+require 'Misago/commands/server.php';
 ?>

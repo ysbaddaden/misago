@@ -7,15 +7,15 @@ if (!isset($_SERVER['argv'][1])) {
 switch($_SERVER['argv'][1])
 {
   case 'install':
-    Misago_Plugin::install($_SERVER['argv'][2]);
+    Misago\Plugin::install($_SERVER['argv'][2]);
   break;
   
   case 'update':
-    Misago_Plugin::update($_SERVER['argv'][2]);
+    Misago\Plugin::update($_SERVER['argv'][2]);
   break;
   
   case 'uninstall':
-    Misago_Plugin::uninstall($_SERVER['argv'][2]);
+    Misago\Plugin::uninstall($_SERVER['argv'][2]);
   break;
   
   default: 

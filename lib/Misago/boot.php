@@ -17,8 +17,10 @@ function __autoload($origClassName)
 
   if (!include $fileName)
   {
+    echo '<pre>';
     echo "\nOops. An error occured while loading $fileName\n";
     debug_print_backtrace();
+    echo '</pre>';
     exit;
   }
   
@@ -46,6 +48,7 @@ ini_set('include_path',
 	ROOT.'/app/helpers'.PATH_SEPARATOR.
 	ROOT.'/lib'.PATH_SEPARATOR.
 	MISAGO.'/lib'.PATH_SEPARATOR.
+	ROOT.'/vendor'.PATH_SEPARATOR.
 	MISAGO.'/vendor'.PATH_SEPARATOR.
 	Misago\Plugin::include_path().PATH_SEPARATOR.
 	ini_get('include_path').PATH_SEPARATOR

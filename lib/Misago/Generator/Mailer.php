@@ -1,5 +1,6 @@
 <?php
 namespace Misago\Generator;
+use Misago\ActiveSupport\String;
 
 class Mailer extends Base
 {

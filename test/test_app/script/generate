@@ -1,7 +1,5 @@
 #! /usr/bin/php
 <?php
-
 require dirname(__FILE__).'/../config/boot.php';
-require 'commands/generate.php';
-
+require 'Misago/commands/generate.php';
 ?>

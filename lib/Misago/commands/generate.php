@@ -36,7 +36,7 @@ if (!isset($arguments[0]))
 
 # runs generator
 $generator = array_shift($arguments);
-$class     = '\Misago\Generator\\'.String::camelize($generator);
+$class     = '\Misago\Generator\\'.\Misago\ActiveSupport\String::camelize($generator);
 new $class($arguments, $options);
 
 ?>
