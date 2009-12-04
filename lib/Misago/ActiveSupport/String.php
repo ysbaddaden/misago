@@ -3,8 +3,6 @@ namespace Misago\ActiveSupport;
 require ROOT.'/config/initializers/inflections.php';
 
 # Extensions for strings.
-# 
-# :namespace: ActiveSupport
 class String extends Inflections
 {
 	static protected $trans;

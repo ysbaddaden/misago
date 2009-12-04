@@ -160,7 +160,7 @@ abstract class Filters extends Rescue
   }
 }
 
-# :private:
+# :nodoc:
 class FailedFilter extends \Exception
 {
   function __construct() {
