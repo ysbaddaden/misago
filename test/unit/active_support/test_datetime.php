@@ -84,6 +84,18 @@ class Test_ActiveSupport_Datetime extends Misago\Unit\Test
     $this->assert_equal($date->min,   '05');
     $this->assert_equal($date->sec,   '00');
   }
+  
+  function test_date()
+  {
+    $date = new ActiveSupport\Date('1995-01-06 15:05:00');
+    $this->assert_equal((string)$date, '1995-01-06');
+  }
+  
+  function test_time()
+  {
+    $time = new ActiveSupport\Time('1995-01-06 15:05:00');
+    $this->assert_equal((string)$time, '15:05:00');
+  }
 }
 
 new Test_ActiveSupport_Datetime();

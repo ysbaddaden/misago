@@ -3,7 +3,8 @@ namespace Misago\ActiveSupport;
 
 class Datetime extends \DateTime
 {
-  protected $original_time;
+  protected $_string_format = 'Y-m-d H:i:s';
+  protected $original_time  = null;
   
   # Works like +DateTime::__construct+, but allows +$timezone+ to be
   # a string (the +DateTimeZone+ object will be created automatically).
@@ -38,7 +39,8 @@ class Datetime extends \DateTime
     switch($method)
     {
       case 'getTimestamp': return $this->format('U');
-      default: trigger_error("Unknown method ActiveSupport\\".get_class($this)."::$method().", E_USER_ERROR);
+      default: trigger_error("Unknown method ActiveSupport\\".
+        get_class($this)."::$method().", E_USER_ERROR);
     }
   }
   
@@ -52,7 +54,8 @@ class Datetime extends \DateTime
       case 'hour':  return $this->format('H'); break;
       case 'min':   return $this->format('i'); break;
       case 'sec':   return $this->format('s'); break;
-      default: trigger_error("Unknonwn property ActiveSupport\\".get_class($this)."::$property.", E_USER_WARNING);
+      default: trigger_error("Unknonwn property ActiveSupport\\".
+        get_class($this)."::$property.", E_USER_WARNING);
     }
   }
   
@@ -82,7 +85,8 @@ class Datetime extends \DateTime
   
   function __toString()
   {
-    return ($this->original_time === null) ? $this->format('Y-m-d H:i:s') : $this->original_time;
+    return ($this->original_time === null) ?
+      $this->format($this->_string_format) : $this->original_time;
   }
   
   # Same as <tt>__toString</tt>, but permits to return a number
@@ -104,22 +108,12 @@ class Datetime extends \DateTime
 
 class Time extends Datetime
 {
-  protected $type = 'time';
-  
-  function __toString()
-  {
-    return $this->format('H:i:s');
-  }
+  protected $_string_format = 'H:i:s';
 }
 
 class Date extends Datetime
 {
-  protected $type = 'date';
-  
-  function __toString()
-  {
-    return $this->format('Y-m-d');
-  }
+  protected $_string_format = 'Y-m-d';
 }
 
 ?>
