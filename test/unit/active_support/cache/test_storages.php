@@ -33,6 +33,15 @@ class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
     $this->assert_equal($this->cache->decrement('inc', 3), 0);
   }
   
+  function test_multiple_read_writes()
+  {
+    $this->cache->write_multiple(array('var_a' => 1, 'var_b' => 2));
+    $this->assert_equal(
+      $this->cache->read_multiple(array('var_b', 'var_a')),
+      array('var_a' => 1, 'var_b' => 2)
+    );
+  }
+  
   function test_expires_in()
   {
     # APC supports +expires_in+ but has a bug: http://pecl.php.net/bugs/bug.php?id=13331

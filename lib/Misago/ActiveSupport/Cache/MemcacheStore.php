@@ -61,6 +61,17 @@ class MemcacheStore extends Store
     }
   }
   
+  function read_multiple($keys)
+  {
+    return $this->memcache->getMulti($keys);
+  }
+  
+  function write_multiple($keys, $options=array())
+  {
+    $expires_in = isset($options['expires_in']) ? $options['expires_in'] : 0;
+    $this->memcache->setMulti($keys, $expires_in);
+  }
+  
   function delete($key)
   {
     $this->memcache->delete($key);

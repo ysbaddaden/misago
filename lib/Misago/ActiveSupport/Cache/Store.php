@@ -20,6 +20,24 @@ abstract class Store extends \Misago\Object
   # 
   abstract function write($key, $value, $options=array());
   
+  # Gets multiple variables at once.
+  function read_multiple($keys)
+  {
+    $rs = array();
+    foreach($keys as $key) {
+      $rs[$key] = $this->read($key);
+    }
+    return $rs;
+  }
+  
+  # Sets multiple variables at once.
+  function write_multiple($keys, $options=array())
+  {
+    foreach($keys as $key => $value) {
+      $rs[$key] = $this->write($key, $value, $options);
+    }
+  }
+  
   # Deletes a variable.
   abstract function delete($key);
   

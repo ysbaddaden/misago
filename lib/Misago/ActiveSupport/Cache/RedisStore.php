@@ -61,6 +61,26 @@ class RedisStore extends Store
     }
   }
   
+  function read_multiple($keys)
+  {
+    return $this->redis->mget($keys);
+  }
+  
+  function write_multiple($keys, $options=array())
+  {
+    $this->redis->mset($keys);
+    
+    if (isset($options['expires_in']))
+    {
+      $this->redis->pipeline(function($pipeline)
+      {
+        foreach(array_keys($keys) as $key) {
+          $pipeline->expire($key, $expires_in);
+        }
+      });
+    }
+  }
+  
   function delete($key)
   {
     $this->redis->del($key);
