@@ -8,8 +8,6 @@ class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
 {
   function test_storage()
   {
-    $this->setup();
-    
     # cache is empty
     $this->assert_false($this->cache->read('var'));
     $this->assert_null($this->cache->fetch('var'));
@@ -18,19 +16,10 @@ class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
     # caching first var (no ttl)
     $this->cache->write('var', 'value');
     $this->assert_equal($this->cache->read('var'), 'value');
-    
-    # APC supports +expires_in+ but it has a bug: http://pecl.php.net/bugs/bug.php?id=13331
-    # And only Memcache supports expires_at.
-    if (get_class($this) == 'Test_ActiveSupport_Cache_MemcacheStore')
-    {
-      # caching second var (with ttl)
-      $this->cache->write('other_var', '23', array('expires_in' => 2));
-      $this->assert_equal($this->cache->read('other_var'), '23');
-      sleep(3);
-      $this->assert_false($this->cache->read('other_var'));
-      $this->assert_equal($this->cache->read('var'), 'value');
-    }
-    
+  }
+  
+  function test_increment_decrement()
+  {
     # increment/decrement (unknown vars)
     $this->assert_equal($this->cache->increment('inc'), 1);
     $this->assert_equal($this->cache->decrement('dec'), 0);
@@ -42,8 +31,26 @@ class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
     $this->assert_equal($this->cache->decrement('inc'), 1);
     $this->assert_equal($this->cache->increment('inc', 2), 3);
     $this->assert_equal($this->cache->decrement('inc', 3), 0);
-    
-    # cache clear
+  }
+  
+  function test_expires_in()
+  {
+    # APC supports +expires_in+ but has a bug: http://pecl.php.net/bugs/bug.php?id=13331
+    # Only Memcache & Redis support expires_in.
+    if (get_class($this) == 'Test_ActiveSupport_Cache_MemcacheStore'
+      or get_class($this) == 'Test_ActiveSupport_Cache_RedisStore')
+    {
+      # caching second var (with ttl)
+      $this->cache->write('other_var', '23', array('expires_in' => 2));
+      $this->assert_equal($this->cache->read('other_var'), '23');
+      sleep(3);
+      $this->assert_false($this->cache->read('other_var'));
+      $this->assert_equal($this->cache->read('var'), 'value');
+    }
+  }
+  
+  function test_clear()
+  {
     $this->cache->clear();
     $this->assert_false($this->cache->read('other_var'));
     $this->assert_false($this->cache->read('inc'));
@@ -76,4 +83,13 @@ if (class_exists('\Memcache', false))
   }
   new Test_ActiveSupport_Cache_MemcacheStore();
 }
+
+class Test_ActiveSupport_Cache_RedisStore extends Test_ActiveSupport_Cache_Store
+{
+  function setup() {
+    $this->cache = new Misago\ActiveSupport\Cache\RedisStore();
+  }
+}
+new Test_ActiveSupport_Cache_RedisStore();
+
 ?>
