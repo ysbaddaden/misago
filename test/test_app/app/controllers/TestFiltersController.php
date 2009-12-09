@@ -1,5 +1,36 @@
 <?php
 
+class TestBeforeFiltersController extends TestFiltersController
+{
+  static function __constructStatic()
+  {
+    static::append_before_filter('b', 'c');
+    static::prepend_before_filter('a', array('except' => array('show', 'neo')));
+  }
+}
+TestBeforeFiltersController::__constructStatic();
+
+class TestAfterFiltersController extends TestFiltersController
+{
+  static function __constructStatic()
+  {
+    static::append_after_filter('b', 'c');
+    static::prepend_before_filter('a', array('only' => array('index')));
+  }
+}
+TestAfterFiltersController::__constructStatic();
+
+class TestSkipFiltersController extends TestFiltersController
+{
+  static function __constructStatic()
+  {
+    static::append_before_filter('a', 'b', 'c');
+    static::append_after_filter('d', 'e');
+    static::skip_filter('b', 'e');
+  }
+}
+TestSkipFiltersController::__constructStatic();
+
 class TestFiltersController extends ApplicationController
 {
   public $var_a;
@@ -7,30 +38,6 @@ class TestFiltersController extends ApplicationController
   public $var_d;
   public $var_e;
   public $var_action;
-  
-  function __construct($type)
-  {
-    parent::__construct();
-    
-    switch($type)
-    {
-      case 'before':
-        $this->append_before_filter('b', 'c');
-        $this->prepend_before_filter('a', array('except' => array('show', 'neo')));
-      break;
-      
-      case 'after':
-        $this->append_after_filter('b', 'c');
-        $this->prepend_before_filter('a', array('only' => array('index')));
-      break;
-      
-      case 'skip':
-        $this->append_before_filter('a', 'b', 'c');
-        $this->append_after_filter('d', 'e');
-        $this->skip_filter('b', 'e');
-      break;
-    }
-  }
   
   function index()
   {

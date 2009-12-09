@@ -7,12 +7,11 @@ namespace Misago\ActionController;
 # 
 #   class PostsController extends ApplicationController
 #   {
-#     protected __construct()
+#     static __constructStatic()
 #     {
-#       parent::__construct();
-#       $this->before_filter('authenticate');
-#       $this->before_filter('requires_login', array('except' => array('index', 'show')));
-#       $this->after_filter('mark_searched_tokens', 'compress_response', array('only' => array('index')));
+#       static::before_filter('authenticate');
+#       static::before_filter('requires_login', array('except' => array('index', 'show')));
+#       static::after_filter('mark_searched_tokens', 'compress_response', array('only' => array('index')));
 #     }
 #   }
 # 
@@ -39,61 +38,70 @@ namespace Misago\ActionController;
 # 
 abstract class Filters extends Rescue
 {
-  private $before_filters = array();
-  private $after_filters  = array();
-  private $skip_filters   = array();
+  static private $before_filters = array();
+  static private $after_filters  = array();
+  static private $skip_filters   = array();
   
   
-  protected function skip_filter($filter)
+  static protected function skip_filter($filter)
   {
     $filters = func_get_args();
-    $this->skip_filters = array_merge($this->skip_filters, $filters);
+    
+    if (isset(self::$skip_filters[get_called_class()]))
+    {
+      self::$skip_filters[get_called_class()] =
+        array_merge(self::$skip_filters[get_called_class()], $filters);
+    }
+    else {
+      self::$skip_filters[get_called_class()] = $filters;
+    }
   }
   
   
   # Alias for <tt>append_before_filter</tt>.
-  protected function before_filter($filter, $options=null)
+  static protected function before_filter($filter, $options=null)
   {
     $filters = func_get_args();
-    call_user_func_array(array($this, 'append_before_filter'), $filters);
+    self::_append_filters('before', $filters);
   }
   
-  protected function append_before_filter($filter, $options=null)
+  static protected function append_before_filter($filter, $options=null)
   {
     $filters = func_get_args();
-    $this->_append_filters('before', $filters);
+    self::_append_filters('before', $filters);
   }
   
-  protected function prepend_before_filter($filter, $options=null)
+  static protected function prepend_before_filter($filter, $options=null)
   {
     $filters = func_get_args();
-    $this->_prepend_filters('before', $filters);
+    self::_prepend_filters('before', $filters);
   }
   
   
   # Alias for <tt>append_after_filter</tt>.
-  protected function after_filter($filter, $options=null)
+  static protected function after_filter($filter, $options=null)
   {
     $filters = func_get_args();
-    call_user_func_array(array($this, 'append_after_filter'), $filters);
+    self::_append_filters('after', $filters);
   }
   
-  protected function append_after_filter($filter, $options=null)
+  static protected function append_after_filter($filter, $options=null)
   {
     $filters = func_get_args();
-    $this->_append_filters('after', $filters);
+    self::_append_filters('after', $filters);
   }
   
   protected function prepend_after_filter($filter, $options=null)
   {
     $filters = func_get_args();
-    $this->_prepend_filters('after', $filters);
+    self::_prepend_filters('after', $filters);
   }
   
   
-  private function _prepend_filters($to, $filters)
+  static private function _prepend_filters($to, $filters)
   {
     $to = "{$to}_filters";
+    $to =& self::$$to;
     
     $options = end($filters);
     if (is_array($options)) {
@@ -101,17 +109,22 @@ abstract class Filters extends Rescue
     }
     else {
       $options = null;
+    }
+    
+    if (!isset($to[get_called_class()])) {
+      $to[get_called_class()] = array();
     }
     
     $filters = array_reverse($filters);
     foreach($filters as $filter) {
-      array_unshift($this->$to, array($filter, $options));
+      array_unshift($to[get_called_class()], array($filter, $options));
     }
   }
   
-  private function _append_filters($to, $filters)
+  static private function _append_filters($to, $filters)
   {
     $to = "{$to}_filters";
+    $to =& self::$$to;
     
     $options = end($filters);
     if (is_array($options)) {
@@ -121,18 +134,25 @@ abstract class Filters extends Rescue
       $options = null;
     }
     
+    if (!isset($to[get_called_class()])) {
+      $to[get_called_class()] = array();
+    }
+    
     foreach($filters as $filter) {
-      array_push($this->$to, array($filter, $options));
+      array_push($to[get_called_class()], array($filter, $options));
     }
   }
   
   
-  # :private:
+  # :nodoc:
   protected function process_before_filters()
   {
-    foreach($this->before_filters as $filter)
+    if (empty(self::$before_filters[get_called_class()])) {
+      return;
+    }
+    foreach(self::$before_filters[get_called_class()] as $filter)
     {
-      if (!in_array($filter[0], $this->skip_filters)
+      if ((!isset(self::$skip_filters[get_called_class()]) or !in_array($filter[0], self::$skip_filters[get_called_class()]))
         and (!isset($filter[1]['except']) or !in_array($this->action, $filter[1]['except']))
         and (!isset($filter[1]['only'])   or  in_array($this->action, $filter[1]['only'])))
       {
@@ -145,12 +165,15 @@ abstract class Filters extends Rescue
     }
   }
   
-  # :private:
+  # :nodoc:
   protected function process_after_filters()
   {
-    foreach($this->after_filters as $filter)
+    if (empty(self::$after_filters[get_called_class()])) {
+      return;
+    }
+    foreach(self::$after_filters[get_called_class()] as $filter)
     {
-      if (!in_array($filter[0], $this->skip_filters)
+      if ((!isset(self::$skip_filters[get_called_class()]) or !in_array($filter[0], self::$skip_filters[get_called_class()]))
         and (!isset($filter[1]['except']) or !in_array($this->action, $filter[1]['except']))
         and (!isset($filter[1]['only'])   or  in_array($this->action, $filter[1]['only'])))
       {
