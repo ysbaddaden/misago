@@ -5,7 +5,7 @@ namespace Misago\ActiveSupport\Cache;
 # See <tt>Store</tt> for help.
 class MemcacheStore extends Store
 {
-  protected $flag = null;
+  private $memcache = null;
   
   function __construct()
   {
@@ -56,8 +56,8 @@ class MemcacheStore extends Store
   function write($key, $value, $options=array())
   {
     $expires_in = isset($options['expires_in']) ? $options['expires_in'] : 0;
-    if (!$this->memcache->replace($key, $value, $this->flag, $expires_in)) {
-      $this->memcache->set($key, $value, $this->flag, $expires_in);
+    if (!$this->memcache->replace($key, $value, $expires_in)) {
+      $this->memcache->set($key, $value, $expires_in);
     }
   }
   
