@@ -6,13 +6,13 @@ error_reporting(E_ALL | E_STRICT);
 
 class Test
 {
-  private $count_assertions = 0;
-  private $count_tests    = 0;
-  private $count_success  = 0;
-  private $count_failures = 0;
-  private $count_errors   = 0;
-  private $time;
-  private $running_test;
+  protected $count_assertions = 0;
+  protected $count_tests    = 0;
+  protected $count_success  = 0;
+  protected $count_failures = 0;
+  protected $count_errors   = 0;
+  protected $time;
+  protected $running_test;
   
   function __construct()
   {
