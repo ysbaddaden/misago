@@ -8,12 +8,14 @@ class Collection extends ActiveSupport\ActiveArray
 {
   protected $parent;
   protected $options;
+  private   $unloaded = true;
   
   function __construct($parent, $childs, $options)
   {
-    $this->parent  = $parent;
-    $this->options = $options;
-    parent::__construct($childs, $this->options['class_name']);
+    $this->parent   = $parent;
+    $this->options  = $options;
+    $this->unloaded = ($childs === null);
+    parent::__construct(($childs === null) ? array() : $childs, $this->options['class_name']);
   }
   
   function __get($attr)
@@ -98,7 +100,7 @@ class Collection extends ActiveSupport\ActiveArray
     
     return $this->klass->transaction(function() use($records, $self)
     {
-      foreach((array)$self as $i => $record)
+      foreach($self->castArray() as $i => $record)
       {
         if (in_array($record, $records))
         {
@@ -119,7 +121,7 @@ class Collection extends ActiveSupport\ActiveArray
     
     return $this->klass->transaction(function() use($records, $self)
     {
-      foreach((array)$self as $i => $record)
+      foreach($self->castArray() as $i => $record)
       {
         if (in_array($record, $records))
         {
@@ -137,18 +139,19 @@ class Collection extends ActiveSupport\ActiveArray
   # They're removed from the collection, too.
   function delete_all()
   {
-    $ids = array();
-    foreach($this as $record) {
-      $ids[] = $record->id;
-    }
+    $other_ids = ActiveSupport\String::singularize(
+      ActiveSupport\String::underscore($this->options['class_name'])).'_ids';
+    $ids = $this->parent->$other_ids;
     
-    $class_name = $this->options['class_name'];
-    if ($class_name::delete($ids))
+    if (!empty($ids))
     {
+      $class_name = $this->options['class_name'];
+      if (!$class_name::delete($ids)) {
+        return false;
+      }
       $this->clear();
-      return true;
     }
-    return false;
+    return true;
   }
   
   # Destroys all records (object callbacks are processed).
@@ -176,9 +179,120 @@ class Collection extends ActiveSupport\ActiveArray
   }
   
   # Clears the collection. This doesn't delete the associated records.
-  function clear()
-  {
+  function clear() {
     $this->exchangeArray(array());
+  }
+  
+  function size()
+  {
+    $options    = $this->find_options();
+    $class_name = $this->options['class_name'];
+    return $class_name::count($options);
+  }
+  
+  private function load()
+  {
+    if (!$this->parent->new_record)
+    {
+      $options    = $this->find_options();
+      $class_name = $this->options['class_name'];
+      $childs     = $class_name::find($this->options['find_scope'], $options);
+      
+      if ($childs) {
+        $this->exchangeArray($childs);
+      }
+      else {
+        $this->clear();
+      }
+    }
+    $this->unloaded = false;
+  }
+  
+  private function & find_options()
+  {
+    $conditions = ($this->options['type'] == 'belongs_to') ?
+      array($this->options['find_key'] => $this->parent->{$assoc['foreign_key']}) :
+      array($this->options['find_key'] => $this->parent->id);
+    
+    $options = isset($this->options['find_options']) ?
+      $this->options['find_options'] : array();
+    $options['conditions'] = empty($options['conditions']) ? $conditions :
+      static::merge_conditions($options['conditions'], $conditions);
+    
+    return $options;
+  }
+  
+  
+  function offsetExists($key)
+  {
+    $this->unloaded and $this->load();
+    return parent::offsetExists($key);
+  }
+  
+#  function offsetSet($key, $value)
+#  {
+#    $this->unloaded and $this->load();
+#    return parent::offsetSet($key, $value);
+#  }
+  
+  function offsetGet($key)
+  {
+    $this->unloaded and $this->load();
+    return parent::offsetGet($key);
+  }
+  
+#  function offsetUnset($key)
+#  {
+#    $this->unloaded and $this->load();
+#    return parent::offsetUnset($key);
+#  }
+  
+  function getIterator()
+  {
+    $this->unloaded and $this->load();
+    return parent::getIterator();
+  }
+  
+  function serialize()
+  {
+    $this->unloaded and $this->load();
+    return parent::serialize();
+  }
+  
+  function asort()
+  {
+    $this->unloaded and $this->load();
+    parent::asort();
+  }
+  
+  function ksort()
+  {
+    $this->unloaded and $this->load();
+    parent::ksort();
+  }
+  
+  function uasort($callback)
+  {
+    $this->unloaded and $this->load();
+    parent::uasort($callback);
+  }
+  
+  function uksort($callback)
+  {
+    $this->unloaded and $this->load();
+    parent::uksort($callback);
+  }
+  
+  function natcasesort()
+  {
+    $this->unloaded and $this->load();
+    parent::natcasesort();
+  }
+  
+  function natsort()
+  {
+    $this->unloaded and $this->load();
+    parent::natsort();
   }
 }
 

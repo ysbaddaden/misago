@@ -1,13 +1,14 @@
 <?php
 namespace Misago\ActiveSupport;
 
-class ActiveArray extends \ArrayObject
+class ActiveArray implements \ArrayAccess, \IteratorAggregate, \Countable, \Serializable
 {
-  public $model;
+  protected $ary;
+  public    $model;
   
   function __construct($ary, $model=null)
   {
-    parent::__construct($ary);
+    $this->ary   = $ary;
     $this->model = $model;
   }
   
@@ -46,6 +47,89 @@ class ActiveArray extends \ArrayObject
       $ary[] = $v->to_array();
     }
     return $ary;
+  }
+  
+  # :nodoc:
+  function castArray() {
+    return $this->ary;
+  }
+  
+  function offsetExists($key) {
+    return isset($this->ary[$key]);
+  }
+  
+  function offsetSet($key, $value)
+  {
+    if ($key === null) {
+      return $this->ary[] = $value;
+    }
+    return $this->ary[$key] = $value;
+  }
+  
+  function offsetGet($key) {
+    return isset($this->ary[$key]) ? $this->ary[$key] : null;
+  }
+  
+  function offsetUnset($key) {
+    unset($this->ary[$key]);
+  }
+  
+  function getIterator() {
+    return new \ArrayIterator($this->ary);
+  }
+  
+  function count() {
+    return count($this->ary);
+  }
+  
+  function serialize() {
+    return serialize($this->ary);
+  }
+  
+  function unserialize($serialized) {
+    $this->data = unserialize($serialized);
+  }
+  
+  function append($value) {
+    array_push($this->ary, $value);
+  }
+  
+  function exchangeArray($input)
+  {
+    if (is_object($input))
+    {
+      $this->ary = array();
+      foreach($input as $key => $value) {
+        $this->ary[$key] = $value;
+      }
+    }
+    else {
+      $this->ary = $input;
+    }
+  }
+  
+  function asort() {
+    asort($this->ary);
+  }
+  
+  function ksort() {
+    ksort($this->ary);
+  }
+  
+  function uasort($callback) {
+    uasort($this->ary, $callback);
+  }
+  
+  function uksort($callback) {
+    uksort($this->ary, $callback);
+  }
+  
+  function natcasesort() {
+    natcasesort($this->ary);
+  }
+  
+  function natsort() {
+    natsort($this->ary);
   }
 }
 

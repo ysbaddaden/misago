@@ -30,7 +30,7 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   {
     $order = new Order(1);
     $this->assert_instance_of($order->baskets, 'Misago\ActiveRecord\Collection');
-    $this->assert_equal($order->baskets->count(), 3);
+    $this->assert_equal($order->baskets->size(), 3);
     
     $basket = $order->baskets->build();
     $this->assert_instance_of($basket, 'Basket');
@@ -40,7 +40,7 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   {
     $programmer = new Programmer(1);
     $this->assert_instance_of($programmer->projects, 'Misago\ActiveRecord\Collection');
-    $this->assert_equal($programmer->projects->count(), 2);
+    $this->assert_equal($programmer->projects->size(), 2);
     
     $project = $programmer->projects->build();
     $this->assert_instance_of($project, 'Project');
@@ -51,20 +51,20 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order = new Order(3);
     $this->assert_instance_of($order->invoice, 'Invoice', 'has_one');
     $this->assert_null($order->invoice->id, 'has_one: fresh object');
-
+    
     $tag = new Tag();
     $this->assert_instance_of($tag->post, 'Post', 'belongs_to');
     $this->assert_null($tag->post->id, 'belongs_to: fresh object');
     
     $post = new Post();
     $this->assert_instance_of($post->tags, 'Misago\ActiveRecord\Collection', 'has_many');
-    $this->assert_equal($post->tags->count(), 0);
+    $this->assert_equal($post->tags->size(), 0);
     $tag = $post->tags->build(array('tag' => 'aaa'));
     $this->assert_instance_of($tag, 'Tag');
     
     $programmer = new Programmer();
     $this->assert_instance_of($programmer->projects, 'Misago\ActiveRecord\Collection', 'HABTM');
-    $this->assert_equal($programmer->projects->count(), 0);
+    $this->assert_equal($programmer->projects->size(), 0);
     $project = $programmer->projects->build(array('name' => 'aaa'));
     $this->assert_instance_of($project, 'Project');
   }
@@ -153,7 +153,8 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
       'created_at' => '2008-09-12 16:10:08',
     ));
     $this->assert_true($basket->new_record);
-    $this->assert_equal($order->baskets->count(), 4);
+    $this->assert_equal($order->baskets->size(), 3);
+    $this->assert_equal(count($order->baskets), 1);
   }
   
   function test_others_create()
@@ -165,15 +166,16 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
       'created_at' => '2008-09-12 16:10:08',
     ));
     $this->assert_false($basket->new_record);
-    $this->assert_equal($order->baskets->count(), 2);
+    $this->assert_equal($order->baskets->size(), 2);
   }
   
   function test_others_clear()
   {
     $order = new Order(1);
-    $this->assert_equal($order->baskets->count(), 3);
+    $this->assert_equal($order->baskets->size(), 3);
     $order->baskets->clear();
-    $this->assert_equal($order->baskets->count(), 0);
+    $this->assert_equal($order->baskets->count(), 0, 'count');
+    $this->assert_equal($order->baskets->size(), 3, "they haven't been destroyed");
   }
   
   function test_others_delete_one()

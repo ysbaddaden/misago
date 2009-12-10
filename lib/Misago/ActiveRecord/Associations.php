@@ -478,37 +478,61 @@ abstract class Associations extends Record
   	# association?
 		if (static::has_association($attribute))
 		{
-		  $assoc = static::association($attribute);
+		  $assoc      = static::association($attribute);
       $class_name = $assoc['class_name'];
       
-		  if (!$this->new_record)
-		  {
-		    # parent does exist
-			  $options = isset($assoc['find_options']) ? $assoc['find_options'] : array();
-			  
-			  $conditions = ($assoc['type'] == 'belongs_to') ?
-			    array($assoc['find_key'] => $this->{$assoc['foreign_key']}) :
-  		    array($assoc['find_key'] => $this->id);
-			  $options['conditions'] = empty($options['conditions']) ? $conditions :
-		      static::merge_conditions($options['conditions'], $conditions);
-		    
-			  $found = $class_name::find($assoc['find_scope'], $options);
+      switch($assoc['type'])
+      {
+        case 'has_one': case 'belongs_to':
+		      if (!$this->new_record)
+		      {
+			      $conditions = ($assoc['type'] == 'belongs_to') ?
+			        array($assoc['find_key'] => $this->{$assoc['foreign_key']}) :
+      		    array($assoc['find_key'] => $this->id);
+			      $options['conditions'] = empty($options['conditions']) ? $conditions :
+		          static::merge_conditions($options['conditions'], $conditions);
+		        
+			      $found = $class_name::find($assoc['find_scope'], $options);
+			      if ($found) {
+			        return $this->$attribute = $found;
+			      }
+          }
+          return $this->$attribute = new $class_name();
+        break;
         
-        if ($found)
-        {
-          # association exists
-	        return $this->$attribute = ($found instanceof \Misago\ActiveSupport\ActiveArray) ?
-	          new Collection($this, $found, $assoc) : $found;
-        }
+        case 'has_many': case 'has_and_belongs_to_many':
+          return $this->$attribute = new Collection($this, null, $assoc);
+        break;
       }
       
-      # association doesn't exists
-      if ($assoc['type'] == 'belongs_to'
-        or $assoc['type'] == 'has_one')
-      {
-        return $this->$attribute = new $class_name();
-      }
-      return $this->$attribute = new Collection($this, array(), $assoc);
+#		  if (!$this->new_record)
+#		  {
+#		    # parent does exist
+#			  $options = isset($assoc['find_options']) ? $assoc['find_options'] : array();
+#			  
+#			  $conditions = ($assoc['type'] == 'belongs_to') ?
+#			    array($assoc['find_key'] => $this->{$assoc['foreign_key']}) :
+#  		    array($assoc['find_key'] => $this->id);
+#			  $options['conditions'] = empty($options['conditions']) ? $conditions :
+#		      static::merge_conditions($options['conditions'], $conditions);
+#		    
+#			  $found = $class_name::find($assoc['find_scope'], $options);
+#        
+#        if ($found)
+#        {
+#          # association exists
+#	        return $this->$attribute = ($found instanceof \Misago\ActiveSupport\ActiveArray) ?
+#	          new Collection($this, $found, $assoc) : $found;
+#        }
+#      }
+#      
+#      # association doesn't exists
+#      if ($assoc['type'] == 'belongs_to'
+#        or $assoc['type'] == 'has_one')
+#      {
+#        return $this->$attribute = new $class_name();
+#      }
+#      return $this->$attribute = new Collection($this, array(), $assoc);
 		}
 		
     # list of ids for a has_many or HABTM relation?
