@@ -66,26 +66,33 @@ class Logger
   # Logs a message.
   function add($severity, $message)
   {
-    $this->messages[$severity][] = $this->format_message($severity, $message);
+    $this->messages[] = array(
+      $severity, $this->format_message($severity, $message)
+    );
     $this->auto_flush && $this->flush();
   }
   
   # Manually flushes messages on log devices.
   function flush()
   {
-    foreach($this->messages as $severity => $messages)
+    $messages = $this->messages;
+    $this->messages = array();
+    
+    foreach($this->devices as $device)
     {
-      $messages = implode("\n", $messages);
-      unset($this->messages[$severity]);
-      
-      foreach($this->devices as $device)
+      foreach($messages as $message)
       {
-        if ($device['log_level'] !== null and $device['log_level'] > $severity) continue;
-        fwrite($device['file'], $messages);
-      }
-      
-      if (isset($this->msg_queue)) {
-        msg_send($this->msg_queue, $severity, $messages, false, true, $errno);
+        list($severity, $message) = $message;
+        
+        if ($device['log_level'] === null
+          or $device['log_level'] <= $severity)
+        {
+          fwrite($device['file'], $message);
+        }
+        
+        if (isset($this->msg_queue)) {
+          msg_send($this->msg_queue, $severity, $message, false, true, $errno);
+        }
       }
     }
   }
