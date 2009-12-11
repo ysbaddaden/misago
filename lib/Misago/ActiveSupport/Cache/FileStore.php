@@ -17,17 +17,43 @@ class FileStore extends Store
   
   function read($key)
   {
+    if (is_array($key))
+    {
+      $rs = array();
+      foreach($key as $k)
+      {
+        $v = $this->read($k);
+        if ($v !== false) {
+          $rs[$k] = $v;
+        }
+      }
+      return $rs;
+    }
     return $this->exists($key) ? file_get_contents($this->file($key)) : false;
   }
   
-  function write($key, $value, $options=array())
+  function write($key, $value=null, $options=array())
   {
+    if (is_array($key))
+    {
+      foreach($key as $k => $v) {
+        $this->write($k, $v);
+      }
+      return;
+    }
     $file = $this->file($key);
     file_put_contents($file, $value);
   }
   
   function delete($key)
   {
+    if (is_array($key))
+    {
+      foreach($key as $k) {
+        $this->delete($k);
+      }
+      return;
+    }
     $file = $this->file($key);
     if (file_exists($file)) {
       unlink($file);

@@ -33,13 +33,22 @@ class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
     $this->assert_equal($this->cache->decrement('inc', 3), 0);
   }
   
-  function test_multiple_read_writes()
+  function test_multiple()
   {
-    $this->cache->write_multiple(array('var_a' => 1, 'var_b' => 2));
-    $this->assert_equal(
-      $this->cache->read_multiple(array('var_b', 'var_a')),
-      array('var_a' => 1, 'var_b' => 2)
-    );
+    $this->cache->write(array('var_a' => 1, 'var_b' => 2));
+    $this->assert_equal($this->cache->read(array('var_b', 'var_a')), array('var_a' => 1, 'var_b' => 2));
+    
+    $this->assert_equal($this->cache->increment(array('var_a', 'var_b')), array('var_a' => 2, 'var_b' => 3));
+    $this->assert_equal($this->cache->read(array('var_b', 'var_a')), array('var_a' => 2, 'var_b' => 3));
+    
+    $this->cache->increment(array('var_a', 'var_b'), 2);
+    $this->assert_equal($this->cache->read(array('var_b', 'var_a')), array('var_a' => 4, 'var_b' => 5));
+    
+    $this->assert_equal($this->cache->decrement(array('var_a', 'var_b'), 3), array('var_a' => 1, 'var_b' => 2));
+    $this->assert_equal($this->cache->read(array('var_b', 'var_a')), array('var_a' => 1, 'var_b' => 2));
+    
+    $this->cache->delete(array('var_a', 'var_b'));
+    $this->assert_equal($this->cache->read(array('var_b', 'var_a')), array());
   }
   
   function test_expires_in()
@@ -92,6 +101,9 @@ if (class_exists('\Memcache', false))
   }
   new Test_ActiveSupport_Cache_MemcacheStore();
 }
+else {
+  echo "\nSkipping: unable to connect to server.\n";
+}
 
 class Test_ActiveSupport_Cache_RedisStore extends Test_ActiveSupport_Cache_Store
 {
@@ -99,6 +111,15 @@ class Test_ActiveSupport_Cache_RedisStore extends Test_ActiveSupport_Cache_Store
     $this->cache = new Misago\ActiveSupport\Cache\RedisStore();
   }
 }
-new Test_ActiveSupport_Cache_RedisStore();
+try {
+  new Test_ActiveSupport_Cache_RedisStore();
+}
+catch(Exception $e)
+{
+  if ($e->getMessage() != 'Connection refused') {
+    throw $e;
+  }
+  echo "\nSkipping: unable to connect to server.\n";
+}
 
 ?>

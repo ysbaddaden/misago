@@ -34,11 +34,29 @@ class RedisStore extends Store
   
   function increment($key, $amount=1)
   {
+    if (is_array($key))
+    {
+      return $this->redis->pipeline(function($pipe) use($key, $amount)
+      {
+        foreach($key as $k) {
+          $pipe->incrby($k, $amount);
+        }
+      });
+    }
     return $this->redis->incrby($key, $amount);
   }
   
   function decrement($key, $amount=1)
   {
+    if (is_array($key))
+    {
+      return $this->redis->pipeline(function($pipe) use($key, $amount)
+      {
+        foreach($key as $k) {
+          $pipe->decrby($k, $amount);
+        }
+      });
+    }
     if ($this->exists($key)) {
       return $this->redis->decrby($key, $amount);
     }
@@ -48,36 +66,45 @@ class RedisStore extends Store
   
   function read($key)
   {
-    $value = $this->redis->get($key);
+    if (is_array($key))
+    {
+      $values = $this->redis->mget($key);
+      foreach($values as $i => $v)
+      {
+        if ($v === null) {
+          unset($values[$i]);
+        }
+      }
+      return $values;
+    }
+    
+    $value  = $this->redis->get($key);
     return ($value === null) ? false : $value;
   }
   
-  function write($key, $value, $options=array())
+  function write($key, $value=null, $options=array())
   {
-    $this->redis->set($key, $value);
-    
-    if (isset($options['expires_in'])) {
-      $this->redis->expire($key, $options['expires_in']);
-    }
-  }
-  
-  function read_multiple($keys)
-  {
-    return $this->redis->mget($keys);
-  }
-  
-  function write_multiple($keys, $options=array())
-  {
-    $this->redis->mset($keys);
-    
-    if (isset($options['expires_in']))
+    if (is_array($key))
     {
-      $this->redis->pipeline(function($pipeline)
+      $this->redis->mset($key);
+      
+      if (isset($options['expires_in']))
       {
-        foreach(array_keys($keys) as $key) {
-          $pipeline->expire($key, $expires_in);
-        }
-      });
+        $this->redis->pipeline(function($pipe)
+        {
+          foreach(array_keys($keys) as $key) {
+            $pipe->expire($key, $expires_in);
+          }
+        });
+      }
+    }
+    else
+    {
+      $this->redis->set($key, $value);
+      
+      if (isset($options['expires_in'])) {
+        $this->redis->expire($key, $options['expires_in']);
+      }
     }
   }
   
