@@ -10,17 +10,17 @@ class Test_ActiveRecord_Connection extends Misago\Unit\TestCase
 {
   function test_create()
   {
-    $db = ActiveRecord\Connection::create('production');
+    $db      = ActiveRecord\Connection::create('production');
     $adapter = $db->config('adapter');
-    $klass = "Misago\ActiveRecord\ConnectionAdapters\\".String::camelize($adapter)."Adapter";
+    $klass   = "Misago\ActiveRecord\ConnectionAdapters\\".String::camelize($adapter)."Adapter";
     $this->assert_true($db instanceof $klass);
   }
   
   function test_get()
   {
-    $db = ActiveRecord\Connection::get($_SERVER['MISAGO_ENV']);
+    $db      = ActiveRecord\Connection::get($_SERVER['MISAGO_ENV']);
     $adapter = $db->config('adapter');
-    $klass = "Misago\ActiveRecord\ConnectionAdapters\\".String::camelize($adapter)."Adapter";
+    $klass   = "Misago\ActiveRecord\ConnectionAdapters\\".String::camelize($adapter)."Adapter";
     $this->assert_true($db instanceof $klass);
   }
 }

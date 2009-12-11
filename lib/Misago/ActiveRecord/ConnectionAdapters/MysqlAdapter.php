@@ -82,8 +82,11 @@ class MysqlAdapter extends AbstractAdapter
     
     if (!$rs)
     {
-      $message = "MySQL error [".mysql_errno($this->link)."] ".mysql_error($this->link);
-      $this->report_error($sql, $message);
+      if (mysql_errno($this->link) != 1146)
+      {
+        $message = "MySQL error [".mysql_errno($this->link)."] ".mysql_error($this->link);
+        $this->report_error($sql, $message);
+      }
     }
     elseif (DEBUG) {
       $this->log_query($sql, mysql_affected_rows($this->link), $time);
