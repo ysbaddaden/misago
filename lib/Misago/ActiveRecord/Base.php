@@ -678,7 +678,9 @@ abstract class Base extends Calculations
         $this->id = $id;
       }
       
-      $this->save_associated();
+      if (!$this->save_associated()) {
+        return false;
+      }
       
       $this->after_create();
       $this->after_save();
@@ -727,7 +729,9 @@ abstract class Base extends Calculations
     
     if ($rs !== false)
     {
-      $this->save_associated();
+      if (!$this->save_associated()) {
+        return false;
+      }
       
       $this->after_update();
       $this->after_save();

@@ -380,6 +380,21 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     
     $this->fixtures('orders', 'invoices', 'baskets');
   }
+  
+  function test_save_associated_with_has_one()
+  {
+    # particular foreign_key
+    $order = new Order(array('id' => 123));
+    $order->build_invoice();
+    $this->assert_true($order->save());
+    $this->assert_equal(Invoice::count(array('conditions' => 'order_id = 123')), 1);
+    
+    # save on the association fails, so save must fail
+    echo "\nThis MySQL error is expected: ";
+    $order = new Order();
+    $order->build_invoice(array('id' => 1));
+    $this->assert_false($order->save());
+  }
 }
 
 

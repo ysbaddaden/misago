@@ -384,7 +384,7 @@ abstract class Associations extends Record
     static::set_association('belongs_to', $name, $options);
   }
   
-  
+  # TODO: add 'autosave' and 'validate' options for has_one relationships.
   protected static function has_one($name, $options=array())
   {
     static::prepare_association_options($name, $options);
@@ -403,7 +403,7 @@ abstract class Associations extends Record
     static::set_association('has_one', $name, $options);
   }
   
-  
+  # TODO: add 'autosave' and 'validate' options for has_many relationships.
   protected static function has_many($name, $options=array())
   {
     static::prepare_association_options($name, $options);
@@ -425,7 +425,7 @@ abstract class Associations extends Record
     static::set_association('has_many', $name, $options);
   }
   
-  
+  # TODO: add 'autosave' and 'validate' options for HABTM relationships.
   protected static function has_and_belongs_to_many($name, $options=array())
   {
     static::prepare_association_options($name, $options);
@@ -729,37 +729,32 @@ abstract class Associations extends Record
     }
   }
   
-  # TODO: save_associated() should save HABTM relationships?
-  # TEST: Test save_associated() with belongs_to, has_one, has_many & HABTM relationships.
+  # TODO: should save_associated() save HABTM relationships?
+  # TEST: Test save_associated() with has_many relationships.
   # :private:
   protected function save_associated()
   {
-    $rs = true;
     foreach(static::get_associations() as $assoc_name => $assoc)
     {
       if (isset($this->{$assoc['name']}))
       {
         switch($assoc['type'])
         {
-          case 'belongs_to':
-            $this->$assoc_name->{$assoc['primary_key']} = $this->{$assoc['foreign_key']};
-          break;
-          
           case 'has_one':
             $primary_key = static::primary_key();
             $this->$assoc_name->{$assoc['foreign_key']} = $this->$primary_key;
           break;
-          
-          case 'has_many':
-          break;
-          
-          #case 'has_and_belongs_to_many':
-          #break;
+          case 'has_many': break;
+          case 'has_and_belongs_to_many': break;
+          case 'belongs_to': continue;
         }
-        $rs &= $this->$assoc_name->save();
+        
+        if (!$this->$assoc_name->save()) {
+          return false;
+        }
       }
     }
-    return $rs;
+    return true;
   }
   
   # :private:
