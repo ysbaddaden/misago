@@ -23,10 +23,11 @@ class Logger
     
     switch(cfg_get('log_level', ($_SERVER['MISAGO_ENV'] == 'production') ? 'info' : 'debug'))
     {
-      case 'error': $this->level = static::ERROR; break;
-      case 'warn':  $this->level = static::WARN;  break;
-      case 'info':  $this->level = static::INFO;  break;
-      case 'debug': $this->level = static::DEBUG; break;
+      case 'error':  $this->level = static::ERROR;  break;
+      case 'warn':   $this->level = static::WARN;   break;
+      case 'notice': $this->level = static::NOTICE; break;
+      case 'info':   $this->level = static::INFO;   break;
+      case 'debug':  $this->level = static::DEBUG;  break;
     }
     
     if (PHP_SAPI != 'cli'
@@ -69,6 +70,9 @@ class Logger
     $this->messages[] = array(
       $severity, $this->format_message($severity, $message)
     );
+    if (DEBUG and $severity > static::INFO) {
+      echo $message;
+    }
     $this->auto_flush && $this->flush();
   }
   
