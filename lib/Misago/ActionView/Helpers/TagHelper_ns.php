@@ -39,18 +39,8 @@ function input_attributes($name, $type, $value, $attributes)
       }
     }
   }
-  /*
-  if (isset($attributes['disabled']))
-  {
-    if ($attributes['disabled']) {
-      $attributes['disabled'] = "disabled";
-    }
-    else {
-      unset($attributes['disabled']);
-    }
-  }
-  */
   
+  # checked?
   if ($type == 'radio' or $type == 'checkbox')
   {
     if (isset($attributes['checked']))
