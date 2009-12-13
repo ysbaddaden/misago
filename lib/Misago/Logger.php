@@ -84,9 +84,9 @@ class Logger
     
     foreach($this->devices as $device)
     {
-      foreach($messages as $message)
+      foreach($messages as $ary)
       {
-        list($severity, $message) = $message;
+        list($severity, $message) = $ary;
         
         if ($device['log_level'] === null
           or $device['log_level'] <= $severity)
