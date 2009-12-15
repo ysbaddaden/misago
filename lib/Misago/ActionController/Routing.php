@@ -455,7 +455,7 @@ class Routing extends \Misago\Object
   # Returns the full list of routes.
   static function collect()
   {
-    $map = Routing::draw();
+    $map = self::draw();
     return $map->routes;
   }
 }

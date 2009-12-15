@@ -5,7 +5,6 @@ $GLOBALS['__fake_apc_data'] = array();
 
 
 # Caches a variable in the data store, only if it's not already stored. 
-# 
 # :nodoc:
 function apc_add($key, $var, $ttl=0)
 {
@@ -16,8 +15,6 @@ function apc_add($key, $var, $ttl=0)
 }
 
 # Caches a variable in the data store. 
-# 
-# FIXME: handle array of keys.
 # :nodoc:
 function apc_store($key, $var=null, $ttl=0)
 {
@@ -34,8 +31,6 @@ function apc_store($key, $var=null, $ttl=0)
 }
 
 # Fetches a stored variable from the cache.
-# 
-# FIXME: handle array of keys.
 # :nodoc:
 function apc_fetch($key, &$success=null)
 {
@@ -60,7 +55,6 @@ function apc_fetch($key, &$success=null)
 }
 
 # Removes a stored variable from the cache.
-# 
 # :nodoc:
 function apc_delete($key)
 {
@@ -77,7 +71,6 @@ function apc_delete($key)
 }
 
 # Clears user cache.
-# 
 # :nodoc:
 function apc_clear_cache()
 {

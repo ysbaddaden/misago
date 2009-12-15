@@ -183,7 +183,7 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     }
   }
   
-  # TODO: Parse multipart/form-data, as well as XML post data.
+  # IMPROVE: Parse multipart/form-data, as well as XML post data.
   private function parse_post_body()
   {
     switch($this->content_type())

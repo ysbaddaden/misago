@@ -27,7 +27,7 @@ class Dispatcher extends \Misago\Object
     $dispatcher->handle_request();
   }
   
-  # TODO: Parse out methods from ActionController\Base (and above): they're not actions.
+  # IMPROVE: Parse out methods from ActionController\Base (and above): they're not actions.
   protected function handle_request()
   {
     $controller = Routing::recognize($this->request);
