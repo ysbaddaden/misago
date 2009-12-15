@@ -99,8 +99,8 @@ class Table
   # 
   # Types:
   # 
-  # - +date+ - will add +created_on+ & +updated_on+.
-  # - +time+ - will add +created_at+ & +updated_at+.
+  # - +date+     - will add +created_on+ & +updated_on+.
+  # - +time+     - will add +created_at+ & +updated_at+.
   # - +datetime+ - will add +created_at+ & +updated_at+.
   # 
   function add_timestamps($type='datetime')

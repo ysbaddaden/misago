@@ -2,7 +2,7 @@
 namespace Misago\ActiveRecord\ConnectionAdapters;
 use Misago\ActiveRecord;
 
-# Abstract adapter to build real <tt>\Misago\ActiveRecord</tt> adapters.
+# Abstract adapter to build real <tt>Misago\ActiveRecord</tt> adapters.
 abstract class AbstractAdapter
 {
   public  $COLUMN_QUOTE = '"';
@@ -120,12 +120,7 @@ abstract class AbstractAdapter
   # Quotes a series of columns for use in a SQL query.
   function quote_columns($columns)
   {
-    if (!is_array($columns))
-    {
-#      if (preg_match_all('/(\b[\w_]+)\(([^\(\)]*)\)/i', $columns, $matches))
-#      {
-#        print_r($matches[0]);
-#      }
+    if (!is_array($columns)) {
       $columns = explode(',', $columns);
     }
     $columns = array_map(array($this, 'quote_column'), $columns);
@@ -549,6 +544,8 @@ abstract class AbstractAdapter
   }
   
   # Merges conditions together.
+  # 
+  # TODO: Move merge_conditions() to ActionController\Base.
   function merge_conditions($a, $b)
   {
     if (!empty($a) and empty($b)) {

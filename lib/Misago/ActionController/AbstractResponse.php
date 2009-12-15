@@ -4,7 +4,7 @@ namespace Misago\ActionController;
 # Response data.
 # 
 # This is some Misaso internal, response should never be used directly.
-# You should use methods from <tt>ActionController_Base</tt> instead.
+# You should use methods from <tt>Misago\ActionController\Base</tt> instead.
 # 
 class AbstractResponse extends \Misago\Object
 {

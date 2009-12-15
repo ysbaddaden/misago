@@ -4,7 +4,7 @@ use Misago\ActiveRecord;
 
 # Mysql adapter.
 # 
-# See <tt>AbstractAdapter</tt> for documentation.
+# See <tt>Misago\ActiveRecord\ConnectionAdapters\AbstractAdapter</tt> for documentation.
 class MysqlAdapter extends AbstractAdapter
 {
   public  $COLUMN_QUOTE = '`';

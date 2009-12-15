@@ -1,7 +1,6 @@
 <?php
 namespace Misago;
 
-# Useful functions for PHP CLI.
 class Terminal
 {
 	static protected $colors = array(
@@ -27,7 +26,7 @@ class Terminal
 		'REVERSE'      => "[7m",
 	);
 	
-	# Colorizes text for PHP.
+	# Colorizes text for terminal output.
 	static function colorize($text, $color='NORMAL')
 	{
 		$tag = isset(self::$colors[$color]) ? self::$colors[$color] : self::$colors['NORMAL'];

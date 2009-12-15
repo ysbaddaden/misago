@@ -17,9 +17,9 @@ namespace Misago\ActionController;
 #     <div class="notice"><\?= $this->flash['notice'] ?\></div>
 #   <\? endif; ?\>
 # 
-# Please remember that variables will be forgotten at the end of the
-# following request. Variables are only accessible at request n+1, not
-# at request n+2, n+3, etc.
+# Please note that variables will be forgotten at the end of the following
+# request. Variables are only accessible at request n+1, not at request n+2,
+# n+3, etc.
 # 
 class Flash extends \ArrayObject
 {

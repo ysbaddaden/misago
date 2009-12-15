@@ -22,12 +22,21 @@ abstract class Rescue extends \Misago\Object
   }
   
   # Checks wether the request originates from localhost or a remote computer.
+  # 
+  # You may overwrite this function in you application to declare what is
+  # to be considered as a local request.
+  # 
+  # By default the following is considered a local request:
+  # 
+  #   - PHP is runned on command-line (CLI);
+  #   - remote address is 127.0.0.1.
   function is_local_request()
   {
-    return (PHP_SAPI == 'cli' or $_SERVER['REMOTE_ADDR'] == '127.0.0.1' or $this->request->remote_ip() == '127.0.0.1');
+    return (PHP_SAPI == 'cli'
+      or $this->request->remote_ip() == '127.0.0.1');
   }
   
-  # Catches PHP errors and logs them.
+  # Catches PHP errors and logs them using <tt>Misago\Logger</tt>.
   function rescue_php_error($errno, $errstr, $errfile=null, $errline=null, array $errcontext=null)
   {
     $php_errors = array(
@@ -65,6 +74,12 @@ abstract class Rescue extends \Misago\Object
   }
   
   # Catches exceptions raised within an action.
+  # 
+  # It executes <tt>rescue_action_locally</tt> if <tt>is_local_request</tt>
+  # returned true, otherwise it executes and runs <tt>rescue_action_in_public</tt>.
+  # 
+  # Overwrite this method in your application if you to change this behavior.
+  # 
   function rescue_action($exception)
   {
     $this->log_error($exception);
@@ -92,8 +107,8 @@ abstract class Rescue extends \Misago\Object
   {
     $status = $this->response->status($status_code);
     
-    if (file_exists(ROOT.'/public/'.$status_code.'.'.I18n::$locale.'.html')) {
-      $this->response->body = file_get_contents(ROOT.'/public/'.$status_code.'.'.I18n::$locale.'.html');
+    if (file_exists(ROOT.'/public/'.$status_code.'.'.I18n::locale().'.html')) {
+      $this->response->body = file_get_contents(ROOT.'/public/'.$status_code.'.'.I18n::locale().'.html');
     }
     elseif (file_exists(ROOT.'/public/'.$status_code.'.html')) {
       $this->response->body = file_get_contents(ROOT.'/public/'.$status_code.'.html');

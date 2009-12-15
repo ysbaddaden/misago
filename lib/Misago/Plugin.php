@@ -17,6 +17,7 @@ class Plugin
     return $plugins;
   }
   
+  # :nodoc:
   static function include_path()
   {
     $path = apc_fetch(TMP."/plugin_lib_paths");

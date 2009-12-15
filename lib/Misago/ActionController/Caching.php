@@ -4,6 +4,19 @@ use Misago\ActiveSupport;
 
 # Caching.
 # 
+# =Cache store
+# 
+# The storage object is avaible throught <tt>cache</tt>.
+# 
+# You may use a particular storage (eg: file, redis, memcache) with
+# +cfg_set+ in your environment:
+# 
+#   # config/environment.php
+#   cfg_set('cache_store', 'memcache');
+# 
+# See <tt>Misago\ActiveSupport\Cache</tt> for the list of available
+# storages (defaults to <tt>Misago\ActiveSupport\Cache\MemoryStore</tt>).
+# 
 # =Page caching
 # 
 # Caches the current action as a real file in the public directory,
@@ -15,7 +28,7 @@ use Misago\ActiveSupport;
 # cached pages, since the application isn't even reached. If you need
 # authentification check action caching below.
 # 
-# Please note that GET parameters are overlooked by the cache, which
+# Please note that GET parameters are overlooked by page cache, which
 # means that +/members.rss+ and +/members.rss?limit=10+ will share the
 # same cache file.
 # 
@@ -56,13 +69,15 @@ use Misago\ActiveSupport;
 # 
 #   class PostsController extends Misago\ActionController\Base
 #   {
-#     protected $before_filters = array(
-#       'authenticate' => array('only' => 'feed')
-#     );
 #     protected $caches_action = array(
 #       'index',
-#       'feed' => array('if' => array(':format' => 'html'))
+#       'feed' => array('if' => array(':format' => 'rss'))
 #     );
+#     
+#     function __constructStatic()
+#     {
+#        static::before_filter('authenticate' => array('only' => 'feed'));
+#     }
 #   }
 # 
 # TODO: :layout => false to only cache the view (while still rendering the layout).
@@ -78,6 +93,7 @@ use Misago\ActiveSupport;
 # 
 abstract class Caching extends Filters
 {
+  #protected $cache;
   protected $caches_page   = array();
   protected $caches_action = array();
   
@@ -108,7 +124,8 @@ abstract class Caching extends Filters
     if (!isset($this->cache))
     {
       $cache_store = cfg_get('cache_store', 'memory_store');
-      $CacheStoreClassName = 'Misago\ActiveSupport\Cache\\'.ActiveSupport\String::camelize($cache_store);
+      $CacheStoreClassName = 'Misago\ActiveSupport\Cache\\'.
+        ActiveSupport\String::camelize($cache_store);
       $this->cache = new $CacheStoreClassName();
     }
     return $this->cache;

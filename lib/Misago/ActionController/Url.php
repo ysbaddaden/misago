@@ -1,7 +1,9 @@
 <?php
+/*
 namespace Misago\ActionController;
 
 # Transparently handles URL (with HTTP method and URI).
+# :nodoc:
 class Url
 {
   public $method;
@@ -18,5 +20,6 @@ class Url
     return $this->uri;
   }
 }
+*/
 
 ?>

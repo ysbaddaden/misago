@@ -1,6 +1,7 @@
 <?php
 namespace Misago;
 
+# Handles insertion and truncation of fixture data.
 class Fixtures
 {
   static private $connection;
@@ -11,6 +12,7 @@ class Fixtures
     self::$connection = ActiveRecord\Connection::get($_SERVER['MISAGO_ENV']);
   }
   
+  # Loads the following fixtures in tables of the same name.
   static function insert($fixture=null)
   {
     if ($fixture === null or is_array($fixture))
@@ -29,6 +31,7 @@ class Fixtures
     }
   }
   
+  # Empties one or many tables.
   static function truncate($table)
   {
     if (is_array($table))

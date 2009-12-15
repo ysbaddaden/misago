@@ -9,7 +9,7 @@ namespace Misago\ActionController;
 # 
 # CgiRequest handles all of that, and much more, transparently.
 # 
-# See <tt>ActionController_AbstractRequest</tt> for actual documentation.
+# See <tt>Misago\ActionController\AbstractRequest</tt> for actual documentation.
 # 
 class CgiRequest extends \Misago\Object implements AbstractRequest
 {

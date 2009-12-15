@@ -3,8 +3,12 @@
 # :namespace: Misago\ActionView\Helpers\DateHelper
 function distance_of_time_in_words($from_time, $to_time=0)
 {
-  if (!$from_time instanceof Misago\ActiveSupport\Datetime) $from_time = new Misago\ActiveSupport\Datetime($from_time);
-  if (!$to_time   instanceof Misago\ActiveSupport\Datetime) $to_time   = new Misago\ActiveSupport\Datetime($to_time);
+  if (!$from_time instanceof Misago\ActiveSupport\Datetime) {
+    $from_time = new Misago\ActiveSupport\Datetime($from_time);
+  }
+  if (!$to_time   instanceof Misago\ActiveSupport\Datetime) {
+    $to_time = new Misago\ActiveSupport\Datetime($to_time);
+  }
   
   $distance = round(abs($from_time->distance($to_time)) / 60.0);
   

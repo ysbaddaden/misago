@@ -30,6 +30,7 @@ class TestCase extends Assertions\ResponseAssertions
     self::$connection->transaction('rollback');
   }
   
+  # :nodoc:
   static function create_database($force=false)
   {
     if (!self::$batch_run or $force)
@@ -50,6 +51,7 @@ class TestCase extends Assertions\ResponseAssertions
     }
   }
   
+  # :nodoc:
   static function drop_database($force=false)
   {
     if (!self::$batch_run or $force)

@@ -28,16 +28,16 @@ use Misago\ActionView;
 # 
 # An ActionController is composed of the following classes:
 # 
-# - <tt>ActionController_Base</tt>
-# - <tt>ActionController_Caching</tt>
-# - <tt>ActionController_Filters</tt>
-# - <tt>ActionController_Rescue</tt>
+# - <tt>Misago\ActionController\Base</tt>
+# - <tt>Misago\ActionController\Caching</tt>
+# - <tt>Misago\ActionController\Filters</tt>
+# - <tt>Misago\ActionController\Rescue</tt>
 # 
 # And uses some objects:
 # 
-# [+$cache+]   <tt>ActiveSupport_Cache_Store</tt>
-# [+$flash+]   <tt>ActionController_Flash</tt>
-# [+$request+] <tt>ActionController_AbstractRequest</tt>
+# [+$cache+]   <tt>ActiveSupport\Cache\Store</tt>
+# [+$flash+]   <tt>Misago\ActionController\Flash</tt>
+# [+$request+] <tt>Misago\ActionController\AbstractRequest</tt>
 # 
 # =Renders
 # 
@@ -68,7 +68,7 @@ abstract class Base extends Caching
 {
   public $helpers = ':all';
   
-  # See <tt>ActionController_Flash</tt>.
+  # See <tt>Misago\ActionController\Flash</tt>.
   public $flash;
   
   # The currently executed action.
@@ -97,7 +97,6 @@ abstract class Base extends Caching
   function __construct()
   {
     Rescue::__construct();
-#    Filters::__construct();
     Caching::__construct();
   }
   
@@ -365,8 +364,8 @@ abstract class Base extends Caching
   # 
   # By default a '302 Moved' header status is sent, but you may customize it:
   # 
-  #   redirect_to('/posts/45.xml', 301); # found
-  #   redirect_to('/posts/45.xml', 201); # created
+  #   redirect_to('/posts/45.xml', 301);  # 301 Found
+  #   redirect_to('/posts/45.xml', 201);  # 201 Created
   protected function redirect_to($url, $status=302)
   {
     if (is_array($url))
@@ -387,7 +386,7 @@ abstract class Base extends Caching
     $this->already_rendered = true;
   }
   
-  # Returns current user IP (REMOTE_ADDR), trying to bypass proxies
+  # Returns IP of current user (REMOTE_ADDR), trying to bypass proxies
   # (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
   protected function remote_ip()
   {

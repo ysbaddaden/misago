@@ -34,8 +34,7 @@ use Misago\I18n;
 # 
 # Or you can create it directly:
 #   
-#   $post = new Post();
-#   $new_post = $post->create(array('title' => 'aaa', 'body' => 'bbb'));
+#   $new_post = Post::create(array('title' => 'aaa', 'body' => 'bbb'));
 # 
 # 
 # ==Read
@@ -57,7 +56,6 @@ use Misago\I18n;
 # 
 # The following methods will return a collection of posts:
 # 
-#   $post  = new Post();
 #   $posts = Post::find();
 #   $posts = Post::find(':all');
 #   $posts = Post::find(':all', array('order' => 'created_at desc', 'limit' => 25));
@@ -312,7 +310,7 @@ abstract class Base extends Calculations
   
   # Returns the I18n translation of model name
   # (in +active_record.models+ context).
-  # Defaults to the <tt>String::humanize()</tt> method.
+  # Defaults to the <tt>Misago\ActiveSupport\String::humanize()</tt> method.
   static function human_name()
   {
     $model = String::underscore(get_called_class());
@@ -322,7 +320,7 @@ abstract class Base extends Calculations
   
   # Returns the I18n translation of attribute name
   # (in +active_record.attributes.$model+ context).
-  # Defaults to the <tt>String::humanize()</tt> method.
+  # Defaults to the <tt>Misago\ActiveSupport\String::humanize()</tt> method.
   static function human_attribute_name($attribute)
   {
     $model = String::underscore(get_called_class());
@@ -829,7 +827,7 @@ abstract class Base extends Calculations
     return $rs;
   }
   
-  # Updates many records at once.
+  # Updates many records at once, and returns the number of affected rows.
   # 
   # Available options: limit, order.
   static function update_all($updates, $conditions=null, $options=null)

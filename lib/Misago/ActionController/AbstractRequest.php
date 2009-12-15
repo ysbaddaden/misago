@@ -3,7 +3,8 @@ namespace Misago\ActionController;
 
 # Request data.
 # 
-# <tt>ActionController_CgiRequest</tt> and <tt>ActionController_TestRequet</tt>
+# <tt>Misago\ActionController\CgiRequest</tt> and
+# <tt>Misago\ActionController\TestRequet</tt>
 # proposes an actual implementation.
 interface AbstractRequest
 {

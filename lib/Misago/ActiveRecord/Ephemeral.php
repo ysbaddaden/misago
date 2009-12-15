@@ -6,8 +6,9 @@ use Misago\I18n;
 
 # Ephemeral Record.
 # 
-# This is for tableless records. You get all the joys of an <tt>Misago\ActiveRecord</tt>
-# (record, validation), without the need to store data. 
+# This is for tableless records. You get all the joys of an
+# <tt>Misago\ActiveRecord</tt> (record, validation), without the need to
+# store data. 
 abstract class Ephemeral extends Validations
 {
   function __set($attribute, $value)
@@ -46,7 +47,7 @@ abstract class Ephemeral extends Validations
   
   # Returns the I18n translation of model name
   # (in +active_record.models context+).
-  # Defaults to the <tt>String::humanize()</tt> method.
+  # Defaults to the <tt>Misago\ActiveSupport\String::humanize()</tt> method.
   function human_name()
   {
     $model = String::underscore(get_class($this));
@@ -56,7 +57,7 @@ abstract class Ephemeral extends Validations
   
   # Returns the I18n translation of attribute name
   # (in +active_record.attributes.$model+ context).
-  # Defaults to the <tt>String::humanize()</tt> method.
+  # Defaults to the <tt>Misago\ActiveSupport\String::humanize()</tt> method.
   function human_attribute_name($attribute)
   {
     $model = String::underscore(get_class($this));

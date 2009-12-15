@@ -9,7 +9,7 @@ use Misago\ActiveRecord;
 # Note: PostgreSQL client library isn't capable to switch between
 #       databases. You need to reconnect to achieve this.
 # 
-# See <tt>AbstractAdapter</tt> for documentation.
+# See <tt>Misago\ActiveRecord\ConnectionAdapters\AbstractAdapter</tt> for documentation.
 class PostgresqlAdapter extends AbstractAdapter
 {
   public $NATIVE_DATABASE_TYPES = array(

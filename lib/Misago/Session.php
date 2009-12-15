@@ -1,7 +1,6 @@
 <?php
 namespace Misago;
 
-# IMPROVE: if we are running in CLI, set session.use_cookies to false.
 class Session
 {
   # Starts a session (if none already exists).
@@ -15,7 +14,7 @@ class Session
     
     # config
     ini_set('session.name', 'session_id');
-    ini_set('session.use_cookies',   true);
+    ini_set('session.use_cookies', PHP_SAPI == 'cli' ? true : false);
     ini_set('session.use_trans_sid', false);
     
     if ($force_new_id) {

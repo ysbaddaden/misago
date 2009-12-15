@@ -17,9 +17,10 @@ namespace Misago\ActionController;
 # 
 # =Before filters
 # 
-# Before filters are processed before processing the action. If a +before_filter+
-# method returns false, the filters' chain will stop and the action won't be processed.
-# This is useful for handling pages where the user must be authenticated, for instance.
+# Before filters are processed before processing the action. If a
+# +before_filter+ method returns false, the filters' chain will stop and the
+# action won't be processed. This is useful for handling pages where the user
+# must be authenticated, for instance.
 # 
 # = After filters
 # 

@@ -308,7 +308,7 @@ use Misago\ActiveSupport\String;
 # FIXME: handle others.build, etc. methods for HABTM relationships.
 # IMPROVE: has_many options: counter_sql, finder_sql
 # IMPROVE: HABTM options: counter_sql, finder_sql, insert_sql, delete_sql
-# TODO: Implement has_many/has_one :through association.
+# TODO: Implement has_many/has_one :throught association.
 abstract class Associations extends Record
 {
   private static $_associations;
@@ -504,35 +504,6 @@ abstract class Associations extends Record
           return $this->$attribute = new Collection($this, null, $assoc);
         break;
       }
-      
-#		  if (!$this->new_record)
-#		  {
-#		    # parent does exist
-#			  $options = isset($assoc['find_options']) ? $assoc['find_options'] : array();
-#			  
-#			  $conditions = ($assoc['type'] == 'belongs_to') ?
-#			    array($assoc['find_key'] => $this->{$assoc['foreign_key']}) :
-#  		    array($assoc['find_key'] => $this->id);
-#			  $options['conditions'] = empty($options['conditions']) ? $conditions :
-#		      static::merge_conditions($options['conditions'], $conditions);
-#		    
-#			  $found = $class_name::find($assoc['find_scope'], $options);
-#        
-#        if ($found)
-#        {
-#          # association exists
-#	        return $this->$attribute = ($found instanceof \Misago\ActiveSupport\ActiveArray) ?
-#	          new Collection($this, $found, $assoc) : $found;
-#        }
-#      }
-#      
-#      # association doesn't exists
-#      if ($assoc['type'] == 'belongs_to'
-#        or $assoc['type'] == 'has_one')
-#      {
-#        return $this->$attribute = new $class_name();
-#      }
-#      return $this->$attribute = new Collection($this, array(), $assoc);
 		}
 		
     # list of ids for a has_many or HABTM relation?
@@ -699,7 +670,7 @@ abstract class Associations extends Record
   # Creates a SQL join fragment for a given association (related to this).
   # 
   # - +$association+ - the association to build the SQL join fragment with.
-  # - +$type+ - inner, outer, left, left outer, etc.
+  # - +$type+        - inner, outer, left, left outer, etc.
   # 
   static function build_join_for($association, $type="inner")
   {
@@ -729,7 +700,7 @@ abstract class Associations extends Record
     }
   }
   
-  # TODO: should save_associated() save HABTM relationships?
+  # TODO: save_associated() must save HABTM relationships.
   # TEST: Test save_associated() with has_many relationships.
   # :private:
   protected function save_associated()

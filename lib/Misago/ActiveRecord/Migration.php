@@ -3,19 +3,18 @@ namespace Misago\ActiveRecord;
 use Misago\ActiveSupport\String;
 
 # Handles database migrations.
+# 
+# IMPROVE: Instead of storing the last migration runned, store each one.
 class Migration
 {
   # Database Object.
   protected $connection;
   
-  # Alias for +$connection+.
-  protected $db;
   protected $version;
   
   function __construct($version)
   {
     $this->connection = Connection::get($_SERVER['MISAGO_ENV']);
-    $this->db = $this->connection;
     $this->version = $version;
   }
   

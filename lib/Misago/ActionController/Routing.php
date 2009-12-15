@@ -98,10 +98,10 @@ use Misago\ActiveSupport\String;
 #
 #   $ script/generate resource posts
 # 
-# This will create the full featured controller, the model and add the route
-# to your configuration.
+# This will create the controller, the model and add the route to your
+# configuration.
 # 
-# IMPROVE: cache routes (in APC).
+# IMPROVE: cache routes using APC.
 # 
 class Routing extends \Misago\Object
 {
@@ -128,7 +128,7 @@ class Routing extends \Misago\Object
     return self::$map;
   }
   
-  # Recognizes the route for the given request, an returns the associated controller.
+  # Recognizes the route for a request, an returns a controller.
   static function recognize($request)
   {
     $map = self::draw();
@@ -461,6 +461,7 @@ class Routing extends \Misago\Object
 }
 
 # Transparently handles URL (with HTTP method and URI).
+# :nodoc:
 class Path
 {
   public $method;
@@ -479,6 +480,7 @@ class Path
 }
 
 # Transparently handles URL (with HTTP method and URI).
+# :nodoc:
 class Url
 {
   public $method;

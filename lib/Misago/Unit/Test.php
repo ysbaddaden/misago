@@ -41,7 +41,7 @@ class Test
       $this->count_tests += 1;
       echo ".";
       
-      $this->logger->info("------- $method:\n");
+      $this->logger->info("------- $method -------\n");
       
       $this->run_test($method);
     }

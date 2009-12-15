@@ -2,7 +2,7 @@
 namespace Misago\ActiveRecord;
 use Misago\ActiveSupport;
 
-# Validation methods for ActiveRecords.
+# Validation methods.
 # 
 # Example:
 # 
@@ -49,7 +49,7 @@ use Misago\ActiveSupport;
 # 
 # TEST: Test validates_associated.
 # IMPROVE: Add possibility to validate a date/time.
-# IMPROVE: On update only validate changed attributes (check new record).
+# IMPROVE: On update only validate changed attributes.
 abstract class Validations extends Associations
 {
   private static $_validations          = array();

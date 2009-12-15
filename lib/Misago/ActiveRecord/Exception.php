@@ -6,8 +6,7 @@ class Exception extends \Misago\Exception
 {
   protected $default_code = 500;
   
-  function __construct($message, $code=null)
-  {
+  function __construct($message, $code=null) {
     parent::__construct($message, $code ? $code : $this->default_code);
   }
 }
