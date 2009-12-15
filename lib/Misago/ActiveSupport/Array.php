@@ -104,4 +104,25 @@ function linearize_option_tree($ary)
   return $h;
 }
 */
+
+function array_to_string($ary)
+{
+  $str = array();
+  
+  # hash
+  if (is_hash($ary))
+  {
+    foreach($ary as $k => $v) {
+      $str[] = "$k => '$v'";
+    }
+    return '{'.implode(', ', $str).'}';
+  }
+  
+  # array
+  foreach($ary as $k => $v) {
+    $str[] = "'$v'";
+  }
+  return '['.implode(', ', $str).']';
+}
+
 ?>

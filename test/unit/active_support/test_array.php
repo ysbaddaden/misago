@@ -53,6 +53,15 @@ class Test_ActiveSupport_Array extends Misago\Unit\Test
     $this->assert_equal($includes, array('tags' => array(), 'comments' => array('order' => 'created_at asc', 'include' => array('user' => array()))));
   }
   */
+  
+  function test_array_to_string()
+  {
+    $ary = array(':controller' => 'posts', ':action' => 'show', ':id' => 1, 'date' => '12/2009');
+    $this->assert_equal(array_to_string($ary),
+      "{:controller => 'posts', :action => 'show', :id => '1', date => '12/2009'}");
+    $ary = array(1, 2, 'azerty');
+    $this->assert_equal(array_to_string($ary), "['1', '2', 'azerty']");
+  }
 }
 
 new Test_ActiveSupport_Array();
