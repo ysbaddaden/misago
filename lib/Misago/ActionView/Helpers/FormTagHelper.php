@@ -42,6 +42,13 @@ function form_tag($url, $attributes=null)
     $str  = "<form action=\"$url\" method=\"post\"$attributes>";
     $str .= '<input type="hidden" name="_method" value="'.$method.'"/>';
   }
+  
+  # Protection against request forgery (CSRF)
+  if ($method != 'get'
+    and Misago\ActionController\protect_against_forgery())
+  {
+    $str .= Misago\ActionController\token_tag();
+  }
   return $str;
 }
 

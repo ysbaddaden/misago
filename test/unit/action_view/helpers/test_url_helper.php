@@ -31,19 +31,19 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
   function test_link_to_with_non_get_methods()
   {
     $html_link = link_to('delete me', new ActionController\Path('DELETE', 'page/123'));
-    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">delete me</a>');
+    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">delete me</a>');
     
     $html_link = link_to('destroy me', new ActionController\Path('DELETE', 'page/459'), array('class' => 'destroy'));
-    $this->assert_equal($html_link, '<a class="destroy" onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/page/459">destroy me</a>');
+    $this->assert_equal($html_link, '<a class="destroy" onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/page/459">destroy me</a>');
     
     $html_link = link_to('update me', new ActionController\Url('PUT', 'page/456'));
-    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="http://localhost:3009/page/456">update me</a>');
+    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="http://localhost:3009/page/456">update me</a>');
     
     $html_link = link_to('update me', '/page/123', array('method' => 'put'));
-    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">update me</a>');
+    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">update me</a>');
     
     $html_link = link_to('delete', new ActionController\Path('DELETE', 'posts/2'), array('method' => 'put'));
-    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); return false;" href="/posts/2">delete</a>');
+    $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/posts/2">delete</a>');
   }
   
   function test_link_to_with_javascript_confirm()
@@ -52,13 +52,13 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
     $this->assert_equal($html_link, '<a onclick="return confirm(\'Are you sure?\');" href="/posts/1">read me</a>');
     
     $html_link = link_to('delete', new ActionController\Path('DELETE', 'posts/1'), array('confirm' => 'Are you sure?'));
-    $this->assert_equal($html_link, '<a onclick="if (confirm(\'Are you sure?\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
+    $this->assert_equal($html_link, '<a onclick="if (confirm(\'Are you sure?\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
     
     $html_link = link_to('delete', '/posts/2', array('confirm' => 'sample text with "quotes" and \'single quotes\''));
     $this->assert_equal($html_link, '<a onclick="return confirm(\'sample text with \\\"quotes\\\" and \\\'single quotes\\\'\');" href="/posts/2">delete</a>');
     
     $html_link = link_to('delete', new ActionController\Path('DELETE', 'posts/1'), array('confirm' => 'sample text with \'single quotes\' and "double quotes"'));
-    $this->assert_equal($html_link, '<a onclick="if (confirm(\'sample text with \\\'single quotes\\\' and \\\"double quotes\\\"\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); f.style.display=\'none\'; this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
+    $this->assert_equal($html_link, '<a onclick="if (confirm(\'sample text with \\\'single quotes\\\' and \\\"double quotes\\\"\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
   }
   
   function test_current_page()

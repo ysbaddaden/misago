@@ -99,15 +99,27 @@ function link_to($content, $url=null, $attributes=null)
       {
         $onclick = "var f = document.createElement('form'); ".
           "f.action = this.href; ".
-          "f.method = 'POST'; ".
-          "var m = document.createElement('input'); ".
+          "f.method = 'POST'; ";
+        
+        # method:
+        $onclick .= "var m = document.createElement('input'); ".
           "m.setAttribute('type', 'hidden'); ".
           "m.setAttribute('name', '_method'); ".
           "m.setAttribute('value', '$method'); ".
           "f.appendChild(m); ".
-          "f.style.display='none'; ".
-          "this.parentNode.appendChild(f); ".
-          "f.submit()";
+          "this.parentNode.appendChild(f); ";
+        
+        # token:
+        if (Misago\ActionController\protect_against_forgery())
+        {
+          $onclick .= "var m = document.createElement('input'); ".
+            "m.setAttribute('type', 'hidden'); ".
+            "m.setAttribute('name', '_token'); ".
+            "m.setAttribute('value', '".Misago\ActionController\form_authenticity_token()."'); ".
+            "f.appendChild(m); ".
+            "this.parentNode.appendChild(f); ";
+        }
+        $onclick .= "f.submit()";
       }
     }
   }

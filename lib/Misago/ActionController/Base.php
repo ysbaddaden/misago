@@ -64,7 +64,7 @@ use Misago\ActionView;
 # 
 #   <h1><\?= $this->post->title ?\></h1>
 # 
-abstract class Base extends Caching
+abstract class Base extends RequestForgeryProtection
 {
   public $helpers = ':all';
   

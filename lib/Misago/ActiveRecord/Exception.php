@@ -2,14 +2,7 @@
 namespace Misago\ActiveRecord;
 
 # Handles exceptions for ActiveRecord classes.
-class Exception extends \Misago\Exception
-{
-  protected $default_code = 500;
-  
-  function __construct($message, $code=null) {
-    parent::__construct($message, $code ? $code : $this->default_code);
-  }
-}
+class Exception extends \Misago\Exception {}
 
 class AdapterNotFound extends Exception {}
 
