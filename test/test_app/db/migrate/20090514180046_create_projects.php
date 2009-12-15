@@ -4,14 +4,14 @@ class CreateProject extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('projects');
+    $t = $this->connection->new_table('projects');
     $t->add_column('title', 'string', array('limit' => 60));
     return $t->create();
   }
   
   function down()
   {
-    return $this->db->drop_table('projects');
+    return $this->connection->drop_table('projects');
   }
 }
 

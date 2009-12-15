@@ -4,7 +4,7 @@ class CreateProduct extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('products');
+    $t = $this->connection->new_table('products');
     
     $t->add_column('name',  'string', array('null' => false, 'limit' => 100));
     $t->add_column('price', 'float',  array('null' => false));
@@ -15,7 +15,7 @@ class CreateProduct extends Misago\ActiveRecord\Migration
   
   function down()
   {
-    return $this->db->drop_table('products');
+    return $this->connection->drop_table('products');
   }
 }
 

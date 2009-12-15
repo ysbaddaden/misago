@@ -4,15 +4,15 @@ class AddingNullableFieldToProduct extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $this->db->add_column('products', 'in_stock',    'boolean');
-    $this->db->add_column('products', 'description', 'text');
+    $this->connection->add_column('products', 'in_stock',    'boolean');
+    $this->connection->add_column('products', 'description', 'text');
     return true;
   }
   
   function down()
   {
-    $this->db->drop_column('products', 'in_stock');
-    $this->db->drop_column('products', 'description');
+    $this->connection->drop_column('products', 'in_stock');
+    $this->connection->drop_column('products', 'description');
     return true;
   }
 }

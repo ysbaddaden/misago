@@ -4,7 +4,7 @@ class CreateMonitoring extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('monitorings');
+    $t = $this->connection->new_table('monitorings');
     
     # validates_presence_of
     $t->add_column('title',       'string');
@@ -42,7 +42,7 @@ class CreateMonitoring extends Misago\ActiveRecord\Migration
   
   function down()
   {
-    return $this->db->drop_table('monitorings');
+    return $this->connection->drop_table('monitorings');
   }
 }
 

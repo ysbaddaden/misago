@@ -4,7 +4,7 @@ class CreateError extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('errors');
+    $t = $this->connection->new_table('errors');
     
     $t->add_column('title', 'string');
     $t->add_column('subtitle', 'string');
@@ -15,7 +15,7 @@ class CreateError extends Misago\ActiveRecord\Migration
   
   function down()
   {
-    return $this->db->drop_table('errors');
+    return $this->connection->drop_table('errors');
   }
 }
 

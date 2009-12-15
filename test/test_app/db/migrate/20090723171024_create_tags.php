@@ -4,7 +4,7 @@ class CreateTag extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('tags');
+    $t = $this->connection->new_table('tags');
     $t->add_column('post_id', 'integer', array('null' => false));
     $t->add_column('tag',     'text',    array('null' => false));
     return $t->create();
@@ -12,7 +12,7 @@ class CreateTag extends Misago\ActiveRecord\Migration
   
   function down()
   {
-    return $this->db->drop_table('tags');
+    return $this->connection->drop_table('tags');
   }
 }
 

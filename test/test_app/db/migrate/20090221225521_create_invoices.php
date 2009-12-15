@@ -4,7 +4,7 @@ class CreateInvoice extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('invoices');
+    $t = $this->connection->new_table('invoices');
     
     $t->add_column('order_id', 'integer');
     $t->add_column('name',     'string');
@@ -16,7 +16,7 @@ class CreateInvoice extends Misago\ActiveRecord\Migration
   
   function down()
   {
-    return $this->db->drop_table('invoices');
+    return $this->connection->drop_table('invoices');
   }
 }
 

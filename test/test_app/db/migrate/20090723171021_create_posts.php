@@ -4,7 +4,7 @@ class CreatePost extends Misago\ActiveRecord\Migration
 {
   function up()
   {
-    $t = $this->db->new_table('posts');
+    $t = $this->connection->new_table('posts');
     $t->add_column('title', 'string', array('null' => false));
     $t->add_column('body',  'text');
     return $t->create();
@@ -12,7 +12,7 @@ class CreatePost extends Misago\ActiveRecord\Migration
   
   function down()
   {
-    return $this->db->drop_table('posts');
+    return $this->connection->drop_table('posts');
   }
 }
 
