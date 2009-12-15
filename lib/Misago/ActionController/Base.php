@@ -120,8 +120,6 @@ abstract class Base extends Caching
   # :private:
   function process($request=null, $response=null)
   {
-    $request_time = microtime(true);
-    
     @\Misago\Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
     
     $this->request  = ($request  !== null) ? $request  : new CgiRequest();
@@ -138,20 +136,21 @@ abstract class Base extends Caching
     $this->params = $this->request->parameters();
     $this->action = $this->params[':action'];
     
-    $helperFile = str_replace('Controller', 'Helper', get_class($this));
+    $helperFile = str_replace('Controller', 'Helper', get_called_class());
     require_once(ROOT."/app/helpers/$helperFile.php");
     $this->view_path = $this->params[':controller'];
     
     if ($this->logger->log_info())
     {
-      $this->logger->info(sprintf("Processing %s::%s (for %s at %s) [%s] ",
-        get_class($this), $this->action, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli', date('Y-m-d H:i:s'),
-        strtoupper($this->request->method())
+      $this->logger->info(sprintf("Processing %s->%s (for %s at %s) [%s] ",
+        get_called_class(), $this->action,
+        isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'cli',
+        date('Y-m-d H:i:s'), strtoupper($this->request->method())
       ));
       if (isset($_SESSION)) {
         $this->logger->info("  Session: ".session_id());
       }
-      $this->logger->info("  Parameters: ".json_encode($this->params));
+      $this->logger->info("  Parameters: ".array_to_string($this->params));
     }
     
     try
@@ -178,14 +177,18 @@ abstract class Base extends Caching
       $this->rescue_action($exception);
     }
     
-    $this->request_time = (microtime(true) - $request_time) / 1000;
-    
-    $this->logger->log_info() && $this->logger->info(sprintf("Completed in %.5f (%d reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
-      $this->request_time, floor(1 / $this->request_time),
-      $this->rendering_time, round(100 / $this->request_time * $this->rendering_time),
-      $this->response->headers['Status'], $this->response->status(),
-      $this->request->url()
-    ));
+    if ($this->logger->log_info())
+    {
+      $this->request_time = (microtime(true) - $_SERVER['REQUEST_TIME']) / 1000;
+      
+      $this->logger->info(
+        sprintf("Completed in %.5f (%d reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
+        $this->request_time, floor(1 / $this->request_time),
+        $this->rendering_time, round(100 / $this->request_time * $this->rendering_time),
+        $this->response->headers['Status'], $this->response->status(),
+        $this->request->url()
+      ));
+    }
   }
   
   # :private:
@@ -384,7 +387,8 @@ abstract class Base extends Caching
     $this->already_rendered = true;
   }
   
-  # Returns current user IP (REMOTE_ADDR), trying to bypass proxies (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
+  # Returns current user IP (REMOTE_ADDR), trying to bypass proxies
+  # (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
   protected function remote_ip()
   {
     return $this->request->remote_ip();
@@ -394,6 +398,12 @@ abstract class Base extends Caching
   protected function is_xml_http_request()
   {
     return $this->request->is_xml_http_request();
+  }
+  
+  # Shortcut for <tt>is_xml_http_request()</tt>.
+  protected function is_xhr()
+  {
+    return $this->is_xml_http_request();
   }
 }
 

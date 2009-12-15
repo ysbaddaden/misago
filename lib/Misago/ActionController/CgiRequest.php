@@ -14,6 +14,7 @@ namespace Misago\ActionController;
 class CgiRequest extends \Misago\Object implements AbstractRequest
 {
   public    $headers;
+  
   protected $format;
   protected $path_parameters;
   
@@ -144,7 +145,8 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
   
   function is_xml_http_request()
   {
-    return (isset($_SERVER['X-Requested-With']) and $_SERVER['X-Requested-With'] == 'XMLHttpRequest');
+    return (isset($_SERVER['HTTP_X_REQUESTED_WITH'])
+      and $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest');
   }
   
   function remote_ip()
