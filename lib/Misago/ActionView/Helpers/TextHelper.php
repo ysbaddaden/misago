@@ -1,22 +1,24 @@
 <?php
-require __DIR__.'/TextHelper_ns.php';
+#require __DIR__.'/TextHelper_ns.php';
 
 # Transforms all links and email addresses to clickable links.
 # 
 # - +link+ - limits what should be linked (either one of all, email_addresses or urls).
 # 
 # :namespace: Misago\ActionView\Helpers\TextHelper
-function auto_link($text, $link='all'/*, $href_options=null, $callback=null*/)
+function auto_link($text, $link='all', $href_options=array())
 {
   if ($link == 'all' or $link == 'urls')
   {
-    $text = preg_replace_callback('/(?:http|https|ftp|sftp|ssh):\/\/[^ ]+/',
-      'Misago\ActionView\Helpers\TextHelper\replace_urls', $text);
+    $text = preg_replace_callback('/(?:http|https|ftp|sftp|ssh):\/\/[^ ]+/', function($match) use($href_options) {
+      return link_to($match[0], null, $href_options);
+    }, $text);
   }
   if ($link == 'all' or $link == 'email_addresses')
   {
-    $text = preg_replace_callback('/[^@ ]+\@[^ ]+/',
-      'Misago\ActionView\Helpers\TextHelper\replace_email_addresses', $text);
+    $text = preg_replace_callback('/[^@ ]+\@[^ ]+/', function($match) use($href_options) {
+      return mail_to($match[0], null, $href_options);
+    }, $text);
   }
   return $text;
 }

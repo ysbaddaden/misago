@@ -22,6 +22,11 @@ class TestTextHelper extends Misago\Unit\Test
     $str = auto_link("Here is my new website: http://www.bd-en-ligne.fr/ and please email me at me@webcomics.fr", 'email_addresses');
     $this->assert_equal($str, 'Here is my new website: http://www.bd-en-ligne.fr/ '.
       'and please email me at <a href="mailto:me@webcomics.fr">me@webcomics.fr</a>');
+    
+    $str = auto_link("Here is my new website: http://www.bd-en-ligne.fr/ and please email me at me@webcomics.fr",
+      'all', array('class' => 'external'));
+    $this->assert_equal($str, 'Here is my new website: <a class="external" href="http://www.bd-en-ligne.fr/">http://www.bd-en-ligne.fr/</a> '.
+      'and please email me at <a class="external" href="mailto:me@webcomics.fr">me@webcomics.fr</a>');
   }
   
   function test_highlight()
