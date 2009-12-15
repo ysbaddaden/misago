@@ -179,11 +179,11 @@ abstract class Base extends Caching
     
     if ($this->logger->log_info())
     {
-      $this->request_time = (microtime(true) - $_SERVER['REQUEST_TIME']) / 1000;
+      $this->request_time = (microtime(true) - $_SERVER['REQUEST_TIME']);
       
       $this->logger->info(
-        sprintf("Completed in %.5f (%d reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
-        $this->request_time, floor(1 / $this->request_time),
+        sprintf("Completed in %.5f (%.1f reqs/sec) | Rendering: %.5f (%d%%) | %d %s [%s]\n",
+        $this->request_time, round(1 / $this->request_time, 2),
         $this->rendering_time, round(100 / $this->request_time * $this->rendering_time),
         $this->response->headers['Status'], $this->response->status(),
         $this->request->url()
