@@ -586,7 +586,16 @@ abstract class Base extends Calculations
   
   static function merge_conditions($a, $b)
   {
-    return static::connection()->merge_conditions($a, $b);
+    if (!empty($a) and empty($b)) {
+      return $a;
+    }
+    if (empty($a) and !empty($b)) {
+      return $b;
+    }
+    $connection = static::connection();
+    $a = $connection->sanitize_sql_for_conditions($a);
+    $b = $connection->sanitize_sql_for_conditions($b);
+    return "($a) AND ($b)";
   }
   
   static function & merge_options($a, $b)

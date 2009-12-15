@@ -542,22 +542,6 @@ abstract class AbstractAdapter
   {
     return $this->execute("TRUNCATE ".$this->quote_table($table_name)." ;");
   }
-  
-  # Merges conditions together.
-  # 
-  # TODO: Move merge_conditions() to ActionController\Base.
-  function merge_conditions($a, $b)
-  {
-    if (!empty($a) and empty($b)) {
-      return $a;
-    }
-    if (empty($a) and !empty($b)) {
-      return $b;
-    }
-    $a = $this->sanitize_sql_for_conditions($a);
-    $b = $this->sanitize_sql_for_conditions($b);
-    return "($a) AND ($b)";
-  }
 }
 
 ?>
