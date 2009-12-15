@@ -54,7 +54,7 @@ require 'I18n_shortcuts.php';
 #   t('there_are_x_messages', array('count' => 1));   # => There is 1 message
 #   t('there_are_x_messages', array('count' => 29));  # => There are 29 messages
 # 
-# IMPROVE: Add possibility to separate translations in a directory structure (ie. use context as subpath).
+# TODO: Separate translations in a directory structure (eg: use context as subpath).
 class I18n
 {
   static public  $locale       = 'en';
@@ -87,14 +87,13 @@ class I18n
     return self::$locale;
   }
   
-  # Finds the translation for a string. Returns the string unstranslated
+  # Finds the translation for a string. Returns the unstranslated string
   # if no translation is found.
-  # 
-  # FIXME: Missing interpolation when translation isn't found. eg: t('this is my {{name}}', array('name' => $name)).
   static function translate($str, $options=null)
   {
     $translation = self::do_translate($str, $options);
-    return ($translation !== null) ? $translation : $str;
+    return ($translation !== null) ?
+      $translation : self::interpolate($str, $options);
   }
   
   # Same as <tt>translate</tt>, but returns null if no translation is found.
@@ -118,17 +117,8 @@ class I18n
         $translation = self::$translations[self::$locale][$key];
       }
       
-      if (!empty($options))
-      {
-        # interpolation
-        $vars = array();
-        foreach($options as $k => $v) {
-          $vars['{{'.$k.'}}'] = $v;
-        }
-        return strtr($translation, $vars);
-      }
-      
-      return $translation;
+      # interpolation
+      return self::interpolate($translation, $options);
     }
     return null;
   }
@@ -150,6 +140,19 @@ class I18n
       default:
         return (string)$obj;
     }
+  }
+  
+  static private function interpolate($str, $options)
+  {
+    if (empty($options)) {
+      return $str;
+    }
+    
+    $vars = array();
+    foreach($options as $k => $v) {
+      $vars['{{'.$k.'}}'] = $v;
+    }
+    return strtr($str, $vars);
   }
   
   static private function load_translations($locale)

@@ -42,7 +42,8 @@ class Test_I18n extends Misago\Unit\Test
   {
     $this->assert_equal(I18n::translate('active_record.products.errors.null', array('attribute' => 'name')), "name can't be null");
     $this->assert_equal(I18n::translate('interpolation', array('bar' => 'baz')), "foo baz");
-    $this->assert_equal(I18n::translate('messages.foo', array('bar' => 'bat')), "foo bat");
+    $this->assert_equal(I18n::translate('messages.foo',  array('bar' => 'bat')), "foo bat");
+    $this->assert_equal(I18n::translate('foo {{bar}}',   array('bar' => 'bat')), "foo bat");
   }
   
   function test_t()
