@@ -119,7 +119,7 @@ abstract class Base extends RequestForgeryProtection
   # :private:
   function process($request=null, $response=null)
   {
-    @\Misago\Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
+    \Misago\Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
     
     $this->request  = ($request  !== null) ? $request  : new CgiRequest();
     $this->response = ($response !== null) ? $response : new AbstractResponse();
@@ -169,10 +169,8 @@ abstract class Base extends RequestForgeryProtection
       
       $this->process_after_filters();
     }
-    catch(FailedFilter $exception) {
-      
-    }
-    catch(Exception $exception) {
+    catch(FailedFilter $exception) {}
+    catch(\Exception $exception) {
       $this->rescue_action($exception);
     }
     
