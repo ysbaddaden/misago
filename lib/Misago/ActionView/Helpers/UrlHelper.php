@@ -112,11 +112,11 @@ function link_to($content, $url=null, $attributes=null)
         # token:
         if (Misago\ActionController\protect_against_forgery())
         {
-          $onclick .= "var m = document.createElement('input'); ".
-            "m.setAttribute('type', 'hidden'); ".
-            "m.setAttribute('name', '_token'); ".
-            "m.setAttribute('value', '".Misago\ActionController\form_authenticity_token()."'); ".
-            "f.appendChild(m); ".
+          $onclick .= "var t = document.createElement('input'); ".
+            "t.setAttribute('type', 'hidden'); ".
+            "t.setAttribute('name', '_token'); ".
+            "t.setAttribute('value', '".Misago\ActionController\form_authenticity_token()."'); ".
+            "f.appendChild(t); ".
             "this.parentNode.appendChild(f); ";
         }
         $onclick .= "f.submit()";

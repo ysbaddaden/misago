@@ -2,7 +2,7 @@
 namespace Misago\ActionController;
 
 class InvalidAuthenticityToken extends \Misago\Exception {
-  protected $default_code = 403;
+  protected $default_code = 422;
 }
 
 class RequestForgeryProtection extends Caching
@@ -25,9 +25,8 @@ class RequestForgeryProtection extends Caching
   protected function is_verified_request()
   {
     return (!protect_against_forgery()
-      and $this->request->method == 'get'
-      and isset($_POST['_token'])
-      and $_POST['_token'] = $_SESSION['csrf_id']);
+      or $this->request->method() == 'get'
+      or (isset($_POST['_token']) and $_POST['_token'] == form_authenticity_token()));
   }
 }
 
@@ -50,7 +49,7 @@ function form_authenticity_token()
       "(CSRF) requires a valid session.", 500);
   }
   if (!isset($_SESSION['csrf_id'])) {
-    $_SESSION['csrf_id'] = md5(uniqid(rand()), true);
+    $_SESSION['csrf_id'] = md5(uniqid(rand()));
   }
   return $_SESSION['csrf_id'];
 }
