@@ -14,16 +14,16 @@ class Session
     
     # config
     ini_set('session.name', 'session_id');
-    ini_set('session.use_cookies', PHP_SAPI == 'cli' ? true : false);
+    ini_set('session.use_cookies', (PHP_SAPI == 'cli') ? false : true);
     ini_set('session.use_trans_sid', false);
     
     if ($force_new_id) {
-      session_regenerate_id();
+      @session_regenerate_id();
     }
     elseif (!empty($session_id)) {
       session_id($session_id);
     }
-    session_start();
+    @session_start();
     
     return Session::init();
   }
@@ -33,7 +33,7 @@ class Session
   {
     Session::destroy();
     ($session_id === null) ? session_regenerate_id() : session_id($session_id);
-    session_start();
+    @session_start();
     return Session::init();
   }
   
@@ -45,7 +45,7 @@ class Session
     }
     session_destroy();
     session_unset();
-    setcookie(session_name(), '', time() - 42000, '/');
+    @setcookie(session_name(), '', time() - 42000, '/');
   }
   
   # Tries to protect against session highjacking
@@ -62,8 +62,8 @@ class Session
       or $_SESSION['user-agent'] != $user_agent)
     {
       session_destroy();
-      session_regenerate_id();
-      session_start();
+      @session_regenerate_id();
+      @session_start();
     }
     
     $_SESSION['initialized'] = true;
