@@ -7,11 +7,11 @@ use Misago\ActiveSupport\String;
 # 
 # =Example
 # 
-#   class Notifier extends ActionMailer_Base
+#   class Notifier extends Misago\ActionMailer\Base
 #   {
-#     function signup_notification($recipient)
+#     static function signup_notification($recipient)
 #     {
-#       $mail = new ActionMailer_Mail('signup_notification');
+#       $mail = new Misago\ActionMailer\Mail('signup_notification');
 #       $mail->from('me <me@domain>');
 #       $mail->to($recipient->email);
 #       $mail->body('account' => $recipient);
@@ -41,14 +41,12 @@ use Misago\ActiveSupport\String;
 # 
 # Simply call the <tt>deliver</tt> method:
 # 
-#   $notifier = new Notifier();
-#   $mail = $notifier->signup_notification($account);
-#   $notifier->deliver($mail);
+#   $mail = Notifier::signup_notification($account);
+#   Notifier::deliver($mail);
 # 
 # There is also a magic shortcut:
 # 
-#   $notifier = new Notifier();
-#   $notifier->deliver_signup_notification($account);
+#   Notifier::deliver_signup_notification($account);
 # 
 # =Configuration option
 # 
@@ -66,26 +64,24 @@ class Base extends \Misago\Object
   # Populated only when delivery_method = 'test'.
   public $deliveries = array();
   
-  
-  function __call($func, $args)
+  static function __callStatic($func, $args)
   {
     if (preg_match('/^deliver_(.+)$/', $func, $match))
     {
-      $mail = call_user_func_array(array($this, $match[1]), $args);
-      return $this->deliver($mail);
+      $mail = forward_static_call(array(get_called_class(), $match[1]), $args);
+      return static::deliver($mail);
     }
-    trigger_error('No such method '.get_class($this).'::'.$func.'().', E_USER_ERROR);
+    trigger_error('No such method '.get_called_class().'::'.$func.'().', E_USER_ERROR);
   }
   
   # Delivers a prepared mail.
-  function deliver($mail)
+  static function deliver($mail)
   {
-    if (cfg_isset('action_mailer.perform_deliveries')
-      and !cfg_get('action_mailer.perform_deliveries'))
+    if (cfg_get('action_mailer.perform_deliveries', false))
     {
       return true;
     }
-    $contents = $this->render($mail);
+    $contents = static::render($mail);
     $headers  = '';
     foreach($mail->headers() as $k => $v) {
       $headers .= "$k: $v\r\n";
@@ -95,7 +91,7 @@ class Base extends \Misago\Object
     {
       case 'test':
         $this->deliveries[] = array(
-          'mailer'     => get_class($this),
+          'mailer'     => get_called_class(),
           'action'     => $mail->action,
           'recipients' => $mail->recipients(),
           'subject'    => $mail->subject,
@@ -110,16 +106,18 @@ class Base extends \Misago\Object
       break;
       
       default:
-        throw new \Misago\Exception("Mailer error: unknown delivery method '".cfg_get('action_mailer.delivery_method')."'.", 500);
+        throw new \Misago\Exception("Mailer error: unknown delivery method '".
+          cfg_get('action_mailer.delivery_method')."'.", 500);
     }
   }
   
-  protected function render($mail)
+  static protected function render($mail)
   {
-    $view = new ActionView\Base($this);
+    $self = new static();
+    $view = new ActionView\Base($self);
     
     $options = array(
-      'template' => String::underscore(get_class($this)).'/'.$mail->action,
+      'template' => String::underscore(get_called_class()).'/'.$mail->action,
       'locals'   => $mail->data,
       'layout'   => false,
     );

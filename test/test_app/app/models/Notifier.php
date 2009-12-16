@@ -2,7 +2,7 @@
 
 class Notifier extends Misago\ActionMailer\Base
 {
-  function monitoring_alert($server)
+  static function monitoring_alert($server)
   {
     $mail = new Misago\ActionMailer\Mail('monitoring_alert');
     
@@ -14,8 +14,7 @@ class Notifier extends Misago\ActionMailer\Base
     return $mail;
   }
   
-  public function render($mail)
-  {
+  static function render($mail) {
     return parent::render($mail);
   }
 }
