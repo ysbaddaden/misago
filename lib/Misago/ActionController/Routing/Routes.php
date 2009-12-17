@@ -164,10 +164,10 @@ class Routes extends ResourceRoutes
   # (as +app/controllers/Admin/ProductsController.php+) and will generate
   # the following named routes:
   # 
-  #   admin_products      admin/products           Admin\ProductController::index()
-  #   new_admin_product   admin/products/new       Admin\ProductController::neo()
-  #   show_admin_product  admin/products/:id       Admin\ProductController::show()
-  #   edit_admin_product  admin/products/:id/edit  Admin\ProductController::edit()
+  #   admin_products      admin/products           Admin\ProductsController::index()
+  #   new_admin_product   admin/products/new       Admin\ProductsController::neo()
+  #   show_admin_product  admin/products/:id       Admin\ProductsController::show()
+  #   edit_admin_product  admin/products/:id/edit  Admin\ProductsController::edit()
   #   etc.
   # 
   function ns($name, $closure)
