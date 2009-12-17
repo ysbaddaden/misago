@@ -11,14 +11,15 @@ task('routes', function()
     $method = isset($route['mapping']['conditions']['method']) ?
       $route['mapping']['conditions']['method'] : '';
     
-    $params = array();
-    foreach($route['mapping'] as $k => $v)
-    {
-      if (is_symbol($k)) {
-        $params[] = $k.'=>"'.$v.'"';
-      }
-    }
-    $params = empty($params) ? '' : '{'.implode(',', $params).'}';
+#    $params = array();
+#    foreach($route['mapping'] as $k => $v)
+#    {
+#      if (is_symbol($k)) {
+#        $params[] = $k.'=>"'.$v.'"';
+#      }
+#    }
+#    $params = empty($params) ? '' : '{'.implode(',', $params).'}';
+    $params = array_to_string($route['mapping']);
     
     $routes[]   = array($route['name'], $method, '/'.$route['path'], $params);
     $lengths[0] = max($lengths[0], strlen($route['name']));

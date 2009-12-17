@@ -338,7 +338,7 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_true(function_exists('purchase_url'));
   }
   
-  function test_named_resource_path()
+  function test_resources()
   {
     $map = ActionController\Routing::draw();
     $map->reset();
@@ -379,6 +379,25 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     
     $this->assert_equal(show_user_path(72), new ActionController\Path('GET', 'users/72'));
     $this->assert_equal(show_user_url(72),  new ActionController\Url('GET', 'users/72'));
+  }
+  
+  function test_nested_resources()
+  {
+    $map = ActionController\Routing::draw();
+    $map->reset();
+    
+    $map->resource('discussions', array('has_many' => 'messages'));
+    $map->build_named_route_helpers();
+
+    $this->assert_equal((string)discussions_path(), '/discussions');
+    
+#    $this->assert_equal((string)discussion_messages_path(array(':discussion_id' => 34)), '/discussions/34/messages');
+#    $this->assert_equal((string)new_discussion_message_path(array(':discussion_id' => 43)), '/discussions/43/messages/new');
+#    $this->assert_equal((string)create_message_body_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Path('POST', 'discussions/13/messages'));
+#    $this->assert_equal((string)show_discussion_message_body_path(array(':discussion_id' => 46, ':id' => 12)), '/discussions/46/messages/12');
+#    $this->assert_equal((string)edit_message_body_path(array(':discussion_id' => 13, ':id' => 26)), '/discussions/13/messages/26/edit');
+#    $this->assert_equal((string)update_message_body_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Path('PUT', '/discussions/13/messages/26'));
+#    $this->assert_equal((string)delete_message_body_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Path('DELETE', '/discussions/13/messages/26'));
   }
   
   function test_named_root_path()
