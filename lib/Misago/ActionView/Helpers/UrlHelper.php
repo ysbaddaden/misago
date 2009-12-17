@@ -22,8 +22,8 @@
 # :namespace: Misago\ActionView\Helpers\UrlHelper
 function current_page($url)
 {
-  if (!$url instanceof Misago\ActionController\Url
-    and !$url instanceof Misago\ActionController\Path
+  if (!$url instanceof Misago\ActionController\Routing\Url
+    and !$url instanceof Misago\ActionController\Routing\Path
     and !is_string($url))
   {
     $url = url_for($url);

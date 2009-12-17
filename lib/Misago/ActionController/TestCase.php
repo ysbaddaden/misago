@@ -23,7 +23,7 @@ class TestCase extends \Misago\Unit\TestCase
   # IMPROVE: Use TestRequest instead of calling a test server.
   function __construct()
   {
-    $map = Routing::draw();
+    $map = Routing\Routes::draw();
     $map->build_named_route_helpers();
     parent::__construct();
   }

@@ -30,19 +30,19 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
   
   function test_link_to_with_non_get_methods()
   {
-    $html_link = link_to('delete me', new ActionController\Path('DELETE', 'page/123'));
+    $html_link = link_to('delete me', new ActionController\Routing\Path('DELETE', 'page/123'));
     $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">delete me</a>');
     
-    $html_link = link_to('destroy me', new ActionController\Path('DELETE', 'page/459'), array('class' => 'destroy'));
+    $html_link = link_to('destroy me', new ActionController\Routing\Path('DELETE', 'page/459'), array('class' => 'destroy'));
     $this->assert_equal($html_link, '<a class="destroy" onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/page/459">destroy me</a>');
     
-    $html_link = link_to('update me', new ActionController\Url('PUT', 'page/456'));
+    $html_link = link_to('update me', new ActionController\Routing\Url('PUT', 'page/456'));
     $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="http://localhost:3009/page/456">update me</a>');
     
     $html_link = link_to('update me', '/page/123', array('method' => 'put'));
     $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/page/123">update me</a>');
     
-    $html_link = link_to('delete', new ActionController\Path('DELETE', 'posts/2'), array('method' => 'put'));
+    $html_link = link_to('delete', new ActionController\Routing\Path('DELETE', 'posts/2'), array('method' => 'put'));
     $this->assert_equal($html_link, '<a onclick="var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'PUT\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); return false;" href="/posts/2">delete</a>');
   }
   
@@ -51,19 +51,19 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
     $html_link = link_to('read me', '/posts/1', array('confirm' => 'Are you sure?'));
     $this->assert_equal($html_link, '<a onclick="return confirm(\'Are you sure?\');" href="/posts/1">read me</a>');
     
-    $html_link = link_to('delete', new ActionController\Path('DELETE', 'posts/1'), array('confirm' => 'Are you sure?'));
+    $html_link = link_to('delete', new ActionController\Routing\Path('DELETE', 'posts/1'), array('confirm' => 'Are you sure?'));
     $this->assert_equal($html_link, '<a onclick="if (confirm(\'Are you sure?\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
     
     $html_link = link_to('delete', '/posts/2', array('confirm' => 'sample text with "quotes" and \'single quotes\''));
     $this->assert_equal($html_link, '<a onclick="return confirm(\'sample text with \\\"quotes\\\" and \\\'single quotes\\\'\');" href="/posts/2">delete</a>');
     
-    $html_link = link_to('delete', new ActionController\Path('DELETE', 'posts/1'), array('confirm' => 'sample text with \'single quotes\' and "double quotes"'));
+    $html_link = link_to('delete', new ActionController\Routing\Path('DELETE', 'posts/1'), array('confirm' => 'sample text with \'single quotes\' and "double quotes"'));
     $this->assert_equal($html_link, '<a onclick="if (confirm(\'sample text with \\\'single quotes\\\' and \\\"double quotes\\\"\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
   }
   
   function test_current_page()
   {
-    $map = ActionController\Routing::draw();
+    $map = ActionController\Routing\Routes::draw();
     $map->reset();
     $map->connect(':controller/:action/:id.:format');
     
@@ -73,10 +73,10 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
     $this->assert_true(current_page(array(':controller' => 'archives')));
     $this->assert_false(current_page(array(':controller' => 'accounts')));
     $this->assert_false(current_page(array(':controller' => 'archives', ':action' => 'categories')));
-    $this->assert_true(current_page(new ActionController\Path('GET', 'archives')));
-    $this->assert_false(current_page(new ActionController\Path('GET', 'articles')));
-#    $this->assert_true(current_page(new ActionController\Url('GET', 'archives')));
-#    $this->assert_false(current_page(new ActionController\Url('GET', 'archives/mine')));
+    $this->assert_true(current_page(new ActionController\Routing\Path('GET', 'archives')));
+    $this->assert_false(current_page(new ActionController\Routing\Path('GET', 'articles')));
+#    $this->assert_true(current_page(new ActionController\Routing\Url('GET', 'archives')));
+#    $this->assert_false(current_page(new ActionController\Routing\Url('GET', 'archives/mine')));
     
     $_SERVER['REQUEST_URI'] = '/articles/show/45';
     $this->assert_false(current_page(array(':controller' => 'archives', ':action' => 'show', ':id' => 45)));

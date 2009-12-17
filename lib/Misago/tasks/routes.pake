@@ -6,7 +6,7 @@ task('routes', function()
   $routes  = array();
   $lengths = array(0, 0, 0, 0);
   
-  foreach(\Misago\ActionController\Routing::collect() as $route)
+  foreach(\Misago\ActionController\Routing\Routes::collect() as $route)
   {
     $method = isset($route['mapping']['conditions']['method']) ?
       $route['mapping']['conditions']['method'] : '';

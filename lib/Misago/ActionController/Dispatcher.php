@@ -30,7 +30,7 @@ class Dispatcher extends \Misago\Object
   # IMPROVE: Parse out methods from ActionController\Base (and above): they're not actions.
   protected function handle_request()
   {
-    $controller = Routing::recognize($this->request);
+    $controller = Routing\Routes::recognize($this->request);
     $params = $this->request->path_parameters();
     
     if (!method_exists($controller, $params[':action'])) {

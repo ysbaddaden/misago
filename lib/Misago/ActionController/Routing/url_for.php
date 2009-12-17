@@ -39,7 +39,7 @@
 # IMPROVE: url_for: handle specified options (host, protocol, etc.)
 # IMPROVE: url_for: permit for simplified calls, like url_for(array(':action' => 'index')), which shall use the current controller.
 # 
-# :namespace: \Misago\ActionController
+# :namespace: \Misago\ActionController\Routing
 function url_for($options)
 {
   if ($options instanceof \Misago\ActiveRecord\Record)
@@ -60,7 +60,7 @@ function url_for($options)
   $mapping = array_diff_key($options, $default_options);
   $options = array_merge($default_options, $options);
   
-  $map  = \Misago\ActionController\Routing::draw();
+  $map  = \Misago\ActionController\Routing\Routes::draw();
   $path = $map->reverse($mapping);
   
   $query_string = array();

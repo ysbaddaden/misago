@@ -1,5 +1,5 @@
 <?php
-namespace Misago\ActionController;
+namespace Misago\ActionController\Routing;
 use Misago\ActiveSupport\String;
 
 # Routing is what connects HTTP requests to your application's controllers,
@@ -8,7 +8,7 @@ use Misago\ActiveSupport\String;
 # You do configure your application's routes in +config/routes.php+.
 # A basic route config file looks like this:
 # 
-#   $map = Misago\ActionController\Routing::draw();
+#   $map = Misago\ActionController\Routing\Routes::draw();
 #   
 #   # basic route: connects /login to AccountsController::login()
 #   $map->connect('login', array(
@@ -59,51 +59,15 @@ use Misago\ActiveSupport\String;
 #   $this->connect('login', array(':controller' => 'accounts', ':action' => 'login',
 #     'conditions' => array('method' => 'POST')));
 # 
-# Using named routes with conditions, returned URL will be an <tt>Misago\ActionController\Url</tt>
-# or <tt>Misago\ActionController\Path</tt> object, that will be transparently handled by view's
-# helpers to generate links and forms that will use the correct HTTP method.
-# 
-# =RESTful routes
-# 
-# REST webservices are handled transparently by misago.
-# 
-# Attention: in RESTful routes +:id+ must be an integer.
-# 
-# Example:
-# 
-#   $map->resource('posts');
-# 
-# This will create the following named routes:
-# 
-#   GET    /posts          => PostsController::index()
-#   GET    /posts/new      => PostsController::neo()
-#   POST   /posts          => PostsController::create()
-#   GET    /posts/:id/edit => PostsController::edit()
-#   GET    /posts/:id      => PostsController::show()
-#   PUT    /posts/:id      => PostsController::update()
-#   DELETE /posts/:id      => PostsController::delete()
-# 
-# Of course being named routes it also creates the following helper functions
-# (they also exists with the +_url+ form):
-# 
-#   posts_path()       => GET    /posts
-#   new_post_path()    => GET    /posts/new
-#   create_post_path() => POST   /posts
-#   show_post_path()   => GET    /posts/:id
-#   edit_post_path()   => GET    /posts/:id/edit
-#   update_post_path() => PUT    /posts/:id
-#   delete_post_path() => DELETE /posts/:id
-# 
-# To create a REST resource, just generate it:
-#
-#   $ script/generate resource posts
-# 
-# This will create the controller, the model and add the route to your
-# configuration.
+# Using named routes with conditions, returned URL will be a
+# <tt>Misago\ActionController\Routing\Url</tt> or
+# <tt>Misago\ActionController\Routing\Path</tt> object, that will be
+# transparently handled by view helpers to generate links and forms that will
+# use the correct HTTP method.
 # 
 # IMPROVE: cache routes using APC.
 # 
-class Routing extends \Misago\Object
+class Routes extends Resources
 {
   private $routes          = array();
   private $default_mapping = array(
@@ -220,37 +184,6 @@ class Routing extends \Misago\Object
     );
   }
   
-  # Builds RESTful connections.
-  function resource($name, $options=array())
-  {
-    $plural   = $name;
-    $singular = String::singularize($name);
-    $this->generate_resource($name, $plural, $singular, $name);
-    
-    if (isset($options['has_many']))
-    {
-      $prefix = "$name/:{$singular}_id";
-      foreach(array_collection($options['has_many']) as $nested_name)
-      {
-        $nested_plural   = "{$singular}_$nested_name";
-        $nested_singular = $singular.'_'.String::singularize($nested_name);
-        $this->generate_resource($nested_name, $nested_plural, $nested_singular,
-          "$prefix/$nested_name");
-      }
-    }
-  }
-  
-  private function generate_resource($name, $plural, $singular, $prefix)
-  {
-    $this->named("$plural",          "$prefix.:format",          array(':controller' => $name, ':action' => 'index',  'conditions' => array('method' => 'GET')));
-    $this->named("new_$singular",    "$prefix/new.:format",      array(':controller' => $name, ':action' => 'neo',    'conditions' => array('method' => 'GET')));
-    $this->named("show_$singular",   "$prefix/:id.:format",      array(':controller' => $name, ':action' => 'show',   'conditions' => array('method' => 'GET'),    'requirements' => array(':id' => '\d+')));
-    $this->named("edit_$singular",   "$prefix/:id/edit.:format", array(':controller' => $name, ':action' => 'edit',   'conditions' => array('method' => 'GET'),    'requirements' => array(':id' => '\d+')));
-    $this->named("create_$singular", "$prefix.:format",          array(':controller' => $name, ':action' => 'create', 'conditions' => array('method' => 'POST')));
-    $this->named("update_$singular", "$prefix/:id.:format",      array(':controller' => $name, ':action' => 'update', 'conditions' => array('method' => 'PUT'),    'requirements' => array(':id' => '\d+')));
-    $this->named("delete_$singular", "$prefix/:id.:format",      array(':controller' => $name, ':action' => 'delete', 'conditions' => array('method' => 'DELETE'), 'requirements' => array(':id' => '\d+')));
-  }
-  
   # Returns a mapping for a given method+path.
   # 
   # :private:
@@ -365,7 +298,7 @@ class Routing extends \Misago\Object
   
   # Builds the named routes helper functions.
   # 
-  # :private:
+  # :nodoc:
   function build_named_route_helpers()
   {
     if (DEBUG
@@ -394,7 +327,7 @@ class Routing extends \Misago\Object
     $func = "function {$route['name']}_{$type}(\$keys=array())
     {
       \$route = $exported_route;
-      return \Misago\ActionController\Routing::named_function_{$type}(\$route, \$keys);
+      return \Misago\ActionController\Routing\Routes::named_function_{$type}(\$route, \$keys);
     }";
     return $func;
   }
@@ -472,44 +405,6 @@ class Routing extends \Misago\Object
   {
     $map = self::draw();
     return $map->routes;
-  }
-}
-
-# Transparently handles URL (with HTTP method and URI).
-# :nodoc:
-class Path
-{
-  public $method;
-  public $path;
-  
-  function __construct($method, $path)
-  {
-    $this->method = $method;
-    $this->path   = '/'.$path;
-  }
-  
-  function __toString()
-  {
-    return $this->path;
-  }
-}
-
-# Transparently handles URL (with HTTP method and URI).
-# :nodoc:
-class Url
-{
-  public $method;
-  public $uri;
-  
-  function __construct($method, $uri)
-  {
-    $this->method = $method;
-    $this->uri    = cfg_get('base_url').'/'.$uri;
-  }
-  
-  function __toString()
-  {
-    return $this->uri;
   }
 }
 
