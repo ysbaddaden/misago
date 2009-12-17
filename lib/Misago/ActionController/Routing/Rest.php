@@ -92,10 +92,13 @@ class Rest extends \Misago\Object
   # 
   # Available options:
   # 
+  # - +as+          - use this name for the path instead
   # - +controller+  - force controller's name (defaults to plural name)
   # - +has_one+     - declare a nested singleton resource
   # - +has_many+    - declare a nested collection resource
   # - +name_prefix+ - particular prefix for routes' name
+  # - +only+        - list of routes to generate (eg: ['index', 'show'])
+  # - +except+      - list of routes to skip (eg: ['update', 'delete'])
   # - +path_prefix+ - a particular prefix for routes' path
   # - +singular+    - force singular name
   # 
@@ -117,49 +120,77 @@ class Rest extends \Misago\Object
   
   private function build_resource($name, $options, $closure)
   {
-    if (!isset($options['name_prefix'])) {
-      $options['name_prefix'] = '';
-    }
-    $controller = isset($options['controller_prefix']) ?
-      $options['controller_prefix'].$options['controller'] : $options['controller'];
+    if (!isset($options['only']))        $options['only']   = array('index', 'new', 'show', 'edit', 'create', 'update', 'delete');
+    if (!isset($options['except']))      $options['except'] = array();
+    if (!isset($options['name_prefix'])) $options['name_prefix'] = '';
     
     $prefix = isset($options['path_prefix']) ?
       $options['path_prefix'].'/'.$options['prefix'] : $options['prefix'];
+    $controller = isset($options['controller_prefix']) ?
+      $options['controller_prefix'].$options['controller'] : $options['controller'];
     
-    $this->named("{$options['name_prefix']}$name", "$prefix.:format", array(
-      ':controller' => $controller, ':action' => 'index',
-      'conditions' => array('method' => 'GET')
-    ));
+    if (in_array('index', $options['only'])
+      and !in_array('index', $options['except']))
+    {
+      $this->named("{$options['name_prefix']}$name", "$prefix.:format", array(
+        ':controller' => $controller, ':action' => 'index',
+        'conditions' => array('method' => 'GET')
+      ));
+    }
     
-    $this->named("new_{$options['name_prefix']}{$options['singular']}", "$prefix/new.:format", array(
-      ':controller' => $controller, ':action' => 'neo',    
-      'conditions' => array('method' => 'GET')
-    ));
+    if (in_array('new', $options['only'])
+      and !in_array('new', $options['except']))
+    {
+      $this->named("new_{$options['name_prefix']}{$options['singular']}", "$prefix/new.:format", array(
+        ':controller' => $controller, ':action' => 'neo',    
+        'conditions' => array('method' => 'GET')
+      ));
+    }
     
-    $this->named("show_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-      ':controller' => $controller, ':action' => 'show',   
-      'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
-    ));
+    if (in_array('show', $options['only'])
+      and !in_array('show', $options['except']))
+    {
+      $this->named("show_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
+        ':controller' => $controller, ':action' => 'show',   
+        'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
+      ));
+    }
     
-    $this->named("edit_{$options['name_prefix']}{$options['singular']}", "$prefix/:id/edit.:format", array(
-      ':controller' => $controller, ':action' => 'edit',   
-      'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
-    ));
+    if (in_array('edit', $options['only'])
+      and !in_array('edit', $options['except']))
+    {
+      $this->named("edit_{$options['name_prefix']}{$options['singular']}", "$prefix/:id/edit.:format", array(
+        ':controller' => $controller, ':action' => 'edit',   
+        'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
+      ));
+    }
     
-    $this->named("create_{$options['name_prefix']}{$options['singular']}", "$prefix.:format", array(
-      ':controller' => $controller, ':action' => 'create', 
-      'conditions' => array('method' => 'POST')
-    ));
+    if (in_array('create', $options['only'])
+      and !in_array('create', $options['except']))
+    {
+      $this->named("create_{$options['name_prefix']}{$options['singular']}", "$prefix.:format", array(
+        ':controller' => $controller, ':action' => 'create', 
+        'conditions' => array('method' => 'POST')
+      ));
+    }
     
-    $this->named("update_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-      ':controller' => $controller, ':action' => 'update', 
-      'conditions' => array('method' => 'PUT'), 'requirements' => array(':id' => '\d+')
-    ));
+    if (in_array('update', $options['only'])
+      and !in_array('update', $options['except']))
+    {
+      $this->named("update_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
+        ':controller' => $controller, ':action' => 'update', 
+        'conditions' => array('method' => 'PUT'), 'requirements' => array(':id' => '\d+')
+      ));
+    }
     
-    $this->named("delete_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-      ':controller' => $controller, ':action' => 'delete', 
-      'conditions' => array('method' => 'DELETE'), 'requirements' => array(':id' => '\d+')
-    ));
+    if (in_array('delete', $options['only'])
+      and !in_array('delete', $options['except']))
+    {
+      $this->named("delete_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
+        ':controller' => $controller, ':action' => 'delete', 
+        'conditions' => array('method' => 'DELETE'), 'requirements' => array(':id' => '\d+')
+      ));
+    }
     
     if (isset($options['has_one']))
     {
