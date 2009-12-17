@@ -67,7 +67,7 @@ use Misago\ActiveSupport\String;
 # 
 # IMPROVE: cache routes using APC.
 # 
-class Routes extends Rest
+class Routes extends ResourceRoutes
 {
   private $routes          = array();
   private $default_mapping = array(

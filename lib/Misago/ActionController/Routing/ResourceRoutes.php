@@ -40,7 +40,7 @@ use Misago\ActiveSupport\String;
 #   $map->resource('event');
 #   $map->resources('tickets', array('path_prefix' => 'ticket/:id'));
 # 
-class Rest extends \Misago\Object
+class ResourceRoutes extends \Misago\Object
 {
   # Singleton resource. Resource name must always be singular, but the
   # controller uses the plural form.
