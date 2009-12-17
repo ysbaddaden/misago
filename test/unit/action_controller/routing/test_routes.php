@@ -499,10 +499,14 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $map->reset();
     
     $map->resources('discussions', array('has_many' => 'messages'));
+    $map->resources('event', function($event)
+    {
+      $event->resource('description', array('as' => 'about'));
+      $event->resources('tickets');
+    });
     $map->build_named_route_helpers();
     
     $this->assert_equal((string)discussions_path(), '/discussions');
-    
     $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)), new ActionController\Routing\Path('GET', 'discussions/34/messages'));
     $this->assert_equal(new_discussion_message_path(array(':discussion_id' => 43)), new ActionController\Routing\Path('GET', 'discussions/43/messages/new'));
     $this->assert_equal(create_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('POST', 'discussions/13/messages'));
@@ -510,6 +514,43 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_equal(edit_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('GET', 'discussions/13/messages/26/edit'));
     $this->assert_equal(update_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('PUT', 'discussions/13/messages/26'));
     $this->assert_equal(delete_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('DELETE', 'discussions/13/messages/26'));
+    
+    $this->assert_equal((string)event_path(), '/event');
+    $this->assert_equal(event_tickets_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/tickets'));
+    $this->assert_equal(event_description_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/about'));
+  }
+  
+  function test_namespace()
+  {
+    $map = ActionController\Routing\Routes::draw();
+    $map->reset();
+    $map->ns('admin', function($admin) {
+      $admin->resources('products');
+    });
+    
+    $controller = \Misago\ActionController\Routing\Routes::recognize(new \Misago\ActionController\TestRequest(array(
+      'path' => 'admin/products/2/edit',
+    )));
+    $this->assert_instance_of($controller, '\Admin\ProductsController');
+    
+    $this->assert_true(function_exists('admin_products_path'));
+    $this->assert_equal((string)admin_products_path(),      '/admin/products');
+    $this->assert_equal((string)new_admin_product_path(),   '/admin/products/new');
+    $this->assert_equal((string)edit_admin_product_path(1), '/admin/products/1/edit');
+    
+    $this->assert_equal($map->route('GET', 'admin/products/456/edit.xml'), array(
+      ':method'     => 'GET',
+      ':controller' => 'admin\products',
+      ':action'     => 'edit',
+      ':id'         => '456',
+      ':format'     => 'xml',
+    ));
+    $this->assert_equal($map->route('GET', 'admin/products'), array(
+      ':method'     => 'GET',
+      ':controller' => 'admin\products',
+      ':action'     => 'index',
+      ':format'     => null,
+    ));
   }
   
   function test_named_root_path()

@@ -4,47 +4,65 @@ use Misago\ActiveSupport\String;
 
 # =RESTful routes
 # 
-# REST webservices are handled transparently by misago.
+# A resource is a pair of controller/model with a REST logic in routes.
+# Declaring a resource will create a bunch of named routes.
+# 
+# See <tt>resource</tt> and <tt>resources</tt> for additional help.
 # 
 # Attention: in RESTful routes +:id+ must be an integer.
 # 
-# Example:
+# ==Nested routes
 # 
-#   $map->resource('posts');
+# Relations are great, but often come with ugly URL like
+# +/tickets/new?event_id=123+. With nested routes you may create better
+# URL and help methods. For instance:
 # 
-# This will create the following named routes:
+#   $map->resource('event', array('has_many' => 'tickets'));
 # 
-#   GET    /posts          => PostsController::index()
-#   GET    /posts/new      => PostsController::neo()
-#   POST   /posts          => PostsController::create()
-#   GET    /posts/:id/edit => PostsController::edit()
-#   GET    /posts/:id      => PostsController::show()
-#   PUT    /posts/:id      => PostsController::update()
-#   DELETE /posts/:id      => PostsController::delete()
+# This will create named routes like:
 # 
-# Of course being named routes it also creates the following helper functions
-# (they also exists with the +_url+ form):
+#   event_tickets      /event/:event_id/tickets/new
+#   new_event_ticket   /event/:event_id/tickets/:id
+#   edit_event_ticket  /event/:event_id/tickets/:id/edit
+#   etc.
 # 
-#   posts_path()       => GET    /posts
-#   new_post_path()    => GET    /posts/new
-#   create_post_path() => POST   /posts
-#   show_post_path()   => GET    /posts/:id
-#   edit_post_path()   => GET    /posts/:id/edit
-#   update_post_path() => PUT    /posts/:id
-#   delete_post_path() => DELETE /posts/:id
+# You may also achieve nested resources the following ways:
 # 
-# To create a REST resource, just generate it:
-#
-#   $ script/generate resource posts
+#   # using +has_many+:
+#   $map->resource('event', array('has_many' => 'tickets'));
+#   
+#   # using closures:
+#   $map->resource('event', function($event) {
+#     $event->resources('tags');
+#   });
 # 
-# This will create the controller, the model and add the route to your
-# configuration.
+#   # using +path_prefix+ (not recommended):
+#   $map->resource('event');
+#   $map->resources('tickets', array('path_prefix' => 'ticket/:id'));
 # 
 class Rest extends \Misago\Object
 {
+  # Singleton resource. Resource name must always be singular, but the
+  # controller uses the plural form.
+  # 
+  #   $map->resource('account');
+  # 
+  # This will create the following named routes:
+  # 
+  #   account         GET     /account           => AccountsController::index()
+  #   new_account     GET     /account/new       => AccountsController::neo()
+  #   create_account  POST    /account           => AccountsController::create()
+  #   edit_account    GET     /account/:id/edit  => AccountsController::edit()
+  #   show_account    GET     /account/:id       => AccountsController::show()
+  #   update_account  PUT     /account/:id       => AccountsController::update()
+  #   delete_account  DELETE  /account/:id       => AccountsController::delete()
+  # 
+  # See <tt>resources</tt> for help on options, except that there's no
+  # +singular+ option, but a +plural+ option instead.
+  # 
   function resource($name, $options=array(), $closure=null)
   {
-    if ($options instanceof Closure)
+    if (is_object($options))
     {
       $closure = $options;
       $options = array();
@@ -53,14 +71,37 @@ class Rest extends \Misago\Object
     $options['singular'] = $name;
     if (empty($options['plural']))      $options['plural']      = String::pluralize($name);
     if (empty($options['controller']))  $options['controller']  = $options['plural'];
-    $options['prefix'] = $options['singular'];
+    $options['prefix'] = isset($options['as']) ? $options['as'] : $options['singular'];
     
     $this->build_resource($name, $options, $closure);
   }
   
+  # Collection resource. Resource name must always be plural.
+  # 
+  #   $map->resources('accounts');
+  # 
+  # This will create the following named routes:
+  # 
+  #   accounts         GET     /accounts           => AccountsController::index()
+  #   new_accounts     GET     /accounts/new       => AccountsController::neo()
+  #   create_accounts  POST    /accounts           => AccountsController::create()
+  #   edit_accounts    GET     /accounts/:id/edit  => AccountsController::edit()
+  #   show_accounts    GET     /accounts/:id       => AccountsController::show()
+  #   update_accounts  PUT     /accounts/:id       => AccountsController::update()
+  #   delete_accounts  DELETE  /accounts/:id       => AccountsController::delete()
+  # 
+  # Available options:
+  # 
+  # - +controller+  - force controller's name (defaults to plural name)
+  # - +has_one+     - declare a nested singleton resource
+  # - +has_many+    - declare a nested collection resource
+  # - +name_prefix+ - particular prefix for routes' name
+  # - +path_prefix+ - a particular prefix for routes' path
+  # - +singular+    - force singular name
+  # 
   function resources($name, $options=array(), $closure=null)
   {
-    if ($options instanceof Closure)
+    if (is_object($options))
     {
       $closure = $options;
       $options = array();
@@ -69,7 +110,7 @@ class Rest extends \Misago\Object
     $options['plural'] = $name;
     if (empty($options['singular']))    $options['singular']    = String::singularize($name);
     if (empty($options['controller']))  $options['controller']  = $options['plural'];
-    $options['prefix'] = $options['plural'];
+    $options['prefix'] = isset($options['as']) ? $options['as'] : $options['plural'];
     
     $this->build_resource($name, $options, $closure);
   }
@@ -79,42 +120,44 @@ class Rest extends \Misago\Object
     if (!isset($options['name_prefix'])) {
       $options['name_prefix'] = '';
     }
+    $controller = isset($options['controller_prefix']) ?
+      $options['controller_prefix'].$options['controller'] : $options['controller'];
     
     $prefix = isset($options['path_prefix']) ?
       $options['path_prefix'].'/'.$options['prefix'] : $options['prefix'];
     
     $this->named("{$options['name_prefix']}$name", "$prefix.:format", array(
-      ':controller' => $options['controller'], ':action' => 'index',
+      ':controller' => $controller, ':action' => 'index',
       'conditions' => array('method' => 'GET')
     ));
     
     $this->named("new_{$options['name_prefix']}{$options['singular']}", "$prefix/new.:format", array(
-      ':controller' => $options['controller'], ':action' => 'neo',    
+      ':controller' => $controller, ':action' => 'neo',    
       'conditions' => array('method' => 'GET')
     ));
     
     $this->named("show_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-      ':controller' => $options['controller'], ':action' => 'show',   
+      ':controller' => $controller, ':action' => 'show',   
       'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
     ));
     
     $this->named("edit_{$options['name_prefix']}{$options['singular']}", "$prefix/:id/edit.:format", array(
-      ':controller' => $options['controller'], ':action' => 'edit',   
+      ':controller' => $controller, ':action' => 'edit',   
       'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
     ));
     
     $this->named("create_{$options['name_prefix']}{$options['singular']}", "$prefix.:format", array(
-      ':controller' => $options['controller'], ':action' => 'create', 
+      ':controller' => $controller, ':action' => 'create', 
       'conditions' => array('method' => 'POST')
     ));
     
     $this->named("update_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-      ':controller' => $options['controller'], ':action' => 'update', 
+      ':controller' => $controller, ':action' => 'update', 
       'conditions' => array('method' => 'PUT'), 'requirements' => array(':id' => '\d+')
     ));
     
     $this->named("delete_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-      ':controller' => $options['controller'], ':action' => 'delete', 
+      ':controller' => $controller, ':action' => 'delete', 
       'conditions' => array('method' => 'DELETE'), 'requirements' => array(':id' => '\d+')
     ));
     
@@ -122,10 +165,14 @@ class Rest extends \Misago\Object
     {
       foreach(array_collection($options['has_one']) as $nested_name)
       {
-        $this->resource($nested_name, array(
-          'name_prefix' => "{$options['singular']}_",
-          'path_prefix' => "$name/:{$options['singular']}_id"
-        ));
+        $nested_options = array(
+          'name_prefix' => "{$options['name_prefix']}{$options['singular']}_",
+          'path_prefix' => "$prefix/:{$options['singular']}_id",
+        );
+        if (isset($options['controller_prefix'])) {
+          $nested_options['controller_prefix'] = $options['controller_prefix'];
+        }
+        $this->resource($nested_name, $nested_options);
       }
     }
     
@@ -133,11 +180,29 @@ class Rest extends \Misago\Object
     {
       foreach(array_collection($options['has_many']) as $nested_name)
       {
+        $nested_options = array(
+          'name_prefix' => "{$options['name_prefix']}{$options['singular']}_",
+          'path_prefix' => "$prefix/:{$options['singular']}_id",
+        );
+        if (isset($options['controller_prefix'])) {
+          $nested_options['controller_prefix'] = $options['controller_prefix'];
+        }
         $this->resources($nested_name, array(
-          'name_prefix' => "{$options['singular']}_",
-          'path_prefix' => "$name/:{$options['singular']}_id"
+          'name_prefix' => "{$options['name_prefix']}{$options['singular']}_",
+          'path_prefix' => "$prefix/:{$options['singular']}_id"
         ));
       }
+    }
+    
+    if (is_object($closure))
+    {
+      $name_prefix       = "{$options['name_prefix']}{$options['singular']}_";
+      $path_prefix       = "{$prefix}/:{$options['singular']}_id";
+      $controller_prefix = isset($options['controller_prefix']) ?
+        $options['controller_prefix'] : null;
+      
+      $obj = new Nested($this, $name_prefix, $path_prefix, $controller_prefix);
+      $closure($obj);
     }
   }
 }

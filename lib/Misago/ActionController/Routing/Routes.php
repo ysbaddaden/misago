@@ -101,10 +101,21 @@ class Routes extends Rest
     $params = $map->route(strtoupper($request->method()), $request->path());
     $request->path_parameters($params);
     
-    $name  = $params[':controller'].'_controller';
-    $class = String::camelize($name);
+    $name = $params[':controller'].'_controller';
+    if (strpos($name, '\\') === false) {
+      $class = String::camelize($name);
+    }
+    else
+    {
+      $parts = explode('\\', $name);
+      $class = '';
+      foreach($parts as $part) {
+        $class .= "\\".String::camelize($part);
+      }
+      unset($parts);
+    }
     
-    if (!file_exists(ROOT."/app/controllers/$class.php")) {
+    if (!file_exists(ROOT."/app/controllers/".str_replace('\\', '/', $class).".php")) {
       throw new \Misago\Exception("No such controller $class.", 404);
     }
     
@@ -140,6 +151,29 @@ class Routes extends Rest
   function named($name, $path, $mapping=array())
   {
     return $this->connect_route($name, $path, $mapping);
+  }
+  
+  # Sometimes it's nice to separate some resources into a particular namespace.
+  # For instance:
+  # 
+  #   $map->ns('admin', function($admin) {
+  #     $admin->resources('products');
+  #   }
+  # 
+  # This will require the controller +Admin\ProductsController+
+  # (as +app/controllers/Admin/ProductsController.php+) and will generate
+  # the following named routes:
+  # 
+  #   admin_products      admin/products           Admin\ProductController::index()
+  #   new_admin_product   admin/products/new       Admin\ProductController::neo()
+  #   show_admin_product  admin/products/:id       Admin\ProductController::show()
+  #   edit_admin_product  admin/products/:id/edit  Admin\ProductController::edit()
+  #   etc.
+  # 
+  function ns($name, $closure)
+  {
+    $obj = new Nested($this, "{$name}_", $name, "$name\\");
+    $closure($obj);
   }
   
   private function connect_route($name, $path, $mapping)
