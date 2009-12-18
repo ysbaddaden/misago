@@ -150,6 +150,7 @@ class Routes extends ResourceRoutes
   # Connects a path to a mapping, giving the route a name.
   function named($name, $path, $mapping=array())
   {
+#    echo "$name  ".(isset($mapping['conditions']['method']) ? $mapping['conditions']['method'] : 'ANY')."  $path\n";
     return $this->connect_route($name, $path, $mapping);
   }
   

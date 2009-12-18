@@ -93,12 +93,14 @@ class ResourceRoutes extends \Misago\Object
   # Available options:
   # 
   # - +as+          - use this name for the path instead
+  # - +collection+  - a hash of additional collection methods {action => method}
   # - +controller+  - force controller's name (defaults to plural name)
+  # - +except+      - list of routes to skip (eg: ['update', 'delete'])
   # - +has_one+     - declare a nested singleton resource
   # - +has_many+    - declare a nested collection resource
   # - +name_prefix+ - particular prefix for routes' name
+  # - +member+      - same as +collection+ but applies to a particular id
   # - +only+        - list of routes to generate (eg: ['index', 'show'])
-  # - +except+      - list of routes to skip (eg: ['update', 'delete'])
   # - +path_prefix+ - a particular prefix for routes' path
   # - +singular+    - force singular name
   # 
@@ -120,119 +122,128 @@ class ResourceRoutes extends \Misago\Object
   
   private function build_resource($name, $options, $closure)
   {
-    if (!isset($options['only']))        $options['only']   = array('index', 'new', 'show', 'edit', 'create', 'update', 'delete');
-    if (!isset($options['except']))      $options['except'] = array();
     if (!isset($options['name_prefix'])) $options['name_prefix'] = '';
     
+    $singular_name = "{$options['name_prefix']}{$options['singular']}";
     $prefix = isset($options['path_prefix']) ?
       $options['path_prefix'].'/'.$options['prefix'] : $options['prefix'];
-    $controller = isset($options['controller_prefix']) ?
-      $options['controller_prefix'].$options['controller'] : $options['controller'];
+    $controller = isset($options['namespace']) ?
+      $options['namespace'].$options['controller'] : $options['controller'];
     
-    if (in_array('index', $options['only'])
-      and !in_array('index', $options['except']))
-    {
-      $this->named("{$options['name_prefix']}$name", "$prefix.:format", array(
-        ':controller' => $controller, ':action' => 'index',
-        'conditions' => array('method' => 'GET')
-      ));
+    # list of collection/member actions
+    $collection = array('index' => 'get', 'new' => 'get', 'create' => 'post');
+    if (!empty($options['collection'])) {
+      $collection = array_merge($options['collection'], $collection);
+    }
+    $member = array('show' => 'get', 'edit' => 'get', 'update' => 'put', 'delete' => 'delete');
+    if (!empty($options['member'])) {
+      $member = array_merge($options['member'], $member);
     }
     
-    if (in_array('new', $options['only'])
-      and !in_array('new', $options['except']))
+    if (!empty($options['only']))
     {
-      $this->named("new_{$options['name_prefix']}{$options['singular']}", "$prefix/new.:format", array(
-        ':controller' => $controller, ':action' => 'neo',    
-        'conditions' => array('method' => 'GET')
-      ));
+      $collection = array_intersect_key($collection, array_flip($options['only']));
+      $member     = array_intersect_key($member,     array_flip($options['only']));
+    }
+    if (!empty($options['except']))
+    {
+      $collection = array_diff_key($collection, array_flip($options['except']));
+      $member     = array_diff_key($member,     array_flip($options['except']));
     }
     
-    if (in_array('show', $options['only'])
-      and !in_array('show', $options['except']))
+    # collection actions like /members[/:action][.:format]
+    foreach($collection as $action => $method)
     {
-      $this->named("show_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-        ':controller' => $controller, ':action' => 'show',   
-        'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
-      ));
+      switch($action)
+      {
+        case 'index':
+          $_name = $options['name_prefix'].$name;
+          $_path = "$prefix.:format";
+        break;
+        
+        case 'create':
+          $_name = $action.'_'.$singular_name;
+          $_path = "$prefix.:format";
+        break;
+        
+        default:
+          $_name = $action.'_'.$singular_name;
+          $_path = "$prefix/$action.:format";
+      }
+      $_options = array(
+        ':controller' => $controller,
+        ':action'     => ($action == 'new') ? 'neo' : $action
+      );
+      if ($method != 'any') {
+        $_options['conditions'] = array('method' => strtoupper($method));
+      }
+      $this->named($_name, $_path, $_options);
+    }
+
+    # member actions like /members/:id[/:action][.:format]
+    foreach($member as $action => $method)
+    {
+      switch($action)
+      {
+        case 'show': case 'update': case 'delete':
+          $_name = $action.'_'.$singular_name;
+          $_path = "$prefix/:id.:format";
+        break;
+        
+        default:
+          $_name = $action.'_'.$singular_name;
+          $_path = "$prefix/:id/$action.:format";
+      }
+      $_options = array(
+        ':controller'  => $controller,
+        ':action'      => $action,
+        'requirements' => array(':id' => '\d+')
+      );
+      if ($method != 'any') {
+        $_options['conditions'] = array('method' => strtoupper($method));
+      }
+      $this->named($_name, $_path, $_options);
     }
     
-    if (in_array('edit', $options['only'])
-      and !in_array('edit', $options['except']))
-    {
-      $this->named("edit_{$options['name_prefix']}{$options['singular']}", "$prefix/:id/edit.:format", array(
-        ':controller' => $controller, ':action' => 'edit',   
-        'conditions' => array('method' => 'GET'), 'requirements' => array(':id' => '\d+')
-      ));
-    }
-    
-    if (in_array('create', $options['only'])
-      and !in_array('create', $options['except']))
-    {
-      $this->named("create_{$options['name_prefix']}{$options['singular']}", "$prefix.:format", array(
-        ':controller' => $controller, ':action' => 'create', 
-        'conditions' => array('method' => 'POST')
-      ));
-    }
-    
-    if (in_array('update', $options['only'])
-      and !in_array('update', $options['except']))
-    {
-      $this->named("update_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-        ':controller' => $controller, ':action' => 'update', 
-        'conditions' => array('method' => 'PUT'), 'requirements' => array(':id' => '\d+')
-      ));
-    }
-    
-    if (in_array('delete', $options['only'])
-      and !in_array('delete', $options['except']))
-    {
-      $this->named("delete_{$options['name_prefix']}{$options['singular']}", "$prefix/:id.:format", array(
-        ':controller' => $controller, ':action' => 'delete', 
-        'conditions' => array('method' => 'DELETE'), 'requirements' => array(':id' => '\d+')
-      ));
-    }
-    
+    # nested resource
     if (isset($options['has_one']))
     {
       foreach(array_collection($options['has_one']) as $nested_name)
       {
         $nested_options = array(
-          'name_prefix' => "{$options['name_prefix']}{$options['singular']}_",
+          'name_prefix' => "{$singular_name}_",
           'path_prefix' => "$prefix/:{$options['singular']}_id",
         );
-        if (isset($options['controller_prefix'])) {
-          $nested_options['controller_prefix'] = $options['controller_prefix'];
+        if (isset($options['namespace'])) {
+          $nested_options['namespace'] = $options['namespace'];
         }
         $this->resource($nested_name, $nested_options);
       }
     }
     
+    # nested resources
     if (isset($options['has_many']))
     {
       foreach(array_collection($options['has_many']) as $nested_name)
       {
         $nested_options = array(
-          'name_prefix' => "{$options['name_prefix']}{$options['singular']}_",
+          'name_prefix' => "{$singular_name}_",
           'path_prefix' => "$prefix/:{$options['singular']}_id",
         );
-        if (isset($options['controller_prefix'])) {
-          $nested_options['controller_prefix'] = $options['controller_prefix'];
+        if (isset($options['namespace'])) {
+          $nested_options['namespace'] = $options['namespace'];
         }
-        $this->resources($nested_name, array(
-          'name_prefix' => "{$options['name_prefix']}{$options['singular']}_",
-          'path_prefix' => "$prefix/:{$options['singular']}_id"
-        ));
+        $this->resources($nested_name, $nested_options);
       }
     }
     
+    # manual nesting
     if (is_object($closure))
     {
-      $name_prefix       = "{$options['name_prefix']}{$options['singular']}_";
-      $path_prefix       = "{$prefix}/:{$options['singular']}_id";
-      $controller_prefix = isset($options['controller_prefix']) ?
-        $options['controller_prefix'] : null;
-      
-      $obj = new Nested($this, $name_prefix, $path_prefix, $controller_prefix);
+      $name_prefix = "{$singular_name}_";
+      $path_prefix = "{$prefix}/:{$options['singular']}_id";
+      $namespace   = isset($options['namespace']) ? $options['namespace'] : null;
+      $obj = new Nested($this, $name_prefix, $path_prefix, $namespace);
       $closure($obj);
     }
   }
