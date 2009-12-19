@@ -16,28 +16,33 @@ class Nested
     $this->ns          = $ns;
   }
   
-  function resource($name, $options=array())
-  {
-    $options['name_prefix'] = $this->name_prefix;
-    $options['path_prefix'] = $this->path_prefix;
-    if (!empty($this->ns))
-    {
-      $options['namespace'] = $this->ns.(
-        empty($options['namespace']) ? '' : '\\'.$options['namespace']);
-    }
-    $this->map->resource($name, $options);
+  function resource($name, $options=array(), $closure=null) {
+    $this->_map('resource', $name, $options, $closure);
   }
   
-  function resources($name, $options=array())
+  function resources($name, $options=array(), $closure=null) {
+    $this->_map('resources', $name, $options, $closure);
+  }
+  
+  private function _map($method, $name, $options, $closure)
   {
-    $options['name_prefix'] = $this->name_prefix;
-    $options['path_prefix'] = $this->path_prefix;
+    if (is_object($options))
+    {
+      $closure = $options;
+      $options = array();
+    }
+    if (!isset($options['name_prefix'])) {
+      $options['name_prefix'] = $this->name_prefix;
+    }
+    if (!isset($options['path_prefix'])) {
+      $options['path_prefix'] = $this->path_prefix;
+    }
     if (!empty($this->ns))
     {
       $options['namespace'] = $this->ns.(
         empty($options['namespace']) ? '' : '\\'.$options['namespace']);
     }
-    $this->map->resources($name, $options);
+    $this->map->$method($name, $options, $closure);
   }
 }
 
