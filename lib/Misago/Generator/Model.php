@@ -14,7 +14,7 @@ class Model extends Base
     $this->options = $options;
     
     $Class = String::camelize($args[0]);
-    $table = String::pluralize(String::underscore$Class));
+    $table = String::pluralize(String::underscore($Class));
     
     $vars = array(
       'Class' => $Class,
