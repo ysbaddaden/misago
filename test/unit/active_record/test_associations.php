@@ -239,6 +239,12 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $this->assert_equal($basket->id, 3);
     
     $order = new Order(1);
+    $this->assert_equal($order->baskets->find(3)->id, 3);
+    
+    $basket = $order->baskets->find(3, array('select' => 'id'));
+    $this->assert_false(property_exists($basket, 'product_id'));
+    
+    $order = new Order(1);
     $basket = $order->baskets->find(':first', array('conditions' => array('id' => 4)));
     $this->assert_equal($basket, null, "record exists, but doesn't belongs to this parent, thus null");
   }
