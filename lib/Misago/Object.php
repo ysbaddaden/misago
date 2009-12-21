@@ -93,7 +93,7 @@ abstract class Object
     if (isset($this->_mapped_methods[$method])) {
       return call_user_func_array($this->_mapped_methods[$method], $args);
     }
-    trigger_error("No such method ".get_class($this)."::$method().", E_USER_ERROR);
+    trigger_error("No such method ".get_class($this)."->$method().", E_USER_ERROR);
   }
   
   static function __callStatic($method, $args)
