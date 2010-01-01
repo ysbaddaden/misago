@@ -18,14 +18,12 @@ $_SERVER['migrate_debug'] = 0;
 #   }
 #   new Test_StoriesController();
 #   ?\>
-class TestCase extends \Misago\Unit\TestCase
+# 
+# IMPROVE: Use TestRequest instead of calling a test server.
+abstract class TestCase extends \Misago\Unit\TestCase
 {
-  # IMPROVE: Use TestRequest instead of calling a test server.
-  function __construct()
-  {
-    $map = Routing\Routes::draw();
-    $map->build_named_route_helpers();
-    parent::__construct();
+  function __construct() {
+    Routing\Routes::draw();
   }
   
   # Executes an action on test server.
