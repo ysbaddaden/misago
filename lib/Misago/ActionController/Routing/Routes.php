@@ -81,6 +81,8 @@ class Routes extends ResourceRoutes
   private static $map;
   private static $current_format = null;
   
+  private $built_named_route_helpers = false;
+  
   # Singleton
   static function draw()
   {
@@ -88,15 +90,15 @@ class Routes extends ResourceRoutes
     {
       self::$map = new self();
       require ROOT.'/config/routes.php';
+      self::$map->build_named_route_helpers();
     }
     return self::$map;
   }
   
-  # Recognizes the route for a request, an returns a controller.
+  # Recognizes the route for a request, and returns a controller.
   static function recognize($request)
   {
     $map = self::draw();
-    $map->build_named_route_helpers();
     
     $params = $map->route(strtoupper($request->method()), $request->path());
     $request->path_parameters($params);
@@ -336,6 +338,10 @@ class Routes extends ResourceRoutes
   # :nodoc:
   function build_named_route_helpers()
   {
+    if ($this->built_named_route_helpers) {
+      return;
+    }
+    
     if (DEBUG
       or !file_exists(TMP.'/named_routes_helpers.php')
       or time() - strtotime('-24 hours') > filemtime(TMP.'/named_routes_helpers.php'))
@@ -353,7 +359,9 @@ class Routes extends ResourceRoutes
       file_put_contents(TMP.'/named_routes_helpers.php', $contents);
     }
     
+#    debug_print_backtrace();
     include TMP.'/named_routes_helpers.php';
+    $this->built_named_route_helpers = true;
   }
   
   private function build_named_function($type, &$route)

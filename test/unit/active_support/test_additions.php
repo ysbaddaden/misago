@@ -1,10 +1,7 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 
-class Test_Additions extends Misago\Unit\Test
+class Test_Additions extends Test\Unit\TestCase
 {
   function test_is_blank()
   {
@@ -16,7 +13,5 @@ class Test_Additions extends Misago\Unit\Test
     $this->assert_false(is_blank(0));
   }
 }
-
-new Test_Additions();
 
 ?>

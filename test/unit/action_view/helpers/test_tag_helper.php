@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 
 class Test_ActionView_Helpers_TagHelper extends Misago\Unit\Test
@@ -25,7 +22,5 @@ class Test_ActionView_Helpers_TagHelper extends Misago\Unit\Test
     $this->assert_equal(tag("span", null, array('class' => 'abcd')), "<span class=\"abcd\"></span>");
   }
 }
-
-new Test_ActionView_Helpers_TagHelper();
 
 ?>

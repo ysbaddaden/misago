@@ -1,13 +1,12 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 
 class FakeClass  { }
 class FakeClass2 { }
+class FakeException  extends Exception { }
+class FakeException2 extends Exception { }
 
-class Test_Misago_Unit_Test extends Misago\Unit\Test
+class Test_Test_Unit_TestCase extends Test\Unit\TestCase
 {
   function test_assert_true()
   {
@@ -22,6 +21,14 @@ class Test_Misago_Unit_Test extends Misago\Unit\Test
   function test_assert_null()
   {
     $this->assert_null(null);
+  }
+  
+  function test_assert_not_null()
+  {
+    $this->assert_not_null(1);
+    $this->assert_not_null(false);
+    $this->assert_not_null(array());
+    $this->assert_not_null(0);
   }
   
   function test_assert_equal()
@@ -95,8 +102,22 @@ class Test_Misago_Unit_Test extends Misago\Unit\Test
     $this->assert_match('/toto/', 'toto wakes up');
     $this->assert_no_match('/tata/', 'toto wakes up');
   }
+  
+  function test_assert_thrown()
+  {
+    $this->assert_throws('FakeException', function() {
+      throw new FakeException();
+    });
+    $this->assert_throws('FakeException', 'FakeException2', function() {
+      throw new FakeException2();
+    }, 'a message');
+  }
+  
+  function test_nothing_thrown()
+  {
+    $this->assert_nothing_thrown(function() {});
+    $this->assert_nothing_thrown(function() { return false; }, 'a message');
+  }
 }
-
-new Test_Misago_Unit_Test();
 
 ?>

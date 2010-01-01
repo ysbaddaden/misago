@@ -1,10 +1,7 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 
-class Test_ActiveSupport_Array extends Misago\Unit\Test
+class Test_ActiveSupport_Array extends Test\Unit\TestCase
 {
   function test_is_hash()
   {
@@ -63,7 +60,5 @@ class Test_ActiveSupport_Array extends Misago\Unit\Test
     $this->assert_equal(array_to_string($ary), "['1', '2', 'azerty']");
   }
 }
-
-new Test_ActiveSupport_Array();
 
 ?>

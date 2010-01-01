@@ -1,12 +1,8 @@
 <?php
-
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 use Misago\ActiveSupport\String;
 
-class Test_String extends Misago\Unit\Test
+class Test_String extends Test\Unit\TestCase
 {
   function test_is_symbol()
   {
@@ -71,7 +67,5 @@ class Test_String extends Misago\Unit\Test
     $this->assert_equal(String::humanize('author_id'), 'Author');
   }
 }
-
-new Test_String();
 
 ?>

@@ -88,6 +88,9 @@ abstract class Base extends RequestForgeryProtection
   
   # :private:
   protected $already_rendered = false;
+  
+  # Default layout to use.
+  protected $default_layout;
 
   # True to skip rendering.
   protected $skip_view = false;
@@ -335,6 +338,10 @@ abstract class Base extends RequestForgeryProtection
         $options['template'] = $this->view_path.'/'.$action;
       }
       $this->logger->log_info() && $this->logger->info("Rendering {$options['template']}");
+      
+      if (!isset($options['layout']) and !empty($this->default_layout)) {
+        $options['layout'] = $this->default_layout;
+      }
       
       $view = new ActionView\Base($this);
       $this->response->content_type_from_format($options['format']);

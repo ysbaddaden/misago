@@ -1,10 +1,7 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../../test_app/config/boot.php";
+require_once __DIR__.'/../../../unit.php';
 
-class Test_ActiveSupport_Cache_Store extends Misago\Unit\Test
+abstract class Test_ActiveSupport_Cache_Store extends Test\Unit\TestCase
 {
   function test_storage()
   {
@@ -81,7 +78,6 @@ class Test_ActiveSupport_Cache_MemoryStore extends Test_ActiveSupport_Cache_Stor
     $this->cache = new Misago\ActiveSupport\Cache\MemoryStore();
   }
 }
-new Test_ActiveSupport_Cache_MemoryStore();
 
 class Test_ActiveSupport_Cache_FileStore extends Test_ActiveSupport_Cache_Store
 {
@@ -89,7 +85,6 @@ class Test_ActiveSupport_Cache_FileStore extends Test_ActiveSupport_Cache_Store
     $this->cache = new Misago\ActiveSupport\Cache\FileStore();
   }
 }
-new Test_ActiveSupport_Cache_FileStore();
 
 if (class_exists('\Memcache', false))
 {
@@ -101,25 +96,12 @@ if (class_exists('\Memcache', false))
   }
   new Test_ActiveSupport_Cache_MemcacheStore();
 }
-else {
-  echo "\nSkipping: unable to connect to server.\n";
-}
 
 class Test_ActiveSupport_Cache_RedisStore extends Test_ActiveSupport_Cache_Store
 {
   function setup() {
     $this->cache = new Misago\ActiveSupport\Cache\RedisStore();
   }
-}
-try {
-  new Test_ActiveSupport_Cache_RedisStore();
-}
-catch(Exception $e)
-{
-  if ($e->getMessage() != 'Connection refused') {
-    throw $e;
-  }
-  echo "\nSkipping: unable to connect to server.\n";
 }
 
 ?>

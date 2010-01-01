@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 use Misago\ActiveRecord;
 
 class Test_ActiveRecord_Errors extends Misago\Unit\TestCase
@@ -243,7 +240,5 @@ class Test_ActiveRecord_Errors extends Misago\Unit\TestCase
       '["Error on record","Title \'my title\' is already taken","Already reserved in Error"]');
   }
 }
-
-new Test_ActiveRecord_Errors();
 
 ?>

@@ -1,12 +1,11 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 use Misago\ActionController;
 
 class Test_ActionController_Routing extends Misago\Unit\TestCase
 {
+  protected $fixtures = array('products');
+  
   function test_draw()
   {
     $map = ActionController\Routing\Routes::draw();
@@ -16,31 +15,18 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_map_root()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
     
-    $map->root(array(':controller' => 'welcome', ':action' => 'home'));
     $this->assert_equal($map->route('GET', ''), array(
       ':method'     => 'GET',
       ':controller' => 'welcome',
       ':action'     => 'home',
       ':format'     => null,
     ));
-    
-    $map->root(array(':controller' => 'welcome', ':action' => 'home', ':format' => 'xml'));
-    $this->assert_equal($map->route('GET', ''), array(
-      ':method'     => 'GET',
-      ':controller' => 'welcome',
-      ':action'     => 'home',
-      ':format'     => 'xml',
-    ));
   }
   
   function test_map_default_connect()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    
-    $map->connect(':controller/:action/:id.:format');
     
     $this->assert_equal($map->route('GET', 'posts/show/1'), array(
       ':method'     => 'GET',
@@ -76,13 +62,8 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_map_connect()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
     
-    $map->connect('posts.:format', array(':controller' => 'posts', ':action' => 'index'));
-    $map->connect('posts/:id.:format', array(':controller' => 'posts', ':action' => 'show'));
-    $map->connect('posts/:id/:action.:format', array(':controller' => 'posts'));
-    
-    $this->assert_equal($map->route('GET', 'posts/1'), array(
+    $this->assert_equal($map->route('GET', 'blog/1'), array(
       ':method'     => 'GET',
       ':controller' => 'posts',
       ':action'     => 'show',
@@ -90,7 +71,7 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('GET', 'posts/1.xml'), array(
+    $this->assert_equal($map->route('GET', 'blog/1.xml'), array(
       ':method'     => 'GET',
       ':controller' => 'posts',
       ':action'     => 'show',
@@ -98,7 +79,7 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
       ':format'     => 'xml',
     ));
     
-    $this->assert_equal($map->route('POST', 'posts/1/create'), array(
+    $this->assert_equal($map->route('POST', 'blog/1/create'), array(
       ':method'     => 'POST',
       ':controller' => 'posts',
       ':action'     => 'create',
@@ -106,7 +87,7 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('POST', 'posts/1/edit.xml'), array(
+    $this->assert_equal($map->route('POST', 'blog/1/edit.xml'), array(
       ':method'     => 'POST',
       ':controller' => 'posts',
       ':action'     => 'edit',
@@ -114,7 +95,7 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
       ':format'     => 'xml',
     ));
     
-    $this->assert_equal($map->route('GET', 'posts.xml'), array(
+    $this->assert_equal($map->route('GET', 'blog.xml'), array(
       ':method'     => 'GET',
       ':controller' => 'posts',
       ':action'     => 'index',
@@ -125,67 +106,63 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_map_resources()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
     
-    $map->resources('posts');
-    $map->connect(':controller/:action/:id.:format');
-    
-    $this->assert_equal($map->route('GET', 'posts'), array(
+    $this->assert_equal($map->route('GET', 'products'), array(
       ':method'     => 'GET',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'index',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('GET', 'posts/1'), array(
+    $this->assert_equal($map->route('GET', 'products/1'), array(
       ':method'     => 'GET',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'show',
       ':id'         => '1',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('GET', 'posts/new'), array(
+    $this->assert_equal($map->route('GET', 'products/new'), array(
       ':method'     => 'GET',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'neo',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('GET', 'posts/1/edit'), array(
+    $this->assert_equal($map->route('GET', 'products/1/edit'), array(
       ':method'     => 'GET',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'edit',
       ':id'         => '1',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('POST', 'posts'), array(
+    $this->assert_equal($map->route('POST', 'products'), array(
       ':method'     => 'POST',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'create',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('PUT', 'posts/1'), array(
+    $this->assert_equal($map->route('PUT', 'products/1'), array(
       ':method'     => 'PUT',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'update',
       ':id'         => '1',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('DELETE', 'posts/1'), array(
+    $this->assert_equal($map->route('DELETE', 'products/1'), array(
       ':method'     => 'DELETE',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'delete',
       ':id'         => '1',
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('GET', 'posts/widget'), array(
+    $this->assert_equal($map->route('GET', 'products/widget'), array(
       ':method'     => 'GET',
-      ':controller' => 'posts',
+      ':controller' => 'products',
       ':action'     => 'widget',
       ':format'     => null,
     ));
@@ -194,10 +171,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_map_resource()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    
-    $map->resource('event');
-    $map->connect(':controller/:action/:id.:format');
     
     $this->assert_equal($map->route('GET', 'event'), array(
       ':method'     => 'GET',
@@ -263,8 +236,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_route_globbing()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->connect('help/*path.:format', array(':controller' => 'html_pages', ':action' => 'help'));
 
     $this->assert_equal($map->route('GET', 'help/webcomics/pages/create'), array(
       ':method'     => 'GET',
@@ -294,9 +265,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_route_requirements()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->connect('page/:id.:format', array(':controller' => 'pages', ':action' => 'show',
-      'requirements' => array(':id' => '\d+')));
     
     $this->assert_equal($map->route('GET', 'page/456'), array(
       ':method'     => 'GET',
@@ -325,19 +293,15 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_reverse()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->resources('posts');
-    $map->connect('page/:id.:format', array(':controller' => 'pages', ':action' => 'show'));
-    $map->connect(':controller/:action/:id.:format');
     
-    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto');
-    $this->assert_equal((string)$map->reverse($mapping), '/page/toto');
+    $mapping = array(':controller' => 'threads', ':action' => 'show', ':id' => 'toto');
+    $this->assert_equal((string)$map->reverse($mapping), '/thread/toto');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 2);
-    $this->assert_equal((string)$map->reverse($mapping), '/products/edit/2');
+    $this->assert_equal((string)$map->reverse($mapping), '/products/2/edit');
     
     $mapping = array(':controller' => 'products', ':action' => 'create');
-    $this->assert_equal((string)$map->reverse($mapping), '/products/create');
+    $this->assert_equal((string)$map->reverse($mapping), '/products');
     
     $mapping = array(':controller' => 'products');
     $this->assert_equal((string)$map->reverse($mapping), '/products');
@@ -346,28 +310,26 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_equal((string)$map->reverse($mapping), '/products.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'create', ':format' => 'html');
-    $this->assert_equal((string)$map->reverse($mapping), '/products/create.html');
+    $this->assert_equal((string)$map->reverse($mapping), '/products.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 10, ':format' => 'xml');
-    $this->assert_equal((string)$map->reverse($mapping), '/products/edit/10.xml');
+    $this->assert_equal((string)$map->reverse($mapping), '/products/10/edit.xml');
     
-    $mapping = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
-    $this->assert_equal((string)$map->reverse($mapping), '/page/toto.json');
+    $mapping = array(':controller' => 'threads', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
+    $this->assert_equal((string)$map->reverse($mapping), '/thread/toto.json');
     
     $mapping = array(':controller' => 'posts', ':action' => 'delete', ':id' => 45);
     $test = $map->reverse($mapping);
-    $this->assert_equal($test->path, '/posts/45');
-    $this->assert_equal($test->method, 'DELETE');
+    $this->assert_equal($test->path, '/blog/45/delete');
+    $this->assert_equal($test->method, 'GET');
   }
   
   function test_url_for()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->connect(':controller/:action/:id.:format');
     
     $options = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
-    $this->assert_equal(url_for($options), '/pages/show/toto.json');
+    $this->assert_equal(url_for($options), '/page/toto.json');
     
     $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc');
     $this->assert_equal(url_for($options), '/pages.xml?order=asc');
@@ -382,10 +344,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_named_routes()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->named('about',    'about', array(':controller' => 'html', ':action' => 'about'));
-    $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
-    $map->build_named_route_helpers();
     
     $this->assert_equal($map->route('GET', 'about'), array(
       ':method'     => 'GET',
@@ -410,9 +368,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_named_routes_for_resources()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->resources('users');
-    $map->build_named_route_helpers();
     
     $this->assert_true(function_exists('users_path'));
     $this->assert_true(function_exists('show_user_path'));
@@ -453,9 +408,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_named_routes_for_resource()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->resource('account');
-    $map->build_named_route_helpers();
     
     $this->assert_true(function_exists('account_path'));
     $this->assert_true(function_exists('show_account_path'));
@@ -496,15 +448,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_nested_resources()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    
-    $map->resources('discussions', array('has_many' => 'messages'));
-    $map->resources('event', function($event)
-    {
-      $event->resource('description', array('as' => 'about'));
-      $event->resources('tickets');
-    });
-    $map->build_named_route_helpers();
     
     $this->assert_equal((string)discussions_path(), '/discussions');
     $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)), new ActionController\Routing\Path('GET', 'discussions/34/messages'));
@@ -523,14 +466,12 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_namespace()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->ns('admin', function($admin) {
-      $admin->resources('products');
-    });
     
-    $controller = \Misago\ActionController\Routing\Routes::recognize(new \Misago\ActionController\TestRequest(array(
-      'path' => 'admin/products/2/edit',
-    )));
+    $controller = \Misago\ActionController\Routing\Routes::recognize(
+      new \Misago\ActionController\TestRequest(array(
+        'path' => 'admin/products/2/edit',
+      ))
+    );
     $this->assert_instance_of($controller, '\Admin\ProductsController');
     
     $this->assert_true(function_exists('admin_products_path'));
@@ -556,9 +497,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_named_root_path()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->root(array(':controller' => 'welcome'));
-    $map->build_named_route_helpers();
     
     $this->assert_true(function_exists('root_path'));
     $this->assert_true(function_exists('root_url'));
@@ -570,10 +508,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_named_routes_with_activerecord()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->resources('products');
-    $map->build_named_route_helpers();
-    $this->fixtures('products');
     
     $this->assert_equal((string)show_product_path(new Product(1)), '/products/1');
     $this->assert_equal((string)edit_product_path(new Product(3)), '/products/3/edit');
@@ -591,10 +525,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   function test_named_routes_with_current_request_format()
   {
     $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->resources('articles');
-    $map->connect(':controller/:action/:id.:format');
-    $map->build_named_route_helpers();
     
     $map->route('GET', '/articles/create.xml');
     $this->assert_equal((string)show_article_path(4), '/articles/4.xml');
@@ -618,7 +548,5 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_equal((string)update_article_path(array('id' => 2)), '/articles/:id?id=2');
   }
 }
-
-new Test_ActionController_Routing();
 
 ?>

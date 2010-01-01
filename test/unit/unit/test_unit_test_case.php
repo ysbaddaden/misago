@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 
 class Test_Misago_Unit_TestCase extends Misago\Unit\TestCase
 {
@@ -35,7 +32,5 @@ class Test_Misago_Unit_TestCase extends Misago\Unit\TestCase
     $this->assert_equal($data, array('1', '2', '3'), "invoices must have been populated");
   }
 }
-
-new Test_Misago_Unit_TestCase();
 
 ?>

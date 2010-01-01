@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 require_once 'TestFiltersController.php';
 use Misago\ActionController;
 
@@ -46,7 +43,5 @@ class Test_ActionController_Filters extends Misago\Unit\TestCase
     $this->assert_null($ctrl->var_e, 'e has been skipped');
   }
 }
-
-new Test_ActionController_Filters();
 
 ?>

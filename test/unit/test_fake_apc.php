@@ -1,11 +1,7 @@
 <?php
+require_once __DIR__.'/../unit.php';
 
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../test_app/config/boot.php";
-
-class TestFakeApc extends Misago\Unit\Test
+class TestFakeApc extends Test\Unit\TestCase
 {
   function test_apc_store()
   {
@@ -36,7 +32,5 @@ class TestFakeApc extends Misago\Unit\Test
     $this->assert_false(apc_fetch('foo'));
   }
 }
-
-new TestFakeApc();
 
 ?>

@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 require_once ROOT."/app/controllers/Application.php";
 use Misago\ActionView;
 
@@ -125,7 +122,5 @@ class Test_ActionView_Base extends Misago\Unit\Test
     $this->assert_equal($html, '<li>1: aaa</li><li>2: bbb</li><li>3: ddd</li>');
   }
 }
-
-new Test_ActionView_Base();
 
 ?>

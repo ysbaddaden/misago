@@ -1,12 +1,17 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 use Misago\ActionController;
 
 class Test_ActionController_Flash extends Misago\Unit\Test
 {
+  function setup() {
+    @session_start();
+  }
+  
+  function teardown() {
+    @session_detroy();
+  }
+  
   function test_hash()
   {
     $flash = new ActionController\Flash();
@@ -100,9 +105,5 @@ class Test_ActionController_Flash extends Misago\Unit\Test
     $this->assert_equal($flash->count(), 0, 'there are still no variables left');
   }
 }
-
-@session_start();
-new Test_ActionController_Flash();
-@session_destroy();
 
 ?>

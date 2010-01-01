@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 
 class FakeAdapter extends Misago\ActiveRecord\ConnectionAdapters\AbstractAdapter
 {
@@ -467,7 +464,5 @@ class Test_ConnectionAdapter_AbstractAdapter extends Misago\Unit\Test
     $this->assert_equal($sql, "ROLLBACK ;");
   }
 }
-
-new Test_ConnectionAdapter_AbstractAdapter();
 
 ?>

@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/FormTagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/UrlHelper.php";
@@ -143,7 +140,5 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
     $this->assert_equal($html, '<a class="email" href="mailto:another@bd-en-ligne.fr">sabrina</a>');
   }
 }
-
-new Test_ActionView_Helpers_UrlHelper();
 
 ?>

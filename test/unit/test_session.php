@@ -1,12 +1,9 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../test/test_app/config/boot.php';
+/*
+require_once __DIR__.'/../unit.php';
 use Misago\Session;
 
-/*
-class Test_Session extends Misago\Unit\Test
+class Test_Session extends Test\Unit\TestCase
 {
   function test_initial_use()
   {
@@ -27,7 +24,5 @@ class Test_Session extends Misago\Unit\Test
     Session::destroy('azerty');
   }
 }
-
-new Test_Session();
 */
 ?>

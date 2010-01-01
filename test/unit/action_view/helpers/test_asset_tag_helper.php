@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/AssetTagHelper.php";
 
@@ -115,7 +112,5 @@ class Test_ActionView_Helper_AssetTagHelper extends Misago\Unit\Test
       '<link rel="something" type="text/xml" href="/posts.xml" title="ATOM"/>');
   }
 }
-
-new Test_ActionView_Helper_AssetTagHelper();
 
 ?>

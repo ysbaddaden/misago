@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/UrlHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TextHelper.php";
@@ -74,6 +71,5 @@ class TestTextHelper extends Misago\Unit\Test
     $this->assert_equal(truncate(str_repeat('j', 20)), str_repeat('j', 20));
   }
 }
-new TestTextHelper();
 
 ?>

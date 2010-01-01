@@ -1,9 +1,5 @@
 <?php
-
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 
 class Test_ActiveRecord_Ephemeral extends Misago\Unit\TestCase
 {
@@ -45,7 +41,5 @@ class Test_ActiveRecord_Ephemeral extends Misago\Unit\TestCase
     $this->assert_true($contact->errors->is_invalid('subject'), 'testing columns definition (limit)');
   }
 }
-
-new Test_ActiveRecord_Ephemeral();
 
 ?>

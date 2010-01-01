@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 use Misago\ActionController;
 
 class Test_ActionController_Base extends Misago\Unit\TestCase
@@ -145,7 +142,5 @@ class Test_ActionController_Base extends Misago\Unit\TestCase
     $this->assert_equal(trim($html), '404 not found');
   }
 }
-
-new Test_ActionController_Base();
 
 ?>

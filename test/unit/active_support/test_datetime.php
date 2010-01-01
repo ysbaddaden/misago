@@ -1,12 +1,8 @@
 <?php
-
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 use Misago\ActiveSupport;
 
-class Test_ActiveSupport_Datetime extends Misago\Unit\Test
+class Test_ActiveSupport_Datetime extends Test\Unit\TestCase
 {
   function test_constructor()
   {
@@ -97,7 +93,5 @@ class Test_ActiveSupport_Datetime extends Misago\Unit\Test
     $this->assert_equal((string)$time, '15:05:00');
   }
 }
-
-new Test_ActiveSupport_Datetime();
 
 ?>

@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/DateHelper.php";
 
 class Test_ActionView_Helpers_DateHelper extends Misago\Unit\TestCase
@@ -23,7 +20,5 @@ class Test_ActionView_Helpers_DateHelper extends Misago\Unit\TestCase
     $this->assert_equal(distance_of_time_in_words('2009-11-12 16:45:00', '2014-11-12 16:40:00'), 'over 5 years');
   }
 }
-
-new Test_ActionView_Helpers_DateHelper();
 
 ?>

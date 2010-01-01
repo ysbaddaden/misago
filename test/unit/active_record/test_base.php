@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 use Misago\ActiveRecord;
 
 class Orphan extends ActiveRecord\Base {
@@ -548,7 +545,5 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
     $this->assert_equal($programmer->cache_key, 'programmer/2');
   }
 }
-
-new Test_ActiveRecord_Base();
 
 ?>

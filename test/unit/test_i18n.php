@@ -1,13 +1,9 @@
 <?php
-
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../test_app/config/boot.php";
+require_once __DIR__.'/../unit.php';
 use Misago\I18n;
 use Misago\ActiveSupport;
 
-class Test_I18n extends Misago\Unit\Test
+class Test_I18n extends Test\Unit\TestCase
 {
   function test_translate()
   {
@@ -84,7 +80,5 @@ class Test_I18n extends Misago\Unit\Test
     $this->assert_equal(l(new ActiveSupport\Time('13:45:36')), '13:45');
   }
 }
-
-new Test_I18n();
 
 ?>

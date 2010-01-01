@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../unit.php';
 
 class Test_ActionMailer_Base extends Misago\Unit\TestCase
 {
@@ -31,5 +28,4 @@ class Test_ActionMailer_Base extends Misago\Unit\TestCase
 #  }
 }
 
-new Test_ActionMailer_Base();
 ?>

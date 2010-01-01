@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../../../test/test_app/config/boot.php';
+require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/FormTagHelper.php";
 
@@ -186,7 +183,5 @@ class Test_ActionView_Helpers_FormTagHelper extends Misago\Unit\Test
     $this->assert_equal($test, '<select autofocus="autofocus" id="category" name="category"></select>');
   }
 }
-
-new Test_ActionView_Helpers_FormTagHelper();
 
 ?>

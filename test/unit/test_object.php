@@ -1,9 +1,5 @@
 <?php
-
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../test_app/config/boot.php";
+require_once __DIR__.'/../unit.php';
 
 class SomeOtherObject extends \Misago\Object
 {
@@ -53,7 +49,7 @@ class SomeObject extends \Misago\Object
 }
 SomeObject::__constructStatic();
 
-class TestObject extends Misago\Unit\Test
+class TestObject extends Test\Unit\TestCase
 {
   function test_attributes_as_methods()
   {
@@ -81,7 +77,5 @@ class TestObject extends Misago\Unit\Test
     $this->assert_equal(SomeObject::module_static_method(), 'f');
   }
 }
-
-new TestObject();
 
 ?>

@@ -1,0 +1,52 @@
+<?php
+
+desc("Runs the test suite");
+task('test', function()
+{
+  passthru("pake test:units");
+  passthru("pake test:functionals");
+});
+
+desc("Runs unit test suite");
+task('test:units', function()
+{
+  require_once 'test/unit.php';
+  load_test_files('test/unit');
+  
+  Misago\Unit\TestCase::$batch_run = true;
+  Misago\Unit\TestCase::create_database(true);
+  Test\Unit\Autorunner::run('UnitTests');
+  Misago\Unit\TestCase::drop_database(true);
+});
+
+desc("Runs functional test suite");
+task('test:functionals', function()
+{
+  require_once 'test/unit.php';
+  load_test_files('test/functional');
+  
+  Misago\Unit\TestCase::$batch_run = true;
+  Misago\Unit\TestCase::create_database(true);
+  Test\Unit\Autorunner::run('FunctionalTests');
+  Misago\Unit\TestCase::drop_database(true);
+});
+
+function load_test_files($path)
+{
+  $dh = opendir($path);
+  while(($file = readdir($dh)) !== false)
+  {
+    if ($file != '.' and $file != '..')
+    {
+      if (is_file("$path/$file")) {
+        require_once "$path/$file";
+      }
+      elseif(is_dir("$path/$file")) {
+        load_test_files("$path/$file");
+      }
+    }
+  }
+  closedir($dh);
+}
+
+?>
