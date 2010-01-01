@@ -1,30 +1,30 @@
 <?php
 namespace Misago\Unit\Assertions;
 
-class DomAssertions extends ModelAssertions
+abstract class DomAssertions extends ModelAssertions
 {
   # HTML strings must be identical, up to attributes.
   # TODO: assert_dom_equal
-  function assert_dom_equal($dom, $expected, $comment='')
+  function assert_dom_equal($dom, $expected, $message='')
   {
     
   }
   
   # Negated form of <tt>assert_dom_equal</tt>.
   # TODO: assert_dom_not_equal
-  function assert_dom_not_equal($dom, $expected, $comment='')
+  function assert_dom_not_equal($dom, $expected, $message='')
   {
     
   }
   
   # TODO: assert_tag
-  function assert_tag($options=array(), $comment='')
+  function assert_tag($options=array(), $message='')
   {
     
   }
   
   # TODO: assert_no_tag
-  function assert_no_tag($options=array(), $comment='')
+  function assert_no_tag($options=array(), $message='')
   {
     
   }
@@ -39,7 +39,7 @@ class DomAssertions extends ModelAssertions
   #   assert_select('2 articles with class foo', 'article.foo', 2)
   #   assert_select('title element must contains "welcome" text', 'head title', 'welcome')
   #
-  protected function assert_select($selector, $equality=true, $comment='')
+  protected function assert_select($selector, $equality=true, $message='')
   {
     $elements = $this->css_select($this->response['body'], $selector);
     
@@ -48,13 +48,27 @@ class DomAssertions extends ModelAssertions
       case 'boolean':
         switch($equality)
         {
-          case true:  $this->assert_true(count($elements) > 0, $comment=''); break;
-          case false: $this->assert_equal(count($elements), 0, $comment=''); break;
+          case true:
+            $message = $this->build_message($message, "expected matches for %s but got none", $selector);
+            $this->assert_block($message, function() use ($elements) {
+              return (count($elements) > 0);
+            });
+          break;
+          
+          case false:
+            $message = $this->build_message($message, "expected no matches for %s but got some", $selector);
+            $this->assert_block($message, function() use ($elements) {
+              return (count($elements) == 0);
+            });
+          break;
         }
       break;
       
       case 'integer':
-        $this->assert_equal(count($elements), $equality, $comment='');
+        $message = $this->build_message($message, "expected %s matches for %s but got none", count($elements), $selector);
+        $this->assert_block($message, function() use ($elements, $equality) {
+          return (count($elements) == $equality);
+        });
       break;
       
       case 'string':
@@ -62,7 +76,7 @@ class DomAssertions extends ModelAssertions
         foreach($elements as $elm) {
           $text .= $elm['text'];
         }
-        $this->assert_match('/'.preg_quote($equality).'/', $text, $comment='');
+        $this->assert_match('/'.preg_quote($equality).'/', $text, $message);
       break;
     }
   }

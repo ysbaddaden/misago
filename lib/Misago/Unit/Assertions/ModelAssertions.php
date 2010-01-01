@@ -2,32 +2,26 @@
 namespace Misago\Unit\Assertions;
 use Misago\Terminal;
 
-class ModelAssertions extends \Misago\Unit\Test
+abstract class ModelAssertions extends \Test\Unit\TestCase
 {
   # Ensures +ActiveRecord+ is valid, otherwise displays list of errors.
-  function assert_valid($record, $comment='')
+  function assert_valid($record, $message='')
   {
-    $this->count_assertions += 1;
+    $is_valid = $record->is_valid();
+    $message  = $this->build_message($message, "Record is invalid:\n%s",
+      "\n  ".implode("\n  ", $record->errors->full_messages()));
     
-    if (!$record->is_valid())
-    {
-      $this->count_failures += 1;
-      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment);
-      printf(Terminal::colorize("    errors:", 'BOLD')." %s\n", print_r($record->errors->full_messages(), true));
-    }
+    $this->assert_block($message, function() use($is_valid) {
+      return $is_valid;
+    });
   }
   
   # Ensures +ActiveRecord+ is invalid.
-  function assert_invalid($record, $comment='')
+  function assert_invalid($record, $message='')
   {
-    $this->count_assertions += 1;
-    
-    if ($record->is_valid())
-    {
-      $this->count_failures += 1;
-      printf("\n".Terminal::colorize("%s failed:", 'RED')." %s\n", $this->running_test, $comment);
-      printf(Terminal::colorize("  expected:", 'BOLD')." invalid record\n");
-    }
+    $this->assert_block($message, function() use($record) {
+      return !$record->is_valid();
+    });
   }
 }
 

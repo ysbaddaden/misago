@@ -5,30 +5,31 @@ use Misago\Fixtures;
 
 $_SERVER['migrate_debug'] = 0;
 
-class TestCase extends Assertions\ResponseAssertions
+abstract class TestCase extends Assertions\ResponseAssertions
 {
-  static public  $batch_run = false;
-  static private $connection;
-  
   protected $fixtures = ':all';
   
-  protected function run_tests()
+  public  static $batch_run = false;
+  private static $connection;
+  
+  function run($result, $progress_block)
   {
     self::create_database();
     $this->load_fixtures();
     
-    parent::run_tests();
+    parent::run($result, $progress_block);
     
     $this->truncate($this->fixtures);
     self::drop_database();
   }
   
-  protected function run_test($method)
+  protected function run_test($method_name)
   {
     self::$connection->transaction('begin');
-    parent::run_test($method);
+    parent::run_test($method_name);
     self::$connection->transaction('rollback');
   }
+  
   
   # :nodoc:
   static function create_database($force=false)
