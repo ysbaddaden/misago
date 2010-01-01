@@ -115,14 +115,17 @@ class MysqlAdapter extends AbstractAdapter
     $results = $this->execute($sql);
     $data    = array();
     
-		if ($results and mysql_num_rows($results) > 0)
+		if ($results)
 		{
-      while ($row = mysql_fetch_row($results)) {
-        $data[] = $row[0];
+		  if (mysql_num_rows($results) > 0)
+		  {
+        while ($row = mysql_fetch_row($results)) {
+          $data[] = $row[0];
+        }
       }
+      mysql_free_result($results);
     }
     
-    mysql_free_result($results);
     return $data;
   }
   
