@@ -1,9 +1,5 @@
 <?php
-
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../../test_app/config/boot.php";
+require_once __DIR__.'/../../unit.php';
 
 class Test_Unit_Assertions_DomAssertions extends Misago\Unit\TestCase
 {
@@ -39,24 +35,18 @@ class Test_Unit_Assertions_DomAssertions extends Misago\Unit\TestCase
     $this->assert_select('article.male', 1);
   }
   
-  function test_assert_tag()
-  {
-    
-  }
-  
-  function test_assert_no_tag()
-  {
-    
-  }
-  
   function test_assert_dom_equal()
   {
-    
+    $this->assert_dom_equal('<p></p>', '<p></p>');
+    $this->assert_dom_equal('<p  class="thing"> aez  </p>', '<p class="thing">aez</p>');
+    $this->assert_dom_equal('<p  class="thing"> <a>aez<a>  </p>', '<p class="thing"><a>aez</a></p>');
+    $this->assert_dom_equal('<p  class="thing"> <a href="http://example.com" class="external">example.com<a>  </p>',
+      '<p class="thing"><a class="external" href="http://example.com">example.com</a></p>');
   }
   
   function test_assert_dom_not_equal()
   {
-    
+    $this->assert_dom_equal('<p  class="thing"> <a>aez<a>  </p>', '<p class="thing"><a>a e z</a></p>');
   }
 }
 

@@ -426,6 +426,7 @@ class Routes extends ResourceRoutes
           unset($keys[$k]);
         }
       }
+      ksort($query);
       $query_string = http_build_query($query);
     }
     

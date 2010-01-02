@@ -4,29 +4,29 @@ namespace Misago\Unit\Assertions;
 abstract class DomAssertions extends ModelAssertions
 {
   # HTML strings must be identical, up to attributes.
-  # TODO: assert_dom_equal
-  function assert_dom_equal($dom, $expected, $message='')
+  function assert_dom_equal($expected, $actual, $message='')
   {
-    
+    $message = $this->build_message($message,
+      "expected %s to be DOM == with %s", $actual, $expected);
+    $this->assert_block($message, function() use($expected, $actual)
+    {
+      $expected = \HTML5_Parser::parseFragment($expected);
+      $actual   = \HTML5_Parser::parseFragment($actual);
+      return $actual == $expected;
+    });
   }
   
   # Negated form of <tt>assert_dom_equal</tt>.
-  # TODO: assert_dom_not_equal
-  function assert_dom_not_equal($dom, $expected, $message='')
+  function assert_dom_not_equal($expected, $actual, $message='')
   {
-    
-  }
-  
-  # TODO: assert_tag
-  function assert_tag($options=array(), $message='')
-  {
-    
-  }
-  
-  # TODO: assert_no_tag
-  function assert_no_tag($options=array(), $message='')
-  {
-    
+    $message = $this->build_message($message,
+      "expected %s to be DOM != with %s", $actual, $expected);
+    $this->assert_block($message, function() use($expected, $actual)
+    {
+      $expected = \HTML5_Parser::parseFragment($expected);
+      $actual   = \HTML5_Parser::parseFragment($actual);
+      return $actual != $expected;
+    });
   }
   
   # Makes tests on DOM using CSS selectors.
@@ -95,14 +95,16 @@ class DOMSelector
 {
   function __construct($html)
   {
-    # drops DOCTYPE since it triggers a warning (StartTag: invalid element name in Entity)
-    $html = preg_replace('/<!DOCTYPE (?:.+?)>/i', '', $html);
+#    # drops DOCTYPE since it triggers a warning (StartTag: invalid element name in Entity)
+#    $html = preg_replace('/<!DOCTYPE (?:.+?)>/i', '', $html);
+#    
+#    # drops XMLNS definitions because XPATH evaluates nothing when XMLNS are defined
+#    $html = preg_replace('/(<.*)xmlns="(?:.+?)"(.*>)/', '\1\2', $html);
+#    
+#    $this->dom = new \DOMDocument();
+#    $this->dom->loadXML(html_entity_decode($html, ENT_NOQUOTES, 'UTF-8'));
     
-    # drops XMLNS definitions because XPATH evaluates nothing when XMLNS are defined
-    $html = preg_replace('/(<.*)xmlns="(?:.+?)"(.*>)/', '\1\2', $html);
-    
-    $this->dom = new \DOMDocument();
-    $this->dom->loadXML(html_entity_decode($html, ENT_NOQUOTES, 'UTF-8'));
+    $this->dom   = \HTML5_Parser::parse($html);
     $this->xpath = new \DOMXpath($this->dom);
   }
   

@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__)."/../test_app/config/boot.php";
+require_once __DIR__.'/../unit.php';
 
 class Test_Unit_Assertions_ResponseAssertions extends Misago\ActionController\TestCase
 {
@@ -34,14 +31,6 @@ class Test_Unit_Assertions_ResponseAssertions extends Misago\ActionController\Te
 
     $this->assert_cookie_not_present('feather');
     $this->assert_cookie_not_equal('feather', '123', "cookie isn't set, thus not equal");
-  }
-  
-  function test_select()
-  {
-    $this->run_action('GET', '/index/html');
-    $this->assert_select('section', 1);
-    $this->assert_select('article', 2);
-    $this->assert_select('article.first', 1);
   }
   
   function test_assert_template()

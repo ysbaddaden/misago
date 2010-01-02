@@ -541,7 +541,7 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_equal((string)show_article_path(array(':id' => 1, 'session_id' => 'abcd')),
       '/articles/1?session_id=abcd');
     $this->assert_equal((string)update_article_path(array(':id' => 43, 'edit' => '1', 'action' => 'first')),
-      '/articles/43?edit=1&action=first');
+      '/articles/43?action=first&edit=1');
     
     # using query string parameters (string) sharing the name of path parameters (symbol)
     $this->assert_equal((string)update_article_path(array(':id' => 2, 'format' => 'html')), '/articles/2?format=html');

@@ -18,6 +18,11 @@
     <article>
       <h2>ccc</h2>
       <p>ddd</p>
+      
+      <p class="buttons">
+        <a href="/link/to?a=b&amp;c=d"></a>
+      </p>
+      
     </article>
     
     <footer>
