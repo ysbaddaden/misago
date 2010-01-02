@@ -2,14 +2,14 @@
 require_once __DIR__.'/../../unit.php';
 use Misago\ActionController;
 
-class Test_ActionController_Flash extends Misago\Unit\Test
+class Test_ActionController_Flash extends Misago\Unit\TestCase
 {
   function setup() {
     @session_start();
   }
   
   function teardown() {
-    @session_detroy();
+    @session_destroy();
   }
   
   function test_hash()

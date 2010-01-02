@@ -50,7 +50,7 @@ class FakeAdapter extends Misago\ActiveRecord\ConnectionAdapters\AbstractAdapter
   function database_exists($database) {}
 }
 
-class Test_ConnectionAdapter_AbstractAdapter extends Misago\Unit\Test
+class Test_ConnectionAdapter_AbstractAdapter extends Misago\Unit\TestCase
 {
   function test_quote_table()
   {

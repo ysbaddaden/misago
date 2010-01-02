@@ -3,7 +3,7 @@ require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/FormTagHelper.php";
 
-class Test_ActionView_Helpers_FormTagHelper extends Misago\Unit\Test
+class Test_ActionView_Helpers_FormTagHelper extends Misago\Unit\TestCase
 {
   function test_form_tag()
   {
@@ -19,6 +19,9 @@ class Test_ActionView_Helpers_FormTagHelper extends Misago\Unit\Test
       '<form action="/accounts" method="post"><input type="hidden" name="_method" value="delete"/>');
     $this->assert_equal(form_tag('/profiles', array('method' => 'put', 'multipart' => true)),
       '<form action="/profiles" method="post" enctype="multipart/form-data"><input type="hidden" name="_method" value="put"/>');
+    
+    $this->assert_equal(form_tag(array(':controller' => 'profiles', ':action' => 'edit', ':id' => 1, 'y' => '2009', 'm' => '12')),
+      '<form action="/profiles/edit/1?m=12&amp;y=2009" method="post">');
   }
   
   function test_form_tag_with_named_routes()

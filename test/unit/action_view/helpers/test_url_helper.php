@@ -5,7 +5,7 @@ require_once MISAGO."/lib/Misago/ActionView/Helpers/FormTagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/UrlHelper.php";
 use Misago\ActionController;
 
-class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
+class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
 {
   function test_link_to()
   {
@@ -14,14 +14,18 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
     $this->assert_equal(link_to('azerty', '/page/123', array('class' => 'toto')), '<a class="toto" href="/page/123">azerty</a>');
     $this->assert_equal(link_to('azerty', '/posts/tag/abcd', array('rel' => 'tag')), '<a rel="tag" href="/posts/tag/abcd">azerty</a>');
     
-    $this->assert_equal(link_to('azerty', 'http://www.domain.com/posts/tag/abcd', array('rel' => 'tag')),
-      '<a rel="tag" href="http://www.domain.com/posts/tag/abcd">azerty</a>');
-    
     $this->assert_equal(link_to('categories', array(':controller' => 'archives', ':action' => 'categories')),
       '<a href="/archives/categories">categories</a>');
-    $this->assert_equal(link_to('products (desc)', array(':controller' => 'products', 'order' => 'desc')),
-      '<a href="/products?order=desc">products (desc)</a>');
     
+    $this->assert_equal(link_to('products (desc)',
+      array(':controller' => 'products', 'order' => 'desc')),
+      '<a href="/products?order=desc">products (desc)</a>');
+    $this->assert_equal(link_to('products',
+      array(':controller' => 'products', 'order' => 'desc', 'field' => 'date')),
+      '<a href="/products?field=date&amp;order=desc">products</a>');
+    
+    $this->assert_equal(link_to('azerty', 'http://www.domain.com/posts/tag/abcd', array('rel' => 'tag')),
+      '<a rel="tag" href="http://www.domain.com/posts/tag/abcd">azerty</a>');
     $this->assert_equal(link_to('http://toto.com/'), '<a href="http://toto.com/">http://toto.com/</a>');
   }
   
@@ -118,6 +122,11 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\Test
   {
     $html = button_to('new', array(':controller' => 'products', ':action' => 'new'));
     $this->assert_equal($html, '<form action="/products/new" method="post" class="button-to">'.
+      '<div><input type="submit" value="new"/></div>'.
+      '</form>');
+    
+    $html = button_to('new', array(':controller' => 'products', ':action' => 'new', 'field' => 'a', 'param' => 'b'));
+    $this->assert_equal($html, '<form action="/products/new?field=a&amp;param=b" method="post" class="button-to">'.
       '<div><input type="submit" value="new"/></div>'.
       '</form>');
     

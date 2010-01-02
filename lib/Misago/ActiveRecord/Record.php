@@ -249,9 +249,17 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     {
       switch(gettype($this->$k))
       {
-        case 'string': $v = "<![CDATA[".$this->$k."]]>"; break;
-        case 'object': $v = $this->$k->to_xml(); break;
-        default:       $v = $this->$k;
+        case 'string':
+          $v = "<![CDATA[".$this->$k."]]>";
+        break;
+        
+        case 'object':
+          $v = method_exists($this->$k, 'to_xml') ?
+            $this->$k->to_xml() : (string)$this->$k;
+        break;
+        
+        default:
+          $v = $this->$k;
       }
       $xml .= "<$k>$v</$k>";
     }
@@ -270,8 +278,10 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   {
     $attributes = $this->__sleep();
     $data = array();
-    foreach($attributes as $k) {
-    	$data[$k] = is_object($this->$k) ? $this->$k->to_yaml() : $this->$k;
+    foreach($attributes as $k)
+    {
+  	  $data[$k] = (is_object($this->$k) and method_exists($this->$k, 'to_yaml')) ?
+  	    $this->$k->to_yaml() : $this->$k;
     }
     return yaml_encode($data);
   }
@@ -281,8 +291,10 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   {
     $attributes = $this->__sleep();
   	$ary = array();
-    foreach($attributes as $k) {
-    	$ary[$k] = is_object($this->$k) ? $this->$k->to_array() : $this->$k;
+    foreach($attributes as $k)
+    {
+  	  $ary[$k] = (is_object($this->$k) and method_exists($this->$k, 'to_array')) ?
+  	    $this->$k->to_array() : $this->$k;
     }
     return $ary;
   }

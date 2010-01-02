@@ -3,7 +3,7 @@ require_once __DIR__.'/../../unit.php';
 require_once ROOT."/app/controllers/Application.php";
 use Misago\ActionView;
 
-class Test_ActionView_Base extends Misago\Unit\Test
+class Test_ActionView_Base extends Misago\Unit\TestCase
 {
   function test_render_template()
   {

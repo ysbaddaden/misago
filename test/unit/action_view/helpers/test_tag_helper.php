@@ -2,7 +2,7 @@
 require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 
-class Test_ActionView_Helpers_TagHelper extends Misago\Unit\Test
+class Test_ActionView_Helpers_TagHelper extends Misago\Unit\TestCase
 {
   function test_cdata()
   {

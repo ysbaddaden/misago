@@ -4,7 +4,7 @@ require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/UrlHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TextHelper.php";
 
-class TestTextHelper extends Misago\Unit\Test
+class TestTextHelper extends Misago\Unit\TestCase
 {
   function test_auto_link()
   {

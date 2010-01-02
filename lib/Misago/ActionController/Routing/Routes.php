@@ -298,9 +298,17 @@ class Routes extends ResourceRoutes
           # has keys?
           if ($this->has_keys($route, $_mapping))
           {
-            $path   = strtr($route['path'], $_mapping);
+            $elements = array();
+            foreach($_mapping as $k => $v)
+            {
+              if ($k[0] == ':') {
+                $elements[$k] = $v;
+              }
+            }
+            $path   = strtr($route['path'], $elements);
             $path   = str_replace(array('/:format', '.:format', '?:format'), '', $path);
-            $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
+            $method = isset($route['mapping']['conditions']['method']) ?
+              $route['mapping']['conditions']['method'] : 'GET';
             return new Path($method, $path);
           }
           
@@ -312,7 +320,8 @@ class Routes extends ResourceRoutes
           if (isset($_mapping[':format'])) {
             $path .= ".{$_mapping[':format']}";
           }
-          $method = isset($route['mapping']['conditions']['method']) ? $route['mapping']['conditions']['method'] : 'GET';
+          $method = isset($route['mapping']['conditions']['method']) ?
+            $route['mapping']['conditions']['method'] : 'GET';
           return new Path($method, $path);
         }
       }

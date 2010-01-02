@@ -137,7 +137,7 @@ function link_to($content, $url=null, $attributes=null)
     $attributes['onclick'] = "$onclick; return false;";
   }
   
-  $attributes['href'] = $url;
+  $attributes['href'] = str_replace('&', '&amp;', $url);
   return tag('a', $content, $attributes);
 }
 

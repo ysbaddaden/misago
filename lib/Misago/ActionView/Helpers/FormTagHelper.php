@@ -34,6 +34,7 @@ function form_tag($url, $attributes=null)
   }
   $attributes = Misago\ActionView\Helpers\TagHelper\parse_attributes($attributes);
   
+  $url = str_replace('&', '&amp;', $url);
   if ($method == 'get' or $method == 'post') {
     $str = "<form action=\"$url\" method=\"$method\"$attributes>";
   }

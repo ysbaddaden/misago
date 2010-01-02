@@ -3,50 +3,52 @@
 desc("Runs the test suite");
 task('test', function()
 {
-  passthru("pake test:units");
-  passthru("pake test:functionals");
+  pake('test:units');
+  pake('test:functionals');
 });
 
 desc("Runs unit test suite");
 task('test:units', function()
 {
-  require_once 'test/unit.php';
-  load_test_files('test/unit');
-  
-  Misago\Unit\TestCase::$batch_run = true;
-  Misago\Unit\TestCase::create_database(true);
-  Test\Unit\Autorunner::run('UnitTests');
-  Misago\Unit\TestCase::drop_database(true);
+  $test_runner = __DIR__."/../TestRunner.php";
+  $files = implode(' ', load_test_files('test/unit'));
+  passthru("$test_runner $files");
 });
 
 desc("Runs functional test suite");
 task('test:functionals', function()
 {
-  require_once 'test/unit.php';
-  load_test_files('test/functional');
-  
-  Misago\Unit\TestCase::$batch_run = true;
-  Misago\Unit\TestCase::create_database(true);
-  Test\Unit\Autorunner::run('FunctionalTests');
-  Misago\Unit\TestCase::drop_database(true);
+  $test_runner = __DIR__."/../TestRunner.php";
+  $files = implode(' ', load_test_files('test/functional'));
+  passthru("$test_runner $files");
 });
 
 function load_test_files($path)
 {
-  $dh = opendir($path);
-  while(($file = readdir($dh)) !== false)
+  $_load_test_files = function($path, &$files, $self)
   {
-    if ($file != '.' and $file != '..')
+    if (($dh = opendir($path)) !== false)
     {
-      if (is_file("$path/$file")) {
-        require_once "$path/$file";
+      while(($file = readdir($dh)) !== false)
+      {
+        if ($file != '.' and $file != '..')
+        {
+          if (is_file("$path/$file")) {
+            $files[] = "$path/$file";
+          }
+          elseif(is_dir("$path/$file")) {
+            $self("$path/$file", $files, $self);
+          }
+        }
       }
-      elseif(is_dir("$path/$file")) {
-        load_test_files("$path/$file");
-      }
+      closedir($dh);
     }
-  }
-  closedir($dh);
+  };
+  
+  $files = array();
+  $_load_test_files($path, $files, $_load_test_files);
+  return $files;
 }
+
 
 ?>
