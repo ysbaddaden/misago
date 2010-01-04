@@ -65,7 +65,7 @@ abstract class DomAssertions extends ModelAssertions
       break;
       
       case 'integer':
-        $message = $this->build_message($message, "expected %s matches for %s but got none", count($elements), $selector);
+        $message = $this->build_message($message, "expected %d matches for %s but got %d", $equality, $selector, count($elements));
         $this->assert_block($message, function() use ($elements, $equality) {
           return (count($elements) == $equality);
         });
