@@ -61,11 +61,11 @@ class Test_ActiveRecord_Record extends Misago\Unit\TestCase
     $this->assert_true($product->name_changed, "attribute has changed");
     $this->assert_false($product->price_changed, "unchanged attribute");
     $this->assert_equal($product->name_was, 'qwerty', "original attribute value");
-    $this->assert_equal($product->name_change, array('qwerty', 'azerty'), "original+new attribute value");
+    $this->assert_equal($product->name_change, array('azerty', 'qwerty'), "original+new attribute value");
     
     $product->name = 'swerty';
     $this->assert_equal($product->name_was, 'qwerty', "other change: original is still the same");
-    $this->assert_equal($product->name_change, array('qwerty', 'swerty'), "other change: new has changed");
+    $this->assert_equal($product->name_change, array('swerty', 'qwerty'), "other change: new has changed");
     
     $product->save();
     $this->assert_false($product->changed, "saving resets state on model");

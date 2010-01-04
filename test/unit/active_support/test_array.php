@@ -32,11 +32,11 @@ class Test_ActiveSupport_Array extends Test\Unit\TestCase
   {
     $test = array('c', 'b', array('b', 'a'));
     array_sort_recursive($test);
-    $this->assert_equal($test, array(array('a', 'b'), 'b', 'c'));
+    $this->assert_equal($test, array('b', 'c', array('a', 'b')));
     
     $test = array('c', 'b', array('b' => 'd', 'a' => 'e'));
     array_sort_recursive($test);
-    $this->assert_equal($test, array(array('b' => 'd', 'a' => 'e'), 'b', 'c'));
+    $this->assert_equal($test, array('b', 'c', array('b' => 'd', 'a' => 'e')));
   }
   /*
   function test_linearize_options_tree()

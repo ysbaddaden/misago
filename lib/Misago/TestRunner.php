@@ -7,7 +7,7 @@ foreach(array_slice($_SERVER['argv'], 1) as $file) {
 Misago\Unit\TestCase::$batch_run = true;
 Misago\Unit\TestCase::create_database(true);
 
-Test\Unit\Autorunner::run('Unit Tests');
+Test\Unit\Autorunner::run('');
 
 Misago\Unit\TestCase::drop_database(true);
 

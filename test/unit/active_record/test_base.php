@@ -410,7 +410,7 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
       'conditions' => 'orders.id = 1',
     ));
     $this->assert_equal(count($baskets), 3);
-    $this->assert_equal(array($baskets[0][0], $baskets[1][0], $baskets[2][0]), array(1, 2, 3));
+    $this->assert_equal(array($baskets[0][0], $baskets[1][0], $baskets[2][0]), array(2, 1, 3));
   }
   
   function test_exists()

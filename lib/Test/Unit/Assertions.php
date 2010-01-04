@@ -58,12 +58,6 @@ abstract class Assertions
   
   protected function assert_equal($test, $expected, $message='')
   {
-    if (is_array($test) and !is_hash($test))
-    {
-      array_sort_recursive($test);
-      if (is_array($expected)) array_sort_recursive($expected);
-    }
-    
     $message = $this->build_message($message,
       "expected %s but was %s", $expected, $test);
     
@@ -76,12 +70,6 @@ abstract class Assertions
   
   protected function assert_not_equal($test, $expected, $message='')
   {
-    if (is_array($test) and !is_hash($test))
-    {
-      array_sort_recursive($test);
-      if (is_array($expected)) array_sort_recursive($expected);
-    }
-    
     $message = $this->build_message($message,
       "expected %s to be != to %s", $expected, $test);
     
