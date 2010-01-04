@@ -36,12 +36,13 @@ class RedisStore extends Store
   {
     if (is_array($key))
     {
-      return $this->redis->pipeline(function($pipe) use($key, $amount)
+      $rs = $this->redis->pipeline(function($pipe) use($key, $amount)
       {
         foreach($key as $k) {
           $pipe->incrby($k, $amount);
         }
       });
+      return $this->build_response($key, $rs);
     }
     return $this->redis->incrby($key, $amount);
   }
@@ -50,12 +51,13 @@ class RedisStore extends Store
   {
     if (is_array($key))
     {
-      return $this->redis->pipeline(function($pipe) use($key, $amount)
+      $rs = $this->redis->pipeline(function($pipe) use($key, $amount)
       {
         foreach($key as $k) {
           $pipe->decrby($k, $amount);
         }
       });
+      return $this->build_response($key, $rs);
     }
     if ($this->exists($key)) {
       return $this->redis->decrby($key, $amount);
@@ -68,14 +70,8 @@ class RedisStore extends Store
   {
     if (is_array($key))
     {
-      $values = $this->redis->mget($key);
-      foreach($values as $i => $v)
-      {
-        if ($v === null) {
-          unset($values[$i]);
-        }
-      }
-      return $values;
+      $rs = $this->redis->mget($key);
+      return $this->build_response($key, $rs);
     }
     
     $value  = $this->redis->get($key);
@@ -121,6 +117,18 @@ class RedisStore extends Store
   function clear()
   {
     $this->redis->flushdb();
+  }
+  
+  private function & build_response($keys, $rs)
+  {
+    $values = array();
+    foreach($rs as $i => $v)
+    {
+      if ($v !== null) {
+        $values[$keys[$i]] = $v;
+      }
+    }
+    return $values;
   }
 }
 
