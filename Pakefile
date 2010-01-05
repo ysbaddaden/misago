@@ -3,16 +3,32 @@
 desc("Runs tests for Misago");
 task('test', function()
 {
-  require_once __DIR__.'/test/unit.php';
-  load_test_files(__DIR__.'/test/unit');
+  $filename  = '/tmp/test_misago_'.getmypid().'.php';
+  $files     = load_test_files(__DIR__.'/test/unit');
   
-  Misago\Unit\TestCase::$batch_run = true;
-  Misago\Unit\TestCase::create_database(true);
-  Test\Unit\Autorunner::run('Misago');
-  Misago\Unit\TestCase::drop_database(true);
+  $php_code  = '<?php ';
+  foreach($files as $file) {
+    $php_code .= "require_once('$file');";
+  }
+  $php_code .= 'Misago\Unit\TestCase::$batch_run = true;';
+  $php_code .= 'Misago\Unit\TestCase::create_database(true);';
+  $php_code .= 'Test\Unit\Autorunner::run(\'Misago\');';
+  $php_code .= 'Misago\Unit\TestCase::drop_database(true);';
+  $php_code .= ' ?>';
+  
+  file_put_contents($filename, $php_code);
+  passthru("php $filename");
+  unlink($filename);
 });
 
-function load_test_files($path)
+function & load_test_files($path)
+{
+  $files = array();
+  _load_test_files($path, $files);
+  return $files;
+}
+
+function _load_test_files($path, &$files)
 {
   $dh = opendir($path);
   while(($file = readdir($dh)) !== false)
@@ -20,10 +36,10 @@ function load_test_files($path)
     if ($file != '.' and $file != '..')
     {
       if (is_file("$path/$file")) {
-        require_once "$path/$file";
+        $files[] = "$path/$file";
       }
       elseif(is_dir("$path/$file")) {
-        load_test_files("$path/$file");
+        _load_test_files("$path/$file", $files);
       }
     }
   }

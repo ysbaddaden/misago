@@ -64,9 +64,9 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
   
   function test_current_page()
   {
-    $map = ActionController\Routing\Routes::draw();
-    $map->reset();
-    $map->connect(':controller/:action/:id.:format');
+#    $map = ActionController\Routing\Routes::draw();
+#    $map->reset();
+#    $map->connect(':controller/:action/:id.:format');
     
     $_SERVER['REQUEST_URI'] = '/archives';
     $this->assert_true(current_page('/archives'));
@@ -79,14 +79,14 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
 #    $this->assert_true(current_page(new ActionController\Routing\Url('GET', 'archives')));
 #    $this->assert_false(current_page(new ActionController\Routing\Url('GET', 'archives/mine')));
     
-    $_SERVER['REQUEST_URI'] = '/articles/show/45';
+    $_SERVER['REQUEST_URI'] = '/mailbox/show/45';
     $this->assert_false(current_page(array(':controller' => 'archives', ':action' => 'show', ':id' => 45)));
-    $this->assert_true(current_page(array(':controller' => 'articles', ':action' => 'show', ':id' => 45)));
+    $this->assert_true(current_page(array(':controller' => 'mailbox', ':action' => 'show', ':id' => 45)));
     
-    $_SERVER['REQUEST_URI'] = '/articles?order=desc';
-    $this->assert_true(current_page(array(':controller' => 'articles')));
-    $this->assert_false(current_page(array(':controller' => 'articles', 'order' => 'asc')));
-    $this->assert_true(current_page(array(':controller' => 'articles', 'order' => 'desc')));
+    $_SERVER['REQUEST_URI'] = '/mailbox?order=desc';
+    $this->assert_true(current_page(array(':controller' => 'mailbox')));
+    $this->assert_false(current_page(array(':controller' => 'mailbox', 'order' => 'asc')));
+    $this->assert_true(current_page(array(':controller' => 'mailbox', 'order' => 'desc')));
   }
   
   function test_link_to_unless_current()
@@ -99,14 +99,17 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
     $this->assert_equal(link_to_unless_current('archives', array(':controller' => 'archives')),
       '<span>archives</span>');
     $this->assert_equal(link_to_unless_current('List', array(':controller' => 'accounts')),
-      '<a href="/accounts">List</a>');
-    $this->assert_equal(link_to_unless_current('categories', array(':controller' => 'archives', ':action' => 'categories')),
+      '<a href="/account">List</a>');
+    $this->assert_equal(link_to_unless_current('categories',
+      array(':controller' => 'archives', ':action' => 'categories')),
       '<a href="/archives/categories">categories</a>');
     
-    $_SERVER['REQUEST_URI'] = '/articles/show/45';
-    $this->assert_equal(link_to_unless_current('more details', array(':controller' => 'products', ':action' => 'show', ':id' => 45)),
-      '<a href="/products/show/45">more details</a>');
-    $this->assert_equal(link_to_unless_current('article', array(':controller' => 'articles', ':action' => 'show', ':id' => 45)),
+    $_SERVER['REQUEST_URI'] = '/articles/45';
+    $this->assert_equal(link_to_unless_current('more details',
+      array(':controller' => 'products', ':action' => 'show', ':id' => 45)),
+      '<a href="/products/45">more details</a>');
+    $this->assert_equal(link_to_unless_current('article',
+      array(':controller' => 'articles', ':action' => 'show', ':id' => 45)),
       '<span>article</span>');
     
     $_SERVER['REQUEST_URI'] = '/articles?order=desc';
@@ -131,7 +134,7 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
       '</form>');
     
     $html = button_to('new', array(':controller' => 'products', ':action' => 'delete', ':id' => 2), array('method' => 'delete', 'confirm' => 'Are you sure?'));
-    $this->assert_equal($html, '<form action="/products/delete/2" method="post" class="button-to" onsubmit="return confirm(\'Are you sure?\');">'.
+    $this->assert_equal($html, '<form action="/products/2" method="post" class="button-to" onsubmit="return confirm(\'Are you sure?\');">'.
       '<input type="hidden" name="_method" value="delete"/>'.
       '<div><input type="submit" value="new"/></div>'.
       '</form>');
