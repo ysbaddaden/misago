@@ -39,13 +39,13 @@ class Resource extends Base
     
     # controller
     $this->create_file_from_template("app/controllers/{$Controller}Controller.php",     'resource/controller.php', $vars);
-    $this->create_file_from_template("test/functional/Test{$Controller}Controller.php", 'resource/test_controller.php', $vars);
+    $this->create_file_from_template("test/functional/test_{$Controller}Controller.php", 'resource/test_controller.php', $vars);
     $this->create_file_from_template("app/helpers/{$Controller}Helper.php",             'resource/helper.php', $vars);
     
     # model
-    $this->create_file_from_template("app/models/{$Model}.php",    'resource/model.php',      $vars);
-    $this->create_file_from_template("test/unit/Test{$Model}.php", 'resource/test_model.php', $vars);
-    $this->create_file_from_template("test/fixtures/{$table}.yml", 'resource/fixture.yml',    $vars);
+    $this->create_file_from_template("app/models/{$Model}.php",     'resource/model.php',      $vars);
+    $this->create_file_from_template("test/unit/test_{$Model}.php", 'resource/test_model.php', $vars);
+    $this->create_file_from_template("test/fixtures/{$table}.yml",  'resource/fixture.yml',    $vars);
     
     # migration
     $migration = gmdate('YmdHis').'_create_'.$table;

@@ -27,10 +27,10 @@ class Controller extends Base
 #    $this->create_directory("app/views/layouts");
     $this->create_directory("test/functional");
     
-    $this->create_file_from_template("app/controllers/{$Class}Controller.php",     'controller/controller.php',  $vars);
-    $this->create_file_from_template("test/functional/Test{$Class}Controller.php", 'controller/test.php',        $vars);
-    $this->create_file_from_template("app/helpers/{$Class}Helper.php",             'controller/helper.php',      $vars);
-#    $this->create_file_from_template("app/views/layouts/{$view_path}.html.tpl",    'controller/layout.html.tpl', $vars);
+    $this->create_file_from_template("app/controllers/{$Class}Controller.php",      'controller/controller.php',  $vars);
+    $this->create_file_from_template("test/functional/test_{$Class}Controller.php", 'controller/test.php',        $vars);
+    $this->create_file_from_template("app/helpers/{$Class}Helper.php",              'controller/helper.php',      $vars);
+#    $this->create_file_from_template("app/views/layouts/{$view_path}.html.tpl",     'controller/layout.html.tpl', $vars);
   }
 }
 

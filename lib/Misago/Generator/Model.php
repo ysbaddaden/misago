@@ -27,9 +27,9 @@ class Model extends Base
     $this->create_directory('test/fixtures');
     
     # files
-    $this->create_file_from_template("app/models/{$Class}.php",    'model/model.php',   $vars);
-    $this->create_file_from_template("test/unit/Test{$Class}.php", 'model/test.php',    $vars);
-    $this->create_file_from_template("test/fixtures/{$table}.yml", 'model/fixture.yml', $vars);
+    $this->create_file_from_template("app/models/{$Class}.php",     'model/model.php',   $vars);
+    $this->create_file_from_template("test/unit/test_{$Class}.php", 'model/test.php',    $vars);
+    $this->create_file_from_template("test/fixtures/{$table}.yml",  'model/fixture.yml', $vars);
     
     # migrations
     $migration = gmdate('YmdHis').'_create_'.$table;

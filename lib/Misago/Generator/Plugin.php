@@ -32,7 +32,7 @@ class Plugin extends Base
     $this->create_file_from_template("vendor/plugins/$Class/tasks/$name.pake", 'plugin/task.pake', $vars);
     
     $this->create_directory("vendor/plugins/$Class/test");
-    $this->create_file_from_template("vendor/plugins/$Class/test/Test$Class.php", 'plugin/test.php', $vars);
+    $this->create_file_from_template("vendor/plugins/$Class/test/test_$Class.php", 'plugin/test.php', $vars);
   }
 }
 

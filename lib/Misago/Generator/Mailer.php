@@ -26,8 +26,8 @@ class Mailer extends Base
     $this->create_directory('app/views/'.String::underscore($filename));
     $this->create_directory('test/unit');
     
-    $this->create_file_from_template("app/models/{$Class}.php",    'mailer/model.php', $vars);
-    $this->create_file_from_template("test/unit/Test{$Class}.php", 'mailer/test.php',  $vars);
+    $this->create_file_from_template("app/models/{$Class}.php",     'mailer/model.php', $vars);
+    $this->create_file_from_template("test/unit/test_{$Class}.php", 'mailer/test.php',  $vars);
   }
 }
 
