@@ -161,7 +161,8 @@ abstract class Assertions
   
   protected function flunk($message='')
   {
-    $this->add_failure($message, null);
+    throw new AssertionFailedError($message);
+    #$this->add_failure($message, null);
   }
   
   protected function build_message($head, $template=null)

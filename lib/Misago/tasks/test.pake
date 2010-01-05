@@ -8,20 +8,34 @@ task('test', function()
 });
 
 desc("Runs unit test suite");
-task('test:units', function()
-{
-  $test_runner = __DIR__."/../TestRunner.php";
-  $files = implode(' ', load_test_files('test/unit'));
-  passthru("$test_runner $files");
+task('test:units', function() {
+  run_tests_from('test/unit', 'Unit tests');
 });
 
 desc("Runs functional test suite");
-task('test:functionals', function()
-{
-  $test_runner = __DIR__."/../TestRunner.php";
-  $files = implode(' ', load_test_files('test/functional'));
-  passthru("$test_runner $files");
+task('test:functionals', function() {
+  run_tests_from('test/functional', 'Functional tests');
 });
+
+function run_tests_from($path, $name='')
+{
+  $filename  = '/tmp/test_misago_app_'.getmypid().'.php';
+  $files     = load_test_files(ROOT.'/'.$path);
+  
+  $php_code  = '<?php ';
+  foreach($files as $file) {
+    $php_code .= "require_once('$file');";
+  }
+  $php_code .= 'Misago\Unit\TestCase::$batch_run = true;';
+  $php_code .= 'Misago\Unit\TestCase::create_database(true);';
+  $php_code .= 'Test\Unit\Autorunner::run("'.$name.'");';
+  $php_code .= 'Misago\Unit\TestCase::drop_database(true);';
+  $php_code .= ' ?>';
+  
+  file_put_contents($filename, $php_code);
+  passthru("php $filename");
+  unlink($filename);
+}
 
 function load_test_files($path)
 {
