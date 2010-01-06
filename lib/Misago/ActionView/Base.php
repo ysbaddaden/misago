@@ -34,8 +34,8 @@ class Base extends \Misago\Object
       if ($success === false)
       {
         $helpers = array();
-        $this->_find_helpers($helpers, __DIR__.'/Helpers/');
-        $this->_find_helpers($helpers, ROOT.'/app/helpers/');
+        $this->_find_helpers($helpers, __DIR__.'/Helpers');
+        $this->_find_helpers($helpers, ROOT.'/app/helpers');
         apc_store(TMP.'/list_of_helpers', $helpers, strtotime('+24 hours'));
       }
     }
@@ -56,8 +56,16 @@ class Base extends \Misago\Object
     {
       while(($file = readdir($dh)) !== false)
       {
-        if (is_file($path.$file) and !strpos($file, 'Helper_ns.php')) {
+        if (is_file("$path/$file")
+          and strpos($file, 'Helper.php'))
+        {
           $helpers[] = $path.'/'.str_replace('Helper.php', '', $file);
+        }
+        elseif(is_dir("$path/$file")
+          and $file != '.'
+          and $file != '..')
+        {
+          $this->_find_helpers($helpers, "$path/$file");
         }
       }
       closedir($dh);

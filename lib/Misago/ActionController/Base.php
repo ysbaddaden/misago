@@ -138,8 +138,9 @@ abstract class Base extends RequestForgeryProtection
     $this->params = $this->request->parameters();
     $this->action = $this->params[':action'];
     
-    $helperFile = str_replace('Controller', 'Helper', get_called_class());
-    require_once(ROOT."/app/helpers/$helperFile.php");
+    $helper_file = str_replace(array('Controller', '\\'), array('Helper', '/'), get_called_class());
+    require_once ROOT."/app/helpers/$helper_file.php";
+    
     $this->view_path = str_replace('\\', '/', $this->params[':controller']);
     
     if ($this->logger->log_info())
