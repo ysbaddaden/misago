@@ -122,14 +122,12 @@ class HTML5_TreeBuilder {
 
     // Namespaces for foreign content
     const NS_HTML   = null; // to prevent DOM from requiring NS on everything
+    const NS_XHTML  = 'http://www.w3.org/1999/xhtml';
     const NS_MATHML = 'http://www.w3.org/1998/Math/MathML';
     const NS_SVG    = 'http://www.w3.org/2000/svg';
     const NS_XLINK  = 'http://www.w3.org/1999/xlink';
     const NS_XML    = 'http://www.w3.org/XML/1998/namespace';
     const NS_XMLNS  = 'http://www.w3.org/2000/xmlns/';
-
-    // Custom namespaces for foreign content manually defined in HTML tag
-    private $namespaceURL = array();
 
     public function __construct() {
         $this->mode = self::INITIAL;
@@ -375,17 +373,6 @@ class HTML5_TreeBuilder {
             /* Create an element for the token in the HTML namespace. Append it 
              * to the Document  object. Put this element in the stack of open 
              * elements. */
-
-            /* Extracts custom namespaces prefix/URI */
-            foreach($token['attr'] as $attr)
-            {
-              if (strpos($attr['name'], 'xmlns:') === 0)
-              {
-                $ns_prefix = substr($attr['name'], 6);
-                $this->namespaceURL[$ns_prefix] = $attr['value'];
-              }
-            }
-
             $html = $this->insertElement($token, false);
             $this->dom->appendChild($html);
             $this->stack[] = $html;
@@ -3051,14 +3038,8 @@ class HTML5_TreeBuilder {
         }
 
     private function insertElement($token, $append = true) {
-        if (strpos($token['name'], ':') === false) {
-          $el = $this->dom->createElementNS(self::NS_HTML, $token['name']);
-        }
-        else
-        {
-          $ns_prefix = substr($token['name'], 0, strpos($token['name'], ':'));
-          $el = $this->dom->createElementNS($this->namespaceURL[$ns_prefix], $token['name']);
-        }
+        $namespaceURI = strpos($token['name'], ':') ? self::NS_XHTML : self::NS_HTML;
+        $el = $this->dom->createElementNS($namespaceURI, $token['name']);
 
         if (!empty($token['attr'])) {
             foreach($token['attr'] as $attr) {
