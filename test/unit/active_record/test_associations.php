@@ -398,6 +398,14 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order->build_invoice(array('id' => 1));
     $this->assert_false($order->save());
   }
+  
+  function test_save_associated_with_has_many()
+  {
+    $order = new Order();
+    $order->baskets->build(array('product_id' => 1));
+    $this->assert_true($order->save());
+    $this->assert_equal(Basket::count(array('conditions' => 'order_id = '.$order->id)), 1);
+  }
 }
 
 

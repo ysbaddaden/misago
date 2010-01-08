@@ -88,6 +88,7 @@ class Collection extends ActiveSupport\ActiveArray
         $record->{$fk} = $self->parent->id;
         $record->do_save();
       }
+      return true;
     });
   }
   
@@ -192,7 +193,8 @@ class Collection extends ActiveSupport\ActiveArray
   
   private function load()
   {
-    if (!$this->parent->new_record)
+    if (!$this->parent->new_record
+      and $this->count() == 0)
     {
       $options    = $this->find_options();
       $class_name = $this->options['class_name'];

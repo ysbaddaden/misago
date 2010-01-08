@@ -652,6 +652,7 @@ abstract class Base extends Calculations
     if (!$this->save($perform_validation)) {
       throw new RecordNotSaved('Record was not saved.');
     }
+    return true;
   }
   
   # Generic create record method.
