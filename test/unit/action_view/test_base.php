@@ -120,6 +120,10 @@ class Test_ActionView_Base extends Misago\Unit\TestCase
     ));
     $html = str_replace(array("\r", "\n"), '', trim($html));
     $this->assert_equal($html, '<li>1: aaa</li><li>2: bbb</li><li>3: ddd</li>');
+    
+    # with subdirs
+    $html = $view->render(array('partial' => 'ads/big/ad'));
+    $this->assert_equal(trim($html), '<big></big>');
   }
 }
 

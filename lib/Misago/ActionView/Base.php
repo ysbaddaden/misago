@@ -188,8 +188,9 @@ class Base extends \Misago\Object
     {
       if (strpos($options['partial'], '/'))
       {
-        $__partial_file = explode('/', $options['partial'], 2);
-        $__partial_file = $__partial_file[0].'/_'.$__partial_file[1];
+        $__partial_file = explode('/', $options['partial']);
+        $__partial_file = implode('/', array_slice($__partial_file, 0, -1)).
+          '/_'.array_pop($__partial_file);
       }
       else {
         $__partial_file = $this->view_path.'/_'.$options['partial'];
