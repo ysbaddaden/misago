@@ -2,7 +2,7 @@
 require_once __DIR__.'/../../../unit.php';
 use Misago\ActionController;
 
-class Test_ActionController_Routing extends Misago\Unit\TestCase
+class Test_ActionController_Routing_Routes extends Misago\Unit\TestCase
 {
   protected $fixtures = array('products');
   
@@ -103,136 +103,6 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     ));
   }
   
-  function test_map_resources()
-  {
-    $map = ActionController\Routing\Routes::draw();
-    
-    $this->assert_equal($map->route('GET', 'products'), array(
-      ':method'     => 'GET',
-      ':controller' => 'products',
-      ':action'     => 'index',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'products/1'), array(
-      ':method'     => 'GET',
-      ':controller' => 'products',
-      ':action'     => 'show',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'products/new'), array(
-      ':method'     => 'GET',
-      ':controller' => 'products',
-      ':action'     => 'neo',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'products/1/edit'), array(
-      ':method'     => 'GET',
-      ':controller' => 'products',
-      ':action'     => 'edit',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('POST', 'products'), array(
-      ':method'     => 'POST',
-      ':controller' => 'products',
-      ':action'     => 'create',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('PUT', 'products/1'), array(
-      ':method'     => 'PUT',
-      ':controller' => 'products',
-      ':action'     => 'update',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('DELETE', 'products/1'), array(
-      ':method'     => 'DELETE',
-      ':controller' => 'products',
-      ':action'     => 'delete',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'products/widget'), array(
-      ':method'     => 'GET',
-      ':controller' => 'products',
-      ':action'     => 'widget',
-      ':format'     => null,
-    ));
-  }
-  
-  function test_map_resource()
-  {
-    $map = ActionController\Routing\Routes::draw();
-    
-    $this->assert_equal($map->route('GET', 'event'), array(
-      ':method'     => 'GET',
-      ':controller' => 'events',
-      ':action'     => 'index',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'event/1'), array(
-      ':method'     => 'GET',
-      ':controller' => 'events',
-      ':action'     => 'show',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'event/new'), array(
-      ':method'     => 'GET',
-      ':controller' => 'events',
-      ':action'     => 'neo',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'event/1/edit'), array(
-      ':method'     => 'GET',
-      ':controller' => 'events',
-      ':action'     => 'edit',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('POST', 'event'), array(
-      ':method'     => 'POST',
-      ':controller' => 'events',
-      ':action'     => 'create',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('PUT', 'event/1'), array(
-      ':method'     => 'PUT',
-      ':controller' => 'events',
-      ':action'     => 'update',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('DELETE', 'event/1'), array(
-      ':method'     => 'DELETE',
-      ':controller' => 'events',
-      ':action'     => 'delete',
-      ':id'         => '1',
-      ':format'     => null,
-    ));
-    
-    $this->assert_equal($map->route('GET', 'events/widget'), array(
-      ':method'     => 'GET',
-      ':controller' => 'events',
-      ':action'     => 'widget',
-      ':format'     => null,
-    ));
-  }
-  
   function test_route_globbing()
   {
     $map = ActionController\Routing\Routes::draw();
@@ -298,10 +168,10 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_equal((string)$map->reverse($mapping), '/thread/toto');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 2);
-    $this->assert_equal((string)$map->reverse($mapping), '/products/2/edit');
+    $this->assert_equal((string)$map->reverse($mapping), '/product/2/edit');
     
     $mapping = array(':controller' => 'products', ':action' => 'create');
-    $this->assert_equal((string)$map->reverse($mapping), '/products');
+    $this->assert_equal((string)$map->reverse($mapping), '/product');
     
     $mapping = array(':controller' => 'products');
     $this->assert_equal((string)$map->reverse($mapping), '/products');
@@ -310,10 +180,10 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_equal((string)$map->reverse($mapping), '/products.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'create', ':format' => 'html');
-    $this->assert_equal((string)$map->reverse($mapping), '/products.html');
+    $this->assert_equal((string)$map->reverse($mapping), '/product.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 10, ':format' => 'xml');
-    $this->assert_equal((string)$map->reverse($mapping), '/products/10/edit.xml');
+    $this->assert_equal((string)$map->reverse($mapping), '/product/10/edit.xml');
     
     $mapping = array(':controller' => 'threads', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
     $this->assert_equal((string)$map->reverse($mapping), '/thread/toto.json');
@@ -365,121 +235,23 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
     $this->assert_true(function_exists('purchase_url'));
   }
   
-  function test_named_routes_for_resources()
-  {
-    $map = ActionController\Routing\Routes::draw();
-    
-    $this->assert_true(function_exists('users_path'));
-    $this->assert_true(function_exists('show_user_path'));
-    $this->assert_true(function_exists('new_user_path'));
-    $this->assert_true(function_exists('create_user_path'));
-    $this->assert_true(function_exists('edit_user_path'));
-    $this->assert_true(function_exists('update_user_path'));
-    $this->assert_true(function_exists('delete_user_path'));
-    
-    $this->assert_equal(users_path(), new ActionController\Routing\Path('GET', 'users'));
-    $this->assert_equal(users_url(),  new ActionController\Routing\Url('GET', 'users'));
-    
-    $this->assert_equal(show_user_path(array(':id' => 1)), new ActionController\Routing\Path('GET', 'users/1'));
-    $this->assert_equal(show_user_url(array(':id' => 1)),  new ActionController\Routing\Url('GET', 'users/1'));
-    
-    $this->assert_equal(new_user_path(), new ActionController\Routing\Path('GET', 'users/new'));
-    $this->assert_equal(new_user_url(),  new ActionController\Routing\Url('GET', 'users/new'));
-    
-    $this->assert_equal(edit_user_path(array(':id' => 1)), new ActionController\Routing\Path('GET', 'users/1/edit'));
-    $this->assert_equal(edit_user_url(array(':id' => 1)),  new ActionController\Routing\Url('GET', 'users/1/edit'));
-    
-    $this->assert_equal(create_user_path(), new ActionController\Routing\Path('POST', 'users'));
-    $this->assert_equal(create_user_url(),  new ActionController\Routing\Url('POST', 'users'));
-    
-    $this->assert_equal(update_user_path(array(':id' => 1)), new ActionController\Routing\Path('PUT', 'users/1'));
-    $this->assert_equal(update_user_url(array(':id' => 1)),  new ActionController\Routing\Url('PUT', 'users/1'));
-    
-    $this->assert_equal(delete_user_path(array(':id' => 1)), new ActionController\Routing\Path('DELETE', 'users/1'));
-    $this->assert_equal(delete_user_url(array(':id' => 1)),  new ActionController\Routing\Url('DELETE', 'users/1'));
-    
-    $this->assert_equal(edit_user_path(45), new ActionController\Routing\Path('GET', 'users/45/edit'));
-    $this->assert_equal(edit_user_url(45),  new ActionController\Routing\Url('GET', 'users/45/edit'));
-    
-    $this->assert_equal(show_user_path(72), new ActionController\Routing\Path('GET', 'users/72'));
-    $this->assert_equal(show_user_url(72),  new ActionController\Routing\Url('GET', 'users/72'));
-  }
-  
-  function test_named_routes_for_resource()
-  {
-    $map = ActionController\Routing\Routes::draw();
-    
-    $this->assert_true(function_exists('account_path'));
-    $this->assert_true(function_exists('show_account_path'));
-    $this->assert_true(function_exists('new_account_path'));
-    $this->assert_true(function_exists('create_account_path'));
-    $this->assert_true(function_exists('edit_account_path'));
-    $this->assert_true(function_exists('update_account_path'));
-    $this->assert_true(function_exists('delete_account_path'));
-    
-    $this->assert_equal(account_path(), new ActionController\Routing\Path('GET', 'account'));
-    $this->assert_equal(account_url(),  new ActionController\Routing\Url('GET', 'account'));
-    
-    $this->assert_equal(show_account_path(array(':id' => 1)), new ActionController\Routing\Path('GET', 'account/1'));
-    $this->assert_equal(show_account_url(array(':id' => 1)),  new ActionController\Routing\Url('GET', 'account/1'));
-    
-    $this->assert_equal(new_account_path(), new ActionController\Routing\Path('GET', 'account/new'));
-    $this->assert_equal(new_account_url(),  new ActionController\Routing\Url('GET', 'account/new'));
-    
-    $this->assert_equal(edit_account_path(array(':id' => 1)), new ActionController\Routing\Path('GET', 'account/1/edit'));
-    $this->assert_equal(edit_account_url(array(':id' => 1)),  new ActionController\Routing\Url('GET', 'account/1/edit'));
-    
-    $this->assert_equal(create_account_path(), new ActionController\Routing\Path('POST', 'account'));
-    $this->assert_equal(create_account_url(),  new ActionController\Routing\Url('POST', 'account'));
-    
-    $this->assert_equal(update_account_path(array(':id' => 1)), new ActionController\Routing\Path('PUT', 'account/1'));
-    $this->assert_equal(update_account_url(array(':id' => 1)),  new ActionController\Routing\Url('PUT', 'account/1'));
-    
-    $this->assert_equal(delete_account_path(array(':id' => 1)), new ActionController\Routing\Path('DELETE', 'account/1'));
-    $this->assert_equal(delete_account_url(array(':id' => 1)),  new ActionController\Routing\Url('DELETE', 'account/1'));
-    
-    $this->assert_equal(edit_account_path(45), new ActionController\Routing\Path('GET', 'account/45/edit'));
-    $this->assert_equal(edit_account_url(45),  new ActionController\Routing\Url('GET', 'account/45/edit'));
-    
-    $this->assert_equal(show_account_path(72), new ActionController\Routing\Path('GET', 'account/72'));
-    $this->assert_equal(show_account_url(72),  new ActionController\Routing\Url('GET', 'account/72'));
-  }
-  
-  function test_nested_resources()
-  {
-    $map = ActionController\Routing\Routes::draw();
-    
-    $this->assert_equal((string)discussions_path(), '/discussions');
-    $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)), new ActionController\Routing\Path('GET', 'discussions/34/messages'));
-    $this->assert_equal(new_discussion_message_path(array(':discussion_id' => 43)), new ActionController\Routing\Path('GET', 'discussions/43/messages/new'));
-    $this->assert_equal(create_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('POST', 'discussions/13/messages'));
-    $this->assert_equal(show_discussion_message_path(array(':discussion_id' => 46, ':id' => 12)), new ActionController\Routing\Path('GET', 'discussions/46/messages/12'));
-    $this->assert_equal(edit_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('GET', 'discussions/13/messages/26/edit'));
-    $this->assert_equal(update_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('PUT', 'discussions/13/messages/26'));
-    $this->assert_equal(delete_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('DELETE', 'discussions/13/messages/26'));
-    
-    $this->assert_equal((string)event_path(), '/event');
-    $this->assert_equal(event_tickets_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/tickets'));
-    $this->assert_equal(event_description_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/about'));
-  }
-  
   function test_namespace()
   {
     $map = ActionController\Routing\Routes::draw();
     
     $controller = \Misago\ActionController\Routing\Routes::recognize(
       new \Misago\ActionController\TestRequest(array(
-        'path' => 'admin/products/2/edit',
+        'path' => 'admin/product/2/edit',
       ))
     );
     $this->assert_instance_of($controller, '\Admin\ProductsController');
     
     $this->assert_true(function_exists('admin_products_path'));
     $this->assert_equal((string)admin_products_path(),      '/admin/products');
-    $this->assert_equal((string)new_admin_product_path(),   '/admin/products/new');
-    $this->assert_equal((string)edit_admin_product_path(1), '/admin/products/1/edit');
+    $this->assert_equal((string)new_admin_product_path(),   '/admin/product/new');
+    $this->assert_equal((string)edit_admin_product_path(1), '/admin/product/1/edit');
     
-    $this->assert_equal($map->route('GET', 'admin/products/456/edit.xml'), array(
+    $this->assert_equal($map->route('GET', 'admin/product/456/edit.xml'), array(
       ':method'     => 'GET',
       ':controller' => 'admin\products',
       ':action'     => 'edit',
@@ -509,43 +281,43 @@ class Test_ActionController_Routing extends Misago\Unit\TestCase
   {
     $map = ActionController\Routing\Routes::draw();
     
-    $this->assert_equal((string)show_product_path(new Product(1)), '/products/1');
-    $this->assert_equal((string)edit_product_path(new Product(3)), '/products/3/edit');
+    $this->assert_equal((string)show_product_path(new Product(1)), '/product/1');
+    $this->assert_equal((string)edit_product_path(new Product(3)), '/product/3/edit');
     
-    $this->assert_equal((string)show_product_url(new Product(2)), 'http://localhost:3009/products/2');
-    $this->assert_equal((string)edit_product_url(new Product(1)), 'http://localhost:3009/products/1/edit');
+    $this->assert_equal((string)show_product_url(new Product(2)), 'http://localhost:3009/product/2');
+    $this->assert_equal((string)edit_product_url(new Product(1)), 'http://localhost:3009/product/1/edit');
   }
   
   function test_url_for_activerecord()
   {
-    $this->assert_equal((string)url_for(new Product(2)), 'http://localhost:3009/products/2');
-    $this->assert_equal((string)url_for(new Product(3)), 'http://localhost:3009/products/3');
+    $this->assert_equal((string)url_for(new Product(2)), 'http://localhost:3009/product/2');
+    $this->assert_equal((string)url_for(new Product(3)), 'http://localhost:3009/product/3');
   }
   
   function test_named_routes_with_current_request_format()
   {
     $map = ActionController\Routing\Routes::draw();
     
-    $map->route('GET', '/articles/create.xml');
-    $this->assert_equal((string)show_article_path(4), '/articles/4.xml');
+    $map->route('GET', '/article/create.xml');
+    $this->assert_equal((string)show_article_path(4), '/article/4.xml');
     
-    $map->route('PUT', '/articles/update.html');
-    $this->assert_equal((string)show_article_path(3), '/articles/3.html');
+    $map->route('PUT', '/article/update.html');
+    $this->assert_equal((string)show_article_path(3), '/article/3.html');
     
-    $map->route('GET', '/articles/5/edit');
-    $this->assert_equal((string)show_article_path(5), '/articles/5');
+    $map->route('GET', '/article/5/edit');
+    $this->assert_equal((string)show_article_path(5), '/article/5');
   }
   
   function test_named_routes_with_query_string()
   {
     $this->assert_equal((string)show_article_path(array(':id' => 1, 'session_id' => 'abcd')),
-      '/articles/1?session_id=abcd');
+      '/article/1?session_id=abcd');
     $this->assert_equal((string)update_article_path(array(':id' => 43, 'edit' => '1', 'action' => 'first')),
-      '/articles/43?action=first&edit=1');
+      '/article/43?action=first&edit=1');
     
     # using query string parameters (string) sharing the name of path parameters (symbol)
-    $this->assert_equal((string)update_article_path(array(':id' => 2, 'format' => 'html')), '/articles/2?format=html');
-    $this->assert_equal((string)update_article_path(array('id' => 2)), '/articles/:id?id=2');
+    $this->assert_equal((string)update_article_path(array(':id' => 2, 'format' => 'html')), '/article/2?format=html');
+    $this->assert_equal((string)update_article_path(array('id' => 2)), '/article/:id?id=2');
   }
 }
 

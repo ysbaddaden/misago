@@ -160,17 +160,17 @@ class Routes extends ResourceRoutes
   # For instance:
   # 
   #   $map->ns('admin', function($admin) {
-  #     $admin->resources('products');
+  #     $admin->resource('product');
   #   }
   # 
   # This will require the controller +Admin\ProductsController+
   # (as +app/controllers/Admin/ProductsController.php+) and will generate
   # the following named routes:
   # 
-  #   admin_products      admin/products           Admin\ProductsController::index()
-  #   new_admin_product   admin/products/new       Admin\ProductsController::neo()
-  #   show_admin_product  admin/products/:id       Admin\ProductsController::show()
-  #   edit_admin_product  admin/products/:id/edit  Admin\ProductsController::edit()
+  #   admin_products      admin/products          Admin\ProductsController::index()
+  #   new_admin_product   admin/product/new       Admin\ProductsController::neo()
+  #   show_admin_product  admin/product/:id       Admin\ProductsController::show()
+  #   edit_admin_product  admin/product/:id/edit  Admin\ProductsController::edit()
   #   etc.
   # 
   function ns($name, $closure)

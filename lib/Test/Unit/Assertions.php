@@ -96,7 +96,7 @@ abstract class Assertions
   
   protected function assert_match($pattern, $text, $message='')
   {
-    $message = $this->build_message("%s expected to match:\n%s", $text, $pattern);
+    $message = $this->build_message($message, "%s expected to match:\n%s", $text, $pattern);
     $this->assert_block($message, function() use($pattern, $text) {
       return preg_match($pattern, $text);
     });
@@ -104,7 +104,7 @@ abstract class Assertions
   
   protected function assert_no_match($pattern, $text, $message='')
   {
-    $message = $this->build_message("%s expected to not match:\n%s", $text, $pattern);
+    $message = $this->build_message($message, "%s expected to not match:\n%s", $text, $pattern);
     $this->assert_block($message, function() use($pattern, $text) {
       return !preg_match($pattern, $text);
     });

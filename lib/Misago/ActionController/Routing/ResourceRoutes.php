@@ -7,7 +7,7 @@ use Misago\ActiveSupport\String;
 # A resource is a pair of controller/model with a REST logic in routes.
 # Declaring a resource will create a bunch of named routes.
 # 
-# See <tt>resource</tt> and <tt>resources</tt> for additional help.
+# See <tt>resource</tt> for additional help.
 # 
 # Attention: in RESTful routes +:id+ must be an integer.
 # 
@@ -33,62 +33,29 @@ use Misago\ActiveSupport\String;
 #   
 #   # using closures:
 #   $map->resource('event', function($event) {
-#     $event->resources('tags');
+#     $event->resource('tag');
 #   });
 # 
 #   # using +path_prefix+ (not recommended):
 #   $map->resource('event');
-#   $map->resources('tickets', array('path_prefix' => 'ticket/:id'));
+#   $map->resource('ticket', array('path_prefix' => 'event/:id'));
 # 
 class ResourceRoutes extends \Misago\Object
 {
   # Singleton resource. Resource name must always be singular, but the
-  # controller uses the plural form.
+  # controller & index use the plural form.
   # 
   #   $map->resource('account');
   # 
   # This will create the following named routes:
   # 
-  #   account         GET     /account           => AccountsController::index()
+  #   accounts        GET     /accounts          => AccountsController::index()
   #   new_account     GET     /account/new       => AccountsController::neo()
   #   create_account  POST    /account           => AccountsController::create()
   #   edit_account    GET     /account/:id/edit  => AccountsController::edit()
   #   show_account    GET     /account/:id       => AccountsController::show()
   #   update_account  PUT     /account/:id       => AccountsController::update()
   #   delete_account  DELETE  /account/:id       => AccountsController::delete()
-  # 
-  # See <tt>resources</tt> for help on options, except that there's no
-  # +singular+ option, but a +plural+ option instead.
-  # 
-  function resource($name, $options=array(), $closure=null)
-  {
-    if (is_object($options))
-    {
-      $closure = $options;
-      $options = array();
-    }
-    
-    $options['singular'] = $name;
-    if (empty($options['plural']))      $options['plural']      = String::pluralize($name);
-    if (empty($options['controller']))  $options['controller']  = $options['plural'];
-    $options['prefix'] = isset($options['as']) ? $options['as'] : $options['singular'];
-    
-    $this->build_resource($name, $options, $closure);
-  }
-  
-  # Collection resource. Resource name must always be plural.
-  # 
-  #   $map->resources('accounts');
-  # 
-  # This will create the following named routes:
-  # 
-  #   accounts         GET     /accounts           => AccountsController::index()
-  #   new_accounts     GET     /accounts/new       => AccountsController::neo()
-  #   create_accounts  POST    /accounts           => AccountsController::create()
-  #   edit_accounts    GET     /accounts/:id/edit  => AccountsController::edit()
-  #   show_accounts    GET     /accounts/:id       => AccountsController::show()
-  #   update_accounts  PUT     /accounts/:id       => AccountsController::update()
-  #   delete_accounts  DELETE  /accounts/:id       => AccountsController::delete()
   # 
   # Available options:
   # 
@@ -104,7 +71,7 @@ class ResourceRoutes extends \Misago\Object
   # - +path_prefix+ - a particular prefix for routes' path
   # - +singular+    - force singular name
   # 
-  function resources($name, $options=array(), $closure=null)
+  function resource($name, $options=array(), $closure=null)
   {
     if (is_object($options))
     {
@@ -112,10 +79,11 @@ class ResourceRoutes extends \Misago\Object
       $options = array();
     }
     
-    $options['plural'] = $name;
-    if (empty($options['singular']))    $options['singular']    = String::singularize($name);
+    $options['singular'] = $name;
+    if (empty($options['plural']))      $options['plural']      = String::pluralize($name);
     if (empty($options['controller']))  $options['controller']  = $options['plural'];
-    $options['prefix'] = isset($options['as']) ? $options['as'] : $options['plural'];
+    $options['prefix'] = isset($options['as']) ? $options['as'] : $options['singular'];
+    $options['plural_prefix'] = isset($options['as']) ? $options['as'] : $options['plural'];
     
     $this->build_resource($name, $options, $closure);
   }
@@ -127,6 +95,8 @@ class ResourceRoutes extends \Misago\Object
     $singular_name = "{$options['name_prefix']}{$options['singular']}";
     $prefix = isset($options['path_prefix']) ?
       $options['path_prefix'].'/'.$options['prefix'] : $options['prefix'];
+    $plural_prefix = isset($options['path_prefix']) ?
+      $options['path_prefix'].'/'.$options['plural_prefix'] : $options['plural_prefix'];
     $controller = isset($options['namespace']) ?
       $options['namespace'].$options['controller'] : $options['controller'];
     
@@ -157,8 +127,8 @@ class ResourceRoutes extends \Misago\Object
       switch($action)
       {
         case 'index':
-          $_name = $options['name_prefix'].$name;
-          $_path = "$prefix.:format";
+          $_name = $options['name_prefix'].$options['plural'];
+          $_path = "{$plural_prefix}.:format";
         break;
         
         case 'create':
@@ -179,7 +149,7 @@ class ResourceRoutes extends \Misago\Object
       }
       $this->named($_name, $_path, $_options);
     }
-
+    
     # member actions like /members/:id[/:action][.:format]
     foreach($member as $action => $method)
     {
@@ -233,7 +203,7 @@ class ResourceRoutes extends \Misago\Object
         if (isset($options['namespace'])) {
           $nested_options['namespace'] = $options['namespace'];
         }
-        $this->resources($nested_name, $nested_options);
+        $this->resource($nested_name, $nested_options);
       }
     }
     

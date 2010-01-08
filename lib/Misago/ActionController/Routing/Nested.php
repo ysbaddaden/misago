@@ -20,10 +20,6 @@ class Nested
     $this->_map('resource', $name, $options, $closure);
   }
   
-  function resources($name, $options=array(), $closure=null) {
-    $this->_map('resources', $name, $options, $closure);
-  }
-  
   private function _map($method, $name, $options, $closure)
   {
     if (is_object($options))

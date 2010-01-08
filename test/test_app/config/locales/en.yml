@@ -1,36 +1,4 @@
 en:
-  active_record:
-    models:
-      monitoring: "Guardian"
-    
-    attributes:
-      monitoring:
-        length_string2: "My length"
-      product:
-        price: "Price of product"
-      contact:
-        from_name: "Your name"
-        from_email: "Your email"
-    
-    errors:
-      messages:
-        blank: "{{attribute}} cannot be blank"
-      models:
-        monitoring:
-          required: "{{attribute}} in monitoring cannot be blank"
-          attributes:
-            title2:
-              required: "please fill this"
-        error:
-          taken: "{{attribute}} '{{value}}' is already taken"
-          attributes: "{{attribute}} '{{value}}' is already taken"
-            domain:
-              reserved: "Already reserved in {{model}}"
-    
-    products:
-      errors:
-        null: "{{attribute}} can't be null"
-  
   toto: "Toto"
   invalid: "{{attribute}} is invalid"
   "invalid title": "Title is invalid"

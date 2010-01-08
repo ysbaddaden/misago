@@ -23,23 +23,23 @@ $map->named('about',    'about', array(':controller' => 'html', ':action' => 'ab
 $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
 
 # RESTful resource(s)
-#$map->resources('posts');
-$map->resources('products');
-$map->resources('users');
+#$map->resource('post');
+$map->resource('product'/*, array('member' => array('purchase' => 'GET'))*/);
+$map->resource('user');
 $map->resource('account');
-$map->resources('articles');
+$map->resource('article');
 
 # nested restful resource(s)
-$map->resources('discussions', array('has_many' => 'messages'));
+$map->resource('discussion', array('has_many' => 'messages'));
 $map->resource('event', function($event)
 {
   $event->resource('description', array('as' => 'about'));
-  $event->resources('tickets');
+  $event->resource('ticket');
 });
 
 # namespaced resource(s)
 $map->ns('admin', function($admin) {
-  $admin->resources('products');
+  $admin->resource('product');
 });
 
 # landing page
