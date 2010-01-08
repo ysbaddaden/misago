@@ -30,8 +30,11 @@ $map->resource('account');
 $map->resource('article');
 
 # nested restful resource(s)
-$map->resource('discussion', array('has_many' => 'messages'));
-$map->resource('event', function($event)
+$map->resource('discussion', array('has_many' => 'message'));
+$map->resource('event', array(
+  'member'     => array('publish'  => 'put'),
+  'collection' => array('archives' => 'get')),
+  function($event)
 {
   $event->resource('description', array('as' => 'about'));
   $event->resource('ticket');

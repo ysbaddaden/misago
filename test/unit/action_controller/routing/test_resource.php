@@ -69,6 +69,21 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
       ':action'     => 'widget',
       ':format'     => null,
     ));
+    
+    $this->assert_equal($map->route('GET', 'events/archives'), array(
+      ':method'     => 'GET',
+      ':controller' => 'events',
+      ':action'     => 'archives',
+      ':format'     => null,
+    ));
+    
+    $this->assert_equal($map->route('PUT', 'event/1/publish'), array(
+      ':method'     => 'PUT',
+      ':controller' => 'events',
+      ':action'     => 'publish',
+      ':format'     => null,
+      ':id'         => 1,
+    ));
   }
   
   function test_named_routes_for_resource()
@@ -110,25 +125,24 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     $this->assert_equal(show_account_path(72), new ActionController\Routing\Path('GET', 'account/72'));
     $this->assert_equal(show_account_url(72),  new ActionController\Routing\Url('GET', 'account/72'));
   }
-  /*
+  
   function test_nested_resources()
   {
     $map = ActionController\Routing\Routes::draw();
     
     $this->assert_equal((string)discussions_path(), '/discussions');
-    $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)), new ActionController\Routing\Path('GET', 'discussions/34/messages'));
-    $this->assert_equal(new_discussion_message_path(array(':discussion_id' => 43)), new ActionController\Routing\Path('GET', 'discussions/43/messages/new'));
-    $this->assert_equal(create_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('POST', 'discussions/13/messages'));
-    $this->assert_equal(show_discussion_message_path(array(':discussion_id' => 46, ':id' => 12)), new ActionController\Routing\Path('GET', 'discussions/46/messages/12'));
-    $this->assert_equal(edit_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('GET', 'discussions/13/messages/26/edit'));
-    $this->assert_equal(update_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('PUT', 'discussions/13/messages/26'));
-    $this->assert_equal(delete_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('DELETE', 'discussions/13/messages/26'));
+    $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)), new ActionController\Routing\Path('GET', 'discussion/34/messages'));
+    $this->assert_equal(new_discussion_message_path(array(':discussion_id' => 43)), new ActionController\Routing\Path('GET', 'discussion/43/message/new'));
+    $this->assert_equal(create_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('POST', 'discussion/13/message'));
+    $this->assert_equal(show_discussion_message_path(array(':discussion_id' => 46, ':id' => 12)), new ActionController\Routing\Path('GET', 'discussion/46/message/12'));
+    $this->assert_equal(edit_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('GET', 'discussion/13/message/26/edit'));
+    $this->assert_equal(update_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('PUT', 'discussion/13/message/26'));
+    $this->assert_equal(delete_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('DELETE', 'discussion/13/message/26'));
     
-    $this->assert_equal((string)events_path(), '/event');
+    $this->assert_equal((string)events_path(), '/events');
     $this->assert_equal(event_tickets_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/tickets'));
-    $this->assert_equal(event_description_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/about'));
+    $this->assert_equal(event_descriptions_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'event/12/about'));
   }
-  */
 }
 
 ?>
