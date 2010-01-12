@@ -104,6 +104,10 @@ class Datetime extends \DateTime
       default: return $this->__toString();
     }
   }
+  
+  function strftime($format) {
+    return strftime($format, $this->getTimestamp());
+  }
 }
 
 class Time extends Datetime

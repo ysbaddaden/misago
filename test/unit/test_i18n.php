@@ -63,7 +63,7 @@ class Test_I18n extends Test\Unit\TestCase
     
     $this->assert_equal(t('empty', 'active_record.errors.messages'), "{{attribute}} can't be empty");
     $this->assert_equal(t('null', 'active_record.products.errors'), "{{attribute}} can't be null");
-
+    
     # with interpolation
     $this->assert_equal(t('foo', array('context' => 'messages', 'bar' => 'baz')), "foo baz");
     $this->assert_equal(t('messages.foo', array('bar' => 'bad')), "foo bad");
@@ -75,9 +75,22 @@ class Test_I18n extends Test\Unit\TestCase
   
   function test_localize()
   {
-    $this->assert_equal(l(new ActiveSupport\Datetime('2009-06-12 00:12:36')), '06/12/2009');
     $this->assert_equal(l(new ActiveSupport\Date('2009-08-12')), '08/12/2009');
-    $this->assert_equal(l(new ActiveSupport\Time('13:45:36')), '13:45');
+    $this->assert_equal(l(new ActiveSupport\Date('2009-08-12'),
+      array('format' => 'short')), 'Aug 12');
+    
+    $this->assert_equal(l(new ActiveSupport\Time('13:45:36')), '01:45 PM');
+    $this->assert_equal(l(new ActiveSupport\Time('13:45:36'),
+      array('format' => 'short')), 'Tue, 12 Jan 01:45 PM');
+    
+    $this->assert_equal(l(new ActiveSupport\Datetime('2009-06-12 00:12:36')),
+      'Fri, 12 Jun 2009 12:12:36 AM +0000');
+    $this->assert_equal(l(new ActiveSupport\Datetime('2009-06-12 00:12:36'),
+      array('format' => 'short')), 'Fri, 12 Jun 12:12 AM');
+    $this->assert_equal(l(new ActiveSupport\Datetime('2009-06-12 00:12:36'),
+      array('format' => 'long')), 'June 12, 2009 12:12 AM');
+    $this->assert_equal(l(new ActiveSupport\Datetime('2009-06-12 00:12:36'),
+      array('format' => 'long')), 'June 12, 2009 12:12 AM');
   }
 }
 

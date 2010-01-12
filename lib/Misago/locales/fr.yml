@@ -12,16 +12,19 @@ fr:
         not_included: "{{attribute}} n'est pas présent dans la liste'"
         reserved: "La valeur de {{attribute}} est réservée"
         taken: "{{attribute}} est déjà pris"
-  localize:
-    date: "%d/%m/%Y"
-    time: "%H:%M"
-    datetime: "%d/%m/%Y %H:%M"
   date:
     formats:
-      default: "d/m/Y"
+      default: "%d/%m/%Y"
+      short: "%e %b"
+      long: "%e %B %Y"
+      only_day: "%e"
   time:
     formats:
-      default: "H:i"
+      default: "%d %B %Y %H:%M"
+      time: "%H:%M"
+      short: "%d %b %H:%M"
+      long: "%A %d %B %Y %H:%M:%S %Z"
+      only_second: "%S"
   number:
     datetime:
       distance_in_words:

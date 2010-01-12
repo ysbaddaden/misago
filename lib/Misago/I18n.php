@@ -159,18 +159,39 @@ class I18n
   }
   
   # Localizes certain objects like dates.
+  # 
+  # Options:
+  # 
+  # - +format+ - specify a particular format.
+  #
+  # Standard formats:
+  # 
+  # - <tt>Misago\ActiveSupport\Date</tt> - +default+, +short+, +long+, +long_ordinal+, +only_day+
+  # - <tt>Misago\ActiveSupport\Time</tt> - +default+, +time+, +short+, +long+, +long_ordinal+, +only_seconds+
+  # - <tt>Misago\ActiveSupport\Datetime</tt> - +default+, +time+, +short+, +long+, +long_ordinal+, +only_seconds+
+  # 
+  # You may have your own formats by adding translations within the following
+  # contexts:
+  # 
+  # - <tt>Misago\ActiveSupport\Date</tt> - +date.formats+
+  # - <tt>Misago\ActiveSupport\Time</tt> - +time.formats+
+  # - <tt>Misago\ActiveSupport\Datetime</tt> - +time.formats+
+  # 
   static function localize($obj, $options=array())
   {
     switch(get_class($obj))
     {
       case 'Misago\ActiveSupport\Datetime':
+        return $obj->strftime(self::translate(isset($options['format']) ?
+          $options['format'] : 'default', array('context' => 'time.formats')));
+      
       case 'Misago\ActiveSupport\Date':
-        return $obj->format(self::translate(isset($options['format']) ?
+        return $obj->strftime(self::translate(isset($options['format']) ?
           $options['format'] : 'default', array('context' => 'date.formats')));
       
       case 'Misago\ActiveSupport\Time':
-        return $obj->format(self::translate(isset($options['format']) ?
-          $options['format'] : 'default', array('context' => 'time.formats')));
+        return $obj->strftime(self::translate(isset($options['format']) ?
+          $options['format'] : 'time', array('context' => 'time.formats')));
       
       default:
         return (string)$obj;

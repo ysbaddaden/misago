@@ -12,16 +12,17 @@ en:
         not_included: "{{attribute}} is not included in the list"
         reserved: "{{attribute}}'s value is reserved"
         taken: "{{attribute}} is already taken"
-  localize:
-    date: "%m/%d/%Y"
-    time: "%H:%M"
-    datetime: "%m/%d/%Y %H:%M"
   date:
     formats:
-      default: "m/d/Y"
+      default: "%m/%d/%Y"
+      short: "%b %e"
+      long: "%B %e, %Y"
   time:
     formats:
-      default: "H:i"
+      default: "%a, %d %b %Y %I:%M:%S %p %z"
+      short: "%a, %d %b %I:%M %p"
+      long: "%B %e, %Y %I:%M %p"
+      time: "%I:%M %p"
   number:
     datetime:
       distance_in_words:
