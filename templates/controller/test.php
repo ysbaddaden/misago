@@ -1,8 +1,5 @@
 <?php
-if (!isset($_SERVER['MISAGO_ENV'])) {
-  $_SERVER['MISAGO_ENV'] = 'test';
-}
-require_once dirname(__FILE__).'/../../config/boot.php';
+require_once __DIR__.'/../test_helper.php';
 
 class Test_#{Class}Controller extends Misago\ActionController\TestCase
 {
@@ -11,7 +8,5 @@ class Test_#{Class}Controller extends Misago\ActionController\TestCase
     $this->assert_true(true);
   }
 }
-
-new Test_#{Class}Controller();
 
 ?>
