@@ -219,7 +219,7 @@ class Collection extends ActiveSupport\ActiveArray
     $options = isset($this->options['find_options']) ?
       $this->options['find_options'] : array();
     $options['conditions'] = empty($options['conditions']) ? $conditions :
-      static::merge_conditions($options['conditions'], $conditions);
+      $this->parent->merge_conditions($options['conditions'], $conditions);
     
     return $options;
   }

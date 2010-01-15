@@ -1,28 +1,4 @@
 <?php
-/*
-Copyright (c) 2009 Daniele Alessandri
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-*/
 namespace Predis;
 
 class PredisException extends \Exception { }
@@ -33,18 +9,11 @@ class MalformedServerResponse extends ServerException { }
 /* ------------------------------------------------------------------------- */
 
 class Client {
-    // TODO: command arguments should be sanitized or checked for bad arguments 
-    //       (e.g. CRLF in keys for inline commands)
+    private $_connection, $_serverProfile;
 
-    private $_connection, $_registeredCommands;
-
-    public function __construct($host = Connection::DEFAULT_HOST, $port = Connection::DEFAULT_PORT) {
-        $this->_registeredCommands = self::initializeDefaultCommands();
-        $this->setConnection($this->createConnection(
-            func_num_args() === 1 && is_array($host) || @stripos('redis://') === 0
-                ? $host
-                : array('host' => $host, 'port' => $port)
-        ));
+    public function __construct($parameters = null, RedisServerProfile $serverProfile = null) {
+        $this->setProfile($serverProfile ?: RedisServerProfile::getDefault());
+        $this->setupConnection($parameters);
     }
 
     public function __destruct() {
@@ -55,21 +24,34 @@ class Client {
         $argv = func_get_args();
         $argc = func_num_args();
 
-        if ($argc == 1) {
-            return new Client($argv[0]);
+        $serverProfile = null;
+        $lastArg = $argv[$argc-1];
+        if ($argc > 0 && !is_string($lastArg) && is_subclass_of($lastArg, '\Predis\RedisServerProfile')) {
+            $serverProfile = array_pop($argv);
+            $argc--;
         }
-        else if ($argc > 1) {
-            $client  = new Client();
+
+        if ($argc === 0) {
+            throw new ClientException('Missing connection parameters');
+        }
+
+        return new Client($argc === 1 ? $argv[0] : $argv, $serverProfile);
+    }
+
+    private function setupConnection($parameters) {
+        if ($parameters !== null && !(is_array($parameters) || is_string($parameters))) {
+            throw new ClientException('Invalid parameters type (array or string expected)');
+        }
+
+        if (is_array($parameters) && isset($parameters[0])) {
             $cluster = new ConnectionCluster();
-            foreach ($argv as $parameters) {
-                // TODO: this is a bit dirty...
-                $cluster->add($client->createConnection($parameters));
+            foreach ($parameters as $shardParams) {
+                $cluster->add($this->createConnection($shardParams));
             }
-            $client->setConnection($cluster);
-            return $client;
+            $this->setConnection($cluster);
         }
         else {
-            return new Client();
+            $this->setConnection($this->createConnection($parameters));
         }
     }
 
@@ -78,12 +60,12 @@ class Client {
         $connection = new Connection($params);
 
         if ($params->password !== null) {
-            $connection->pushInitCommand($this->createCommandInstance(
+            $connection->pushInitCommand($this->createCommand(
                 'auth', array($params->password)
             ));
         }
         if ($params->database !== null) {
-            $connection->pushInitCommand($this->createCommandInstance(
+            $connection->pushInitCommand($this->createCommand(
                 'select', array($params->database)
             ));
         }
@@ -93,6 +75,14 @@ class Client {
 
     private function setConnection(IConnection $connection) {
         $this->_connection = $connection;
+    }
+
+    public function setProfile(RedisServerProfile $serverProfile) {
+        $this->_serverProfile = $serverProfile;
+    }
+
+    public function getProfile() {
+        return $this->_serverProfile;
     }
 
     public function connect() {
@@ -112,224 +102,61 @@ class Client {
     }
 
     public function __call($method, $arguments) {
-        $command = $this->createCommandInstance($method, $arguments);
+        $command = $this->_serverProfile->createCommand($method, $arguments);
         return $this->executeCommand($command);
     }
 
-    public function createCommandInstance($method, $arguments) {
-        $commandClass = $this->_registeredCommands[$method];
+    public function createCommand($method, $arguments = array()) {
+        return $this->_serverProfile->createCommand($method, $arguments);
+    }
 
-        if ($commandClass === null) {
-            throw new ClientException("'$method' is not a registered Redis command");
+    private function executeCommandInternal(IConnection $connection, Command $command) {
+        $connection->writeCommand($command);
+        if ($command->closesConnection()) {
+            return $connection->disconnect();
         }
-
-        $command = new $commandClass();
-        $command->setArgumentsArray($arguments);
-        return $command;
+        return $connection->readResponse($command);
     }
 
     public function executeCommand(Command $command) {
-        $this->_connection->writeCommand($command);
-        if ($command->closesConnection()) {
-            return $this->_connection->disconnect();
+        return self::executeCommandInternal($this->_connection, $command);
+    }
+
+    public function executeCommandOnShards(Command $command) {
+        $replies = array();
+        if (is_a($this->_connection, '\Predis\ConnectionCluster')) {
+            foreach($this->_connection as $connection) {
+                $replies[] = self::executeCommandInternal($connection, $command);
+            }
         }
-        return $this->_connection->readResponse($command);
+        else {
+            $replies[] = self::executeCommandInternal($this->_connection, $command);
+        }
+        return $replies;
     }
 
     public function rawCommand($rawCommandData, $closesConnection = false) {
-        // TODO: rather than check the type of a connection instance, we should 
-        //       check if it does respond to the rawCommand method.
         if (is_a($this->_connection, '\Predis\ConnectionCluster')) {
             throw new ClientException('Cannot send raw commands when connected to a cluster of Redis servers');
         }
         return $this->_connection->rawCommand($rawCommandData, $closesConnection);
     }
 
-    public function pipeline(\Closure $pipelineBlock = null) {
+    public function pipeline($pipelineBlock = null) {
         $pipeline = new CommandPipeline($this);
         return $pipelineBlock !== null ? $pipeline->execute($pipelineBlock) : $pipeline;
     }
 
-    public function registerCommands(Array $commands) {
-        foreach ($commands as $command => $aliases) {
-            $this->registerCommand($command, $aliases);
-        }
-    }
-
-    public function registerCommand($command, $aliases) {
-        $commandReflection = new \ReflectionClass($command);
-
-        if (!$commandReflection->isSubclassOf('\Predis\Command')) {
-            throw new ClientException("Cannot register '$command' as it is not a valid Redis command");
-        }
-
-        if (is_array($aliases)) {
-            foreach ($aliases as $alias) {
-                $this->_registeredCommands[$alias] = $command;
-            }
-        }
-        else {
-            $this->_registeredCommands[$aliases] = $command;
-        }
-    }
-
-    private static function initializeDefaultCommands() {
-        // NOTE: we don't use \Predis\Client::registerCommands for performance reasons.
-        return array(
-            /* miscellaneous commands */
-            'ping'      => '\Predis\Commands\Ping',
-            'echo'      => '\Predis\Commands\DoEcho',
-            'auth'      => '\Predis\Commands\Auth',
-
-            /* connection handling */
-            'quit'      => '\Predis\Commands\Quit',
-
-            /* commands operating on string values */
-            'set'                     => '\Predis\Commands\Set',
-            'setnx'                   => '\Predis\Commands\SetPreserve',
-                'setPreserve'         => '\Predis\Commands\SetPreserve',
-            'mset'                    => '\Predis\Commands\SetMultiple',  
-                'setMultiple'         => '\Predis\Commands\SetMultiple',
-            'msetnx'                  => '\Predis\Commands\SetMultiplePreserve',
-                'setMultiplePreserve' => '\Predis\Commands\SetMultiplePreserve',
-            'get'                     => '\Predis\Commands\Get',
-            'mget'                    => '\Predis\Commands\GetMultiple',
-                'getMultiple'         => '\Predis\Commands\GetMultiple',
-            'getset'                  => '\Predis\Commands\GetSet',
-                'getSet'              => '\Predis\Commands\GetSet',
-            'incr'                    => '\Predis\Commands\Increment',
-                'increment'           => '\Predis\Commands\Increment',
-            'incrby'                  => '\Predis\Commands\IncrementBy',
-                'incrementBy'         => '\Predis\Commands\IncrementBy',
-            'decr'                    => '\Predis\Commands\Decrement',
-                'decrement'           => '\Predis\Commands\Decrement',
-            'decrby'                  => '\Predis\Commands\DecrementBy',
-                'decrementBy'         => '\Predis\Commands\DecrementBy',
-            'exists'                  => '\Predis\Commands\Exists',
-            'del'                     => '\Predis\Commands\Delete',
-                'delete'              => '\Predis\Commands\Delete',
-            'type'                    => '\Predis\Commands\Type',
-
-            /* commands operating on the key space */
-            'keys'               => '\Predis\Commands\Keys',
-            'randomkey'          => '\Predis\Commands\RandomKey',
-                'randomKey'      => '\Predis\Commands\RandomKey',
-            'rename'             => '\Predis\Commands\Rename',
-            'renamenx'           => '\Predis\Commands\RenamePreserve',
-                'renamePreserve' => '\Predis\Commands\RenamePreserve',
-            'expire'             => '\Predis\Commands\Expire',
-            'expireat'           => '\Predis\Commands\ExpireAt',
-                'expireAt'       => '\Predis\Commands\ExpireAt',
-            'dbsize'             => '\Predis\Commands\DatabaseSize',
-                'databaseSize'   => '\Predis\Commands\DatabaseSize',
-            'ttl'                => '\Predis\Commands\TimeToLive',
-                'timeToLive'     => '\Predis\Commands\TimeToLive',
-
-            /* commands operating on lists */
-            'rpush'            => '\Predis\Commands\ListPushTail',
-                'pushTail'     => '\Predis\Commands\ListPushTail',
-            'lpush'            => '\Predis\Commands\ListPushHead',
-                'pushHead'     => '\Predis\Commands\ListPushHead',
-            'llen'             => '\Predis\Commands\ListLength',
-                'listLength'   => '\Predis\Commands\ListLength',
-            'lrange'           => '\Predis\Commands\ListRange',
-                'listRange'    => '\Predis\Commands\ListRange',
-            'ltrim'            => '\Predis\Commands\ListTrim',
-                'listTrim'     => '\Predis\Commands\ListTrim',
-            'lindex'           => '\Predis\Commands\ListIndex',
-                'listIndex'    => '\Predis\Commands\ListIndex',
-            'lset'             => '\Predis\Commands\ListSet',
-                'listSet'      => '\Predis\Commands\ListSet',
-            'lrem'             => '\Predis\Commands\ListRemove',
-                'listRemove'   => '\Predis\Commands\ListRemove',
-            'lpop'             => '\Predis\Commands\ListPopFirst',
-                'popFirst'     => '\Predis\Commands\ListPopFirst',
-            'rpop'             => '\Predis\Commands\ListPopLast',
-                'popLast'      => '\Predis\Commands\ListPopLast',
-            'rpoplpush'        => '\Predis\Commands\ListPushTailPopFirst',
-                'listPopLastPushHead'  => '\Predis\Commands\ListPopLastPushHead',
-
-            /* commands operating on sets */
-            'sadd'                      => '\Predis\Commands\SetAdd', 
-                'setAdd'                => '\Predis\Commands\SetAdd',
-            'srem'                      => '\Predis\Commands\SetRemove', 
-                'setRemove'             => '\Predis\Commands\SetRemove',
-            'spop'                      => '\Predis\Commands\SetPop',
-                'setPop'                => '\Predis\Commands\SetPop',
-            'smove'                     => '\Predis\Commands\SetMove', 
-                'setMove'               => '\Predis\Commands\SetMove',
-            'scard'                     => '\Predis\Commands\SetCardinality', 
-                'setCardinality'        => '\Predis\Commands\SetCardinality',
-            'sismember'                 => '\Predis\Commands\SetIsMember', 
-                'setIsMember'           => '\Predis\Commands\SetIsMember',
-            'sinter'                    => '\Predis\Commands\SetIntersection', 
-                'setIntersection'       => '\Predis\Commands\SetIntersection',
-            'sinterstore'               => '\Predis\Commands\SetIntersectionStore', 
-                'setIntersectionStore'  => '\Predis\Commands\SetIntersectionStore',
-            'sunion'                    => '\Predis\Commands\SetUnion', 
-                'setUnion'              => '\Predis\Commands\SetUnion',
-            'sunionstore'               => '\Predis\Commands\SetUnionStore', 
-                'setUnionStore'         => '\Predis\Commands\SetUnionStore',
-            'sdiff'                     => '\Predis\Commands\SetDifference', 
-                'setDifference'         => '\Predis\Commands\SetDifference',
-            'sdiffstore'                => '\Predis\Commands\SetDifferenceStore', 
-                'setDifferenceStore'    => '\Predis\Commands\SetDifferenceStore',
-            'smembers'                  => '\Predis\Commands\SetMembers', 
-                'setMembers'            => '\Predis\Commands\SetMembers',
-            'srandmember'               => '\Predis\Commands\SetRandomMember', 
-                'setRandomMember'       => '\Predis\Commands\SetRandomMember',
-
-            /* commands operating on sorted sets */
-            'zadd'                          => '\Predis\Commands\ZSetAdd', 
-                'zsetAdd'                   => '\Predis\Commands\ZSetAdd',
-            'zrem'                          => '\Predis\Commands\ZSetRemove', 
-                'zsetRemove'                => '\Predis\Commands\ZSetRemove',
-            'zrange'                        => '\Predis\Commands\ZSetRange', 
-                'zsetRange'                 => '\Predis\Commands\ZSetRange',
-            'zrevrange'                     => '\Predis\Commands\ZSetReverseRange', 
-                'zsetReverseRange'          => '\Predis\Commands\ZSetReverseRange',
-            'zrangebyscore'                 => '\Predis\Commands\ZSetRangeByScore', 
-                'zsetRangeByScore'          => '\Predis\Commands\ZSetRangeByScore',
-            'zcard'                         => '\Predis\Commands\ZSetCardinality', 
-                'zsetCardinality'           => '\Predis\Commands\ZSetCardinality',
-            'zscore'                        => '\Predis\Commands\ZSetScore', 
-                'zsetScore'                 => '\Predis\Commands\ZSetScore',
-            'zremrangebyscore'              => '\Predis\Commands\ZSetRemoveRangeByScore', 
-                'zsetRemoveRangeByScore'    => '\Predis\Commands\ZSetRemoveRangeByScore',
-
-            /* multiple databases handling commands */
-            'select'                => '\Predis\Commands\SelectDatabase', 
-                'selectDatabase'    => '\Predis\Commands\SelectDatabase',
-            'move'                  => '\Predis\Commands\MoveKey', 
-                'moveKey'           => '\Predis\Commands\MoveKey',
-            'flushdb'               => '\Predis\Commands\FlushDatabase', 
-                'flushDatabase'     => '\Predis\Commands\FlushDatabase',
-            'flushall'              => '\Predis\Commands\FlushAll', 
-                'flushDatabases'    => '\Predis\Commands\FlushAll',
-
-            /* sorting */
-            'sort'                  => '\Predis\Commands\Sort',
-
-            /* remote server control commands */
-            'info'                  => '\Predis\Commands\Info',
-            'slaveof'               => '\Predis\Commands\SlaveOf', 
-                'slaveOf'           => '\Predis\Commands\SlaveOf',
-
-            /* persistence control commands */
-            'save'                  => '\Predis\Commands\Save',
-            'bgsave'                => '\Predis\Commands\BackgroundSave', 
-                'backgroundSave'    => '\Predis\Commands\BackgroundSave',
-            'lastsave'              => '\Predis\Commands\LastSave', 
-                'lastSave'          => '\Predis\Commands\LastSave',
-            'shutdown'              => '\Predis\Commands\Shutdown'
-        );
+    public function multiExec($multiExecBlock = null) {
+        $multiExec = new MultiExecBlock($this);
+        return $multiExecBlock !== null ? $multiExec->execute($multiExecBlock) : $multiExec;
     }
 }
 
 /* ------------------------------------------------------------------------- */
 
 abstract class Command {
-    private $_arguments;
+    private $_arguments, $_hash;
 
     public abstract function getCommandId();
 
@@ -337,6 +164,27 @@ abstract class Command {
 
     public function canBeHashed() {
         return true;
+    }
+
+    public function getHash() {
+        if (isset($this->_hash)) {
+            return $this->_hash;
+        }
+        else {
+            if (isset($this->_arguments[0])) {
+                $key = $this->_arguments[0];
+
+                $start = strpos($key, '{');
+                $end   = strpos($key, '}');
+                if ($start !== false && $end !== false) {
+                    $key = substr($key, ++$start, $end - $start);
+                }
+
+                $this->_hash = crc32($key);
+                return $this->_hash;
+            }
+        }
+        return null;
     }
 
     public function closesConnection() {
@@ -356,11 +204,11 @@ abstract class Command {
     }
 
     protected function getArguments() {
-        return $this->_arguments !== null ? $this->_arguments : array();
+        return isset($this->_arguments) ? $this->_arguments : array();
     }
 
     public function getArgument($index = 0) {
-        return $this->_arguments !== null ? $this->_arguments[$index] : null;
+        return isset($this->_arguments[$index]) ? $this->_arguments[$index] : null;
     }
 
     public function parseResponse($data) {
@@ -424,6 +272,7 @@ class Response {
     const NEWLINE = "\r\n";
     const OK      = 'OK';
     const ERROR   = 'ERR';
+    const QUEUED  = 'QUEUED';
     const NULL    = 'nil';
 
     private static $_prefixHandlers;
@@ -431,41 +280,45 @@ class Response {
     private static function initializePrefixHandlers() {
         return array(
             // status
-            '+' => function($socket) {
-                $status = rtrim(fgets($socket), Response::NEWLINE);
-                return $status === Response::OK ? true : $status;
+            '+' => function($socket, $prefix, $status) {
+                if ($status === Response::OK) {
+                    return true;
+                }
+                else if ($status === Response::QUEUED) {
+                    return new ResponseQueued();
+                }
+                return $status;
             }, 
 
             // error
-            '-' => function($socket) {
-                $errorMessage = rtrim(fgets($socket), Response::NEWLINE);
+            '-' => function($socket, $prefix, $errorMessage) {
                 throw new ServerException(substr($errorMessage, 4));
             }, 
 
             // bulk
-            '$' => function($socket) {
-                $dataLength = rtrim(fgets($socket), Response::NEWLINE);
-
+            '$' => function($socket, $prefix, $dataLength) {
                 if (!is_numeric($dataLength)) {
                     throw new ClientException("Cannot parse '$dataLength' as data length");
                 }
 
                 if ($dataLength > 0) {
                     $value = stream_get_contents($socket, $dataLength);
+                    if ($value === false) {
+                        throw new ClientException('An error has occurred while reading from the network stream');
+                    }
                     fread($socket, 2);
                     return $value;
                 }
                 else if ($dataLength == 0) {
-                    // TODO: I just have a doubt here...
                     fread($socket, 2);
+                    return '';
                 }
 
                 return null;
             }, 
 
             // multibulk
-            '*' => function($socket) {
-                $rawLength = rtrim(fgets($socket), Response::NEWLINE);
+            '*' => function($socket, $prefix, $rawLength) {
                 if (!is_numeric($rawLength)) {
                     throw new ClientException("Cannot parse '$rawLength' as data length");
                 }
@@ -479,8 +332,7 @@ class Response {
 
                 if ($listLength > 0) {
                     for ($i = 0; $i < $listLength; $i++) {
-                        $handler = Response::getPrefixHandler(fgetc($socket));
-                        $list[] = $handler($socket);
+                        $list[] = Response::read($socket);
                     }
                 }
 
@@ -488,8 +340,7 @@ class Response {
             }, 
 
             // integer
-            ':' => function($socket) {
-                $number = rtrim(fgets($socket), Response::NEWLINE);
+            ':' => function($socket, $prefix, $number) {
                 if (is_numeric($number)) {
                     return (int) $number;
                 }
@@ -503,16 +354,32 @@ class Response {
         );
     }
 
-    public static function getPrefixHandler($prefix) {
-        if (self::$_prefixHandlers == null) {
+    public static function read($socket) {
+        $header  = fgets($socket);
+        if ($header === false) {
+           throw new ClientException('An error has occurred while reading from the network stream');
+        }
+
+        $prefix  = $header[0];
+        $payload = substr($header, 1, -2);
+
+        if (!isset(self::$_prefixHandlers)) {
             self::$_prefixHandlers = self::initializePrefixHandlers();
+        }
+        if (!isset(self::$_prefixHandlers[$prefix])) {
+            throw new MalformedServerResponse("Unknown prefix '$prefix'");
         }
 
         $handler = self::$_prefixHandlers[$prefix];
-        if ($handler === null) {
-            throw new MalformedServerResponse("Unknown prefix '$prefix'");
-        }
-        return $handler;
+        return $handler($socket, $prefix, $payload);
+    }
+}
+
+class ResponseQueued {
+    public $queued = true;
+
+    public function __toString() {
+        return Response::QUEUED;
     }
 }
 
@@ -526,7 +393,7 @@ class CommandPipeline {
     }
 
     public function __call($method, $arguments) {
-        $command = $this->_redisClient->createCommandInstance($method, $arguments);
+        $command = $this->_redisClient->createCommand($method, $arguments);
         $this->recordCommand($command);
     }
 
@@ -539,25 +406,24 @@ class CommandPipeline {
     }
 
     public function flushPipeline() {
-        if (count($this->_pipelineBuffer) === 0) {
+        $sizeofPipe = count($this->_pipelineBuffer);
+        if ($sizeofPipe === 0) {
             return;
         }
 
         $connection = $this->_redisClient->getConnection();
-        $commands   = &$this->getRecordedCommands();
+        $commands   = &$this->_pipelineBuffer;
 
         foreach ($commands as $command) {
             $connection->writeCommand($command);
         }
-        foreach ($commands as $command) {
-            $this->_returnValues[] = $connection->readResponse($command);
+        for ($i = 0; $i < $sizeofPipe; $i++) {
+            $this->_returnValues[] = $connection->readResponse($commands[$i]);
+            unset($commands[$i]);
         }
-
-        $this->_pipelineBuffer = array();
     }
 
     private function setRunning($bool) {
-        // TODO: I am honest when I say that I don't like this approach.
         if ($bool == true && $this->_running == true) {
             throw new ClientException("This pipeline is already opened");
         }
@@ -565,7 +431,11 @@ class CommandPipeline {
         $this->_running = $bool;
     }
 
-    public function execute(\Closure $block = null) {
+    public function execute($block = null) {
+        if ($block && !is_callable($block)) {
+            throw new \RuntimeException('Argument passed must be a callable object');
+        }
+
         $this->setRunning(true);
         $pipelineBlockException = null;
 
@@ -589,12 +459,83 @@ class CommandPipeline {
     }
 }
 
+class MultiExecBlock {
+    private $_redisClient, $_commands, $_initialized;
+
+    public function __construct(Client $redisClient) {
+        $this->_initialized = false;
+        $this->_redisClient = $redisClient;
+        $this->_commands    = array();
+    }
+
+    private function initialize() {
+        if ($this->_initialized === false) {
+            $this->_redisClient->multi();
+            $this->_initialized = true;
+        }
+    }
+
+    public function __call($method, $arguments) {
+        $this->initialize();
+        $command  = $this->_redisClient->createCommand($method, $arguments);
+        $response = $this->_redisClient->executeCommand($command);
+        if (isset($response->queued)) {
+            $this->_commands[] = $command;
+            return $response;
+        }
+        else {
+            throw new ClientException('The server did not respond with a QUEUED status reply');
+        }
+    }
+
+    public function execute($block = null) {
+        if ($block && !is_callable($block)) {
+            throw new \RuntimeException('Argument passed must be a callable object');
+        }
+
+        $blockException = null;
+        $returnValues   = array();
+
+        try {
+            if ($block !== null) {
+                $block($this);
+            }
+
+            $execReply = $this->_redisClient->exec();
+            $commands  = &$this->_commands;
+            $sizeofReplies = count($execReply);
+
+            if ($sizeofReplies !== count($commands)) {
+                // TODO: think of a better exception message
+                throw new ClientException("Out-of-sync");
+            }
+
+            for ($i = 0; $i < $sizeofReplies; $i++) {
+                $returnValues[] = $commands[$i]->parseResponse($execReply[$i]);
+                unset($commands[$i]);
+            }
+        }
+        catch (\Exception $exception) {
+            $blockException = $exception;
+        }
+
+        if ($blockException !== null) {
+            throw $blockException;
+        }
+
+        return $returnValues;
+    }
+}
+
 /* ------------------------------------------------------------------------- */
 
 class ConnectionParameters {
+    const DEFAULT_HOST = '127.0.0.1';
+    const DEFAULT_PORT = 6379;
     private $_parameters;
 
     public function __construct($parameters) {
+        $parameters = $parameters ?: array();
         $this->_parameters = is_array($parameters) 
             ? self::filterConnectionParams($parameters) 
             : self::parseURI($parameters);
@@ -618,6 +559,12 @@ class ConnectionParameters {
                     case 'password':
                         $details['password'] = $v;
                         break;
+                    case 'connection_timeout':
+                        $details['connection_timeout'] = $v;
+                        break;
+                    case 'read_write_timeout':
+                        $details['read_write_timeout'] = $v;
+                        break;
                 }
             }
             $parsed = array_merge($parsed, $details);
@@ -632,15 +579,21 @@ class ConnectionParameters {
 
     private static function filterConnectionParams($parameters) {
         return array(
-            'host' => self::getParamOrDefault($parameters, 'host', Connection::DEFAULT_HOST), 
-            'port' => (int) self::getParamOrDefault($parameters, 'port', Connection::DEFAULT_PORT), 
+            'host' => self::getParamOrDefault($parameters, 'host', self::DEFAULT_HOST), 
+            'port' => (int) self::getParamOrDefault($parameters, 'port', self::DEFAULT_PORT), 
             'database' => self::getParamOrDefault($parameters, 'database'), 
-            'password' => self::getParamOrDefault($parameters, 'password')
+            'password' => self::getParamOrDefault($parameters, 'password'), 
+            'connection_timeout' => self::getParamOrDefault($parameters, 'connection_timeout'), 
+            'read_write_timeout' => self::getParamOrDefault($parameters, 'read_write_timeout'), 
         );
     }
 
     public function __get($parameter) {
         return $this->_parameters[$parameter];
+    }
+
+    public function __isset($parameter) {
+        return isset($this->_parameters[$parameter]);
     }
 }
 
@@ -653,10 +606,7 @@ interface IConnection {
 }
 
 class Connection implements IConnection {
-    const DEFAULT_HOST = '127.0.0.1';
-    const DEFAULT_PORT = 6379;
     const CONNECTION_TIMEOUT = 2;
-    const READ_WRITE_TIMEOUT = 5;
 
     private $_params, $_socket, $_initCmds;
 
@@ -678,11 +628,15 @@ class Connection implements IConnection {
             throw new ClientException('Connection already estabilished');
         }
         $uri = sprintf('tcp://%s:%d/', $this->_params->host, $this->_params->port);
-        $this->_socket = @stream_socket_client($uri, $errno, $errstr, self::CONNECTION_TIMEOUT);
+        $connectionTimeout = $this->_params->connection_timeout ?: self::CONNECTION_TIMEOUT;
+        $this->_socket = @stream_socket_client($uri, $errno, $errstr, $connectionTimeout);
         if (!$this->_socket) {
             throw new ClientException(trim($errstr), $errno);
         }
-        stream_set_timeout($this->_socket, self::READ_WRITE_TIMEOUT);
+
+        if (isset($this->_params->read_write_timeout)) {
+            stream_set_timeout($this->_socket, $this->_params->read_write_timeout);
+        }
 
         if (count($this->_initCmds) > 0){
             $this->sendInitializationCommands();
@@ -709,24 +663,30 @@ class Connection implements IConnection {
     }
 
     public function writeCommand(Command $command) {
-        fwrite($this->getSocket(), $command());
+        $written = fwrite($this->getSocket(), $command());
+        if ($written === false){
+           throw new ClientException(sprintf(
+               'An error has occurred while writing command %s on the network stream'),
+               $command->getCommandId()
+           );
+        }
     }
 
     public function readResponse(Command $command) {
-        $socket   = $this->getSocket();
-        $handler  = Response::getPrefixHandler(fgetc($socket));
-        $response = $command->parseResponse($handler($socket));
-        return $response;
+        $response = Response::read($this->getSocket());
+        return isset($response->queued) ? $response : $command->parseResponse($response);
     }
 
     public function rawCommand($rawCommandData, $closesConnection = false) {
         $socket = $this->getSocket();
-        fwrite($socket, $rawCommandData);
+        $written = fwrite($socket, $rawCommandData);
+        if ($written === false){
+           throw new ClientException('An error has occurred while writing a raw command on the network stream');
+        }
         if ($closesConnection) {
             return;
         }
-        $handler = Response::getPrefixHandler(fgetc($socket));
-        return $handler($socket);
+        return Response::read($socket);
     }
 
     public function getSocket() {
@@ -737,14 +697,11 @@ class Connection implements IConnection {
     }
 
     public function __toString() {
-        return sprintf('tcp://%s:%d/', $this->_params->host, $this->_params->port);
+        return sprintf('%s:%d', $this->_params->host, $this->_params->port);
     }
 }
 
-class ConnectionCluster implements IConnection  {
-    // TODO: storing a temporary map of commands hashes to hashring items (that 
-    //       is, connections) could offer a notable speedup, but I am wondering 
-    //       about the increased memory footprint.
+class ConnectionCluster implements IConnection, \IteratorAggregate {
     // TODO: find a clean way to handle connection failures of single nodes.
 
     private $_pool, $_ring;
@@ -784,22 +741,21 @@ class ConnectionCluster implements IConnection  {
         $this->_ring->add($connection);
     }
 
-    private function getConnectionFromRing(Command $command) {
-        return $this->_ring->get($this->computeHash($command));
-    }
-
-    private function computeHash(Command $command) {
-        return crc32($command->getArgument(0));
-    }
-
     private function getConnection(Command $command) {
-        return $command->canBeHashed() 
-            ? $this->getConnectionFromRing($command) 
-            : $this->getConnectionById(0);
+        if ($command->canBeHashed() === false) {
+            throw new ClientException(
+                sprintf("Cannot send '%s' commands to a cluster of connections.", $command->getCommandId())
+            );
+        }
+        return $this->_ring->get($command->getHash());
     }
 
     public function getConnectionById($id = null) {
-        return $this->_pool[$id === null ? 0 : $id];
+        return $this->_pool[$id ?: 0];
+    }
+
+    public function getIterator() {
+        return new \ArrayIterator($this->_pool);
     }
 
     public function writeCommand(Command $command) {
@@ -808,6 +764,263 @@ class ConnectionCluster implements IConnection  {
 
     public function readResponse(Command $command) {
         return $this->getConnection($command)->readResponse($command);
+    }
+}
+
+/* ------------------------------------------------------------------------- */
+
+abstract class RedisServerProfile {
+    const DEFAULT_SERVER_PROFILE = '\Predis\RedisServer_v1_2';
+    private $_registeredCommands;
+
+    public function __construct() {
+        $this->_registeredCommands = $this->getSupportedCommands();
+    }
+
+    public abstract function getVersion();
+
+    protected abstract function getSupportedCommands();
+
+    public static function getDefault() {
+        $defaultProfile = self::DEFAULT_SERVER_PROFILE;
+        return new $defaultProfile();
+    }
+
+    public function compareWith($version, $operator = null) {
+        // one could expect that PHP's version_compare would behave 
+        // the same way if invoked with 2 arguments or 3 arguments 
+        // with the third being NULL, but it is not like that.
+        // TODO: since version_compare considers 1 < 1.0 < 1.0.0, 
+        //       we might need to revise the behavior of this method.
+        return ($operator === null 
+            ? version_compare($this, $version)
+            : version_compare($this, $version, $operator)
+        );
+    }
+
+    public function supportsCommand($command) {
+        return isset($this->_registeredCommands[$command]);
+    }
+
+    public function createCommand($method, $arguments = array()) {
+        if (!isset($this->_registeredCommands[$method])) {
+            throw new ClientException("'$method' is not a registered Redis command");
+        }
+        $commandClass = $this->_registeredCommands[$method];
+        $command = new $commandClass();
+        $command->setArgumentsArray($arguments);
+        return $command;
+    }
+
+    public function registerCommands(Array $commands) {
+        foreach ($commands as $command => $aliases) {
+            $this->registerCommand($command, $aliases);
+        }
+    }
+
+    public function registerCommand($command, $aliases) {
+        $commandReflection = new \ReflectionClass($command);
+
+        if (!$commandReflection->isSubclassOf('\Predis\Command')) {
+            throw new ClientException("Cannot register '$command' as it is not a valid Redis command");
+        }
+
+        if (is_array($aliases)) {
+            foreach ($aliases as $alias) {
+                $this->_registeredCommands[$alias] = $command;
+            }
+        }
+        else {
+            $this->_registeredCommands[$aliases] = $command;
+        }
+    }
+
+    public function __toString() {
+        return $this->getVersion();
+    }
+}
+
+class RedisServer_v1_0 extends RedisServerProfile {
+    public function getVersion() { return '1.0'; }
+    public function getSupportedCommands() {
+        return array(
+            /* miscellaneous commands */
+            'ping'      => '\Predis\Commands\Ping',
+            'echo'      => '\Predis\Commands\DoEcho',
+            'auth'      => '\Predis\Commands\Auth',
+
+            /* connection handling */
+            'quit'      => '\Predis\Commands\Quit',
+
+            /* commands operating on string values */
+            'set'                     => '\Predis\Commands\Set',
+            'setnx'                   => '\Predis\Commands\SetPreserve',
+                'setPreserve'         => '\Predis\Commands\SetPreserve',
+            'get'                     => '\Predis\Commands\Get',
+            'mget'                    => '\Predis\Commands\GetMultiple',
+                'getMultiple'         => '\Predis\Commands\GetMultiple',
+            'getset'                  => '\Predis\Commands\GetSet',
+                'getSet'              => '\Predis\Commands\GetSet',
+            'incr'                    => '\Predis\Commands\Increment',
+                'increment'           => '\Predis\Commands\Increment',
+            'incrby'                  => '\Predis\Commands\IncrementBy',
+                'incrementBy'         => '\Predis\Commands\IncrementBy',
+            'decr'                    => '\Predis\Commands\Decrement',
+                'decrement'           => '\Predis\Commands\Decrement',
+            'decrby'                  => '\Predis\Commands\DecrementBy',
+                'decrementBy'         => '\Predis\Commands\DecrementBy',
+            'exists'                  => '\Predis\Commands\Exists',
+            'del'                     => '\Predis\Commands\Delete',
+                'delete'              => '\Predis\Commands\Delete',
+            'type'                    => '\Predis\Commands\Type',
+
+            /* commands operating on the key space */
+            'keys'               => '\Predis\Commands\Keys',
+            'randomkey'          => '\Predis\Commands\RandomKey',
+                'randomKey'      => '\Predis\Commands\RandomKey',
+            'rename'             => '\Predis\Commands\Rename',
+            'renamenx'           => '\Predis\Commands\RenamePreserve',
+                'renamePreserve' => '\Predis\Commands\RenamePreserve',
+            'expire'             => '\Predis\Commands\Expire',
+            'expireat'           => '\Predis\Commands\ExpireAt',
+                'expireAt'       => '\Predis\Commands\ExpireAt',
+            'dbsize'             => '\Predis\Commands\DatabaseSize',
+                'databaseSize'   => '\Predis\Commands\DatabaseSize',
+            'ttl'                => '\Predis\Commands\TimeToLive',
+                'timeToLive'     => '\Predis\Commands\TimeToLive',
+
+            /* commands operating on lists */
+            'rpush'            => '\Predis\Commands\ListPushTail',
+                'pushTail'     => '\Predis\Commands\ListPushTail',
+            'lpush'            => '\Predis\Commands\ListPushHead',
+                'pushHead'     => '\Predis\Commands\ListPushHead',
+            'llen'             => '\Predis\Commands\ListLength',
+                'listLength'   => '\Predis\Commands\ListLength',
+            'lrange'           => '\Predis\Commands\ListRange',
+                'listRange'    => '\Predis\Commands\ListRange',
+            'ltrim'            => '\Predis\Commands\ListTrim',
+                'listTrim'     => '\Predis\Commands\ListTrim',
+            'lindex'           => '\Predis\Commands\ListIndex',
+                'listIndex'    => '\Predis\Commands\ListIndex',
+            'lset'             => '\Predis\Commands\ListSet',
+                'listSet'      => '\Predis\Commands\ListSet',
+            'lrem'             => '\Predis\Commands\ListRemove',
+                'listRemove'   => '\Predis\Commands\ListRemove',
+            'lpop'             => '\Predis\Commands\ListPopFirst',
+                'popFirst'     => '\Predis\Commands\ListPopFirst',
+            'rpop'             => '\Predis\Commands\ListPopLast',
+                'popLast'      => '\Predis\Commands\ListPopLast',
+
+            /* commands operating on sets */
+            'sadd'                      => '\Predis\Commands\SetAdd', 
+                'setAdd'                => '\Predis\Commands\SetAdd',
+            'srem'                      => '\Predis\Commands\SetRemove', 
+                'setRemove'             => '\Predis\Commands\SetRemove',
+            'spop'                      => '\Predis\Commands\SetPop',
+                'setPop'                => '\Predis\Commands\SetPop',
+            'smove'                     => '\Predis\Commands\SetMove', 
+                'setMove'               => '\Predis\Commands\SetMove',
+            'scard'                     => '\Predis\Commands\SetCardinality', 
+                'setCardinality'        => '\Predis\Commands\SetCardinality',
+            'sismember'                 => '\Predis\Commands\SetIsMember', 
+                'setIsMember'           => '\Predis\Commands\SetIsMember',
+            'sinter'                    => '\Predis\Commands\SetIntersection', 
+                'setIntersection'       => '\Predis\Commands\SetIntersection',
+            'sinterstore'               => '\Predis\Commands\SetIntersectionStore', 
+                'setIntersectionStore'  => '\Predis\Commands\SetIntersectionStore',
+            'sunion'                    => '\Predis\Commands\SetUnion', 
+                'setUnion'              => '\Predis\Commands\SetUnion',
+            'sunionstore'               => '\Predis\Commands\SetUnionStore', 
+                'setUnionStore'         => '\Predis\Commands\SetUnionStore',
+            'sdiff'                     => '\Predis\Commands\SetDifference', 
+                'setDifference'         => '\Predis\Commands\SetDifference',
+            'sdiffstore'                => '\Predis\Commands\SetDifferenceStore', 
+                'setDifferenceStore'    => '\Predis\Commands\SetDifferenceStore',
+            'smembers'                  => '\Predis\Commands\SetMembers', 
+                'setMembers'            => '\Predis\Commands\SetMembers',
+            'srandmember'               => '\Predis\Commands\SetRandomMember', 
+                'setRandomMember'       => '\Predis\Commands\SetRandomMember',
+
+            /* multiple databases handling commands */
+            'select'                => '\Predis\Commands\SelectDatabase', 
+                'selectDatabase'    => '\Predis\Commands\SelectDatabase',
+            'move'                  => '\Predis\Commands\MoveKey', 
+                'moveKey'           => '\Predis\Commands\MoveKey',
+            'flushdb'               => '\Predis\Commands\FlushDatabase', 
+                'flushDatabase'     => '\Predis\Commands\FlushDatabase',
+            'flushall'              => '\Predis\Commands\FlushAll', 
+                'flushDatabases'    => '\Predis\Commands\FlushAll',
+
+            /* sorting */
+            'sort'                  => '\Predis\Commands\Sort',
+
+            /* remote server control commands */
+            'info'                  => '\Predis\Commands\Info',
+            'slaveof'               => '\Predis\Commands\SlaveOf', 
+                'slaveOf'           => '\Predis\Commands\SlaveOf',
+
+            /* persistence control commands */
+            'save'                  => '\Predis\Commands\Save',
+            'bgsave'                => '\Predis\Commands\BackgroundSave', 
+                'backgroundSave'    => '\Predis\Commands\BackgroundSave',
+            'lastsave'              => '\Predis\Commands\LastSave', 
+                'lastSave'          => '\Predis\Commands\LastSave',
+            'shutdown'              => '\Predis\Commands\Shutdown',
+        );
+    }
+}
+
+class RedisServer_v1_2 extends RedisServer_v1_0 {
+    public function getVersion() { return '1.2'; }
+    public function getSupportedCommands() {
+        return array_merge(parent::getSupportedCommands(), array(
+            /* commands operating on string values */
+            'mset'                    => '\Predis\Commands\SetMultiple',
+                'setMultiple'         => '\Predis\Commands\SetMultiple',
+            'msetnx'                  => '\Predis\Commands\SetMultiplePreserve',
+                'setMultiplePreserve' => '\Predis\Commands\SetMultiplePreserve',
+
+            /* commands operating on lists */
+            'rpoplpush'        => '\Predis\Commands\ListPushTailPopFirst',
+                'listPopLastPushHead'  => '\Predis\Commands\ListPopLastPushHead',
+
+            /* commands operating on sorted sets */
+            'zadd'                          => '\Predis\Commands\ZSetAdd',
+                'zsetAdd'                   => '\Predis\Commands\ZSetAdd',
+            'zincrby'                       => '\Predis\Commands\ZSetIncrementBy',
+                'zsetIncrementBy'           => '\Predis\Commands\ZSetIncrementBy',
+            'zrem'                          => '\Predis\Commands\ZSetRemove',
+                'zsetRemove'                => '\Predis\Commands\ZSetRemove',
+            'zrange'                        => '\Predis\Commands\ZSetRange',
+                'zsetRange'                 => '\Predis\Commands\ZSetRange',
+            'zrevrange'                     => '\Predis\Commands\ZSetReverseRange',
+                'zsetReverseRange'          => '\Predis\Commands\ZSetReverseRange',
+            'zrangebyscore'                 => '\Predis\Commands\ZSetRangeByScore',
+                'zsetRangeByScore'          => '\Predis\Commands\ZSetRangeByScore',
+            'zcard'                         => '\Predis\Commands\ZSetCardinality',
+                'zsetCardinality'           => '\Predis\Commands\ZSetCardinality',
+            'zscore'                        => '\Predis\Commands\ZSetScore',
+                'zsetScore'                 => '\Predis\Commands\ZSetScore',
+            'zremrangebyscore'              => '\Predis\Commands\ZSetRemoveRangeByScore',
+                'zsetRemoveRangeByScore'    => '\Predis\Commands\ZSetRemoveRangeByScore',
+        ));
+    }
+}
+
+class RedisServer_vNext extends RedisServer_v1_2 {
+    public function getVersion() { return '1.3'; }
+    public function getSupportedCommands() {
+        return array_merge(parent::getSupportedCommands(), array(
+            /* miscellaneous commands */
+            'multi'     => '\Predis\Commands\Multi',
+            'exec'      => '\Predis\Commands\Exec',
+
+            /* commands operating on lists */
+            'blpop'                     => '\Predis\Commands\ListPopFirstBlocking',
+                'popFirstBlocking'      => '\Predis\Commands\ListPopFirstBlocking',
+            'brpop'                     => '\Predis\Commands\ListPopLastBlocking',
+                'popLastBlocking'       => '\Predis\Commands\ListPopLastBlocking',
+        ));
     }
 }
 
@@ -827,7 +1040,8 @@ class HashRing {
 
     public function add($node) {
         $nodeHash = (string) $node;
-        for ($i = 0; $i < $this->_replicas; $i++) {
+        $replicas = $this->_replicas;
+        for ($i = 0; $i < $replicas; $i++) {
             $key = crc32($nodeHash . ':' . $i);
             $this->_ring[$key] = $node;
         }
@@ -837,7 +1051,8 @@ class HashRing {
 
     public function remove($node) {
         $nodeHash = (string) $node;
-        for ($i = 0; $i < $this->_replicas; $i++) {
+        $replicas = $this->_replicas;
+        for ($i = 0; $i < $replicas; $i++) {
             $key = crc32($nodeHash . ':' . $i);
             unset($this->_ring[$key]);
             $this->_ringKeys = array_filter($this->_ringKeys, function($rk) use($key) {
@@ -851,24 +1066,26 @@ class HashRing {
     }
 
     private function getNodeKey($key) {
-        $upper = count($this->_ringKeys) - 1;
+        $ringKeys = $this->_ringKeys;
+
+        $upper = count($ringKeys) - 1;
         $lower = 0;
         $index = 0;
 
         while ($lower <= $upper) {
             $index = ($lower + $upper) / 2;
-            $item  = $this->_ringKeys[$index];
-            if ($item === $key) {
-                return $index;
-            }
-            else if ($item > $key) {
+            $item  = $ringKeys[$index];
+            if ($item > $key) {
                 $upper = $index - 1;
             }
-            else {
+            else if ($item < $key) {
                 $lower = $index + 1;
             }
+            else {
+                return $index;
+            }
         }
-        return $this->_ringKeys[$upper];
+        return $ringKeys[$upper];
     }
 }
 
@@ -983,7 +1200,6 @@ class RandomKey extends \Predis\InlineCommand {
 }
 
 class Rename extends \Predis\InlineCommand {
-    // TODO: doesn't RENAME break the hash-based client-side sharding?
     public function canBeHashed()  { return false; }
     public function getCommandId() { return 'RENAME'; }
 }
@@ -1058,6 +1274,14 @@ class ListPopLast extends \Predis\InlineCommand {
     public function getCommandId() { return 'RPOP'; }
 }
 
+class ListPopFirstBlocking extends \Predis\InlineCommand {
+    public function getCommandId() { return 'BLPOP'; }
+}
+
+class ListPopLastBlocking extends \Predis\InlineCommand {
+    public function getCommandId() { return 'BRPOP'; }
+}
+
 /* commands operating on sets */
 class SetAdd extends \Predis\BulkCommand {
     public function getCommandId() { return 'SADD'; }
@@ -1126,6 +1350,10 @@ class ZSetAdd extends \Predis\BulkCommand {
     public function parseResponse($data) { return (bool) $data; }
 }
 
+class ZSetIncrementBy extends \Predis\BulkCommand {
+    public function getCommandId() { return 'ZINCRBY'; }
+}
+
 class ZSetRemove extends \Predis\BulkCommand {
     public function getCommandId() { return 'ZREM'; }
     public function parseResponse($data) { return (bool) $data; }
@@ -1133,9 +1361,22 @@ class ZSetRemove extends \Predis\BulkCommand {
 
 class ZSetRange extends \Predis\InlineCommand {
     public function getCommandId() { return 'ZRANGE'; }
+    public function parseResponse($data) {
+        $arguments = $this->getArguments();
+        if (count($arguments) === 4) {
+            if (strtolower($arguments[3]) === 'withscores') {
+                $result = array();
+                for ($i = 0; $i < count($data); $i++) {
+                    $result[] = array($data[$i], $data[++$i]);
+                }
+                return $result;
+            }
+        }
+        return $data;
+    }
 }
 
-class ZSetReverseRange extends \Predis\InlineCommand {
+class ZSetReverseRange extends \Predis\Commands\ZSetRange {
     public function getCommandId() { return 'ZREVRANGE'; }
 }
 
@@ -1221,6 +1462,12 @@ class Save extends \Predis\InlineCommand {
 class BackgroundSave extends \Predis\InlineCommand {
     public function canBeHashed()  { return false; }
     public function getCommandId() { return 'BGSAVE'; }
+    public function parseResponse($data) {
+        if ($data == 'Background saving started') {
+            return true;
+        }
+        return $data;
+    }
 }
 
 class LastSave extends \Predis\InlineCommand {
@@ -1265,5 +1512,15 @@ class SlaveOf extends \Predis\InlineCommand {
     public function filterArguments(Array $arguments) {
         return count($arguments) === 0 ? array('NO ONE') : $arguments;
     }
+}
+
+class Multi extends \Predis\InlineCommand {
+    public function canBeHashed()  { return false; }
+    public function getCommandId() { return 'MULTI'; }
+}
+
+class Exec extends \Predis\InlineCommand {
+    public function canBeHashed()  { return false; }
+    public function getCommandId() { return 'EXEC'; }
 }
 ?>
