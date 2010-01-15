@@ -332,18 +332,21 @@ abstract class Base extends Calculations
   # 
   # Examples:
   # 
-  #   $user  = User::find_by_id();
+  #   $user  = User::find_by_id($id);
   #   $post  = Post::find_first_by_tag($tag);
   #   $posts = Post::find_all_by_category_id($category_id);
+  # 
+  #   $count_users = User::count_by_id($id);
+  # 
   static function __callStatic($method, $args)
   {
-    if (preg_match('/^find(?:_([^_]+)|)(?:_by_(.+)|)$/', $method, $match))
+    if (preg_match('/^(find|count)(?:_([^_]+)|)(?:_by_(.+)|)$/', $method, $match))
     {
-      if (!empty($match[2]))
+      if (!empty($match[3]))
       {
-        if (!in_array($match[2], static::column_names()))
+        if (!in_array($match[3], static::column_names()))
         {
-          trigger_error("No such column '{$match[2]}'.", E_USER_WARNING);
+          trigger_error("No such column '{$match[3]}'.", E_USER_WARNING);
           return;
         }
         if (!isset($args[0]))
@@ -352,14 +355,20 @@ abstract class Base extends Calculations
           return;
         }
         $options = isset($args[1]) ? $args[1] : array();
-        $options['conditions'] = array($match[2] => $args[0]);
+        $options['conditions'] = array($match[3] => $args[0]);
       }
       else {
         $options = isset($args[0]) ? $args[0] : array();
       }
       
-      $scope = empty($match[1]) ? ':first' : ':'.$match[1];
-      return static::find($scope, $options);
+      if ($match[1] == 'find')
+      {
+        $scope = empty($match[2]) ? ':first' : ':'.$match[2];
+        return static::find($scope, $options);
+      }
+      else {
+        return static::count($options);
+      }
     }
     elseif ($method == 'delete') {
       return forward_static_call_array(array(get_called_class(), '_static_delete'), $args);

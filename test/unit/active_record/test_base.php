@@ -439,6 +439,12 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
     $this->assert_equal($products[0]->id, 2);
   }
   
+  function test_magic_count_methods()
+  {
+    $this->assert_equal(Product::count_by_name('azerty'), 1);
+    $this->assert_equal(Product::count_by_id(1), 1);
+  }
+  
   function test_find_values()
   {
     $options = Product::find(':values', array('select' => 'name, id', 'order' => 'name asc'));
