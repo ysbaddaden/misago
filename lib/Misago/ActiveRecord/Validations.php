@@ -74,7 +74,7 @@ abstract class Validations extends Associations
   function save_without_validation()
   {
     $method = $this->new_record ? '_create' : '_update';
-    return ($this->$method() === false);
+    return ($this->$method() !== false);
   }
   
   # Runs validation tests.
