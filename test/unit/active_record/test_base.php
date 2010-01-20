@@ -2,9 +2,7 @@
 require_once __DIR__.'/../../unit.php';
 use Misago\ActiveRecord;
 
-class Orphan extends ActiveRecord\Base {
-  
-}
+class Orphan extends ActiveRecord\Base {}
 
 class Test_ActiveRecord_Base extends Misago\Unit\TestCase
 {
@@ -12,15 +10,9 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
   
   function test_no_such_table()
   {
-    try
-    {
+    $this->assert_throws('Misago\ActiveRecord\StatementInvalid', function() {
       Orphan::columns();
-      $test = false;
-    }
-    catch(ActiveRecord\StatementInvalid $e) {
-      $test = true;
-    }
-    $this->assert_true($test, "Must throw an ActiveRecord\StatementInvalid exception (no such table)");
+    }, "Must throw an ActiveRecord\StatementInvalid exception (no such table)");
   }
   
   function test_column_names()
@@ -253,13 +245,11 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
   
   function test_save()
   {
-    $this->truncate('products');
-    
     # save: create
     $product = new Product(array('name' => 'mwerty', 'price' => 6));
-    $this->assert_true($product->new_record(), "before creation: is a new record");
+    $this->assert_true($product->new_record, "before creation: is a new record");
     $this->assert_true($product->save(), "creates record");
-    $this->assert_false($product->new_record(), "after creation: no longer a new record");
+    $this->assert_false($product->new_record, "after creation: no longer a new record");
     
     # save: update
     $product->name = 'pwerty';
