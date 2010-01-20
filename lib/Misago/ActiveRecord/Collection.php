@@ -57,7 +57,9 @@ class Collection extends ActiveSupport\ActiveArray
   # Adds a new record to the collection, but doesn't save it.
   function build($attributes=array())
   {
-    $attributes[$this->options['foreign_key']] = $this->parent->id;
+    if (!isset($this->options['through'])) {
+      $attributes[$this->options['foreign_key']] = $this->parent->id;
+    }
     
     $class  = $this->model;
     $record = new $class($attributes);
@@ -70,8 +72,13 @@ class Collection extends ActiveSupport\ActiveArray
   function create($attributes)
   {
     $record = $this->build($attributes);
-    if (!$this->parent->new_record and !$record->save()) {
-      return false;
+    if (!$this->parent->new_record)
+    {
+      # record
+      if (!$record->save()) {
+        return false;
+      }
+      $this->create_join_relation($record);
     }
     return $record;
   }
@@ -87,9 +94,31 @@ class Collection extends ActiveSupport\ActiveArray
       {
         $record->{$fk} = $self->parent->id;
         $record->do_save();
+        $self->create_join_relation($record);
       }
       return true;
     });
+  }
+  
+  # :nodoc:
+  function create_join_relation($record)
+  {
+    if (isset($this->options['through']))
+    {
+      $attributes = array(
+        $this->options['foreign_key'] => $this->parent->id,
+        $this->options['through_foreign_key'] => $record->id,
+      );
+      $this->parent->{$this->options['through']}->create($attributes);
+    }
+    elseif ($this->options['type'] == 'has_and_belongs_to_many')
+    {
+      $attributes = array(
+        $this->options['foreign_key'] => $this->parent->id,
+        $this->options['association_foreign_key'] => $record->id,
+      );
+      $this->parent->connection->insert($this->options['join_table'], $attributes);
+    }
   }
   
   # Removes the given records from the collection by nullifying their
@@ -115,6 +144,8 @@ class Collection extends ActiveSupport\ActiveArray
     });
   }
   
+  # Destroys the given records (callbacks are processed).
+  # They're removed from the collection too.
   function destroy($record)
   {
     $records = func_get_args();
@@ -137,21 +168,37 @@ class Collection extends ActiveSupport\ActiveArray
   }
   
   # Deletes all records (object callbacks aren't processed).
-  # They're removed from the collection, too.
+  # They're removed from the collection too.
   function delete_all()
   {
-    $other_ids = ActiveSupport\String::singularize(
-      ActiveSupport\String::underscore($this->options['class_name'])).'_ids';
-    $ids = $this->parent->$other_ids;
+    $class_name = $this->options['class_name'];
     
-    if (!empty($ids))
+    if ($this->options['type'] == 'has_and_belongs_to_many')
     {
-      $class_name = $this->options['class_name'];
-      if (!$class_name::delete($ids)) {
+      # deletions
+      $conditions = "{$this->options['association_primary_key']} IN ( ".
+        "SELECT {$this->options['association_foreign_key']} ".
+        "FROM programmers_projects ".
+        "WHERE ".$this->parent->connection->sanitize_sql_for_conditions(array(
+          $this->options['foreign_key'] => $this->parent->id,
+        ))." )";
+      if ($class_name::delete_all($conditions) === false) {
         return false;
       }
-      $this->clear();
+      
+      # cleanup
+      $conditions = array($this->options['foreign_key'] => $this->parent->id);
+      $this->parent->connection()->delete($this->options['join_table'], $conditions);
     }
+    else
+    {
+      $conditions = array($this->options['foreign_key'] => $this->parent->id);
+      if ($class_name::delete_all($conditions) === false) {
+        return false;
+      }
+    }
+    
+    $this->clear();
     return true;
   }
   
@@ -186,7 +233,8 @@ class Collection extends ActiveSupport\ActiveArray
   
   function size()
   {
-    $options    = $this->find_options();
+    $options = $this->find_options();
+    unset($options['select']);
     $class_name = $this->options['class_name'];
     return $class_name::count($options);
   }

@@ -4,9 +4,10 @@ require_once __DIR__.'/../../unit.php';
 class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
 {
   protected $fixtures = array('products', 'orders', 'baskets', 'invoices',
-    'programmers', 'projects', 'programmers_projects');
+    'programmers', 'projects', 'programmers_projects',
+    'authors', 'books', 'authorships');
   
-  function test_belongs_to_relationship()
+  function test_belongs_to()
   {
     $invoice = new Invoice(1);
     $this->assert_instance_of($invoice->order, 'Order');
@@ -16,14 +17,14 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $this->assert_equal($basket->product->id, 3);
   }
   
-  function test_has_one_relationship()
+  function test_has_one()
   {
     $order = new Order(2);
     $this->assert_instance_of($order->invoice, 'Invoice');
     $this->assert_equal($order->invoice->id, 2);
   }
   
-  function test_has_many_relationship()
+  function test_has_many()
   {
     $order = new Order(1);
     $this->assert_instance_of($order->baskets, 'Misago\ActiveRecord\Collection');
@@ -33,7 +34,7 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $this->assert_instance_of($basket, 'Basket');
   }
   
-  function test_has_and_belongs_to_many_relationship()
+  function test_has_and_belongs_to_many()
   {
     $programmer = new Programmer(1);
     $this->assert_instance_of($programmer->projects, 'Misago\ActiveRecord\Collection');
@@ -41,6 +42,28 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     
     $project = $programmer->projects->build();
     $this->assert_instance_of($project, 'Project');
+  }
+  
+  function test_has_many_through()
+  {
+    $author = new Author(1);
+    $this->assert_instance_of($author->books[0], 'Book');
+    $this->assert_equal($author->books[0]->id, 1);
+    
+    $book = new Book(2);
+    $this->assert_instance_of($book->authors[0], 'Author');
+    $this->assert_equal($book->authors->size(), 1);
+    $this->assert_equal($book->authors[0]->id, 1);
+  }
+  
+  function test_has_many_through_save()
+  {
+    $author = new Author(2);
+    $this->assert_equal($author->books->size(), 0);
+    
+    $book = $author->books->build(array('title' => 'another book'));
+    $this->assert_true($author->books->save());
+    $this->assert_equal($author->books->size(), 1);
   }
   
   function test_loading_association_when_parent_is_a_new_record()
@@ -144,6 +167,7 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   
   function test_others_build()
   {
+    # has_many
     $order  = new Order(1);
     $basket = $order->baskets->build(array(
       'product_id' => 2,
@@ -152,10 +176,24 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $this->assert_true($basket->new_record);
     $this->assert_equal($order->baskets->size(), 3);
     $this->assert_equal(count($order->baskets), 1);
+    
+    # habtm
+    $programmer = new Programmer(1);
+    $project = $programmer->projects->build(array('title' => 'kokone'));
+    $this->assert_true($project->new_record);
+    $this->assert_equal($programmer->projects->size(), 2);
+    $this->assert_equal(count($programmer->projects), 1);
+    
+    # has many through
+    $author = new Author(1);
+    $book = $author->books->build(array('title' => "That's my book!"));
+    $this->assert_instance_of($book, 'Book');
+    $this->assert_equal($book->attributes(), array('title' => "That's my book!"));
   }
   
   function test_others_create()
   {
+    # has_many
     $order  = new Order(2);
     $basket = $order->baskets->create(array(
       'id' => 7,
@@ -164,18 +202,32 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     ));
     $this->assert_false($basket->new_record);
     $this->assert_equal($order->baskets->size(), 2);
+    
+    # habtm
+    $programmer = new Programmer(1);
+    $project = $programmer->projects->create(array('title' => 'kokone'));
+    $this->assert_false($project->new_record);
+    $this->assert_equal($programmer->projects->size(), 3);
+    
+    # has_many through
+    $book = new Book(2);
+    $author = $book->authors->create(array('name' => 'robert'));
+    $this->assert_instance_of($author, 'Author');
+    $this->assert_equal($author->attributes(), array('id' => 3, 'name' => 'robert'));
+    $this->assert_equal($book->authors->size(), 2);
   }
   
   function test_others_clear()
   {
     $order = new Order(1);
     $this->assert_equal($order->baskets->size(), 3);
+    
     $order->baskets->clear();
     $this->assert_equal($order->baskets->count(), 0, 'count');
     $this->assert_equal($order->baskets->size(), 3, "they haven't been destroyed");
   }
   
-  function test_others_delete_one()
+  function test_others_delete()
   {
     $order     = new Order(1);
     $basket_id = $order->baskets[0]->id;
@@ -186,8 +238,6 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $basket = new Basket($basket_id);
     $this->assert_true(Basket::exists($basket_id), 'object still exists');
     $this->assert_null($basket->order_id, 'the foreign key has been nullified');
-    
-    $this->fixtures('baskets');
   }
   
   function test_others_delete_many()
@@ -195,8 +245,6 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order = new Order(1);
     $order->baskets->delete($order->baskets[0], $order->baskets[2]);
     $this->assert_equal($order->baskets->count(), 1, 'collection has been reduced by 2');
-    
-    $this->fixtures('baskets');
   }
   
   function test_others_delete_all()
@@ -204,11 +252,11 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order = new Order(1);
     $order->baskets->delete_all();
     $this->assert_equal($order->baskets->count(), 0, 'collection is now empty');
+    $this->assert_equal($order->baskets->size(), 0, 'records must have been deleted from database');
     
-    $order = new Order(1);
-    $this->assert_equal($order->baskets->count(), 0, 'records must have been deleted from database');
-    
-    $this->fixtures('baskets');
+    $programmer = new Programmer(1);
+    $programmer->projects->delete_all();
+    $this->assert_equal($programmer->projects->size(), 0);
   }
   
   function test_others_destroy_all()
@@ -216,9 +264,7 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order = new Order(1);
     $order->baskets->destroy_all();
     $this->assert_equal($order->baskets->count(), 0, 'collection is now empty');
-    
-    $order = new Order(1);
-    $this->assert_equal($order->baskets->count(), 0, 'records must have been destroyed from database');
+    $this->assert_equal($order->baskets->size(), 0, 'records must have been destroyed from database');
     
     $this->fixtures('baskets');
   }
@@ -250,36 +296,6 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
   {
     $order = new Order(1);
     $this->assert_equal($order->basket_ids, array(1, 2, 3));
-  }
-  
-  # TEST: test_others_build_when_parent_is_new_record()
-  function test_others_build_when_parent_is_new_record()
-  {
-    
-  }
-  
-  # TEST: test_others_create_when_parent_is_new_record()
-  function test_others_create_when_parent_is_new_record()
-  {
-    
-  }
-  
-  # TEST: test_others_delete_when_parent_is_new_record()
-  function test_others_delete_when_parent_is_new_record()
-  {
-    
-  }
-  
-  # TEST: test_others_delete_all_when_parent_is_new_record()
-  function test_others_delete_all_when_parent_is_new_record()
-  {
-    
-  }
-  
-  # TEST: test_others_find_when_parent_is_new_record()
-  function test_others_find_when_parent_is_new_record()
-  {
-    
   }
   
   function test_build_join_for()
@@ -405,6 +421,23 @@ class Test_ActiveRecord_Associations extends Misago\Unit\TestCase
     $order->baskets->build(array('product_id' => 1));
     $this->assert_true($order->save());
     $this->assert_equal(Basket::count(array('conditions' => 'order_id = '.$order->id)), 1);
+  }
+  
+  function test_save_associated_with_has_many_through()
+  {
+    $author = new Author(array('name' => 'john doe'));
+    $author->books->build(array('title' => 'has_many through'));
+    $this->assert_true($author->save());
+    $this->assert_equal($author->books->size(), 1);
+  }
+  
+  function test_save_associated_with_habtm()
+  {
+    $programmer = new Programmer(array('name' => 'steph'));
+    $programmer->projects->build(array('title' => 'stabilities'));
+    $programmer->projects->build(array('title' => 'experimentations'));
+    $this->assert_true($programmer->save());
+    $this->assert_equal($programmer->projects->size(), 2);
   }
 }
 

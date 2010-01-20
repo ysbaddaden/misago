@@ -411,7 +411,6 @@ abstract class Associations extends Record
     if (empty($options['foreign_key'])) {
       $options['foreign_key'] = String::underscore(get_called_class()).'_id';
     }
-    $options['find_key']     = $options['foreign_key'];
     $options['find_scope']   = ':all';
     $options['find_options'] = array_intersect_key($options, array(
       'select'     => '',
@@ -422,6 +421,29 @@ abstract class Associations extends Record
       'group'      => '',
       'include'    => '',
     ));
+    
+    # has_many through
+    if (isset($options['through']))
+    {
+      $through    = static::association($options['through']);
+      $through    = $through['class_name'];
+      $assoc      = $through::association(String::singularize($name));
+      $class_name = $assoc['class_name'];
+      
+      $options['class_name']  = $assoc['class_name'];
+      $options['primary_key'] = $assoc['primary_key'];
+      $options['through_foreign_key'] = $assoc['foreign_key'];
+      
+      $options['find_key']  = $through::table_name().'.'.$options['foreign_key'];
+      if (!isset($options['find_options']['select'])) {
+        $options['find_options']['select'] = $assoc['table_name'].'.*';
+      }
+      $options['find_options']['joins'] = $options['through'];
+    }
+    else {
+      $options['find_key'] = $options['foreign_key'];
+    }
+    
     static::set_association('has_many', $name, $options);
   }
   
@@ -701,7 +723,6 @@ abstract class Associations extends Record
   }
   
   # TODO: save_associated() must save HABTM relationships.
-  # TEST: Test save_associated() with has_many relationships.
   # :private:
   protected function save_associated()
   {
@@ -740,46 +761,62 @@ abstract class Associations extends Record
       
       switch($assoc['type'])
       {
+        case 'has_one':
+          switch($assoc['dependent'])
+          {
+            case 'delete': $this->$assoc_name->delete(); break 2;
+            case 'destroy':
+              $obj = new $assoc['class_name']();
+              $obj->destroy_all(array($assoc['foreign_key'] => $this->id));
+            break 2;
+            case 'nullify':
+              $obj = new $assoc['class_name']();
+              $obj->update_all(array($assoc['foreign_key'] => null),
+                array($assoc['foreign_key'] => $this->id));
+            break 2;
+          }
+        break;
+        
         case 'belongs_to':
           switch($assoc['dependent'])
           {
-            case 'delete': $this->$assoc_name->delete(); break;
+            case 'delete': $this->$assoc_name->delete(); break 2;
             case 'destroy':
               $obj = new $assoc['class_name']();
               $obj->destroy_all(array($assoc['primary_key'] => $this->id));
-            break;
+            break 2;
           }
         break;
         
         case 'has_many':
-          switch($assoc['dependent'])
+          if (!isset($this->options['through']))
           {
-            case 'delete_all': $this->$assoc_name->delete_all(); break;
-            case 'destroy':
-              $obj = new $assoc['class_name']();
-              $obj->destroy_all(array($assoc['foreign_key'] => $this->id));
-            break;
-            case 'nullify':
-              $obj = new $assoc['class_name']();
-              $obj->update_all(array($assoc['foreign_key'] => null),
-                array($assoc['foreign_key'] => $this->id));
-            break;
+            switch($assoc['dependent'])
+            {
+              case 'delete_all': $this->$assoc_name->delete_all(); break 2;
+              case 'destroy':
+                $obj = new $assoc['class_name']();
+                $obj->destroy_all(array($assoc['foreign_key'] => $this->id));
+              break 2;
+              case 'nullify':
+                $obj = new $assoc['class_name']();
+                $obj->update_all(array($assoc['foreign_key'] => null),
+                  array($assoc['foreign_key'] => $this->id));
+              break 2;
+            }
           }
         break;
         
-        case 'has_one':
+        case 'has_and_belongs_to_many':
           switch($assoc['dependent'])
           {
-            case 'delete': $this->$assoc_name->delete(); break;
+            case 'delete_all': $this->$assoc_name->delete_all(); break 2;
             case 'destroy':
-              $obj = new $assoc['class_name']();
-              $obj->destroy_all(array($assoc['foreign_key'] => $this->id));
-            break;
+              trigger_error("dependent => destroy not (yet) supported by HABTM relationships", E_USER_ERROR);
+            break 2;
             case 'nullify':
-              $obj = new $assoc['class_name']();
-              $obj->update_all(array($assoc['foreign_key'] => null),
-                array($assoc['foreign_key'] => $this->id));
-            break;
+              trigger_error("dependent => nullify not (yet) supported by HABTM relationships", E_USER_ERROR);
+            break 2;
           }
         break;
       }
