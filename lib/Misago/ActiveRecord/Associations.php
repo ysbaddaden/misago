@@ -320,6 +320,26 @@ abstract class Associations extends Record
   {
     $options = isset(self::$_associations[get_called_class()][$assoc]) ?
       self::$_associations[get_called_class()][$assoc] : null;
+    
+    if ($options !== null
+      and $options['type'] == 'has_many'
+      and isset($options['through']))
+    {
+      $through    = static::association($options['through']);
+      $through    = $through['class_name'];
+      $assoc      = $through::association(String::singularize($options['name']));
+      $class_name = $assoc['class_name'];
+      
+      $options['class_name']  = $assoc['class_name'];
+      $options['primary_key'] = $assoc['primary_key'];
+      $options['through_foreign_key'] = $assoc['foreign_key'];
+      
+      $options['find_key']  = $through::table_name().'.'.$options['foreign_key'];
+      if (!isset($options['find_options']['select'])) {
+        $options['find_options']['select'] = $assoc['table_name'].'.*';
+      }
+      $options['find_options']['joins'] = $options['through'];
+    }
     return $options;
   }
   
@@ -328,15 +348,7 @@ abstract class Associations extends Record
     return isset(self::$_associations[get_called_class()][$assoc]);
   }
   
-  # Returns the list of associations, with configuration.
-  static function & get_associations()
-  {
-    $associations = isset(self::$_associations[get_called_class()]) ?
-      self::$_associations[get_called_class()] : array();
-    return $associations;
-  }
-  
-  # Returns the list of associations, with configuration.
+  # Returns the list of associations.
   static function & association_names()
   {
     $associations = isset(self::$_associations[get_called_class()]) ?
@@ -423,8 +435,9 @@ abstract class Associations extends Record
     ));
     
     # has_many through
-    if (isset($options['through']))
+    if (!isset($options['through']))
     {
+      /*
       $through    = static::association($options['through']);
       $through    = $through['class_name'];
       $assoc      = $through::association(String::singularize($name));
@@ -441,6 +454,7 @@ abstract class Associations extends Record
       $options['find_options']['joins'] = $options['through'];
     }
     else {
+      */
       $options['find_key'] = $options['foreign_key'];
     }
     
@@ -726,8 +740,10 @@ abstract class Associations extends Record
   # :private:
   protected function save_associated()
   {
-    foreach(static::get_associations() as $assoc_name => $assoc)
+    foreach(static::association_names() as $assoc_name)
     {
+      $assoc = static::association($assoc_name);
+      
       if (isset($this->{$assoc['name']}))
       {
         switch($assoc['type'])
@@ -753,8 +769,10 @@ abstract class Associations extends Record
   protected function delete_associated()
   {
     $rs = true;
-    foreach(static::get_associations() as $assoc_name => $assoc)
+    foreach(static::association_names() as $assoc_name)
     {
+      $assoc = static::association($assoc_name);
+      
       if (empty($assoc['dependent'])) {
         continue;
       }

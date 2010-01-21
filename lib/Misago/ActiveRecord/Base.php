@@ -884,13 +884,13 @@ abstract class Base extends Calculations
   }
   
   # Toggles a boolean from true to false (or false to true).
-  function toggle_attribute($column_name)
+  function toggle($attribute)
   {
-    $column = static::column_for_attribute($column_name);
+    $column = static::column_for_attribute($attribute);
     if ($column['type'] != 'boolean') {
-      throw new RecordNotSaved("Cannot toggle $column_name: not a boolean column.");
+      throw new RecordNotSaved("Cannot toggle $attribute: not a boolean column.");
     }
-    return $this->update_attribute($column_name, !$this->$column_name);
+    return $this->update_attribute($attribute, !$this->$attribute);
   }
   
   # Deletes the record from database using a SQL +DELETE+ statement.

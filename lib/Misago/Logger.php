@@ -10,7 +10,7 @@ class Logger
   const DEBUG  = 1;
   
   public  $level      = 1;
-  public  $auto_flush = false;
+  public  $auto_flush = true;
   
   private $devices    = array();
   private $messages   = array();
