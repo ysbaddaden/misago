@@ -321,6 +321,7 @@ abstract class Associations extends Record
     $options = isset(self::$_associations[get_called_class()][$assoc]) ?
       self::$_associations[get_called_class()][$assoc] : null;
     
+    # IMPROVE: declare has_many through options once!
     if ($options !== null
       and $options['type'] == 'has_many'
       and isset($options['through']))
