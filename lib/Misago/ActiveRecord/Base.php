@@ -883,6 +883,16 @@ abstract class Base extends Calculations
     return $this->save();
   }
   
+  # Toggles a boolean from true to false (or false to true).
+  function toggle_attribute($column_name)
+  {
+    $column = static::column_for_attribute($column_name);
+    if ($column['type'] != 'boolean') {
+      throw new RecordNotSaved("Cannot toggle $column_name: not a boolean column.");
+    }
+    return $this->update_attribute($column_name, !$this->$column_name);
+  }
+  
   # Deletes the record from database using a SQL +DELETE+ statement.
   # The record isn't instanciated, and callbacks aren't runned. This
   # is faster than the +destroy+ method.
