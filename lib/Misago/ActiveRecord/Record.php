@@ -75,11 +75,6 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
       return isset($this->_attributes[$attribute]) ?
         $this->_attributes[$attribute] : null;
     }
-    elseif ($attribute == 'changed')
-    {
-      $changes = $this->changes();
-      return (!empty($changes));
-    }
     elseif (preg_match('/^(.+)_(changed|was|change)$/', $attribute, $match))
     {
       $func = 'attribute_'.$match[2];
@@ -104,8 +99,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     unset($this->_attributes[$attribute]);
   }
   
-  static function columns()
-  {
+  static function columns() {
     trigger_error("static method ActiveRecord\Record::columns() must be overwritten by child class.", E_USER_ERROR);
   }
   
@@ -133,19 +127,16 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     return $columns[$attribute];
   }
   
-  function has_attribute($attribute)
-  {
+  function has_attribute($attribute) {
     return array_key_exists($attribute, $this->_attributes);
   }
   
-  function attribute_names()
-  {
+  function attribute_names() {
     return array_keys($this->_attributes);
   }
   
   # Returns current attributes.
-  function attributes()
-  {
+  function attributes() {
     return $this->_attributes;
   }
   
@@ -162,12 +153,17 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     $this->_original_attributes = $this->_attributes;
   }
   
-  
-  # List of attributes with unsaved changes.
-  function & changed()
+  # Has any attribute changed?
+  function changed()
   {
     $changes = $this->changes();
-    $changed = array_keys($changes);
+    return (!empty($changes));
+  }
+  
+  # List of attributes with unsaved changes.
+  function & changed_attributes()
+  {
+    $changed = array_keys($this->changes());
     return $changed;
   }
   

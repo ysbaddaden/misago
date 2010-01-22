@@ -55,6 +55,7 @@ class Test_ActiveRecord_Record extends Misago\Unit\TestCase
     $product = new Product(array('name' => 'qwerty', 'price' => 50));
     $this->assert_false($product->changed);
     $this->assert_false($product->name_changed);
+    $this->assert_equal($product->changed_attributes(), array());
     
     $product->name = 'azerty';
     $this->assert_true($product->changed, "model has changed");
@@ -92,11 +93,11 @@ class Test_ActiveRecord_Record extends Misago\Unit\TestCase
     
     $product->name = 'rty';
     $this->assert_equal($product->changes(), array('name' => 'rty'));
-    $this->assert_equal($product->changed(), array('name'));
+    $this->assert_equal($product->changed_attributes(), array('name'));
     
     $product->price = 99;
     $this->assert_equal($product->changes(), array('name' => 'rty', 'price' => 99));
-    $this->assert_equal($product->changed(), array('name', 'price'));
+    $this->assert_equal($product->changed_attributes(), array('name', 'price'));
   }
 }
 

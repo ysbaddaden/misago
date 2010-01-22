@@ -743,10 +743,10 @@ abstract class Associations extends Record
   {
     foreach(static::association_names() as $assoc_name)
     {
-      $assoc = static::association($assoc_name);
-      
-      if (isset($this->{$assoc['name']}))
+      if (isset($this->$assoc_name))
       {
+        $assoc = static::association($assoc_name);
+        
         switch($assoc['type'])
         {
           case 'has_one':
