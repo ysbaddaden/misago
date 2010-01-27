@@ -119,6 +119,11 @@ abstract class Assertions
     $message = (isset($args[count($args) - 1]) and is_string($args[count($args) - 1])) ? array_pop($args) : null;
     $block   = array_pop($args);
     
+    $message = (count($args) == 1) ?
+      $this->build_message($message, "expected a %s exception but got none", $args[0]) :
+      $this->build_message($message, "expected any of those exceptions but got none:\n%s", implode(', ', $args));
+    
+    
     $this->assert_block($message, function() use($args, $block)
     {
       try {

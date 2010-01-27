@@ -1,7 +1,9 @@
 -
   id: 1
   title: "misago pour les nuls"
+  published: true
 -
   id: 2
   title: "kokone experts"
+  published: false
 

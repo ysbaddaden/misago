@@ -71,6 +71,7 @@ class ResourceRoutes extends \Misago\Object
   # - +path_prefix+ - a particular prefix for routes' path
   # - +singular+    - force singular name
   # 
+  # FIXME: 'only' causes 'collection' & 'member' to not generate routes!
   function resource($name, $options=array(), $closure=null)
   {
     if (is_object($options))

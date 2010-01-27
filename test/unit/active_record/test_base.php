@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__.'/../../unit.php';
+require_once 'Misago/ActiveRecord/Exception.php';
 use Misago\ActiveRecord;
 
 class Orphan extends ActiveRecord\Base {}
@@ -540,6 +541,50 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
     $programmer = new Programmer(2);
     $this->assert_equal($programmer->cache_key, 'programmer/2');
   }
+  
+  function test_toggle()
+  {
+    $this->fixtures('books');
+    
+    # true > false
+    $book = new Book(1);
+    $this->assert_true($book->published);
+    $this->assert_true($book->toggle('published'));
+    $book = new Book(1);
+    $this->assert_false($book->published);
+    
+    # false > true
+    $book = new Book(2);
+    $this->assert_false($book->published);
+    $this->assert_true($book->toggle('published'));
+    $book = new Book(2);
+    $this->assert_true($book->published);
+    
+    # new record
+    $book = new Book(array('published' => false));
+    $this->assert_nothing_thrown(function() use($book){
+      $book->toggle('published');
+    });
+    $this->assert_true($book->published);
+    
+    # not a boolean column
+    $book = new Book(array('title' => 'azerty'));
+    $this->assert_throws('Misago\ActiveRecord\RecordNotSaved', function() use($book) {
+      $book->toggle('title');
+    });
+    $this->assert_equal($book->title, 'azerty');
+  }
+  
+#  function test_increment()
+#  {
+#    $post = new Post(1);
+#    $this->assert_equal($post->increment('comment_count'), 2);
+#  }
+  
+#  function test_decrement()
+#  {
+#    
+#  }
 }
 
 ?>
