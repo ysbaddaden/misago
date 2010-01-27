@@ -83,6 +83,9 @@ class AbstractResponse extends \Misago\Object
     'atom' => 'application/atom+xml',
     'yaml' => 'application/x-yaml',
     'json' => 'application/json',
+    'jpg'  => 'image/jpeg',
+    'png'  => 'image/png',
+    'gif'  => 'image/gif',
   );
   
   function content_type($content_type=null)
