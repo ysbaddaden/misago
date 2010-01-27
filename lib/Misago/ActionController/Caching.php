@@ -119,9 +119,8 @@ abstract class Caching extends Filters
   static function caches_page($action, $options=array())
   {
     $args = func_get_args();
-    if (is_array(end($args))) {
-      $options = array_pop($args);
-    }
+    $options = (is_array(end($args))) ? array_pop($args) : array();
+    
     foreach($args as $action) {
       static::$caches_page[get_called_class()][$action] =& $options;
     }
@@ -154,9 +153,8 @@ abstract class Caching extends Filters
   static function caches_action($action, $options=array())
   {
     $args = func_get_args();
-    if (is_array(end($args))) {
-      $options = array_pop($args);
-    }
+    $options = (is_array(end($args))) ? array_pop($args) : array();
+    
     foreach($args as $action) {
       static::$caches_action[get_called_class()][] = $action;
     }
