@@ -36,15 +36,19 @@ use Misago\ActiveSupport;
 # 
 #   class PostsController extends Misago\ActionController\Base
 #   {
-#     protected $caches_page = array(
-#       'index',
-#       'feed' => array('unless' => array(':format' => 'html'))
-#     );
+#     static function __constructStatic()
+#     {
+#       static::caches_page('index');
+#       static::caches_page('feed', array('unless' => array(':format' => 'html')));
+#     }
 #     
 #     function create()
 #     {
 #       $this->expire_page(array(':action' => 'index'));
 #     }
+#     
+#     function index() {}
+#     function feed() {}
 #   }
 # 
 # ==Conditions
@@ -69,10 +73,11 @@ use Misago\ActiveSupport;
 # 
 #   class PostsController extends Misago\ActionController\Base
 #   {
-#     protected $caches_action = array(
-#       'index',
-#       'feed' => array('if' => array(':format' => 'rss'))
-#     );
+#     static function __constructStatic()
+#     {
+#       static::caches_action('index');
+#       static::caches_action('feed', array('unless' => array(':format' => 'html')));
+#     }
 #     
 #     function __constructStatic()
 #     {
@@ -93,30 +98,9 @@ use Misago\ActiveSupport;
 # 
 abstract class Caching extends Filters
 {
-  #protected $cache;
-  protected $caches_page   = array();
-  protected $caches_action = array();
+  static protected $caches_page   = array();
+  static protected $caches_action = array();
   
-  function __construct()
-  {
-    foreach($this->caches_page as $k => $v)
-    {
-      if (is_integer($k))
-      {
-        $this->caches_page[$v] = array();
-        unset($this->caches_page[$k]);
-      }
-    }
-    
-    foreach($this->caches_action as $k => $v)
-    {
-      if (is_integer($k))
-      {
-        $this->caches_action[$v] = array();
-        unset($this->caches_action[$k]);
-      }
-    }
-  }
   
 	# See <tt>Misago\ActiveSupport\Cache</tt>.
   function cache()
@@ -131,6 +115,17 @@ abstract class Caching extends Filters
     return $this->cache;
   }
   
+  
+  static function caches_page($action, $options=array())
+  {
+    $args = func_get_args();
+    if (is_array(end($args))) {
+      $options = array_pop($args);
+    }
+    foreach($args as $action) {
+      static::$caches_page[get_called_class()][$action] =& $options;
+    }
+  }
   
   # Manually caches the current request as a real file into the +public+ folder.
   function cache_page($content=null, $options=null)
@@ -152,6 +147,18 @@ abstract class Caching extends Filters
     {
       $this->logger->log_debug() && $this->logger->debug("Expired page public/$path");
       unlink(ROOT.'/public'.$path);
+    }
+  }
+  
+  
+  static function caches_action($action, $options=array())
+  {
+    $args = func_get_args();
+    if (is_array(end($args))) {
+      $options = array_pop($args);
+    }
+    foreach($args as $action) {
+      static::$caches_action[get_called_class()][] = $action;
     }
   }
   
@@ -207,18 +214,19 @@ abstract class Caching extends Filters
   # :private:
   protected function shall_we_cache_page()
   {
-    if (isset($this->caches_page[$this->action]))
+    if (isset(static::$caches_page[get_called_class()][$this->action]))
     {
-      $cache = true;
+      $cache   = true;
+      $options = static::$caches_page[get_called_class()][$this->action];
       
-      if (isset($this->caches_page[$this->action]['unless']))
+      if (isset($options['unless']))
       {
-        $test = array_intersect_assoc($this->params, $this->caches_page[$this->action]['unless']);
+        $test = array_intersect_assoc($this->params, $options['unless']);
         $cache &= empty($test);
       }
-      if (isset($this->caches_page[$this->action]['if']))
+      if (isset($options['if']))
       {
-        $test = array_intersect_assoc($this->params, $this->caches_page[$this->action]['if']);
+        $test = array_intersect_assoc($this->params, $options['if']);
         $cache &= (!empty($test));
       }
       
@@ -230,18 +238,19 @@ abstract class Caching extends Filters
   # :private:
   protected function shall_we_cache_action()
   {
-    if (isset($this->caches_page[$this->action]))
+    if (isset(static::$caches_action[get_called_class()][$this->action]))
     {
-      $cache = true;
+      $cache   = true;
+      $options = static::$caches_action[get_called_class()][$this->action];
       
-      if (isset($this->caches_action[$this->action]['unless']))
+      if (isset($options['unless']))
       {
-        $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['unless']);
+        $test  = array_intersect_assoc($this->params, $options['unless']);
         $cache &= empty($test);
       }
-      if (isset($this->caches_action[$this->action]['if']))
+      if (isset($options['if']))
       {
-        $test  = array_intersect_assoc($this->params, $this->caches_action[$this->action]['if']);
+        $test  = array_intersect_assoc($this->params, $options['if']);
         $cache &= (!empty($test));
       }
       

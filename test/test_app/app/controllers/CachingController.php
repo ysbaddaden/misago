@@ -2,11 +2,14 @@
 
 class CachingController extends ApplicationController
 {
-  protected $caches_page = array(
-    'index',
-    'show' => array('unless' => array(':format' => 'html')),
-    'feed' => array('if'     => array(':format' => 'xml'))
-  );
+  static function __constructStatic()
+  {
+    parent::__constructStatic();
+    
+    static::caches_page('index');
+    static::caches_page('show', array('unless' => array(':format' => 'html')));
+    static::caches_page('feed', array('if'     => array(':format' => 'xml')));
+  }
   
   function index()
   {
