@@ -893,6 +893,36 @@ abstract class Base extends Calculations
     return $this->update_attribute($attribute, !$this->$attribute);
   }
   
+  function increment($attribute, $by=1)
+  {
+    $column = static::column_for_attribute($attribute);
+    if ($column['type'] != 'integer'
+      and $column['type'] != 'float'
+      and $column['type'] != 'numeric')
+    {
+      throw new RecordNotSaved("Cannot increment $attribute: not a numeric column.");
+    }
+    if ($this->update_attribute($attribute, $this->$attribute += $by)) {
+      return $this->$attribute;
+    }
+    return false;
+  }
+  
+  function decrement($attribute, $by=1)
+  {
+    $column = static::column_for_attribute($attribute);
+    if ($column['type'] != 'integer'
+      and $column['type'] != 'float'
+      and $column['type'] != 'numeric')
+    {
+      throw new RecordNotSaved("Cannot decrement $attribute: not a numeric column.");
+    }
+    if ($this->update_attribute($attribute, $this->$attribute -= $by)) {
+      return $this->$attribute;
+    }
+    return false;
+  }
+  
   # Deletes the record from database using a SQL +DELETE+ statement.
   # The record isn't instanciated, and callbacks aren't runned. This
   # is faster than the +destroy+ method.
