@@ -604,6 +604,19 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
       $post->decrement('title');
     });
   }
+  
+  function test_increment_decrement_counter()
+  {
+    $this->fixtures('posts');
+    
+    Post::increment_counter('comment_count', 1);
+    $post = new Post(1);
+    $this->assert_equal($post->comment_count, 2);
+    
+    Post::decrement_counter('comment_count', 1);
+    $post = new Post(1);
+    $this->assert_equal($post->comment_count, 1);
+  }
 }
 
 ?>
