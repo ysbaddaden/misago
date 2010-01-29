@@ -893,6 +893,8 @@ abstract class Base extends Calculations
     return $this->update_attribute($attribute, !$this->$attribute);
   }
   
+  # Increments a numerical column (numeric, integer, float).
+  # If the attribute is null, the attribute is assigned 0, and then incremented.
   function increment($attribute, $by=1)
   {
     $column = static::column_for_attribute($attribute);
@@ -908,6 +910,8 @@ abstract class Base extends Calculations
     return false;
   }
   
+  # Decrements a numerical column (numeric, integer, float).
+  # If the attribute is null, the attribute is assigned 0, and then decremented.
   function decrement($attribute, $by=1)
   {
     $column = static::column_for_attribute($attribute);

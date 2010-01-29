@@ -592,7 +592,17 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
   
   function test_decrement()
   {
+    $this->fixtures('posts');
     
+    $post = new Post(1);
+    $this->assert_equal($post->decrement('comment_count'), 0);
+    
+    $post = new Post();
+    $this->assert_equal($post->decrement('comment_count'), -1);
+    
+    $this->assert_throws('Misago\ActiveRecord\RecordNotSaved', function() use($post) {
+      $post->decrement('title');
+    });
   }
 }
 
