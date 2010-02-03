@@ -13,6 +13,8 @@ namespace Misago\ActiveSupport\Cache;
 # 
 abstract class Store extends \Misago\Object
 {
+  private static $singletons = array();
+  
   # Gets a variable.
   # 
   #   $user_id = $store->read('user_id');
@@ -79,6 +81,14 @@ abstract class Store extends \Misago\Object
   {
     $value = $this->read($key);
     return ($value === false) ? $default : $value;
+  }
+  
+  static function singleton()
+  {
+    if (!isset(self::$singletons[get_called_class()])) {
+      return self::$singletons[get_called_class()] = new static();
+    }
+    return self::$singletons[get_called_class()];
   }
 }
 
