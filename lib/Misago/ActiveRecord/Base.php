@@ -893,6 +893,70 @@ abstract class Base extends Calculations
     return $this->update_attribute($attribute, !$this->$attribute);
   }
   
+  # Increments a numerical column (numeric, integer, float).
+  # If the attribute is null, the attribute is assigned 0, and then incremented.
+  function increment($attribute, $by=1)
+  {
+    $column = static::column_for_attribute($attribute);
+    if ($column['type'] != 'integer'
+      and $column['type'] != 'float'
+      and $column['type'] != 'numeric')
+    {
+      throw new RecordNotSaved("Cannot increment $attribute: not a numeric column.");
+    }
+    if ($this->update_attribute($attribute, $this->$attribute += $by)) {
+      return $this->$attribute;
+    }
+    return false;
+  }
+  
+  # Decrements a numerical column (numeric, integer, float).
+  # If the attribute is null, the attribute is assigned 0, and then decremented.
+  function decrement($attribute, $by=1)
+  {
+    $column = static::column_for_attribute($attribute);
+    if ($column['type'] != 'integer'
+      and $column['type'] != 'float'
+      and $column['type'] != 'numeric')
+    {
+      throw new RecordNotSaved("Cannot decrement $attribute: not a numeric column.");
+    }
+    if ($this->update_attribute($attribute, $this->$attribute -= $by)) {
+      return $this->$attribute;
+    }
+    return false;
+  }
+  
+  # Increments a counter.
+  # 
+  #  Post::increment_counter('comment_count', 23);
+  static function increment_counter($counter_name, $id) {
+    return static::update_counters($id, array($counter_name => 1));
+  }
+  
+  # Decrements a counter.
+  # 
+  #  Post::decrement_counter('comment_count', 13);
+  static function decrement_counter($counter_name, $id) {
+    return static::update_counters($id, array($counter_name => -1));
+  }
+  
+  # Updates multiple counters at once.
+  # 
+  #  Post::update_counters(5, array('comment_count' => 1, 'tag_count' => -1));
+  static function update_counters($id, $counters)
+  {
+    $updates = array();
+    foreach($counters as $counter_name => $value)
+    {
+      $updates[] = ($value > 0) ?
+        "$counter_name = $counter_name + $value" :
+        "$counter_name = $counter_name - ".abs($value);
+    }
+    $conditions = array(static::primary_key() => $id);
+    return static::update_all(implode(', ', $updates), $conditions);
+  }
+  
   # Deletes the record from database using a SQL +DELETE+ statement.
   # The record isn't instanciated, and callbacks aren't runned. This
   # is faster than the +destroy+ method.

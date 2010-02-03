@@ -2,6 +2,7 @@
   id: 1
   title: misago
   body: some body
+  comment_count: 1
 -
   id: 2
   title: pdoc

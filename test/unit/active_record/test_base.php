@@ -575,16 +575,48 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
     $this->assert_equal($book->title, 'azerty');
   }
   
-#  function test_increment()
-#  {
-#    $post = new Post(1);
-#    $this->assert_equal($post->increment('comment_count'), 2);
-#  }
+  function test_increment()
+  {
+    $this->fixtures('posts');
+    
+    $post = new Post(1);
+    $this->assert_equal($post->increment('comment_count'), 2);
+    
+    $post = new Post();
+    $this->assert_equal($post->increment('comment_count'), 1);
+    
+    $this->assert_throws('Misago\ActiveRecord\RecordNotSaved', function() use($post) {
+      $post->increment('title');
+    });
+  }
   
-#  function test_decrement()
-#  {
-#    
-#  }
+  function test_decrement()
+  {
+    $this->fixtures('posts');
+    
+    $post = new Post(1);
+    $this->assert_equal($post->decrement('comment_count'), 0);
+    
+    $post = new Post();
+    $this->assert_equal($post->decrement('comment_count'), -1);
+    
+    $this->assert_throws('Misago\ActiveRecord\RecordNotSaved', function() use($post) {
+      $post->decrement('title');
+    });
+  }
+  
+  function test_increment_decrement_counter()
+  {
+    $this->fixtures('posts');
+    
+    Post::increment_counter('comment_count', 1);
+    $post = new Post(1);
+    $this->assert_equal($post->comment_count, 2);
+    
+    Post::decrement_counter('comment_count', 1);
+    $post = new Post(1);
+    $this->assert_equal($post->comment_count, 1);
+  }
 }
 
 ?>
