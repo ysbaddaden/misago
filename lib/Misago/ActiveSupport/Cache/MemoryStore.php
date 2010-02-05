@@ -13,6 +13,7 @@ class MemoryStore extends Store
   function write($key, $value=null, $options=array())
   {
     $ttl = isset($options['expires_in']) ? $options['expires_in'] : 0;
+    $ttl = is_string($ttl) ? strtotime($ttl) : $ttl;
     apc_store($key, $value, $ttl);
   }
   

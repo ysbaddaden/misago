@@ -104,18 +104,15 @@ class RedisStore extends Store
     }
   }
   
-  function delete($key)
-  {
+  function delete($key) {
     $this->redis->del($key);
   }
   
-  function exists($key)
-  {
+  function exists($key) {
     return (bool)$this->redis->exists($key);
   }
   
-  function clear()
-  {
+  function clear() {
     $this->redis->flushdb();
   }
   
