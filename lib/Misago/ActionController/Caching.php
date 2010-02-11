@@ -112,6 +112,11 @@ abstract class Caching extends Filters
         ActiveSupport\String::camelize($cache_store);
       $this->cache = new $CacheStoreClassName();
     }
+    if (func_num_args())
+    {
+      $args = func_get_args();
+      return call_user_func_array($this->cache, $args);
+    }
     return $this->cache;
   }
   

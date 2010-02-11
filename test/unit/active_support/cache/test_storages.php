@@ -15,6 +15,15 @@ abstract class Test_ActiveSupport_Cache_Store extends Test\Unit\TestCase
     $this->assert_equal($this->cache->read('var'), 'value');
   }
   
+  function test_invoke()
+  {
+    $cache = $this->cache;
+    $test1 = $cache('test_storages', function() { return 'a,b'; });
+    $test2 = $cache('test_storages', function() { return 'a,b,c'; });
+    $this->assert_equal($test2, $test1,
+      "the first call must store 'a,b' and the second call must return it.");
+  }
+  
   function test_increment_decrement()
   {
     # increment/decrement (unknown vars)

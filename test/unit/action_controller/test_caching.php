@@ -8,6 +8,10 @@ class Test_ActionController_Caching extends Misago\Unit\TestCase
   {
     $controller = new SayController();
     $this->assert_instance_of($controller->cache, 'Misago\ActiveSupport\Cache\Store');
+    
+    $test1 = $controller->cache('test_action_controller_cache', function() { return 'a,b,c'; });
+    $test2 = $controller->cache('test_action_controller_cache', function() { return 'a,b'; });
+    $this->assert_equal($test2, $test1, 'must have stored a,b,c and must return it on the second it.');
   }
   
   function test_caches_page()
