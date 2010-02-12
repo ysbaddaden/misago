@@ -258,6 +258,17 @@ class MysqlAdapter extends AbstractAdapter
     return $success;
   }
   
+  function create_table($table, array $definition)
+  {
+    if (empty($definition['options'])) {
+      $definition['options'] = 'ENGINE = INNODB';
+    }
+    elseif(stripos('ENGINE', $definition['options']) === false) {
+      $definition['options'] .= ' ENGINE = INNODB';
+    }
+    return parent::create_table($table, $definition);
+  }
+  
   function insert($table, array $data, $primary_key=null)
   {
     $success = parent::insert($table, $data);
