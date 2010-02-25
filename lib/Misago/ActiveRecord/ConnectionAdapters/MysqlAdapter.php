@@ -263,7 +263,7 @@ class MysqlAdapter extends AbstractAdapter
     if (empty($definition['options'])) {
       $definition['options'] = 'ENGINE = INNODB';
     }
-    elseif(stripos('ENGINE', $definition['options']) === false) {
+    elseif(stripos($definition['options'], 'ENGINE') === false) {
       $definition['options'] .= ' ENGINE = INNODB';
     }
     return parent::create_table($table, $definition);
