@@ -33,8 +33,7 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     
   }
   
-  function content_type()
-  {
+  function content_type() {
     return $_SERVER['CONTENT_TYPE'];
   }
   
@@ -59,26 +58,34 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     return strtolower($method);
   }
   
-  function protocol()
-  {
+  function protocol() {
     return isset($_SERVER['HTTPS']) ? 'https://' : 'http://';
   }
   
-  function is_ssl()
-  {
+  function is_ssl() {
     return isset($_SERVER['HTTPS']);
   }
   
   function host()
   {
-    $host = explode(':', $_SERVER['HTTP_HOST']);
-    return $host[0];
+    $pos = strrpos($_SERVER['HTTP_HOST'], ':');
+    if ($pos === false
+      or substr($_SERVER['HTTP_HOST'], -1) == ']')
+    {
+      return $_SERVER['HTTP_HOST'];
+    }
+    return substr($_SERVER['HTTP_HOST'], 0, $pos);
   }
   
   function port()
   {
-    $host = explode(':', $_SERVER['HTTP_HOST']);
-    return isset($host[1]) ? $host[1] : ($_SERVER['HTTPS'] ? 443 : 80);
+    $pos = strrpos($_SERVER['HTTP_HOST'], ':');
+    if ($pos === false
+      or substr($_SERVER['HTTP_HOST'], -1) == ']')
+    {
+      return isset($_SERVER['HTTPS']) ? 443 : 80;
+    }
+    return (int)substr($_SERVER['HTTP_HOST'], $pos + 1);
   }
   
   function port_string()

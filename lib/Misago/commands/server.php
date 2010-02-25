@@ -87,19 +87,22 @@ $fcgi_envs = array(
   'PHP_FCGI_CHILDREN'     => 5,
   'PHP_FCGI_MAX_REQUESTS' => 1000,
 );
-$fcgi_process = proc_open('exec php-cgi -b '.ServerConfig::$fcgi_socket, $descriptorspec, $pipes, null, $fcgi_envs);
+$fcgi_process = proc_open('exec php-cgi -b '.ServerConfig::$fcgi_socket,
+  $descriptorspec, $pipes, null, $fcgi_envs);
 
 # HTTP server
 switch(ServerConfig::$http_server)
 {
   case 'lighttpd': 
     echo "=> Starting LightTPD HTTP server at http://".ServerConfig::$http_host.":".ServerConfig::$http_port."/\n";
-    $http_process = proc_open('exec lighttpd -Df '.ServerConfig::$server_tmp_conf, $descriptorspec, $pipes, null, null);
+    $http_process = proc_open('exec lighttpd -Df '.ServerConfig::$server_tmp_conf,
+      $descriptorspec, $pipes, null, null);
   break;
   
   case 'nginx': 
     echo "=> Starting NGINX HTTP server at http://".ServerConfig::$http_host.":".ServerConfig::$http_port."/\n";
-    $http_process = proc_open('exec nginx -c '.ServerConfig::$server_tmp_conf, $descriptorspec, $pipes, null, null);
+    $http_process = proc_open('exec nginx -c '.ServerConfig::$server_tmp_conf,
+      $descriptorspec, $pipes, null, null);
   break;
 }
 
