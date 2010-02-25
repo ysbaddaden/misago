@@ -617,6 +617,27 @@ class Test_ActiveRecord_Base extends Misago\Unit\TestCase
     $post = new Post(1);
     $this->assert_equal($post->comment_count, 1);
   }
+  
+  # IMPROVE: Test ActiveRecord\Base::paginate() with 'count' option.
+  function test_paginate()
+  {
+    $posts = Post::paginate(array('per_page' => 2));
+    $this->assert_equal(count($posts), 2);
+    
+    $posts = Post::paginate(array('per_page' => 2, 'page' => 2));
+    $this->assert_equal(count($posts), 1);
+    
+    $posts = Post::paginate(array('select' => 'id', 'per_page' => 2, 'page' => 2, 'order' => 'id desc'));
+    $this->assert_equal(count($posts), 1);
+    $this->assert_equal($posts[0]->id, 1);
+    
+    $posts = Post::paginate(array('conditions' => array('id' => 2)));
+    $this->assert_equal(count($posts), 1);
+    $this->assert_equal($posts[0]->id, 2);
+    
+    $posts = Post::paginate(array('conditions' => array('id' => 2), 'page' => 2));
+    $this->assert_equal(count($posts), 0);
+  }
 }
 
 ?>

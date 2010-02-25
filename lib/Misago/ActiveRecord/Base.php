@@ -616,6 +616,48 @@ abstract class Base extends Calculations
     return $c;
   }
   
+  # Finds paginated results.
+  # 
+  # Accepts all find options, plus:
+  # 
+  # - +page+     - current page (defaults to 1)
+  # - +per_page+ - how many results per page (defaults to 30)
+  # - +count+    - particular options for +count()+
+  # 
+  # Returns a <tt>Misago\ActiveSupport\ActiveArray</tt> object with
+  # the following properties, useful for adding paginated links in views:
+  # 
+  # - +current_page+
+  # - +per_page+
+  # - +total_entries+
+  # - +total_pages+
+  # 
+  static function paginate($options=array())
+  {
+    $page          = isset($options['page'])     ? $options['page']     : 1;
+    $per_page      = isset($options['per_page']) ? $options['per_page'] : 30;
+    $count_options = isset($options['count'])    ? $options['count']    : array();
+    
+    $options = array_diff_key($options, array_flip(array('per_page', 'count')));
+    
+    # finds entries
+    $rs = static::find(':all', array_merge($options, array(
+      'limit'  => $per_page,
+#      'offset' => ($page - 1) * $per_page
+    )));
+    
+    # counts entries
+    unset($options['select']);
+    $count = static::count(array_merge($options, $count_options));
+    
+    $rs->current_page  = $page;
+    $rs->per_page      = $per_page;
+    $rs->total_entries = $count;
+    $rs->total_pages   = ceil($count / $per_page);
+    
+    return $rs;
+  }
+  
   # Executes a function inside a database transaction.
   # 
   # Whenever an exception is raised, transacted queries
