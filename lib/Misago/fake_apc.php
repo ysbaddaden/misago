@@ -11,7 +11,7 @@ function apc_add($key, $var, $ttl=0)
   if (!array_key_exists($key, $GLOBALS['__fake_apc_data'])) {
     return apc_store($key, $var, $ttl);
   }
-  return true;
+  return false;
 }
 
 # Caches a variable in the data store. 

@@ -18,7 +18,6 @@ class MemoryStore extends Store
   
   function write_once($key, $value=null, $options=array())
   {
-    trigger_error("apc_add() always returns true even when it should return false!", E_USER_WARNING);
     $ttl = isset($options['expires_in']) ? $options['expires_in'] : 0;
     $ttl = is_string($ttl) ? strtotime($ttl) : $ttl;
     return apc_add($key, $value, $ttl);

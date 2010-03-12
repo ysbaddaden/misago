@@ -59,10 +59,8 @@ abstract class Test_ActiveSupport_Cache_Store extends Test\Unit\TestCase
   
   function test_write_once()
   {
-    # FileStore doesn't support write_once() and APC doesn't return
-    # false like it should.
-    if (get_class($this) == 'Test_ActiveSupport_Cache_MemcacheStore'
-      or get_class($this) == 'Test_ActiveSupport_Cache_RedisStore')
+    # FileStore doesn't support write_once().
+    if (get_class($this) != 'Test_ActiveSupport_Cache_FileStore')
     {
       $this->assert_true($this->cache->write_once('uniq_token', 'foo'));
       $this->assert_false($this->cache->write_once('uniq_token', 'bar'));
