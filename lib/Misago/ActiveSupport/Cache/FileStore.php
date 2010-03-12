@@ -45,6 +45,13 @@ class FileStore extends Store
     file_put_contents($file, $value);
   }
   
+  function write_once($key, $value=null, $options=array())
+  {
+    trigger_error("FileStore isn't compatible with write_once, use Memcache or Redis instead.", E_USER_WARNING);
+    $this->write($key, $value, $options);
+    return true;
+  }
+  
   function delete($key)
   {
     if (is_array($key))

@@ -78,11 +78,12 @@ class RedisStore extends Store
     return ($value === null) ? false : $value;
   }
   
-  function write($key, $value=null, $options=array())
+  private function _write($key, $value=null, $options=array(), $nx=false)
   {
     if (is_array($key))
     {
-      $this->redis->mset($key);
+      $method = $nx ? 'msetnx' : 'mset';
+      $rs = $this->redis->$method($key);
       
       if (isset($options['expires_in']))
       {
@@ -96,12 +97,22 @@ class RedisStore extends Store
     }
     else
     {
-      $this->redis->set($key, $value);
+      $method = $nx ? 'setnx' : 'set';
+      $rs = $this->redis->$method($key, $value);
       
       if (isset($options['expires_in'])) {
         $this->redis->expire($key, $options['expires_in']);
       }
     }
+    return $rs;
+  }
+  
+  function write($key, $value=null, $options=array()) {
+    $this->_write($key, $value, $options, false);
+  }
+  
+  function write_once($key, $value=null, $options=array()) {
+    return $this->_write($key, $value, $options, true);
   }
   
   function delete($key) {
