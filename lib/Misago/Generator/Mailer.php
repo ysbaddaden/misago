@@ -18,12 +18,11 @@ class Mailer extends Base
     
     $vars = array(
       'Class'     => $Class,
-      'filename'  => $filename,
       'view_path' => $view_path,
     );
     
     $this->create_directory('app/models');
-    $this->create_directory('app/views/'.String::underscore($filename));
+    $this->create_directory('app/views/'.String::underscore($view_path));
     $this->create_directory('test/unit');
     
     $this->create_file_from_template("app/models/{$Class}.php",     'mailer/model.php', $vars);
