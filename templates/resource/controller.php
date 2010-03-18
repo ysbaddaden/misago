@@ -4,8 +4,7 @@ class #{Controller}Controller extends ApplicationController
 {
   function index()
   {
-    $#{model} = new #{Model}();
-    $this->#{model_plural} = $#{model}->find(':all');
+    $this->#{model_plural} = #{Model}::all();
     
     switch($this->format)
     {
@@ -49,10 +48,11 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->redirect_to(show_#{model}_path($this->#{model})); break;
-        case 'xml':
-        case 'json':
-          $this->render(array('xml' => $this->#{model}, 'status' => 201,
-            'location' => show_#{model}_url($this->#{model})));
+        case 'xml': case 'json':
+          $this->render(array(
+            $this->format => $this->#{model},
+            'status'      => 201,
+            'location'    => show_#{model}_url($this->#{model})));
         break;
       }
     }
@@ -61,8 +61,9 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->render('new'); break;
-        case 'xml': 
-        case 'json': $this->render(array($this->format => $this->#{model}->errors, 'status' => 412)); break;
+        case 'xml': case 'json':
+          $this->render(array($this->format => $this->#{model}->errors, 'status' => 412));
+        break;
       }
     }
   }
@@ -78,9 +79,9 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->redirect_to(show_#{model}_path($this->#{model})); break;
-        case 'xml':
-        case 'json': $this->render(array($this->format => $this->#{model}, 'status' => 200)); break;
-#        case 'json': $this->head(200); break;
+        case 'xml': case 'json':
+          $this->render(array($this->format => $this->#{model}, 'status' => 200));
+        break;
       }
     }
     else
@@ -88,16 +89,16 @@ class #{Controller}Controller extends ApplicationController
       switch($this->format)
       {
         case 'html': $this->render('edit'); break;
-        case 'xml':
-        case 'json': $this->render(array($this->format => $this->#{model}->errors, 'status' => 412)); break;
+        case 'xml': case 'json':
+          $this->render(array($this->format => $this->#{model}->errors, 'status' => 412));
+        break;
       }
     }
   }
   
   function delete()
   {
-    $#{model} = new #{Model}();
-    if ($#{model}->delete($this->params[':id']))
+    if (#{Model}::delete($this->params[':id']))
     {
       $this->flash['notice'] = t('#{Model} was successfully deleted.', '#{controller}.create');
       switch($this->format)
@@ -110,7 +111,6 @@ class #{Controller}Controller extends ApplicationController
     else {
       $this->head(500);
     }
-    exit;
   }
 }
 
