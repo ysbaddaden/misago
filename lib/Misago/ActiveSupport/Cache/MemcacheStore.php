@@ -10,7 +10,7 @@ class MemcacheStore extends Store
   function __construct()
   {
     $this->memcache = new \Memcache();
-  
+    
     $servers = func_num_args() ? func_get_args() : array('localhost:11211');
     foreach($servers as $server)
     {
@@ -50,7 +50,11 @@ class MemcacheStore extends Store
   
   function read($key)
   {
-    return $this->memcache->get($key);
+    $rs = $this->memcache->get($key);
+    if ($rs === false and is_array($key)) {
+      return array();
+    }
+    return $rs;
   }
   
   function write($key, $value=null, $options=array())
@@ -61,18 +65,21 @@ class MemcacheStore extends Store
     }
   }
   
-  function delete($key)
+  function write_once($key, $value=null, $options=array())
   {
+    $expires_in = isset($options['expires_in']) ? $options['expires_in'] : 0;
+    return $this->memcache->add($key, $value, null, $expires_in);
+  }
+  
+  function delete($key) {
     $this->memcache->delete($key);
   }
   
-  function exists($key)
-  {
+  function exists($key) {
     return ($this->read($key) === false);
   }
   
-  function clear()
-  {
+  function clear() {
     $this->memcache->flush();
   }
 }

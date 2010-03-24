@@ -54,7 +54,7 @@ class Datetime extends \DateTime
       case 'hour':  return $this->format('H'); break;
       case 'min':   return $this->format('i'); break;
       case 'sec':   return $this->format('s'); break;
-      default: trigger_error("Unknonwn property ActiveSupport\\".
+      default: trigger_error("Unknown property ActiveSupport\\".
         get_class($this)."::$property.", E_USER_WARNING);
     }
   }
@@ -66,27 +66,24 @@ class Datetime extends \DateTime
     return $datetime->getTimestamp() - $this->getTimestamp();
   }
   
-  function is_valid()
-  {
+  function is_valid() {
     return ($this->original_time === null);
   }
   
   # RSS date format (RFC2822).
-  function to_rfc2822()
-  {
+  function to_rfc2822() {
     return $this->format(DateTime::RFC2822);
   }
   
   # ATOM date format (ISO8601).
-  function to_iso8601()
-  {
+  function to_iso8601() {
     return $this->format(DateTime::ISO8601);
   }
   
   function __toString()
   {
     return ($this->original_time === null) ?
-      $this->format($this->_string_format) : $this->original_time;
+      (string)$this->format($this->_string_format) : (string)$this->original_time;
   }
   
   # Same as <tt>__toString</tt>, but permits to return a number
@@ -110,13 +107,11 @@ class Datetime extends \DateTime
   }
 }
 
-class Time extends Datetime
-{
+class Time extends Datetime {
   protected $_string_format = 'H:i:s';
 }
 
-class Date extends Datetime
-{
+class Date extends Datetime {
   protected $_string_format = 'Y-m-d';
 }
 

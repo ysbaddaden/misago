@@ -57,6 +57,17 @@ abstract class Test_ActiveSupport_Cache_Store extends Test\Unit\TestCase
     $this->assert_equal($this->cache->read(array('var_b', 'var_a')), array());
   }
   
+  function test_write_once()
+  {
+    # FileStore doesn't support write_once().
+    if (get_class($this) != 'Test_ActiveSupport_Cache_FileStore')
+    {
+      $this->assert_true($this->cache->write_once('uniq_token', 'foo'));
+      $this->assert_false($this->cache->write_once('uniq_token', 'bar'));
+      $this->assert_equal($this->cache->read('uniq_token'), 'foo');
+    }
+  }
+  
   function test_expires_in()
   {
     # APC supports +expires_in+ but has a bug: http://pecl.php.net/bugs/bug.php?id=13331

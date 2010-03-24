@@ -1,12 +1,11 @@
 <?php
 namespace Misago\ActiveSupport\Cache;
 
-# A Cache Store implementation which stores data with APC.
+# A Cache Store implementation which stores data using APC.
 # See <tt>Store</tt> for help.
 class MemoryStore extends Store
 {
-  function read($key)
-  {
+  function read($key) {
     return apc_fetch($key);
   }
   
@@ -17,18 +16,22 @@ class MemoryStore extends Store
     apc_store($key, $value, $ttl);
   }
   
-  function delete($key)
+  function write_once($key, $value=null, $options=array())
   {
+    $ttl = isset($options['expires_in']) ? $options['expires_in'] : 0;
+    $ttl = is_string($ttl) ? strtotime($ttl) : $ttl;
+    return apc_add($key, $value, $ttl);
+  }
+  
+  function delete($key) {
     apc_delete($key);
   }
   
-  function exists($key)
-  {
+  function exists($key) {
     return (apc_fetch($key) === false);
   }
   
-  function clear()
-  {
+  function clear() {
     apc_clear_cache('user');
   }
 }

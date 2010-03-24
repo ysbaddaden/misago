@@ -3,7 +3,7 @@ require_once __DIR__.'/../../../unit.php';
 require_once MISAGO."/lib/Misago/ActionView/Helpers/TagHelper.php";
 require_once MISAGO."/lib/Misago/ActionView/Helpers/AssetTagHelper.php";
 
-class Test_ActionView_Helper_AssetTagHelper extends Misago\Unit\TestCase
+class Test_ActionView_Helpers_AssetTagHelper extends Misago\Unit\TestCase
 {
   function test_image_path()
   {

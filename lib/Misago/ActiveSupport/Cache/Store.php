@@ -57,6 +57,13 @@ abstract class Store extends \Misago\Object
   # 
   abstract function write($key, $value=null, $options=array());
   
+  # Sets a variable if it hasn't be set already. This is safer than checking
+  # with exists and setting it afterward, since it will be execute in a single
+  # and exclusive command.
+  # 
+  # See <tt>write()</tt> for syntax and options.
+  abstract function write_once($key, $value=null, $options=array());
+  
   # Deletes a variable.
   # 
   #   $store->delete('user_id');

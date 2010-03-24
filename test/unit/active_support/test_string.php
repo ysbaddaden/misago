@@ -1,8 +1,9 @@
+
 <?php
 require_once __DIR__.'/../../unit.php';
 use Misago\ActiveSupport\String;
 
-class Test_String extends Test\Unit\TestCase
+class Test_ActiveSupport_String extends Test\Unit\TestCase
 {
   function test_is_symbol()
   {
