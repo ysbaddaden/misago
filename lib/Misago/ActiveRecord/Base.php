@@ -638,11 +638,12 @@ abstract class Base extends Calculations
     $per_page      = isset($options['per_page']) ? $options['per_page'] : 30;
     $count_options = isset($options['count'])    ? $options['count']    : array();
     
-    $options = array_diff_key($options, array_flip(array('per_page', 'count')));
+    $options = array_diff_key($options, array_flip(array('per_page', 'page', 'count')));
     
     # finds entries
     $rs = static::find(':all', array_merge($options, array(
       'limit'  => $per_page,
+      'page'   => $page,
 #      'offset' => ($page - 1) * $per_page
     )));
     
@@ -653,7 +654,7 @@ abstract class Base extends Calculations
     $rs->current_page  = $page;
     $rs->per_page      = $per_page;
     $rs->total_entries = $count;
-    $rs->total_pages   = ceil($count / $per_page);
+    $rs->total_pages   = (int)ceil($count / $per_page);
     
     return $rs;
   }
