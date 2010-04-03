@@ -49,7 +49,7 @@ class SomeObject extends \Misago\Object
 }
 SomeObject::__constructStatic();
 
-class TestObject extends Test\Unit\TestCase
+class Test_Object extends Test\Unit\TestCase
 {
   function test_attributes_as_methods()
   {
