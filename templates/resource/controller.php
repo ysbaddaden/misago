@@ -4,7 +4,7 @@ class #{Controller}Controller extends ApplicationController
 {
   function index()
   {
-    $this->#{model_plural} = #{Model}::all();
+    $this->#{model_plural} = #{Model}::find(':all');
     
     switch($this->format)
     {
@@ -74,7 +74,7 @@ class #{Controller}Controller extends ApplicationController
     
     if ($this->#{model}->update_attributes($this->params['#{model}']))
     {
-      $this->flash['notice'] = t('#{Model} was successfully updated.', '#{controller}.create');
+      $this->flash['notice'] = t('#{Model} was successfully updated.', '#{controller}.update');
       
       switch($this->format)
       {
@@ -100,7 +100,7 @@ class #{Controller}Controller extends ApplicationController
   {
     if (#{Model}::delete($this->params[':id']))
     {
-      $this->flash['notice'] = t('#{Model} was successfully deleted.', '#{controller}.create');
+      $this->flash['notice'] = t('#{Model} was successfully deleted.', '#{controller}.delete');
       switch($this->format)
       {
         case 'html': $this->redirect_to(#{model}s_path()); break;
