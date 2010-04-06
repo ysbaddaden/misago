@@ -98,7 +98,7 @@ class #{Controller}Controller extends ApplicationController
   
   function delete()
   {
-    if (#{Model}::delete($this->params[':id']))
+    if (#{Model}::destroy($this->params[':id']))
     {
       $this->flash['notice'] = t('#{Model} was successfully deleted.', '#{controller}.delete');
       switch($this->format)
