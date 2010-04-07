@@ -17,7 +17,7 @@ namespace Misago;
 #     function id() {
 #       return $this->id;
 #     }
-#
+#     
 #     function id_set($id) {
 #       return $this->id = $id;
 #     }
@@ -30,147 +30,58 @@ namespace Misago;
 # the property:
 #
 #   $o = new MyClass();
-#   $o->new_record         # => returns false
-#   $o->new_record = true  # => error: protected attribute
+#   $o->new_record;         # => returns false
 #
-# You may also have setters, using this time a +property_set()+
-# method:
-#
+# You may also have a write setter, using a +property_set+ method:
+# 
 #   $o = new MyClass();
-#   $o->id = 4  # sets property throught the +id_set()+ method.
-#   $o->id      # returns 4 (using the +id()+ method).
-#
-# Note: it is recommended to never call the +property_set+ method
-# directly, since it may be renamed someday.
+#   $o->id = 4;             # => returns 4
+# 
 abstract class Object
 {
-  private static $_included_modules = array();
-  private static $_mapped_statics   = array();
-  private        $_mapped_methods   = array();
+  static function __constructStatic() { }
+  protected $_reflection;
   
-  function __construct()
-  {
-    if (!empty(self::$_included_modules[get_called_class()]))
-    {
-      foreach(self::$_included_modules[get_called_class()] as $module => $methods)
-      {
-        $object = new $module($this);
-        foreach($methods as $method) {
-          $this->map_method(array($object, $method), $method);
-        }
-      }
-    }
-  }
-  
-  static function __constructStatic()
-  {
-    
-  }
-  
-  function __get($property)
-  {
-    if (method_exists($this, $property)
-      or isset($this->_mapped_methods[$property]))
-    {
-      return $this->$property();
-    }
-    return null;
+  function __get($property) {
+    return method_exists($this, $property) ? $this->$property() : null;
   }
   
   function __set($property, $value)
   {
     $method = "{$property}_set";
-    if (method_exists($this, $method)
-      or isset($this->_mapped_methods[$method]))
-    {
+    if (method_exists($this, $method)) {
       return $this->$method($value);
     }
-    return $this->$property = $value;
-  }
-  
-  function __call($method, $args)
-  {
-    if (isset($this->_mapped_methods[$method])) {
-      return call_user_func_array($this->_mapped_methods[$method], $args);
-    }
-    trigger_error("No such method ".get_class($this)."->$method().", E_USER_ERROR);
-  }
-  
-  static function __callStatic($method, $args)
-  {
-    if (isset(self::$_mapped_statics[get_called_class()][$method])) {
-      return forward_static_call_array(self::$_mapped_statics[get_called_class()][$method], $args);
-    }
-    trigger_error("No such static method ".get_called_class()."::$method().", E_USER_ERROR);
-  }
-  
-  # Maps instance and static methods from a given class, as instance
-  # and static methods for this class.
-  protected static function include_module($module)
-  {
-    $reflection = new \ReflectionClass($module);
     
-    $methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC | !\ReflectionMethod::IS_STATIC);
-    if (!empty($methods))
-    {
-      self::$_included_modules[get_called_class()][$module] = array();
-      foreach($methods as $method)
-      {
-        if (strpos($method->name, '__') === 0 or $method->class != $module) {
-          continue;
-        }
-        if (method_exists(get_called_class(), $method->name)) {
-          trigger_error("Method ".get_called_class()."->{$method->name}() is already defined.", E_USER_WARNING);
-        }
-        self::$_included_modules[get_called_class()][$module][] = $method->name;
-      }
+    # if the property exists, I wouldn't be there I the caller had 
+    # direct access to it, it's thus propected or private!
+    if (!isset($this->_reflection)) {
+      $this->_reflection = new \ReflectionClass(get_called_class());
+    }
+    if ($this->_reflection->hasProperty($property)) {
+      throw new \Exception("Can't access property $property which is either protected or private.");
     }
     
-    $statics = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_STATIC);
-    foreach($statics as $method)
-    {
-      if (strpos($method->name, '__') === 0 or $method->class != $module) {
-        continue;
-      }
-      if (method_exists(get_called_class(), $method->name)) {
-        trigger_error("Method ".get_called_class()."::{$method->name}() is already defined.", E_USER_WARNING);
-      }
-      static::map_static_method(array($module, $method->name), $method->name);
-    }
+    $this->$property = $value;
   }
   
-  # Maps an external callback as class method.
-  function map_method($callback, $as) {
-    $this->_mapped_methods[$as] =& $callback;
-  }
-  
-  # Maps an external callback as class static method.
-  static function map_static_method($callback, $as) {
-    self::$_mapped_statics[get_called_class()][$as] =& $callback;
-  }
-  
-  function to_s()
-  {
+  function to_s() {
     return $this->__toString();
   }
   
-  function to_xml()
-  {
+  function to_xml() {
     return $this->to_s();
   }
 
-  function to_json()
-  {
+  function to_json() {
     return $this->to_s();
   }
   
-  function to_yaml()
-  {
+  function to_yaml() {
     return $this->to_s();
   }
   
-  function to_array()
-  {
+  function to_array() {
     return $this->to_s();
   }
 }

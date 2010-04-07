@@ -59,16 +59,16 @@ class MemcacheStore extends Store
   
   function write($key, $value=null, $options=array())
   {
-    $expires_in = isset($options['expires_in']) ? $options['expires_in'] : 0;
-    if (!$this->memcache->replace($key, $value, null, $expires_in)) {
-      $this->memcache->set($key, $value, null, $expires_in);
+    $ttl = $this->ttl($options);
+    if (!$this->memcache->replace($key, $value, null, $ttl)) {
+      $this->memcache->set($key, $value, null, $ttl);
     }
   }
   
   function write_once($key, $value=null, $options=array())
   {
-    $expires_in = isset($options['expires_in']) ? $options['expires_in'] : 0;
-    return $this->memcache->add($key, $value, null, $expires_in);
+    $ttl = $this->ttl($options);
+    return $this->memcache->add($key, $value, null, $ttl);
   }
   
   function delete($key) {

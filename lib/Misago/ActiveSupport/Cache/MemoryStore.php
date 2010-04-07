@@ -9,18 +9,12 @@ class MemoryStore extends Store
     return apc_fetch($key);
   }
   
-  function write($key, $value=null, $options=array())
-  {
-    $ttl = isset($options['expires_in']) ? $options['expires_in'] : 0;
-    $ttl = is_string($ttl) ? strtotime($ttl) : $ttl;
-    apc_store($key, $value, $ttl);
+  function write($key, $value=null, $options=array()) {
+    apc_store($key, $value, $this->ttl($options));
   }
   
-  function write_once($key, $value=null, $options=array())
-  {
-    $ttl = isset($options['expires_in']) ? $options['expires_in'] : 0;
-    $ttl = is_string($ttl) ? strtotime($ttl) : $ttl;
-    return apc_add($key, $value, $ttl);
+  function write_once($key, $value=null, $options=array()) {
+    return apc_add($key, $value, $this->ttl($options));
   }
   
   function delete($key) {

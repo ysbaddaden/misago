@@ -3,11 +3,13 @@ namespace Misago\ActiveSupport\Cache;
 
 # Abstract cache storage.
 # 
-# See <tt>MemoryStore</tt>, <tt>MemcacheStore</tt>, <tt>RedisStore</tt> or
-# <tt>FileStore</tt> for actual implementations. You may build your own
-# one too.
+# See <tt>Misago\ActiveSupport\MemoryStore</tt>,
+# <tt>Misago\ActiveSupport\MemcacheStore</tt>,
+# <tt>Misago\ActiveSupport\RedisStore</tt> or
+# <tt>Misago\ActiveSupport\FileStore</tt> for actual implementations.
+# You may also build your own one.
 # 
-# Note: <tt>ActiveSupport\Cache</tt> is meant to store strings. Some
+# Note: <tt>Misago\ActiveSupport\Cache</tt> is meant to store strings. Some
 # implementations may store something else (like objects), but that shouldn't
 # be used.
 # 
@@ -24,8 +26,9 @@ abstract class Store extends \Misago\Object
   #   {
   #     function show()
   #     {
-  #       $data = $this->cache("cache_key", function() use($this->params) {
-  #          return User::find($this->params[':id']);
+  #       $id   = $this->params[':id'];
+  #       $user = $this->cache("cache_key", function() use($id) {
+  #          return User::find($id);
   #       });
   #     }
   #   }
@@ -53,12 +56,13 @@ abstract class Store extends \Misago\Object
   #   $store->write('user_id', 123);
   #   $store->write(array('user_id' => 123, 'name' => 'John Doe'));
   # 
-  # - expires_in: the number of seconds that this value may live in cache.
+  # - +expires_in+ - the number of seconds this key may live in cache
+  # - +expires_at+ - the date the key will expire
   # 
   abstract function write($key, $value=null, $options=array());
   
-  # Sets a variable if it hasn't be set already. This is safer than checking
-  # with exists and setting it afterward, since it will be execute in a single
+  # Sets a variable if it hasn't been set already. This is safer than checking
+  # with exists and setting it afterward, since it will be executed in a single
   # and exclusive command.
   # 
   # See <tt>write()</tt> for syntax and options.
@@ -122,6 +126,22 @@ abstract class Store extends \Misago\Object
       return self::$singletons[get_called_class()] = new static();
     }
     return self::$singletons[get_called_class()];
+  }
+  
+  # Generates the time-to-live from +expires_in+ or +expires_at+ options.
+  protected function ttl($options)
+  {
+    if (isset($options['expires_in']))
+    {
+      return is_string($options['expires_in']) ?
+        strtotime($options['expires_in']) : $options['expires_in'];
+    }
+    elseif (isset($options['expires_at']))
+    {
+      return is_string($options['expires_at']) ?
+        strtotime($options['expires_at']) : $options['expires_at'];
+    }
+    return null;
   }
 }
 

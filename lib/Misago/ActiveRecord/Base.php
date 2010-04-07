@@ -210,8 +210,6 @@ abstract class Base extends Calculations
   
   function __construct($arg=null)
   {
-    \Misago\Object::__construct();
-    
     if ($arg !== null)
     {
       if (!is_array($arg))

@@ -1,35 +1,23 @@
 <?php
 namespace Misago\ActiveSupport\Cache;
-require 'Predis.php';
+#require 'Redis.php';
 
-# A Cache Store implementation which stores data with Redis.
-# See <tt>Store</tt> for help.
+# A Cache Store implementation which uses Redis.
+# See <tt>Misago\ActiveSupport\Cache\Store</tt> for actual help.
+# 
+# Note: RedisStore can't connect to multiple Redis servers.
 class RedisStore extends Store
 {
   private $redis;
   
-  function __construct()
+  function __construct($config=array())
   {
-    if (!func_num_args()) {
-      $this->redis = new \Predis\Client();
-    }
-    else
+    if (func_num_args() > 1)
     {
-      $servers = func_get_args();
-      foreach($servers as $i => $server)
-      {
-        if (strpos($server, ':') !== false) {
-          list($host, $port) = explode(':', $server, 2);
-        }
-        else
-        {
-          $host = $server;
-          $port = '6379';
-        }
-        $servers[$i] = array('host' => $host, 'port' => $port);
-      }
-      $this->redis = forward_static_call(array('\Predis\Client', 'create'), $servers);
+      trigger_error("RedisStore cannot connect to multiple Redis servers.",
+        E_USER_WARNING);
     }
+    $this->redis = new \Redis\Client($config);
   }
   
   function increment($key, $amount=1)
@@ -80,17 +68,19 @@ class RedisStore extends Store
   
   private function _write($key, $value=null, $options=array(), $nx=false)
   {
+    $ttl = $this->ttl($options);
+    
     if (is_array($key))
     {
       $method = $nx ? 'msetnx' : 'mset';
       $rs = $this->redis->$method($key);
       
-      if (isset($options['expires_in']))
+      if ($ttl !== null)
       {
-        $this->redis->pipeline(function($pipe)
+        $this->redis->pipeline(function($pipe) use($keys)
         {
           foreach(array_keys($keys) as $key) {
-            $pipe->expire($key, $expires_in);
+            $pipe->expire($key, $ttl);
           }
         });
       }
@@ -100,8 +90,8 @@ class RedisStore extends Store
       $method = $nx ? 'setnx' : 'set';
       $rs = $this->redis->$method($key, $value);
       
-      if (isset($options['expires_in'])) {
-        $this->redis->expire($key, $options['expires_in']);
+      if ($ttl !== null) {
+        $this->redis->expire($key, $ttl);
       }
     }
     return $rs;
