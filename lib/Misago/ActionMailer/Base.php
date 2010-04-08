@@ -62,13 +62,13 @@ class Base extends \Misago\Object
   public $params  = array();
   
   # Populated only when delivery_method = 'test'.
-  public $deliveries = array();
+  static $deliveries = array();
   
   static function __callStatic($func, $args)
   {
     if (preg_match('/^deliver_(.+)$/', $func, $match))
     {
-      $mail = forward_static_call(array(get_called_class(), $match[1]), $args);
+      $mail = forward_static_call_array(array(get_called_class(), $match[1]), $args);
       return static::deliver($mail);
     }
     trigger_error('No such method '.get_called_class().'::'.$func.'().', E_USER_ERROR);
@@ -77,8 +77,7 @@ class Base extends \Misago\Object
   # Delivers a prepared mail.
   static function deliver($mail)
   {
-    if (cfg_get('action_mailer.perform_deliveries', false))
-    {
+    if (cfg_get('action_mailer.perform_deliveries', false)) {
       return true;
     }
     $contents = static::render($mail);
@@ -90,7 +89,7 @@ class Base extends \Misago\Object
     switch(cfg_get('action_mailer.delivery_method'))
     {
       case 'test':
-        $this->deliveries[] = array(
+        static::$deliveries[] = array(
           'mailer'     => get_called_class(),
           'action'     => $mail->action,
           'recipients' => $mail->recipients(),
