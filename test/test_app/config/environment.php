@@ -18,5 +18,5 @@ cfg_set('action_mailer.perform_deliveries', false);
 #cfg_set('action_mailer.return_path', 'postmaster@domain.com');
 
 cfg_set('action_controller.cache_store', 'memory_store');
-cfg_set('action_controller.allow_forgery_protection', true);
+#cfg_set('action_controller.allow_forgery_protection', true);
 ?>
