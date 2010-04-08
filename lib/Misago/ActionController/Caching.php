@@ -12,7 +12,7 @@ use Misago\ActiveSupport;
 # +cfg_set+ in your environment:
 # 
 #   # config/environment.php
-#   cfg_set('cache_store', 'memcache');
+#   cfg_set('action_controller.cache_store', 'memcache');
 # 
 # See <tt>Misago\ActiveSupport\Cache</tt> for the list of available
 # storages (defaults to <tt>Misago\ActiveSupport\Cache\MemoryStore</tt>).
@@ -107,7 +107,7 @@ abstract class Caching extends Filters
   {
     if (!isset($this->cache))
     {
-      $cache_store = cfg_get('cache_store', 'memory_store');
+      $cache_store = cfg_get('action_controller.cache_store', 'memory_store');
       $CacheStoreClassName = 'Misago\ActiveSupport\Cache\\'.
         ActiveSupport\String::camelize($cache_store);
       $this->cache = new $CacheStoreClassName();
