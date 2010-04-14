@@ -62,8 +62,8 @@ if (!isset($_SERVER['MISAGO_ENV'])) {
 # more requirements
 require 'Misago/ActiveSupport.php';
 require 'Misago/ActionController.php';
-require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 require ROOT.'/config/environment.php';
+require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 
 Misago\I18n::initialize();
 
