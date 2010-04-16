@@ -19,20 +19,6 @@ class Test_ActionView_Base extends Misago\Unit\TestCase
     $this->assert_equal(trim($html), '<p>Hello world!</p>', 'format defaults to html');
   }
   
-  function test_render_view_with_layout()
-  {
-    $view = new ActionView\Base();
-    $view->view_path = 'say';
-    
-    $xml = $view->render(array(
-      'template' => 'say/hello',
-      'layout'   => 'say',
-      'format'   => 'xml',
-    ));
-    $xml = str_replace(array("\n", "\r"), '', trim($xml));
-    $this->assert_equal($xml, "<say><message>hello world</message></say>");
-  }
-  
   function test_template_not_found()
   {
     $view = new ActionView\Base();

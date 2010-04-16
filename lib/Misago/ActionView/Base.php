@@ -84,12 +84,6 @@ class Base extends \Misago\Object
   # 
   # This will render the view +index.html.tpl+.
   # 
-  # = Render a view inside a layout:
-  # 
-  #   render(array('action' => 'index', 'layout' => 'products'));
-  # 
-  # This will render the view +index.html.tpl+ inside the layout +products.html.tpl+.
-  # 
   # = Render a partial:
   # 
   #   render(array('partial' => 'form'));
@@ -114,7 +108,6 @@ class Base extends \Misago\Object
   # This will render the partial +posts/_post.html.tpl+, regardless of
   # which controller this is being called from.
   # 
-  # TODO: move layout rendering to ActionController\Base.
   function render($options)
   {
     # locals
@@ -125,7 +118,7 @@ class Base extends \Misago\Object
       }
     }
     
-    # view (+layout)
+    # template
     if (isset($options['template']))
     {
       $this->view_format = isset($options['format']) ? $options['format'] : 'html';
@@ -137,50 +130,12 @@ class Base extends \Misago\Object
           $this->copy_controller_vars();
         }
         
-        # view
         ob_start();
         include ROOT."/app/views/{$__template_file}";
-        $this->yield('content', ob_get_clean());
-        
-        # no layout
-        if (isset($options['layout']) and $options['layout'] === false) {
-          return $this->yield('content');
-        }
-        
-        # layout
-        if (isset($options['layout']))
-        {
-          $__layout_file = "{$options['layout']}.{$this->view_format}.tpl";
-          if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
-          {
-            ob_start();
-            include ROOT."/app/views/layouts/{$__layout_file}";
-            return ob_get_clean();
-          }
-          else {
-            throw new \Misago\Exception("Layout template not found: '{$options['layout']}'", 404);
-          }
-        }
-        else
-        {
-          $__layout_file = "{$this->view_path}.{$this->view_format}.tpl";
-          if (file_exists(ROOT."/app/views/layouts/{$__layout_file}"))
-          {
-            ob_start();
-            include ROOT."/app/views/layouts/{$__layout_file}";
-            return ob_get_clean();
-          }
-          elseif (file_exists(ROOT."/app/views/layouts/default.{$this->view_format}.tpl"))
-          {
-            ob_start();
-            include ROOT."/app/views/layouts/default.{$this->view_format}.tpl";
-            return ob_get_clean();
-          }
-        }
-        return $this->yield('content');
+        return ob_get_clean();
       }
       
-      throw new \Misago\Exception("View template not found: '{$__template_file}'", 404);
+      throw new \Misago\Exception("Template not found: '{$__template_file}'", 404);
     }
     
     # partial (or collection of partials)
@@ -236,6 +191,13 @@ class Base extends \Misago\Object
       return isset($this->yields[$name]) ? $this->yields[$name] : null;
     }
     $this->yields[$name] = $content;
+  }
+  
+  # Returns true if a given template exists.
+  function template_exists($template, $format=null)
+  {
+    if ($format === null) $format = $this->view_format;
+    return file_exists(ROOT."/app/views/$template.$format.tpl");
   }
   
   # Copies public vars from controller, not overriding view's own class vars.

@@ -241,19 +241,48 @@ abstract class Base extends RequestForgeryProtection
   # 
   # =Layouts
   # 
-  # By default controller's layout (eg: +layouts/posts.html.tpl+) is used,
-  # and falls back to the generic default layout (+layouts/default.html.tpl+).
+  # By default a particular layout per controller will be rendered, for instance
+  # +layouts/products.html.tpl+ for +ProductsController+. If no such layout
+  # exists it will fall back on +layouts/default.html.tpl+.
   # 
   #   # use a particular layout:
   #   render(array('action' => 'create', 'layout' => 'admin'));
-  #     => renders create.html.tpl inside admin.html.tpl
+  #     => renders create.html.tpl inside layouts/admin.html.tpl
+  # 
+  #   # use a particular format:
+  #   render(array('action' => 'index', 'layout' => 'feeds', 'format' => 'rss'));
+  #     => renders index.rss.tpl inside layouts/feeds.rss.tpl
   # 
   #   # no layout at all:
   #   render(array('layout' => false));
+  # 
+  # You may also override the layout you want to use for the whole controller.
+  # For instance in the following example +layouts/website.html.tpl+ will be
+  # used for all view:
+  # 
+  #   ProductsController extends Misago\ActionController\Base {
+  #     protected $default_layout = 'website';
+  #   }
+  # 
+  # To render the page content in the layout, as well as pass data from the
+  # template to the layout, use the +yield()+ method:
+  # 
+  #   # my_template.html.tpl
+  #   <\? $this->yield('page_title') ?\>
   #   
-  #   # use a particular format:
-  #   render(array('action' => 'index', 'layout' => 'feeds', 'format' => 'rss'));
-  #     => renders index.rss.tpl inside feeds.rss.tpl
+  #   <section id="main"> ... </section>
+  #   <aside id="sidebar"> ... </aside>
+  # 
+  #   # my_layout.html.tpl
+  #   <!DOCTYPE html>
+  #   <html>
+  #   <head>
+  #     <title><\?= $this->yield('page_title') ?\></title>
+  #   </head>
+  #   <body>
+  #     <div id="content"><\?= $this->yield('content') ?\></div>
+  #   </body>
+  #   </html>
   # 
   # =Export a resource in a particular file format:
   # 
@@ -264,7 +293,7 @@ abstract class Base extends RequestForgeryProtection
   #   # => exports $this->user as XML
   #   
   #   render(array('json' => $this->products));
-  #   # => exports $this->user as JSON
+  #   # => exports $this->products as JSON
   # 
   # Note: no layout is rendered when using XML or JSON exports.
   # 
@@ -333,20 +362,38 @@ abstract class Base extends RequestForgeryProtection
     }
     else
     {
+      $view = new ActionView\Base($this);
+      
+      # view
       if (!isset($options['template']))
       {
         $action = isset($options['action']) ? $options['action'] : $this->action;
         $options['template'] = $this->view_path.'/'.$action;
       }
       $this->logger->log_info() && $this->logger->info("Rendering {$options['template']}");
+      $content = $view->render($options);
       
-      if (!isset($options['layout']) and !empty($this->default_layout)) {
-        $options['layout'] = $this->default_layout;
+      # layout
+      $layout = isset($options['layout']) ? $options['layout'] : $this->default_layout;
+      
+      if ($layout === false) {
+        $this->response->body = $content;
+      }
+      else
+      {
+        if (empty($layout))
+        {
+          $layout = $view->template_exists("layouts/{$this->view_path}", $options['format']) ?
+            $this->view_path : 'default';
+        }
+        $options['template'] = "layouts/$layout";
+        $view->yield('content', $content);
+        
+        $this->logger->log_info() && $this->logger->info("Rendering layout {$layout}");
+        $this->response->body = $view->render($options);
       }
       
-      $view = new ActionView\Base($this);
       $this->response->content_type_from_format($options['format']);
-      $this->response->body = $view->render($options);
     }
     
     $this->rendering_time = (microtime(true) - $rendering_time) / 1000;
