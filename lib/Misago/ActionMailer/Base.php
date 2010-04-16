@@ -58,6 +58,12 @@ use Misago\ActiveSupport\String;
 # 
 class Base extends \Misago\Object
 {
+  # Default layout to use.
+  protected $layout;
+  
+  # Template folder containing views.
+  public $view_path;
+  
   public $helpers = ':all';
   public $params  = array();
   
@@ -72,6 +78,13 @@ class Base extends \Misago\Object
       return static::deliver($mail);
     }
     trigger_error('No such method '.get_called_class().'::'.$func.'().', E_USER_ERROR);
+  }
+  
+  function __construct()
+  {
+    if (empty($this->view_path)) {
+      $this->view_path = str_replace('\\', '/', String::underscore(get_called_class()));
+    }
   }
   
   # Delivers a prepared mail.
@@ -116,18 +129,43 @@ class Base extends \Misago\Object
     $view = new ActionView\Base($self);
     
     $options = array(
-      'template' => String::underscore(get_called_class()).'/'.$mail->action,
+      'template' => "{$self->view_path}/{$mail->action}",
       'locals'   => $mail->data,
-      'layout'   => false,
     );
     
     $options['format'] = 'plain';
-    $mail->body_plain = $view->render($options);
+    $body_plain = $view->render($options);
     
     $options['format'] = 'html';
-    $mail->body_html = $view->render($options);
+    $body_html = $view->render($options);
+    
+    if (isset($self->layout))
+    {
+      $body_plain = static::render_layout($self->layout, 'plain', $body_plain, $view, $options);
+      $body_html  = static::render_layout($self->layout, 'html',  $body_html,  $view, $options);
+    }
+    else
+    {
+      if ($view->template_exists("layouts/{$self->view_path}", 'plain')) {
+        $body_plain = static::render_layout($self->view_path, 'plain', $body_plain, $view, $options);
+      }
+      if ($view->template_exists("layouts/{$self->view_path}", 'html')) {
+        $body_html = static::render_layout($self->view_path, 'html', $body_html, $view, $options);
+      }
+    }
+    
+    $mail->body_plain = $body_plain;
+    $mail->body_html  = $body_html;
     
     return $mail->contents();
+  }
+  
+  private static function render_layout($layout, $format, $content, $view, $options)
+  {
+    $options['template'] = "layouts/{$layout}";
+    $options['format']   = $format;
+    $view->yield('content', $content);
+    return $view->render($options);
   }
 }
 
