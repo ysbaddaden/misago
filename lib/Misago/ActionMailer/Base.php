@@ -37,6 +37,21 @@ use Misago\ActiveSupport\String;
 # Please note that for the time being, it is necessary to have
 # both the +plain+ and +html+ templates.
 # 
+# = Layouts
+# 
+# You may render emails inside layouts. By default it searches for mailer's
+# layouts, for instance +layouts/user_mailer.html.tpl+ and
+# +layouts/user_mailer.plain.tpl+ for a +UserMailer+ class.
+# 
+# You may also configure a per-class layout, using the +$layout+ property. For
+# instance the following class will user +layouts/user_mailer.html.tpl+ and
+# +layouts/user_mailer.plain.tpl+:
+# 
+#   class UserMailer {
+#     protected $layout = 'email';
+#   }
+# 
+# 
 # =Delivering
 # 
 # Simply call the <tt>deliver</tt> method:
