@@ -1,5 +1,4 @@
 <?php
-#require __DIR__.'/ActiveRecordHelper_ns.php';
 
 # :namespace: Misago\ActionView\Helpers\ActiveRecordHelper
 function error_message_on($object, $column, $all)

@@ -98,8 +98,8 @@ class I18n
   # Initializes the I18n translator.
   static function initialize()
   {
-    if (cfg_isset('i18n_default_locale')) {
-      self::$locale = cfg_get('i18n_default_locale');
+    if (cfg_isset('i18n.default_locale')) {
+      self::$locale = cfg_get('i18n.default_locale');
     }
     self::load_translations(self::$locale);
   }

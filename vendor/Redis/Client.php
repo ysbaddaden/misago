@@ -11,7 +11,7 @@ namespace Redis;
 # See http://code.google.com/redis for the full list of commands and their
 # documentation.
 # 
-# = Examples
+# == Examples
 # 
 #   $r = new Redis\Client();
 #   
@@ -26,6 +26,21 @@ namespace Redis;
 #   
 #   $r->del('counter');          # => 1
 #   $r->get('counter');          # => null
+# 
+# == MGET
+# 
+#   $r->mget('key1', 'key2', 'keyn');
+#   $r->mget(array('key1', 'key2', 'keyn'));
+# 
+# == MSET / MSETNX
+# 
+#   $r->mset(array('key1' => 1, 'key2' => 'value2', 'keyn' => 'valuen'));
+#   $r->msetnx(array('key1' => 1, 'key2' => 'value2', 'keyn' => 'valuen'));
+# 
+# == DEL
+# 
+#   $r->del('key1', 'key2', 'keyn');
+#   $r->del(array('key1', 'key2', 'keyn'));
 # 
 # = Replies
 # 
@@ -70,140 +85,136 @@ class Client
   const ERR_ARG_COUNT = 4;
   const ERR_REPLY     = 5;
   
-  const CMD_INLINE    = 1;
-  const CMD_BULK      = 2;
-  const CMD_MULTIBULK = 3;
-  
   const REP_FLOAT     = 1;
   const REP_BOOL      = 2;
-  const REP_ARRAY     = 3;
-  const REP_ASSOC     = 4;
-  const REP_QUEUED    = '+QUEUED';
+  const REP_ASSOC     = 3;
   
   public  $debug = false;
   private $sock;
   
   private static $commands = array(
     # connection
-    'auth'         => array(self::CMD_INLINE),
+#    'select'       => null,
+#    'auth'         => null,
     
     # multi/exec (untested)
-    'multi'        => array(self::CMD_INLINE),
-    'exec'         => array(self::CMD_INLINE),
-    'discard'      => array(self::CMD_INLINE),
+#    'multi'        => null,
+#    'exec'         => null,
+#    'discard'      => null,
     
     # generics
-    'exists'       => array(self::CMD_INLINE,    self::REP_BOOL),
-    'del'          => array(self::CMD_INLINE),
-    'type'         => array(self::CMD_INLINE),
-    'keys'         => array(self::CMD_INLINE),
-    'randomkey'    => array(self::CMD_INLINE),
-    'rename'       => array(self::CMD_INLINE),
-    'renamenx'     => array(self::CMD_INLINE,    self::REP_BOOL),
-    'dbsize'       => array(self::CMD_INLINE),
-    'expire'       => array(self::CMD_INLINE,    self::REP_BOOL),
-    'expireat'     => array(self::CMD_INLINE,    self::REP_BOOL),
-    'ttl'          => array(self::CMD_INLINE),
-    'select'       => array(self::CMD_INLINE),
-    'move'         => array(self::CMD_INLINE,    self::REP_BOOL),
-    'flushdb'      => array(self::CMD_INLINE),
-    'flushall'     => array(self::CMD_INLINE),
+    'exists'       => array(self::REP_BOOL),
+#    'del'          => null,
+#    'type'         => null,
+#    'keys'         => null,
+#    'randomkey'    => null,
+#    'rename'       => null,
+    'renamenx'     => array(self::REP_BOOL),
+#    'dbsize'       => null,
+    'expire'       => array(self::REP_BOOL),
+    'expireat'     => array(self::REP_BOOL),
+#    'ttl'          => null,
+#    'select'       => null,
+    'move'         => array(self::REP_BOOL),
+#    'flushdb'      => null,
+#    'flushall'     => null,
     
     # strings
-    'set'          => array(self::CMD_BULK),
-    'get'          => array(self::CMD_INLINE),
-    'getset'       => array(self::CMD_BULK),
-    'setnx'        => array(self::CMD_BULK,      self::REP_BOOL),
-    'mget'         => array(self::CMD_INLINE),
-    'mset'         => array(self::CMD_MULTIBULK),
-    'msetnx'       => array(self::CMD_MULTIBULK, self::REP_BOOL),
-    'incr'         => array(self::CMD_INLINE),
-    'incrby'       => array(self::CMD_INLINE),
-    'decr'         => array(self::CMD_INLINE),
-    'decrby'       => array(self::CMD_INLINE),
+#    'set'          => null,
+#    'get'          => null,
+#    'getset'       => null,
+    'setnx'        => array(self::REP_BOOL),
+#    'mget'         => null,
+#    'mset'         => null,
+    'msetnx'       => array(self::REP_BOOL),
+#    'incr'         => null,
+#    'incrby'       => null,
+#    'decr'         => null,
+#    'decrby'       => null,
     
     # lists
-    'lpush'        => array(self::CMD_BULK,      self::REP_BOOL),
-    'rpush'        => array(self::CMD_BULK,      self::REP_BOOL),
-    'llen'         => array(self::CMD_INLINE),
-    'lrange'       => array(self::CMD_INLINE),
-    'ltrim'        => array(self::CMD_INLINE),
-    'lindex'       => array(self::CMD_INLINE),
-    'lset'         => array(self::CMD_BULK),
-    'lrem'         => array(self::CMD_BULK),
-    'lpop'         => array(self::CMD_INLINE),
-    'rpop'         => array(self::CMD_INLINE),
-    'rpoplpush'    => array(self::CMD_INLINE),
-    'blpop'        => array(self::CMD_INLINE),
-    'brpop'        => array(self::CMD_INLINE),
+    'lpush'        => array(self::REP_BOOL),
+    'rpush'        => array(self::REP_BOOL),
+#    'llen'         => null,
+#    'lrange'       => null,
+#    'ltrim'        => null,
+#    'lindex'       => null,
+#    'lset'         => null,
+#    'lrem'         => null,
+#    'lpop'         => null,
+#    'rpop'         => null,
+#    'rpoplpush'    => null,
+#    'blpop'        => null,
+#    'brpop'        => null,
     
     # sets
-    'sadd'         => array(self::CMD_BULK,      self::REP_BOOL),
-    'srem'         => array(self::CMD_BULK,      self::REP_BOOL),
-    'spop'         => array(self::CMD_INLINE),
-    'smove'        => array(self::CMD_BULK,      self::REP_BOOL),
-    'scard'        => array(self::CMD_INLINE),
-    'sismember'    => array(self::CMD_BULK,      self::REP_BOOL),
-    'sinter'       => array(self::CMD_INLINE),
-    'sinterstore'  => array(self::CMD_INLINE),
-    'sunion'       => array(self::CMD_INLINE),
-    'sunionstore'  => array(self::CMD_INLINE),
-    'sdiff'        => array(self::CMD_INLINE),
-    'sdiffstore'   => array(self::CMD_INLINE),
-    'smembers'     => array(self::CMD_INLINE,    self::REP_ARRAY),
-    'srandmember'  => array(self::CMD_INLINE),
+    'sadd'         => array(self::REP_BOOL),
+    'srem'         => array(self::REP_BOOL),
+#    'spop'         => null,
+    'smove'        => array(self::REP_BOOL),
+#    'scard'        => null,
+    'sismember'    => array(self::REP_BOOL),
+#    'sinter'       => null,
+#    'sinterstore'  => null,
+#    'sunion'       => null,
+#    'sunionstore'  => null,
+#    'sdiff'        => null,
+#    'sdiffstore'   => null,
+#    'smembers'     => null,
+#    'srandmember'  => null,
     
     # zsets (sorted sets)
-    'zadd'                     => array(self::CMD_BULK,   self::REP_BOOL),
-    'zrem'                     => array(self::CMD_BULK,   self::REP_BOOL),
-    'zincrby'                  => array(self::CMD_BULK,   self::REP_FLOAT),
-    'zrange'                   => array(self::CMD_INLINE, self::REP_ARRAY),
-    'zrevrange'                => array(self::CMD_INLINE, self::REP_ARRAY),
-    'zrangebyscore'            => array(self::CMD_INLINE, self::REP_ARRAY),
-    'zrange_withscores'        => array(self::CMD_INLINE, self::REP_ASSOC, 'zrange',        'withscores'),
-    'zrevrange_withscores'     => array(self::CMD_INLINE, self::REP_ASSOC, 'zrevrange',     'withscores'),
-    'zrangebyscore_withscores' => array(self::CMD_INLINE, self::REP_ASSOC, 'zrangebyscore', 'withscores'),
-    'zcard'                    => array(self::CMD_INLINE),
-    'zscore'                   => array(self::CMD_BULK,   self::REP_FLOAT),
-    'zremrangebyscore'         => array(self::CMD_INLINE),
-    'zremrangebyrank'          => array(self::CMD_INLINE),
-    'zrank'                    => array(self::CMD_BULK),
-    'zrevrank'                 => array(self::CMD_BULK),
-    'zcount'                   => array(self::CMD_INLINE),
-#    'zunion'                   => array(self::CMD_INLINE),
-#    'zinter'                   => array(self::CMD_INLINE),
+    'zadd'                     => array(self::REP_BOOL),
+    'zrem'                     => array(self::REP_BOOL),
+    'zincrby'                  => array(self::REP_FLOAT),
+#    'zrange'                   => null,
+#    'zrevrange'                => null,
+#    'zrangebyscore'            => null,
+    'zrange_withscores'        => array(self::REP_ASSOC, 'zrange',        'withscores'),
+    'zrevrange_withscores'     => array(self::REP_ASSOC, 'zrevrange',     'withscores'),
+    'zrangebyscore_withscores' => array(self::REP_ASSOC, 'zrangebyscore', 'withscores'),
+#    'zcard'                    => null,
+    'zscore'                   => array(self::REP_FLOAT),
+#    'zremrangebyscore'         => null,
+#    'zremrangebyrank'          => null,
+#    'zrank'                    => null,
+#    'zrevrank'                 => null,
+#    'zcount'                   => null,
+##    'zunion'                   => null,
+##    'zinter'                   => null,
     
     # sorting
-    'sort'         => array(self::CMD_INLINE),
+#    'sort'         => null,
     
     # hashes
-    'hset'         => array(self::CMD_MULTIBULK,  self::REP_BOOL),
-    'hget'         => array(self::CMD_BULK),
-    'hdel'         => array(self::CMD_BULK,       self::REP_BOOL),
-    'hlen'         => array(self::CMD_INLINE),
-    'hkeys'        => array(self::CMD_INLINE),
-    'hvals'        => array(self::CMD_INLINE),
-    'hgetall'      => array(self::CMD_INLINE,     self::REP_ASSOC),
-    'hexists'      => array(self::CMD_BULK,       self::REP_BOOL),
-    'hincrby'      => array(self::CMD_MULTIBULK),
+    'hset'         => array(self::REP_BOOL),
+#    'hmset'        => null,
+#    'hget'         => null,
+    'hdel'         => array(self::REP_BOOL),
+#    'hlen'         => null,
+#    'hkeys'        => null,
+#    'hvals'        => null,
+    'hgetall'      => array(self::REP_ASSOC),
+    'hexists'      => array(self::REP_BOOL),
+#    'hincrby'      => null,
     
     # persistence
-    'save'         => array(self::CMD_INLINE),
-    'bgsave'       => array(self::CMD_INLINE),
-    'bgrewriteaof' => array(self::CMD_INLINE),
-    'lastsave'     => array(self::CMD_INLINE),
+#    'save'         => null,
+#    'bgsave'       => null,
+#    'bgrewriteaof' => null,
+#    'lastsave'     => null,
     
     # pub/sub
-    'subscribe'    => array(self::CMD_INLINE),
-    'unsubscribe'  => array(self::CMD_INLINE),
-    'publish'      => array(self::CMD_BULK),
+#    'subscribe'    => null,
+#    'unsubscribe'  => null,
+#    'publish'      => null,
     
     # server
-    'config'       => array(self::CMD_BULK),
-    'ping'         => array(self::CMD_INLINE),
-    'shutdown'     => array(self::CMD_INLINE),
-    'info'         => array(self::CMD_INLINE),
-    'slaveof'      => array(self::CMD_INLINE),
+#    'config'       => null,
+#    'ping'         => null,
+#    'shutdown'     => null,
+#    'info'         => null,
+#    'slaveof'      => null,
   );
   
   function __construct($config=null) {
@@ -250,35 +261,6 @@ class Client
     }
   }
   
-  # Returns an array of integers/strings if getting only one field.
-  # Returns an array of arrays (of integers/strings) when getting multiple fields.
-  # 
-  # For instance:
-  # 
-  #   $r->sort('stories get # get story:*:title get story:*:summary');
-  function sort()
-  {
-    $args = func_get_args();
-    $rs   = $this->send_command(array(array('sort', $args)));
-    
-    $count = substr_count(strtoupper(implode(' ', $args)), ' GET ');
-    if ($count > 1)
-    {
-      $ary = array();
-      for($i=0; $i<count($rs); $i+=$j)
-      {
-        $a = array();
-        for($j=0; $j<$count; $j++) {
-          $a[] = $rs[$i+$j];
-        }
-        $ary[] = $a;
-      }
-      return $ary;
-    }
-    
-    return $rs;
-  }
-  
   function pipeline($closure)
   {
     $pipe = new Pipeline($this);
@@ -291,73 +273,132 @@ class Client
     return $this->read_raw_reply();
   }
   
+  # Sorts a list, set or sorted set.
+  # 
+  # Returns an array of integers/strings if getting only one field. Returns
+  # an array of arrays (of integers/strings) when getting multiple fields.
+  # 
+  # Options:
+  # 
+  # - +by+     - sort by other key
+  # - +order+  - either +asc+ (default) or +desc+
+  # - +limit+
+  # - +offset+
+  # - +get+    - an array of keys
+  # - +store+  - store result in an external key
+  function sort($key, $options=array())
+  {
+    $args = array($key);
+    
+    if (isset($options['by'])) {
+      $args[] = 'by'; $args[] = $options['by'];
+    }
+    
+    if (isset($options['offset']) and !isset($options['limit'])) {
+      $options['limit'] = 0;
+    }
+    if (isset($options['limit']))
+    {
+      $args[] = 'limit';
+      $args[] = isset($options['offset']) ? $options['offset'] : 0;
+      $args[] = $options['limit'];
+    }
+    
+    if (isset($options['alpha']) and $options['alpha']) {
+      $args[] = 'alpha';
+    }
+    
+    if (isset($options['order'])) {
+      $args[] = $options['order'];
+    }
+    
+    if (isset($options['get']))
+    {
+      foreach($options['get'] as $v) {
+        $args[] = 'get'; $args[] = $v;
+      }
+    }
+    
+    if (isset($options['store'])) {
+      $args[] = 'store'; $args[] = $options['store'];
+    }
+    
+    $rs = $this->send_command(array(array('sort', $args)));
+    
+    if (isset($options['get'])
+      and count($options['get']) > 1)
+    {
+      $ary = array();
+      for($i=0; $i<count($rs); $i+=$j)
+      {
+        $a = array();
+        for($j=0; $j<count($options['get']); $j++) {
+          $a[] = $rs[$i+$j];
+        }
+        $ary[] = $a;
+      }
+      return $ary;
+    }
+    
+    return $rs;
+  }
+  
   # :nodoc:
   static function lookup_command($name)
   {
     $cmd = isset(self::$commands[$name]) ?
-      self::$commands[$name] : array(self::CMD_MULTIBULK);
+      self::$commands[$name] : array();
     
     return array(
-      'name'    => isset($cmd[2]) ? $cmd[2] : $name,
-      'type'    => $cmd[0],
-      'reply'   => isset($cmd[1]) ? $cmd[1] : null,
-      'options' => isset($cmd[3]) ? $cmd[3] : '',
+      'name'    => isset($cmd[1]) ? $cmd[1] : $name,
+      'reply'   => isset($cmd[0]) ? $cmd[0] : null,
+      'options' => isset($cmd[2]) ? $cmd[2] : '',
     );
   }
   
   private function format_command($cmd, $args)
   {
-    if (isset($args[0]) and is_array($args[0])) {
-      $args = $args[0];
+    switch($cmd['name'])
+    {
+      case 'mget': case 'del':
+        if (isset($args[0]) and is_array($args[0])) {
+          $args = $args[0];
+        }
+      break;
+      
+      case 'mset': case 'msetnx':
+        $_args = array();
+        foreach($args[0] as $k => $v)
+        {
+          $_args[] = $k;
+          $_args[] = $v;
+        }
+        $args = $_args;
+      break;
+      
+      case 'hmset': case 'hmsetnx':
+        $_args = array($args[0]);
+        foreach($args[1] as $k => $v)
+        {
+          $_args[] = $k;
+          $_args[] = $v;
+        }
+        $args = $_args;
+      break;
+      
+      case 'hmget':
+        $key  = $args[0];
+        $args = $args[1];
+        array_unshift($args, $key);
+      break;
     }
     
-    switch($cmd['type'])
-    {
-      case self::CMD_INLINE:
-        $str = $this->format_inline_command($cmd['name'], $args);
-        return empty($cmd['options']) ? $str : "$str {$cmd['options']}";
-      
-      case self::CMD_BULK:
-        return $this->format_bulk_command($cmd['name'], $args);
-      
-      case self::CMD_MULTIBULK:
-        return $this->format_multibulk_command($cmd['name'], $args);
+    if ($cmd['name'] !== null) {
+      array_unshift($args, $cmd['name']);
     }
-  }
-  
-  private function format_inline_command($name, $args=array())
-  {
-    $cmd = $name;
-    foreach($args as $arg) {
-      $cmd .= ' '.(is_array($arg) ? implode(' ', $arg) : $arg);
-    }
-    return $cmd;
-  }
-  
-  private function format_bulk_command($name, $args=array())
-  {
-    $bulk_data = array_pop($args);
-    $cmd  = "$name ".implode(' ', $args).' ';
-    $cmd .= sprintf("%lu\r\n", mb_strlen($bulk_data, '8bit'));
-    $cmd .= $bulk_data;
-    return $cmd;
-  }
-  
-  private function format_multibulk_command($name, $args=array())
-  {
-    if ($name == 'mset'
-      or $name == "msetnx")
-    {
-      $_args = array();
-      foreach($args as $k => $v)
-      {
-        $_args[] = $k;
-        $_args[] = $v;
-      }
-      $args = $_args;
-    }
-    if ($name !== null) {
-      array_unshift($args, $name);
+    
+    if (!empty($cmd['options'])) {
+      $args[] = $cmd['options'];
     }
     
     $cmd = '*'.count($args);
@@ -388,8 +429,6 @@ class Client
       {
         case self::REP_BOOL:  $rs[$i] = (bool)$r;  break;
         case self::REP_FLOAT: $rs[$i] = (float)$r; break;
-        case self::REP_ARRAY: $rs[$i] = ($r !== null) ? $r : array(); break;
-        
         case self::REP_ASSOC:
           $ary = array();
           for ($j=0; $j<count($r); $j+=2) {

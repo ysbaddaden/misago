@@ -1,5 +1,4 @@
 <?php
-#require __DIR__.'/TextHelper_ns.php';
 
 # Transforms all links and email addresses to clickable links.
 # 

@@ -33,8 +33,6 @@
 #   $f->submit('Save');
 #   $f->end();
 # 
-# TODO: Transparently protect against CSRF attacks (using a hash built with a secret stored in session).
-# 
-namespace Misago\ActionView\Helpers\ActiveRecordHelper {}
+namespace Misago\ActionView\Helpers\ActiveRecordHelper;
 
 ?>
