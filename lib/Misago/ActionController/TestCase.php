@@ -7,7 +7,9 @@ $_SERVER['migrate_debug'] = 0;
 # Functional tests for ActionControllers.
 # 
 #   <\?php
-#   class Test_StoriesController extends ActionControllerTest
+#   require __DIR__.'/../test_helper.php';
+#   
+#   class Test_StoriesController extends Misago\ActionController\TestCase
 #   {
 #     function test_index()
 #     {
@@ -16,12 +18,13 @@ $_SERVER['migrate_debug'] = 0;
 #       $this->assert_select('.stories li', 4);
 #     }
 #   }
-#   new Test_StoriesController();
 #   ?\>
 # 
 # IMPROVE: Use TestRequest instead of calling a test server.
 abstract class TestCase extends \Misago\Unit\TestCase
 {
+  protected $use_transactional_fixtures = false;
+  
   function __construct() {
     Routing\Routes::draw();
   }

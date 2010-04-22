@@ -8,6 +8,7 @@ $_SERVER['migrate_debug'] = 0;
 abstract class TestCase extends Assertions\ResponseAssertions
 {
   protected $fixtures = ':all';
+  protected $use_transactional_fixtures = true;
   
   public  static $batch_run = false;
   private static $connection;
@@ -15,21 +16,35 @@ abstract class TestCase extends Assertions\ResponseAssertions
   function run($result, $progress_block)
   {
     self::create_database();
-    $this->load_fixtures();
     
-    parent::run($result, $progress_block);
+    if ($this->use_transactional_fixtures)
+    {
+      $this->load_fixtures();
+      parent::run($result, $progress_block);
+      $this->drop_fixtures();
+    }
+    else {
+      parent::run($result, $progress_block);
+    }
     
-    $this->truncate($this->fixtures);
     self::drop_database();
   }
   
   protected function run_test($method_name)
   {
-    self::$connection->transaction('begin');
-    parent::run_test($method_name);
-    self::$connection->transaction('rollback');
+    if ($this->use_transactional_fixtures)
+    {
+      self::$connection->transaction('begin');
+      parent::run_test($method_name);
+      self::$connection->transaction('rollback');
+    }
+    else
+    {
+      $this->load_fixtures();
+      parent::run_test($method_name);
+      $this->drop_fixtures();
+    }
   }
-  
   
   # :nodoc:
   static function create_database($force=false)
@@ -62,12 +77,18 @@ abstract class TestCase extends Assertions\ResponseAssertions
     }
   }
   
+  # :nodoc:
   protected function load_fixtures()
   {
     if ($this->fixtures === ':all') {
       $this->fixtures = Fixtures::all();
     }
     Fixtures::insert($this->fixtures);
+  }
+  
+  # :nodoc:
+  protected function drop_fixtures() {
+    $this->truncate($this->fixtures);
   }
   
   # Loads one or many fixtures into the database.
