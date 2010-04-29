@@ -38,7 +38,7 @@ abstract class TestCase extends \Misago\Unit\TestCase
   #   $this->run_action(new_account_path());
   #   $this->run_action(delete_account_path());
   # 
-  protected function & run_action($method, $uri=null, $postfields=null, $files=null)
+  function & run_action($method, $uri=null, $postfields=null, $files=null)
   {
     $args = func_get_args();
     if (is_object($args[0]))
@@ -46,6 +46,7 @@ abstract class TestCase extends \Misago\Unit\TestCase
       $uri        = (string)$args[0];
       $method     = $args[0]->method;
       $postfields = isset($args[1]) ? $args[1] : null;
+      $files      = isset($args[2]) ? $args[2] : null;
     }
     
     # requests a page

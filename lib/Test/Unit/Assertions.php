@@ -27,7 +27,7 @@ abstract class Assertions
 {
   # Base assertion that is used by all other assertions. Passed block
   # must return a boolean: true if assertion is succesful, false otherwise.
-  protected function assert_block($message, $block)
+  function assert_block($message, $block)
   {
     if (!$block()) {
       throw new AssertionFailedError($message);
@@ -35,28 +35,28 @@ abstract class Assertions
     $this->_result->add_assertion();
   }
   
-  protected function assert($test, $message='') {
+  function assert($test, $message='') {
     return $this->assert_equal($test, true, $message);
   }
   
   # Alias for <tt>assert</tt>.
-  protected function assert_true($test, $message='') {
+  function assert_true($test, $message='') {
     $this->assert($test, $message);
   }
   
-  protected function assert_false($test, $message='') {
+  function assert_false($test, $message='') {
     return $this->assert_equal($test, false, $message);
   }
   
-  protected function assert_null($test, $message='') {
+  function assert_null($test, $message='') {
     return $this->assert_equal($test, null, $message);
   }
   
-  protected function assert_not_null($test, $message='') {
+  function assert_not_null($test, $message='') {
     return $this->assert_not_equal($test, null, $message);
   }
   
-  protected function assert_equal($test, $expected, $message='')
+  function assert_equal($test, $expected, $message='')
   {
     $message = $this->build_message($message,
       "expected %s but was %s", $expected, $test);
@@ -68,7 +68,7 @@ abstract class Assertions
     });
   }
   
-  protected function assert_not_equal($test, $expected, $message='')
+  function assert_not_equal($test, $expected, $message='')
   {
     $message = $this->build_message($message,
       "expected %s to be != to %s", $expected, $test);
@@ -80,7 +80,7 @@ abstract class Assertions
     });
   }
   
-  protected function assert_instance_of($object, $class_name, $message='')
+  function assert_instance_of($object, $class_name, $message='')
   {
     $message = $this->build_message($message,
       "expected instance of %s but got %s", $class_name, get_class($object));
@@ -90,11 +90,11 @@ abstract class Assertions
     });
   }
   
-  protected function assert_type($var, $type, $message='') {
+  function assert_type($var, $type, $message='') {
     $this->assert_equal(gettype($var), $type, $message);
   }
   
-  protected function assert_match($pattern, $text, $message='')
+  function assert_match($pattern, $text, $message='')
   {
     $message = $this->build_message($message, "%s expected to match:\n%s", $text, $pattern);
     $this->assert_block($message, function() use($pattern, $text) {
@@ -102,7 +102,7 @@ abstract class Assertions
     });
   }
   
-  protected function assert_no_match($pattern, $text, $message='')
+  function assert_no_match($pattern, $text, $message='')
   {
     $message = $this->build_message($message, "%s expected to not match:\n%s", $text, $pattern);
     $this->assert_block($message, function() use($pattern, $text) {
@@ -113,7 +113,7 @@ abstract class Assertions
   #   assert_throws('TestException' 'OtherTestException', function() {
   #     throw new TestException('test');
   #   }, "some message");
-  protected function assert_throws()
+  function assert_throws()
   {
     $args    = func_get_args();
     $message = (isset($args[count($args) - 1]) and is_string($args[count($args) - 1])) ? array_pop($args) : null;
@@ -146,7 +146,7 @@ abstract class Assertions
   #   assert_nothing_thrown(function() {
   #     // code that won't throw any exception
   #   }, "some message");
-  protected function assert_nothing_thrown()
+  function assert_nothing_thrown()
   {
     $args    = func_get_args();
     $message = (isset($args[count($args) - 1]) and is_string($args[count($args) - 1])) ? array_pop($args) : null;
@@ -164,13 +164,11 @@ abstract class Assertions
     });
   }
   
-  protected function flunk($message='')
-  {
+  function flunk($message='') {
     throw new AssertionFailedError($message);
-    #$this->add_failure($message, null);
   }
   
-  protected function build_message($head, $template=null)
+  function build_message($head, $template=null)
   {
     if (!empty($template))
     {

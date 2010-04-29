@@ -39,7 +39,7 @@ abstract class DomAssertions extends ModelAssertions
   #   assert_select('2 articles with class foo', 'article.foo', 2)
   #   assert_select('title element must contains "welcome" text', 'head title', 'welcome')
   #
-  protected function assert_select($selector, $equality=true, $message='')
+  function assert_select($selector, $equality=true, $message='')
   {
     $elements = $this->css_select($this->response['body'], $selector);
     
