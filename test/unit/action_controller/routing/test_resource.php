@@ -25,7 +25,7 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('GET', 'event/new'), array(
+    $this->assert_equal($map->route('GET', 'events/new'), array(
       ':method'     => 'GET',
       ':controller' => 'events',
       ':action'     => 'neo',
@@ -40,7 +40,7 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
       ':format'     => null,
     ));
     
-    $this->assert_equal($map->route('POST', 'event'), array(
+    $this->assert_equal($map->route('POST', 'events'), array(
       ':method'     => 'POST',
       ':controller' => 'events',
       ':action'     => 'create',
@@ -104,14 +104,14 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     $this->assert_equal(show_account_path(array(':id' => 1)), new ActionController\Routing\Path('GET', 'account/1'));
     $this->assert_equal(show_account_url(array(':id' => 1)),  new ActionController\Routing\Url('GET', 'account/1'));
     
-    $this->assert_equal(new_account_path(), new ActionController\Routing\Path('GET', 'account/new'));
-    $this->assert_equal(new_account_url(),  new ActionController\Routing\Url('GET', 'account/new'));
+    $this->assert_equal(new_account_path(), new ActionController\Routing\Path('GET', 'accounts/new'));
+    $this->assert_equal(new_account_url(),  new ActionController\Routing\Url('GET', 'accounts/new'));
     
     $this->assert_equal(edit_account_path(array(':id' => 1)), new ActionController\Routing\Path('GET', 'account/1/edit'));
     $this->assert_equal(edit_account_url(array(':id' => 1)),  new ActionController\Routing\Url('GET', 'account/1/edit'));
     
-    $this->assert_equal(create_account_path(), new ActionController\Routing\Path('POST', 'account'));
-    $this->assert_equal(create_account_url(),  new ActionController\Routing\Url('POST', 'account'));
+    $this->assert_equal(create_account_path(), new ActionController\Routing\Path('POST', 'accounts'));
+    $this->assert_equal(create_account_url(),  new ActionController\Routing\Url('POST', 'accounts'));
     
     $this->assert_equal(update_account_path(array(':id' => 1)), new ActionController\Routing\Path('PUT', 'account/1'));
     $this->assert_equal(update_account_url(array(':id' => 1)),  new ActionController\Routing\Url('PUT', 'account/1'));
@@ -132,8 +132,8 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     
     $this->assert_equal((string)discussions_path(), '/discussions');
     $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)), new ActionController\Routing\Path('GET', 'discussion/34/messages'));
-    $this->assert_equal(new_discussion_message_path(array(':discussion_id' => 43)), new ActionController\Routing\Path('GET', 'discussion/43/message/new'));
-    $this->assert_equal(create_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('POST', 'discussion/13/message'));
+    $this->assert_equal(new_discussion_message_path(array(':discussion_id' => 43)), new ActionController\Routing\Path('GET', 'discussion/43/messages/new'));
+    $this->assert_equal(create_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('POST', 'discussion/13/messages'));
     $this->assert_equal(show_discussion_message_path(array(':discussion_id' => 46, ':id' => 12)), new ActionController\Routing\Path('GET', 'discussion/46/message/12'));
     $this->assert_equal(edit_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('GET', 'discussion/13/message/26/edit'));
     $this->assert_equal(update_discussion_message_path(array(':discussion_id' => 13, ':id' => 26)), new ActionController\Routing\Path('PUT', 'discussion/13/message/26'));

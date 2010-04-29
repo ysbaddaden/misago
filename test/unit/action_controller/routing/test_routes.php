@@ -171,7 +171,7 @@ class Test_ActionController_Routing_Routes extends Misago\Unit\TestCase
     $this->assert_equal((string)$map->reverse($mapping), '/product/2/edit');
     
     $mapping = array(':controller' => 'products', ':action' => 'create');
-    $this->assert_equal((string)$map->reverse($mapping), '/product');
+    $this->assert_equal((string)$map->reverse($mapping), '/products');
     
     $mapping = array(':controller' => 'products');
     $this->assert_equal((string)$map->reverse($mapping), '/products');
@@ -180,7 +180,7 @@ class Test_ActionController_Routing_Routes extends Misago\Unit\TestCase
     $this->assert_equal((string)$map->reverse($mapping), '/products.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'create', ':format' => 'html');
-    $this->assert_equal((string)$map->reverse($mapping), '/product.html');
+    $this->assert_equal((string)$map->reverse($mapping), '/products.html');
     
     $mapping = array(':controller' => 'products', ':action' => 'edit', ':id' => 10, ':format' => 'xml');
     $this->assert_equal((string)$map->reverse($mapping), '/product/10/edit.xml');
@@ -248,7 +248,7 @@ class Test_ActionController_Routing_Routes extends Misago\Unit\TestCase
     
     $this->assert_true(function_exists('admin_products_path'));
     $this->assert_equal((string)admin_products_path(),      '/admin/products');
-    $this->assert_equal((string)new_admin_product_path(),   '/admin/product/new');
+    $this->assert_equal((string)new_admin_product_path(),   '/admin/products/new');
     $this->assert_equal((string)edit_admin_product_path(1), '/admin/product/1/edit');
     
     $this->assert_equal($map->route('GET', 'admin/product/456/edit.xml'), array(

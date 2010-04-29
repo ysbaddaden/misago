@@ -50,8 +50,8 @@ class ResourceRoutes extends \Misago\Object
   # This will create the following named routes:
   # 
   #   accounts        GET     /accounts          => AccountsController::index()
-  #   new_account     GET     /account/new       => AccountsController::neo()
-  #   create_account  POST    /account           => AccountsController::create()
+  #   new_account     GET     /accounts/new      => AccountsController::neo()
+  #   create_account  POST    /accounts          => AccountsController::create()
   #   edit_account    GET     /account/:id/edit  => AccountsController::edit()
   #   show_account    GET     /account/:id       => AccountsController::show()
   #   update_account  PUT     /account/:id       => AccountsController::update()
@@ -102,11 +102,21 @@ class ResourceRoutes extends \Misago\Object
       $options['namespace'].$options['controller'] : $options['controller'];
     
     # list of collection/member actions
-    $collection = array('index' => 'get', 'new' => 'get', 'create' => 'post');
+    $collection = array(
+      'index'  => 'get',
+      'new'    => 'get',
+      'create' => 'post'
+    );
     if (!empty($options['collection'])) {
       $collection = array_merge($options['collection'], $collection);
     }
-    $member = array('show' => 'get', 'edit' => 'get', 'update' => 'put', 'delete' => 'delete');
+    
+    $member = array(
+      'show'   => 'get',
+      'edit'   => 'get',
+      'update' => 'put',
+      'delete' => 'delete'
+    );
     if (!empty($options['member'])) {
       $member = array_merge($options['member'], $member);
     }
@@ -132,14 +142,19 @@ class ResourceRoutes extends \Misago\Object
           $_path = "{$plural_prefix}.:format";
         break;
         
+        case 'new':
+          $_name = $action.'_'.$singular_name;
+          $_path = "{$plural_prefix}/$action.:format";
+        break;
+        
         case 'create':
           $_name = $action.'_'.$singular_name;
-          $_path = "$prefix.:format";
+          $_path = "{$plural_prefix}.:format";
         break;
         
         default:
-          $_name = $action.'_'.$singular_name;
-          $_path = "$prefix/$action.:format";
+          $_name = $action.'_'.$options['plural'];
+          $_path = "{$plural_prefix}/$action.:format";
       }
       $_options = array(
         ':controller' => $controller,
