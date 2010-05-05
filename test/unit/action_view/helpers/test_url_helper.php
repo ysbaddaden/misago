@@ -62,6 +62,20 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
     $this->assert_equal($html_link, '<a onclick="if (confirm(\'sample text with \\\'single quotes\\\' and \\\"double quotes\\\"\')) { var f = document.createElement(\'form\'); f.action = this.href; f.method = \'POST\'; var m = document.createElement(\'input\'); m.setAttribute(\'type\', \'hidden\'); m.setAttribute(\'name\', \'_method\'); m.setAttribute(\'value\', \'DELETE\'); f.appendChild(m); this.parentNode.appendChild(f); f.submit(); } return false;" href="/posts/1">delete</a>');
   }
   
+  function test_link_to_if()
+  {
+    $this->assert_equal('<a href="/delete">destroy this</a>', link_to_if(true, 'destroy this', '/delete'));
+    $this->assert_equal('destroy this', link_to_if(false, 'destroy this', '/delete'));
+    $this->assert_equal('<a href="/events">events</a>', link_to_if(true, 'events', events_path()));
+  }
+  
+  function test_link_to_unless()
+  {
+    $this->assert_equal('<a href="/delete">destroy this</a>', link_to_unless(false, 'destroy this', '/delete'));
+    $this->assert_equal('destroy this', link_to_unless(true, 'destroy this', '/delete'));
+    $this->assert_equal('<a href="/events">events</a>', link_to_unless(false, 'events', events_path()));
+  }
+  
   function test_current_page()
   {
 #    $map = ActionController\Routing\Routes::draw();

@@ -141,6 +141,16 @@ function link_to($content, $url=null, $attributes=null)
   return tag('a', $content, $attributes);
 }
 
+# Renders a link if the condition is true, otherwise returns the link's name only.
+function link_to_if($condition, $content, $url=null, $attributes=null) {
+  return $condition ? link_to($content, $url, $attributes) : $content;
+}
+
+# Renders a link unless the condition is true, otherwise returns the link's name only.
+function link_to_unless($condition, $content, $url=null, $attributes=null) {
+  return (!$condition) ? link_to($content, $url, $attributes) : $content;
+}
+
 # Renders a link unless it points to the current page. Otherwise
 # displays the content into a SPAN tag with no attributes.
 # 
@@ -200,8 +210,7 @@ function button_to($name, $url, $attributes=null)
 #   # => <a class="email" href="mailto:me@domain.com">another</a>
 # 
 # :namespace: Misago\ActionView\Helpers\UrlHelper
-function mail_to($email, $name=null, $options=null)
-{
+function mail_to($email, $name=null, $options=null) {
   return link_to($name === null ? $email : $name, "mailto:$email", $options);
 }
 
