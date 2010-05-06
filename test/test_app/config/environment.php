@@ -7,8 +7,8 @@ if (extension_loaded('mbstring')) {
 	ini_set('mbstring.func_overload', 7);
 }
 
-#cfg_set('i18n.default_locale', 'en');
-#setlocale(LC_ALL, 'en_US.UTF-8');
+cfg_set('i18n.default_locale', 'en');
+setlocale(LC_ALL, 'en_US.UTF-8');
 
 # date & tz
 date_default_timezone_set('UTC');
