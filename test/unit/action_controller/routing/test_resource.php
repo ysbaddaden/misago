@@ -74,8 +74,13 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     # except
     $this->assert_not_equal($map->route('DELETE', 'kategorien/2'), array(
       ':method' => 'DELETE', ':controller' => 'categories', ':action' => 'delete', ':id' => 2, ':format' => null));
+    
+    # controller
+    $this->assert_equal($map->route('GET', 'pictures'), array(
+      ':method' => 'GET', ':controller' => 'images', ':action' => 'index', ':format' => null,
+    ));
   }
-
+  
   function test_map_resource()
   {
     $map = ActionController\Routing\Routes::draw();
@@ -225,6 +230,18 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
   {
     $map = ActionController\Routing\Routes::draw();
     
+    $this->assert_equal($map->route('POST', 'discussions/31/messages'), array(
+      ':method' => 'POST', ':controller' => 'messages', ':action' => 'create', ':discussion_id' => 31, ':format' => null));
+    
+    $this->assert_equal($map->route('GET', 'discussions/32/messages/234/edit.xml'), array(
+      ':method' => 'GET', ':controller' => 'messages', ':action' => 'edit', ':discussion_id' => 32, ':id' => 234, ':format' => 'xml'));
+    
+    $this->assert_equal($map->route('PUT', 'discussions/32/messages/234.json'), array(
+      ':method' => 'PUT', ':controller' => 'messages', ':action' => 'update', ':discussion_id' => 32, ':id' => 234, ':format' => 'json'));
+    
+    $this->assert_equal($map->route('DELETE', 'discussions/32/messages/234'), array(
+      ':method' => 'DELETE', ':controller' => 'messages', ':action' => 'delete', ':discussion_id' => 32, ':id' => 234, ':format' => null));
+    
     # has_many
     $this->assert_equal((string)discussions_path(), '/discussions');
     $this->assert_equal(discussion_messages_path(array(':discussion_id' => 34)),
@@ -264,6 +281,10 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
       new ActionController\Routing\Path('GET', 'events/14/about/new'));
     $this->assert_equal(edit_event_description_path(array(':event_id' => 17)),
       new ActionController\Routing\Path('GET', 'events/17/about/edit'));
+    
+    # resource closure + controller + as
+    $this->assert_equal(profile_picture_path(),
+      new ActionController\Routing\Path('GET', 'profil/picture'));
   }
 }
 

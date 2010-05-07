@@ -61,8 +61,13 @@ $map->resources('categories', array(
 $map->resource('profile', array(
   'only'   => 'show,update,delete',
   'except' => 'delete',
-  'as'     => 'profil'
-));
+  'as'     => 'profil'), function($profile)
+{
+  $profile->resource('picture', array('controller' => 'profile\images', 'only' => 'show'));
+});
+
+$map->resources('pictures', array('controller' => 'images', 'only' => 'index'));
+#$map->resource('profile/picture', array('controller' => 'profile\images', 'only' => 'show'));
 
 # namespaced resource(s)
 #$map->ns('admin', function($admin) {

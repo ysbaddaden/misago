@@ -41,6 +41,7 @@ use Misago\ActiveSupport\String;
 #   $map->resources('tickets', array('path_prefix' => 'events/:id'));
 #   $map->resource('tag',      array('path_prefix' => 'events/:id'));
 # 
+# TODO: namespaced resources.
 # IMPROVE: :path_names option
 # IMPROVE: config.action_controller.resources_path_names
 #
@@ -412,6 +413,15 @@ class ResourceRoutes extends \Misago\Object
 #        }
         $this->resources($nested_name, $nested_options);
       }
+    }
+    
+    # manual nesting
+    if (is_object($closure))
+    {
+      $name_prefix = "{$singular_name}_";
+#      $namespace   = isset($options['namespace']) ? $options['namespace'] : null;
+      $obj = new Nested($this, $name_prefix, $singular_path/*, $namespace*/);
+      $closure($obj);
     }
   }
   
