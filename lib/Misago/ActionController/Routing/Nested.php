@@ -16,6 +16,10 @@ class Nested
     $this->ns          = $ns;
   }
   
+  function resources($name, $options=array(), $closure=null) {
+    $this->_map('resources', $name, $options, $closure);
+  }
+  
   function resource($name, $options=array(), $closure=null) {
     $this->_map('resource', $name, $options, $closure);
   }

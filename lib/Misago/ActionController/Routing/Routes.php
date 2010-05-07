@@ -19,12 +19,15 @@ use Misago\ActiveSupport\String;
 #   # landing page: / => HomeController::index()
 #   $map->root(array(':controller' => 'home'));
 #   
-#   # default route
+#   # default routes
+#   $map->connect(':controller/:action/:id');
 #   $map->connect(':controller/:action/:id.:format');
 # 
-# You may use a different default route, for instance:
+# You may use different default routes, for instance:
 # 
+#   $map->connect(':controller/:action');
 #   $map->connect(':controller/:action.:format');
+#   $map->connect(':controller/:id/:action');
 #   $map->connect(':controller/:id/:action.:format');
 # 
 # =Named routes
@@ -44,8 +47,8 @@ use Misago\ActiveSupport\String;
 # 
 # =Requirements (Regular Expressions)
 # 
-# You may check parameters by using regular expressions. A route that doesn't match
-# requirements isn't matched. In this example +:id+ must be an integer:
+# You may check parameters by using regular expressions. A route that doesn't
+# match the requirements isn't matched. In this example +:id+ must be an integer:
 # 
 #   $map->connect('/posts/:id', array(':controller' => 'posts',
 #     'requirements' => array(':id' => '\d+')));
@@ -53,19 +56,22 @@ use Misago\ActiveSupport\String;
 # =Conditions
 # 
 # You may add conditions to routes. At the moment only the HTTP method
-# can be a condition. For instance the following route will only be used
-# on a POST request:
+# can be a condition. For instance the following route will match on a +POST+
+# request only:
 # 
-#   $this->connect('login', array(':controller' => 'accounts', ':action' => 'login',
-#     'conditions' => array('method' => 'POST')));
+#   $this->connect('login', array(
+#     ':controller' => 'accounts',
+#     ':action'     => 'login',
+#     'conditions'  => array('method' => 'POST')
+#   ));
 # 
-# Using named routes with conditions, returned URL will be a
+# Using named routes with conditions, the returned URL will be a
 # <tt>Misago\ActionController\Routing\Url</tt> or
 # <tt>Misago\ActionController\Routing\Path</tt> object, that will be
 # transparently handled by view helpers to generate links and forms that will
 # use the correct HTTP method.
 # 
-# IMPROVE: cache routes using APC.
+# IMPROVE: Cache routes using APC (how do I know when to save it?).
 # 
 class Routes extends ResourceRoutes
 {
@@ -79,7 +85,6 @@ class Routes extends ResourceRoutes
     'requirements' => array(),
   );
   private static $map;
-  private static $current_format = null;
   
   private $built_named_route_helpers = false;
   
@@ -126,14 +131,12 @@ class Routes extends ResourceRoutes
   }
   
   # Empties routes.
-  function reset()
-  {
+  function reset() {
     $this->routes = array();
   }
   
   # Connects a path to a mapping.
-  function connect($path, $mapping=array())
-  {
+  function connect($path, $mapping=array()) {
     $this->connect_route(null, $path, $mapping);
   }
   
@@ -150,9 +153,7 @@ class Routes extends ResourceRoutes
   }
   
   # Connects a path to a mapping, giving the route a name.
-  function named($name, $path, $mapping=array())
-  {
-#    echo "$name  ".(isset($mapping['conditions']['method']) ? $mapping['conditions']['method'] : 'ANY')."  $path\n";
+  function named($name, $path, $mapping=array()) {
     return $this->connect_route($name, $path, $mapping);
   }
   
@@ -169,7 +170,7 @@ class Routes extends ResourceRoutes
   # 
   #   admin_products      admin/products          Admin\ProductsController::index()
   #   new_admin_product   admin/product/new       Admin\ProductsController::neo()
-  #   show_admin_product  admin/product/:id       Admin\ProductsController::show()
+  #   admin_product       admin/product/:id       Admin\ProductsController::show()
   #   edit_admin_product  admin/product/:id/edit  Admin\ProductsController::edit()
   #   etc.
   # 
@@ -202,20 +203,21 @@ class Routes extends ResourceRoutes
     $keys = array();
     foreach(preg_split('/[\.\/\?]/', $path, -1, PREG_SPLIT_NO_EMPTY) as $key)
     {
-      if ($key[0] == ':'
-        and $key != ':controller'
-        and $key != ':action'
-        and $key != ':format')
-      {
+      if (strpos($key, ':') === 0) {
         $keys[] = $key;
       }
     }
+
+    if (isset($mapping['conditions']['method'])) {
+      $mapping['conditions']['method'] = strtoupper($mapping['conditions']['method']);
+    }
+    sort($keys);
     
     $this->routes[] = array(
       'path'    => $path,
       'regexp'  => "#^$regexp$#u",
-      'mapping' => &$mapping,
-      'keys'    => &$keys,
+      'mapping' => $mapping,
+      'keys'    => $keys,
       'default' => empty($mapping),
       'name'    => $name,
     );
@@ -258,8 +260,6 @@ class Routes extends ResourceRoutes
       throw new \Misago\Exception("No route for '$method /$uri'", 404);
     }
     
-    self::$current_format = $mapping[':format'];
-    
     foreach($mapping as $k => $v)
     {
       if (is_symbol($k) and is_string($v)) {
@@ -278,68 +278,70 @@ class Routes extends ResourceRoutes
   # FIXME: Handle special requirements for keys to select the route.
   # 
   # :private:
-  function reverse(array $mapping)
+  function reverse($mapping)
   {
-    $_mapping = array_merge(array(
-      ':controller' => '',
-      ':action'     => 'index',
-    ), $mapping);
+    if (!isset($mapping[':action'])) $mapping[':action'] = 'index';
+    $keys = array_diff(array_keys($mapping), array(':controller', ':action'));
+    $k    = array_keys($mapping);
+    sort($k);
     
     foreach($this->routes as $route)
     {
-      # has controller?
-      if ((isset($route['mapping'][':controller']) and $_mapping[':controller'] == $route['mapping'][':controller'])
-        or strpos($route['path'], ':controller') !== false)
+      # matches specific routes
+      if (isset($route['mapping'][':controller'])
+        and $mapping[':controller'] == $route['mapping'][':controller']
+        and (
+          (isset($route['mapping'][':action']) and $mapping[':action'] == $route['mapping'][':action'])
+          or !isset($route['mapping'][':action'])
+        ))
       {
-        # has action?
-        if ((isset($route['mapping'][':action']) and $_mapping[':action'] == $route['mapping'][':action'])
-          or strpos($route['path'], ':action') !== false)
+        $diff = array_diff($keys, $route['keys']);
+        if (empty($diff))
         {
-          # has keys?
-          if ($this->has_keys($route, $_mapping))
-          {
-            $elements = array();
-            foreach($_mapping as $k => $v)
-            {
-              if ($k[0] == ':') {
-                $elements[$k] = $v;
-              }
-            }
-            $path   = strtr($route['path'], $elements);
-            $path   = str_replace(array('/:format', '.:format', '?:format'), '', $path);
-            $method = isset($route['mapping']['conditions']['method']) ?
-              $route['mapping']['conditions']['method'] : 'GET';
-            return new Path($method, $path);
-          }
-          
-          # default
-          $path = ($_mapping[':action'] == 'index') ?
-            "{$_mapping[':controller']}" :
-            "{$_mapping[':controller']}/{$_mapping[':action']}";
-          
-          if (isset($_mapping[':format'])) {
-            $path .= ".{$_mapping[':format']}";
-          }
+          $path   = strtr($route['path'], $mapping);
           $method = isset($route['mapping']['conditions']['method']) ?
             $route['mapping']['conditions']['method'] : 'GET';
           return new Path($method, $path);
         }
       }
+      
+      # matches default routes
+      if ($route['keys'] == $k)
+      {
+        $path   = strtr($route['path'], $mapping);
+        $method = isset($route['mapping']['conditions']['method']) ?
+          $route['mapping']['conditions']['method'] : 'GET';
+        return new Path($method, $path);
+      }
     }
+    
+    # default default routes
+    if ($this->compare($mapping, array(':controller', ':action')))
+    {
+      $path = ($mapping[':action'] != 'index') ?
+        "{$mapping[':controller']}/{$mapping[':action']}" : $mapping[':controller'];
+      return new Path('GET', $path);
+    }
+    elseif ($this->compare($mapping, array(':controller', ':action', ':format')))
+    {
+      $path = ($mapping[':action'] != 'index') ?
+        "{$mapping[':controller']}/{$mapping[':action']}" : $mapping[':controller'];
+      return new Path('GET', "$path.{$mapping[':format']}");
+    }
+    elseif ($this->compare($mapping, array(':controller'))) {
+      return new Path('GET', $mapping[':controller']);
+    }
+    elseif ($this->compare($mapping, array(':controller', ':format'))) {
+      return new Path('GET', "{$mapping[':controller']}.{$mapping[':format']}");
+    }
+    
     throw new \Misago\Exception("No route for: ".print_r($mapping, true), 500);
   }
   
-  private function has_keys($route, $mapping)
+  private function compare($mapping, $keys)
   {
-    foreach($route['keys'] as $key)
-    {
-      if (!isset($mapping[$key]))
-      {
-        return false;
-        break;
-      }
-    }
-    return true;
+    $ary = array_diff(array_keys($mapping), $keys);
+    return empty($ary);
   }
   
   # Builds the named routes helper functions.
@@ -368,7 +370,6 @@ class Routes extends ResourceRoutes
       file_put_contents(TMP.'/named_routes_helpers.php', $contents);
     }
     
-#    debug_print_backtrace();
     include TMP.'/named_routes_helpers.php';
     $this->built_named_route_helpers = true;
   }
@@ -430,10 +431,6 @@ class Routes extends ResourceRoutes
       $query_string = http_build_query($query);
     }
     
-    if (!isset($keys[':format']) and isset(self::$current_format)) {
-      $keys[':format'] = self::$current_format;
-    }
-    
     foreach($keys as $k => $v) {
       $keys[$k] = urlencode($v);
     }
@@ -446,10 +443,6 @@ class Routes extends ResourceRoutes
     }
     
     $path = strtr($route['path'], $keys);
-    $path = ($route['default']) ?
-      preg_replace('/[\\/\\.\\?]:[^\\/\\.\\?]+/', '', $path) :
-      preg_replace('/[\\/\\.\\?]:format/', '', $path);
-    
     return $path.(empty($query_string) ? '' : "?{$query_string}");
   }
   

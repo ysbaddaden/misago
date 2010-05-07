@@ -44,7 +44,7 @@ function url_for($options)
 {
   if ($options instanceof \Misago\ActiveRecord\Record)
   {
-    $named_route = 'show_'.\Misago\ActiveSupport\String::underscore(get_class($options)).'_url';
+    $named_route = \Misago\ActiveSupport\String::underscore(get_class($options)).'_url';
     return $named_route($options);
   }
   
@@ -60,16 +60,19 @@ function url_for($options)
   $mapping = array_diff_key($options, $default_options);
   $options = array_merge($default_options, $options);
   
-  $map  = \Misago\ActionController\Routing\Routes::draw();
-  $path = $map->reverse($mapping);
-  
+  $map = \Misago\ActionController\Routing\Routes::draw();
+  $keys = array();
   $query_string = array();
   foreach($mapping as $k => $v)
   {
-    if (strpos($k, ':') !== 0) {
+    if (is_symbol($k)) {
+      $keys[$k] = $v;
+    }
+    else {
       $query_string[] = "$k=".urlencode($v);
     }
   }
+  $path = $map->reverse($keys);
   sort($query_string);
   
   $path .= (empty($query_string) ? '' : '?'.implode('&', $query_string)).

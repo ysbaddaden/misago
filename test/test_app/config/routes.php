@@ -7,8 +7,10 @@ $map = Misago\ActionController\Routing\Routes::draw();
 # regular routes
 $map->connect('blog.:format', array(':controller' => 'posts', ':action' => 'index'));
 $map->connect('blog/:id.:format', array(':controller' => 'posts', ':action' => 'show'));
+$map->connect('blog/:id/:action', array(':controller' => 'posts'));
 $map->connect('blog/:id/:action.:format', array(':controller' => 'posts'));
 
+$map->connect('thread/:id', array(':controller' => 'threads', ':action' => 'show'));
 $map->connect('thread/:id.:format', array(':controller' => 'threads', ':action' => 'show'));
 
 # routes with globbing (*path)
@@ -23,32 +25,39 @@ $map->named('about',    'about', array(':controller' => 'html', ':action' => 'ab
 $map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
 
 # RESTful resource(s)
-#$map->resource('post');
-$map->resource('product'/*, array('member' => array('purchase' => 'GET'))*/);
-$map->resource('user');
-$map->resource('account');
-$map->resource('article');
+#$map->resources('posts');
+$map->resources('products');
+$map->resource('geocoder', array(
+  'member'     => array('add' => 'get', 'remove' => 'delete'),
+  'collection' => array('all' => 'get')
+));
+$map->resources('wiki');
+#$map->resources('users');
+$map->resources('accounts');
+$map->resources('articles');
 
 # nested restful resource(s)
-$map->resource('discussion', array('has_many' => 'message'));
-$map->resource('event', array(
-  'member'     => array('publish'  => 'put'),
-  'collection' => array('archives' => 'get')),
+$map->resources('discussions', array('has_many' => 'messages', 'has_one' => 'author'));
+$map->resources('events', array(
+  'member'     => array('publish'  => 'put', 'tags'   => 'get'),
+  'collection' => array('archives' => 'get', 'latest' => 'get')),
   function($event)
 {
   $event->resource('description', array('as' => 'about'));
-  $event->resource('ticket');
+  $event->resources('tickets');
 });
 
+#$map->resources('categories', array('as' => 'kategorien'));
+
 # namespaced resource(s)
-$map->ns('admin', function($admin) {
-  $admin->resource('product');
-});
+#$map->ns('admin', function($admin) {
+#  $admin->resources('products');
+#});
 
 # landing page
 $map->root(array(':controller' => 'welcome', ':action' => 'home'));
 
 # default routes
+$map->connect(':controller/:action/:id');
 $map->connect(':controller/:action/:id.:format');
-
 ?>

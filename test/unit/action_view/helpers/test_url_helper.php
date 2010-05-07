@@ -78,10 +78,6 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
   
   function test_current_page()
   {
-#    $map = ActionController\Routing\Routes::draw();
-#    $map->reset();
-#    $map->connect(':controller/:action/:id.:format');
-    
     $_SERVER['REQUEST_URI'] = '/archives';
     $this->assert_true(current_page('/archives'));
     $this->assert_false(current_page('/articles'));
@@ -118,10 +114,10 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
       array(':controller' => 'archives', ':action' => 'categories')),
       '<a href="/archives/categories">categories</a>');
     
-    $_SERVER['REQUEST_URI'] = '/article/45';
+    $_SERVER['REQUEST_URI'] = '/articles/45';
     $this->assert_equal(link_to_unless_current('more details',
       array(':controller' => 'products', ':action' => 'show', ':id' => 45)),
-      '<a href="/product/45">more details</a>');
+      '<a href="/products/45">more details</a>');
     $this->assert_equal(link_to_unless_current('article',
       array(':controller' => 'articles', ':action' => 'show', ':id' => 45)),
       '<span>article</span>');
@@ -148,7 +144,7 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
       '</form>');
     
     $html = button_to('new', array(':controller' => 'products', ':action' => 'delete', ':id' => 2), array('method' => 'delete', 'confirm' => 'Are you sure?'));
-    $this->assert_equal($html, '<form action="/product/2" method="post" class="button-to" onsubmit="return confirm(\'Are you sure?\');">'.
+    $this->assert_equal($html, '<form action="/products/2" method="post" class="button-to" onsubmit="return confirm(\'Are you sure?\');">'.
       '<input type="hidden" name="_method" value="delete"/>'.
       '<div><input type="submit" value="new"/></div>'.
       '</form>');

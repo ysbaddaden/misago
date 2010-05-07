@@ -11,15 +11,8 @@ task('routes', function()
     $method = isset($route['mapping']['conditions']['method']) ?
       $route['mapping']['conditions']['method'] : '';
     
-#    $params = array();
-#    foreach($route['mapping'] as $k => $v)
-#    {
-#      if (is_symbol($k)) {
-#        $params[] = $k.'=>"'.$v.'"';
-#      }
-#    }
-#    $params = empty($params) ? '' : '{'.implode(',', $params).'}';
-    $params = array_to_string($route['mapping']);
+    $params = array_to_string(array_intersect_key($route['mapping'],
+      array(':controller' => '', ':action' => '')));
     
     $routes[]   = array($route['name'], $method, '/'.$route['path'], $params);
     $lengths[0] = max($lengths[0], strlen($route['name']));
@@ -29,7 +22,6 @@ task('routes', function()
   
   foreach($routes as $route)
   {
-    echo "  ";
     foreach($route as $i => $v) {
       echo str_pad($v, $lengths[$i], ' ', ($i == 0) ? STR_PAD_LEFT : STR_PAD_RIGHT).' ';
     }

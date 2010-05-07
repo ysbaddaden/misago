@@ -89,7 +89,7 @@ class TestRequest extends \Misago\Object implements AbstractRequest
     if (isset($this->data['url'])) {
       return $this->data['url'];
     }
-    return url_for(array_merge($this->path_parameters, $this->get));
+    return url_for(array_merge($this->path_parameters(), $this->get));
   }
   
   function relative_url_root()
@@ -100,7 +100,7 @@ class TestRequest extends \Misago\Object implements AbstractRequest
   function path_parameters($params=null)
   {
     return array_intersect_key($this->data, array(
-      ':method'     => '',
+#      ':method'     => '',
       ':controller' => '',
       ':action'     => '',
       ':id'         => '',

@@ -141,12 +141,12 @@ function link_to($content, $url=null, $attributes=null)
   return tag('a', $content, $attributes);
 }
 
-# Renders a link if the condition is true, otherwise returns the link's name only.
+# Renders a link if the condition is true, otherwise returns the content only.
 function link_to_if($condition, $content, $url=null, $attributes=null) {
   return $condition ? link_to($content, $url, $attributes) : $content;
 }
 
-# Renders a link unless the condition is true, otherwise returns the link's name only.
+# Renders a link unless the condition is true, otherwise returns the content only.
 function link_to_unless($condition, $content, $url=null, $attributes=null) {
   return (!$condition) ? link_to($content, $url, $attributes) : $content;
 }

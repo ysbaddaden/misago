@@ -23,6 +23,7 @@ class Test_ActionController_Caching extends Misago\Unit\TestCase
     $controller->process(new ActionController\TestRequest(array(
       ':method' => 'GET', ':controller' => 'caching', ':action' => 'index', ':format' => 'html',
     )), $response);
+    
     $this->assert_true(file_exists(ROOT.'/public/caching.html'));
     $controller->expire_page();
     $this->assert_false(file_exists(ROOT.'/public/caching.html'));
