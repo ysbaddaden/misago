@@ -157,29 +157,6 @@ class Routes extends ResourceRoutes
     return $this->connect_route($name, $path, $mapping);
   }
   
-  # Sometimes it's nice to separate some resources into a particular namespace.
-  # For instance:
-  # 
-  #   $map->ns('admin', function($admin) {
-  #     $admin->resource('product');
-  #   }
-  # 
-  # This will require the controller +Admin\ProductsController+
-  # (as +app/controllers/Admin/ProductsController.php+) and will generate
-  # the following named routes:
-  # 
-  #   admin_products      admin/products          Admin\ProductsController::index()
-  #   new_admin_product   admin/product/new       Admin\ProductsController::neo()
-  #   admin_product       admin/product/:id       Admin\ProductsController::show()
-  #   edit_admin_product  admin/product/:id/edit  Admin\ProductsController::edit()
-  #   etc.
-  # 
-  function ns($name, $closure)
-  {
-    $obj = new Nested($this, "{$name}_", $name, "$name\\");
-    $closure($obj);
-  }
-  
   private function connect_route($name, $path, $mapping)
   {
     $regexp = $path;

@@ -32,7 +32,8 @@ $map->named('purchase', 'products/:id/purchase', array(
 $map->resources('products');
 $map->resource('geocoder', array(
   'member'     => array('add' => 'get', 'remove' => 'delete'),
-  'collection' => array('all' => 'get')
+  'collection' => array('all' => 'get'),
+  'plural'     => 'geocoder',
 ));
 $map->resources('wiki');
 #$map->resources('users');
@@ -66,13 +67,17 @@ $map->resource('profile', array(
   $profile->resource('picture', array('controller' => 'profile\images', 'only' => 'show'));
 });
 
+# controller
 $map->resources('pictures', array('controller' => 'images', 'only' => 'index'));
-#$map->resource('profile/picture', array('controller' => 'profile\images', 'only' => 'show'));
 
 # namespaced resource(s)
-#$map->ns('admin', function($admin) {
-#  $admin->resources('products');
-#});
+$map->name_space('admin', function($admin)
+{
+  $admin->resources('products', array('only' => array('index', 'show')), function($product) {
+    $product->resources('invoices', array('only' => array('index', 'show'), 'member' => array('validate' => 'put')));
+  });
+  $admin->resource('options', array('only' => 'edit,update,delete', 'plural' => 'options'));
+});
 
 # landing page
 $map->root(array(':controller' => 'welcome', ':action' => 'home'));

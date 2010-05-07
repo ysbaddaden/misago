@@ -41,12 +41,79 @@ use Misago\ActiveSupport\String;
 #   $map->resources('tickets', array('path_prefix' => 'events/:id'));
 #   $map->resource('tag',      array('path_prefix' => 'events/:id'));
 # 
-# TODO: namespaced resources.
 # IMPROVE: :path_names option
 # IMPROVE: config.action_controller.resources_path_names
 #
 class ResourceRoutes extends \Misago\Object
 {
+  # Creates a RESTful resources. The name must be plural.
+  # 
+  #   $map->resources('accounts');
+  # 
+  # It will generate the following routes:
+  # 
+  #       accounts GET    /accounts          AccountsController->index()
+  #    new_account GET    /accounts/new      AccountsController->neo()
+  #                POST   /accounts          AccountsController->create()
+  #        account GET    /accounts/:id      AccountsController->show()
+  #   edit_account GET    /accounts/:id/edit AccountsController->edit()
+  #                PUT    /accounts/:id      AccountsController->update()
+  #                DELETE /accounts/:id      AccountsController->delete()
+  # 
+  # =Form helpers
+  # 
+  # You may use the generated named routes to link to the resources:
+  # 
+  #   <\?= link_to("all accounts", accounts_path()) ?\>
+  #   <\?= link_to("new account", new_account_path()) ?\>
+  #   <\?= link_to($account->name, account_path($account)) ?\>
+  #   <\?= link_to($account->name, account_path(array(':id' => $account->id))) ?\>
+  #   <\?= link_to("modify your account", edit_account_path($account)) ?\>
+  # 
+  #   # deletion link:
+  #   <\?= link_to("delete your account", account_path($account),
+  #     array('method' => 'delete', 'confirm' => "Are you sure?")) ?\>
+  # 
+  # You may create forms this way:
+  # 
+  #   # deletion button
+  #   <\?= button_to("delete your account", account_path($account), array('method' => 'delete') ?\>
+  #   
+  #   # update form:
+  #   <\? $f = form_for($account) ?\>
+  #   <\?= $f->start(account_path(), array('method' => 'put')) ?\>
+  #     <\?= $this->render(array('partial' => 'form', 'locals' => array('f' => $f))) ?\>
+  #   <\?= $f->end() ?\>
+  # 
+  # You may also rely on the record's state (thanks to +new_record+), and let
+  # +form_for()+ decide by itself what to do (either create or update):
+  # 
+  #   # this one will generate a POST form (create) on account_path() URL:
+  #   <\? $f = form_for(new Account()) ?\>
+  #   <\?= $f->start() ?\>
+  #     <\?= $this->render(array('partial' => 'form', 'locals' => array('f' => $f))) ?\>
+  #   <\?= $f->end() ?\>
+  #   
+  #   # while this one will generate a PUT form (update) on account_path() URL:
+  #   <\? $f = form_for(Account(5)) ?\>
+  #   <\?= $f->start() ?\>
+  #     <\?= $this->render(array('partial' => 'form', 'locals' => array('f' => $f))) ?\>
+  #   <\?= $f->end() ?\>
+  # 
+  # = Options:
+  # 
+  # * +as+          - use another path for the route. For instance +resource('profile', array('as' => 'benutzerprofil'))+ will generate routes like +"/benutzerprofil/edit"+ using +ProfilesController+.
+  # * +collection+  - additional resources actions in an +{action => pair}+ hash.
+  # * +controller+  - specify the controller to use (may be a namespaced one using +admin\controller+)
+  # * +except+      - an array of actions to skip. For instance +{'only' => ['update', 'delete']}+ will skip the +update+ and +delete+ routes.
+  # * +has_many+    - 
+  # * +has_one+     - 
+  # * +member+      - same as collection, but for a particular resource.
+  # * +name_prefix+ - 
+  # * +only+        - limits actions to this list. For instance +{'only' => ['index', 'show']}+ will generate the index and show routes only.
+  # * +path_prefix+ - 
+  # * +plural+      - specify the plural name of the resource
+  # 
   # TODO: Check if named route $plural exists before defining POST!
   # TODO: Check if named route $singular exists before defining PUT/DELETE!
   function resources($name, $options=array(), $closure=null)
@@ -67,7 +134,11 @@ class ResourceRoutes extends \Misago\Object
     
     $plural_name   = $options['name_prefix'].$plural;
     $singular_name = $options['name_prefix'].$singular;
-    $controller    = isset($options['controller'])  ? $options['controller'] : $plural;
+    
+    $controller = isset($options['controller']) ? $options['controller'] : $plural;
+    if (isset($options['name_space'])) {
+      $controller = $options['name_space'].'\\'.$controller;
+    }
     
     # only/except
     $actions = isset($options['only']) ? array_collection($options['only']) :
@@ -166,13 +237,13 @@ class ResourceRoutes extends \Misago\Object
     {
       $this->named($singular_name, "$plural_path/:id", array(
         ':controller' => $controller,
-        ':action' => 'show',
-        'conditions' => array('method' => 'GET')
+        ':action'     => 'show',
+        'conditions'  => array('method' => 'GET')
       ));
       $this->named("formatted_$singular_name", "$plural_path/:id.:format", array(
         ':controller' => $controller,
-        ':action' => 'show',
-        'conditions' => array('method' => 'GET')
+        ':action'     => 'show',
+        'conditions'  => array('method' => 'GET')
       ));
     }
     if (in_array('update', $actions))
@@ -193,12 +264,12 @@ class ResourceRoutes extends \Misago\Object
       $this->connect("$plural_path/:id", array(
         ':controller' => $controller,
         ':action'     => 'delete',
-        'conditions' => array('method' => 'DELETE')
+        'conditions'  => array('method' => 'DELETE')
       ));
       $this->connect("$plural_path/:id.:format", array(
         ':controller' => $controller,
         ':action'     => 'delete',
-        'conditions' => array('method' => 'DELETE')
+        'conditions'  => array('method' => 'DELETE')
       ));
     }
     
@@ -211,9 +282,9 @@ class ResourceRoutes extends \Misago\Object
           'name_prefix' => "{$singular_name}_",
           'path_prefix' => "$plural_path/:{$singular}_id",
         );
-#        if (isset($options['namespace'])) {
-#          $nested_options['namespace'] = $options['namespace'];
-#        }
+        if (isset($options['name_space'])) {
+          $nested_options['name_space'] = $options['name_space'];
+        }
         $this->resource($nested_name, $nested_options);
       }
     }
@@ -227,9 +298,9 @@ class ResourceRoutes extends \Misago\Object
           'name_prefix' => "{$singular_name}_",
           'path_prefix' => "$plural_path/:{$singular}_id",
         );
-#        if (isset($options['namespace'])) {
-#          $nested_options['namespace'] = $options['namespace'];
-#        }
+        if (isset($options['name_space'])) {
+          $nested_options['name_space'] = $options['name_space'];
+        }
         $this->resources($nested_name, $nested_options);
       }
     }
@@ -239,12 +310,32 @@ class ResourceRoutes extends \Misago\Object
     {
       $name_prefix = "{$singular_name}_";
       $path_prefix = "{$plural_path}/:{$singular}_id";
-#      $namespace   = isset($options['namespace']) ? $options['namespace'] : null;
-      $obj         = new Nested($this, $name_prefix, $path_prefix/*, $namespace*/);
+      $name_space  = isset($options['name_space']) ? $options['name_space'] : null;
+      $obj         = new Nested($this, $name_prefix, $path_prefix, $name_space);
       $closure($obj);
     }
   }
   
+  # Create a singleton resource within a global context. For instance their
+  # might a single +/profile+ connected to the currently authentified member.
+  # 
+  # The resource must always be singular, but the controller will be plural.
+  # 
+  # It will generate the following routes:
+  # 
+  #        profile GET    /profile      ProfilesController->show()
+  #    new_profile GET    /profile/new  ProfilesController->neo()
+  #                POST   /profile      ProfilesController->create()
+  #   edit_profile GET    /profile/edit ProfilesController->edit()
+  #                PUT    /profile      ProfilesController->update()
+  #                DELETE /profile      ProfilesController->delete()
+  # 
+  # See <tt>resources</tt> for parameters and options. The main differences are:
+  # 
+  # * there is no +singular+ option, but a +plural+ one;
+  # * there is no index route;
+  # * nesting resource(s) will use the singular name as path prefix.
+  # 
   # TODO: Check if named route $singular exists before defining POST/PUT/DELETE!
   function resource($name, $options=array(), $closure=null)
   {
@@ -255,7 +346,7 @@ class ResourceRoutes extends \Misago\Object
     }
     $options  = array_merge(array('name_prefix' => ''), $options);
     $singular = $name;
-    $plural   = isset($options['plural']) ? $options['plural'] : String::singularize($name);
+    $plural   = isset($options['plural']) ? $options['plural'] : String::pluralize($name);
     
     $singular_path = isset($options['as']) ? $options['as'] : $singular;
     if (isset($options['path_prefix'])) {
@@ -264,7 +355,11 @@ class ResourceRoutes extends \Misago\Object
     
     $singular_name = $options['name_prefix'].$singular;
     $plural_name   = $options['name_prefix'].$plural;
-    $controller    = isset($options['controller'])  ? $options['controller'] : $plural;
+    
+    $controller = isset($options['controller']) ? $options['controller'] : $plural;
+    if (isset($options['name_space'])) {
+      $controller = $options['name_space'].'\\'.$controller;
+    }
     
     $actions = isset($options['only']) ? array_collection($options['only']) :
       array('new', 'create', 'show', 'edit', 'update', 'delete');
@@ -293,12 +388,12 @@ class ResourceRoutes extends \Misago\Object
       $this->named($singular_name, $singular_path, array(
         ':controller' => $controller,
         ':action'     => 'show',
-        'conditions' => array('method' => 'GET')
+        'conditions'  => array('method' => 'GET')
       ));
       $this->named("formatted_$singular_name", "$singular_path.:format", array(
         ':controller' => $controller,
         ':action'     => 'show',
-        'conditions' => array('method' => 'GET')
+        'conditions'  => array('method' => 'GET')
       ));
     }
     if (in_array('new', $actions))
@@ -392,9 +487,9 @@ class ResourceRoutes extends \Misago\Object
           'name_prefix' => "{$singular_name}_",
           'path_prefix' => "$singular_path/:{$singular}_id",
         );
-#        if (isset($options['namespace'])) {
-#          $nested_options['namespace'] = $options['namespace'];
-#        }
+        if (isset($options['name_space'])) {
+          $nested_options['name_space'] = $options['name_space'];
+        }
         $this->resource($nested_name, $nested_options);
       }
     }
@@ -408,9 +503,9 @@ class ResourceRoutes extends \Misago\Object
           'name_prefix' => "{$singular_name}_",
           'path_prefix' => "$singular_path/:{$singular}_id",
         );
-#        if (isset($options['namespace'])) {
-#          $nested_options['namespace'] = $options['namespace'];
-#        }
+        if (isset($options['name_space'])) {
+          $nested_options['name_space'] = $options['name_space'];
+        }
         $this->resources($nested_name, $nested_options);
       }
     }
@@ -419,204 +514,36 @@ class ResourceRoutes extends \Misago\Object
     if (is_object($closure))
     {
       $name_prefix = "{$singular_name}_";
-#      $namespace   = isset($options['namespace']) ? $options['namespace'] : null;
-      $obj = new Nested($this, $name_prefix, $singular_path/*, $namespace*/);
+      $name_space  = isset($options['name_space']) ? $options['name_space'] : null;
+      $obj = new Nested($this, $name_prefix, $singular_path, $name_space);
       $closure($obj);
     }
   }
   
-  /*
-  # Singleton resource. Resource name must always be singular, but the
-  # controller & index use the plural form.
+  # Easily create resource(s) within a same folder. For instance moving
+  # administration files to +/admin+:
   # 
-  #   $map->resource('account');
+  #   $map->name_space('admin', function($admin) {
+  #     $admin->resources('products');
+  #   }
   # 
-  # This will create the following named routes:
+  # This will require the controller +Admin\ProductsController+
+  # (as +app/controllers/Admin/ProductsController.php+).
   # 
-  #   accounts        GET     /accounts          => AccountsController::index()
-  #   new_account     GET     /accounts/new      => AccountsController::neo()
-  #   create_account  POST    /accounts          => AccountsController::create()
-  #   edit_account    GET     /account/:id/edit  => AccountsController::edit()
-  #   show_account    GET     /account/:id       => AccountsController::show()
-  #   update_account  PUT     /account/:id       => AccountsController::update()
-  #   delete_account  DELETE  /account/:id       => AccountsController::delete()
+  # Please note that it's just an easier way to write resource(s) with particular
+  # +name_prefix+ and +path_prefix+ options. It will for instance create the
+  # following routes:
   # 
-  # Available options:
+  #   admin_products      admin/products          Admin\ProductsController::index()
+  #   new_admin_product   admin/product/new       Admin\ProductsController::neo()
+  #   admin_product       admin/product/:id       Admin\ProductsController::show()
+  #   edit_admin_product  admin/product/:id       Admin\ProductsController::edit()
   # 
-  # - +as+          - use this name for the path instead
-  # - +collection+  - a hash of additional collection methods {action => method}
-  # - +controller+  - force controller's name (defaults to plural name)
-  # - +except+      - list of routes to skip (eg: ['update', 'delete'])
-  # - +has_one+     - declare a nested singleton resource
-  # - +has_many+    - declare a nested collection resource
-  # - +name_prefix+ - particular prefix for routes' name
-  # - +member+      - same as +collection+ but applies to a particular id
-  # - +only+        - list of routes to generate (eg: ['index', 'show'])
-  # - +path_prefix+ - a particular prefix for routes' path
-  # - +singular+    - force singular name
-  # 
-  function resource($name, $options=array(), $closure=null)
+  function name_space($name, $closure)
   {
-    if (is_object($options))
-    {
-      $closure = $options;
-      $options = array();
-    }
-    
-    $options['singular'] = $name;
-    if (empty($options['plural']))      $options['plural']      = String::pluralize($name);
-    if (empty($options['controller']))  $options['controller']  = $options['plural'];
-    $options['prefix'] = isset($options['as']) ? $options['as'] : $options['singular'];
-    $options['plural_prefix'] = isset($options['as']) ? $options['as'] : $options['plural'];
-    
-    $this->build_resource($name, $options, $closure);
+    $obj = new Nested($this, "{$name}_", $name, $name);
+    $closure($obj);
   }
-  
-  private function build_resource($name, $options, $closure)
-  {
-    if (!isset($options['name_prefix'])) $options['name_prefix'] = '';
-    
-    $singular_name = "{$options['name_prefix']}{$options['singular']}";
-    $prefix = isset($options['path_prefix']) ?
-      $options['path_prefix'].'/'.$options['prefix'] : $options['prefix'];
-    $plural_prefix = isset($options['path_prefix']) ?
-      $options['path_prefix'].'/'.$options['plural_prefix'] : $options['plural_prefix'];
-    $controller = isset($options['namespace']) ?
-      $options['namespace'].$options['controller'] : $options['controller'];
-    
-    # list of collection/member actions
-    $collection = array(
-      'index'  => 'get',
-      'new'    => 'get',
-      'create' => 'post'
-    );
-    if (!empty($options['collection'])) {
-      $collection = array_merge($options['collection'], $collection);
-    }
-    
-    $member = array(
-      'show'   => 'get',
-      'edit'   => 'get',
-      'update' => 'put',
-      'delete' => 'delete'
-    );
-    if (!empty($options['member'])) {
-      $member = array_merge($options['member'], $member);
-    }
-    
-    if (!empty($options['only']))
-    {
-      $collection = array_intersect_key($collection, array_flip($options['only']));
-      $member     = array_intersect_key($member,     array_flip($options['only']));
-    }
-    if (!empty($options['except']))
-    {
-      $collection = array_diff_key($collection, array_flip($options['except']));
-      $member     = array_diff_key($member,     array_flip($options['except']));
-    }
-    
-    # collection actions like /members[/:action][.:format]
-    foreach($collection as $action => $method)
-    {
-      switch($action)
-      {
-        case 'index':
-          $_name = $options['name_prefix'].$options['plural'];
-          $_path = "{$plural_prefix}.:format";
-        break;
-        
-        case 'new':
-          $_name = $action.'_'.$singular_name;
-          $_path = "{$plural_prefix}/$action.:format";
-        break;
-        
-        case 'create':
-          $_name = $action.'_'.$singular_name;
-          $_path = "{$plural_prefix}.:format";
-        break;
-        
-        default:
-          $_name = $action.'_'.$options['plural'];
-          $_path = "{$plural_prefix}/$action.:format";
-      }
-      $_options = array(
-        ':controller' => $controller,
-        ':action'     => ($action == 'new') ? 'neo' : $action
-      );
-      if ($method != 'any') {
-        $_options['conditions'] = array('method' => strtoupper($method));
-      }
-      $this->named($_name, $_path, $_options);
-    }
-    
-    # member actions like /members/:id[/:action][.:format]
-    foreach($member as $action => $method)
-    {
-      switch($action)
-      {
-        case 'show': case 'update': case 'delete':
-          $_name = $action.'_'.$singular_name;
-          $_path = "$prefix/:id.:format";
-        break;
-        
-        default:
-          $_name = $action.'_'.$singular_name;
-          $_path = "$prefix/:id/$action.:format";
-      }
-      $_options = array(
-        ':controller'  => $controller,
-        ':action'      => $action,
-        'requirements' => array(':id' => '\d+')
-      );
-      if ($method != 'any') {
-        $_options['conditions'] = array('method' => strtoupper($method));
-      }
-      $this->named($_name, $_path, $_options);
-    }
-    
-    # nested resource
-    if (isset($options['has_one']))
-    {
-      foreach(array_collection($options['has_one']) as $nested_name)
-      {
-        $nested_options = array(
-          'name_prefix' => "{$singular_name}_",
-          'path_prefix' => "$prefix/:{$options['singular']}_id",
-        );
-        if (isset($options['namespace'])) {
-          $nested_options['namespace'] = $options['namespace'];
-        }
-        $this->resource($nested_name, $nested_options);
-      }
-    }
-    
-    # nested resources
-    if (isset($options['has_many']))
-    {
-      foreach(array_collection($options['has_many']) as $nested_name)
-      {
-        $nested_options = array(
-          'name_prefix' => "{$singular_name}_",
-          'path_prefix' => "$prefix/:{$options['singular']}_id",
-        );
-        if (isset($options['namespace'])) {
-          $nested_options['namespace'] = $options['namespace'];
-        }
-        $this->resource($nested_name, $nested_options);
-      }
-    }
-    
-    # manual nesting
-    if (is_object($closure))
-    {
-      $name_prefix = "{$singular_name}_";
-      $path_prefix = "{$prefix}/:{$options['singular']}_id";
-      $namespace   = isset($options['namespace']) ? $options['namespace'] : null;
-      $obj = new Nested($this, $name_prefix, $path_prefix, $namespace);
-      $closure($obj);
-    }
-  }
-  */
 }
 
 ?>

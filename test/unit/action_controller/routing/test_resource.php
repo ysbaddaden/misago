@@ -120,18 +120,18 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     
     # as
     $this->assert_equal($map->route('GET', 'profil'), array(
-      ':method' => 'GET', ':controller' => 'profile', ':action' => 'show', ':format' => null));
+      ':method' => 'GET', ':controller' => 'profiles', ':action' => 'show', ':format' => null));
     
     $this->assert_equal($map->route('PUT', 'profil.xml'), array(
-      ':method' => 'PUT', ':controller' => 'profile', ':action' => 'update', ':format' => 'xml'));
+      ':method' => 'PUT', ':controller' => 'profiles', ':action' => 'update', ':format' => 'xml'));
     
     # only
     $this->assert_not_equal($map->route('GET', 'profil/new'), array(
-      ':method' => 'GET', ':controller' => 'profile', ':action' => 'neo', ':format' => null));
+      ':method' => 'GET', ':controller' => 'profiles', ':action' => 'neo', ':format' => null));
     
     # except
     $this->assert_not_equal($map->route('DELETE', 'profil'), array(
-      ':method' => 'DELETE', ':controller' => 'profile', ':action' => 'delete', ':format' => null));
+      ':method' => 'DELETE', ':controller' => 'profiles', ':action' => 'delete', ':format' => null));
   }
   
   function test_named_routes_for_resources()
@@ -285,6 +285,38 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     # resource closure + controller + as
     $this->assert_equal(profile_picture_path(),
       new ActionController\Routing\Path('GET', 'profil/picture'));
+  }
+  
+  function test_name_space()
+  {
+    $map = ActionController\Routing\Routes::draw();
+    
+    $this->assert_equal($map->route('GET', 'admin/products'), array(
+      ':method' => 'GET', ':controller' => 'admin\products', ':action' => 'index', ':format' => null));
+    
+    $this->assert_equal($map->route('GET', 'admin/products/1'), array(
+      ':method' => 'GET', ':controller' => 'admin\products', ':action' => 'show', ':id' => 1, ':format' => null));
+    
+    $this->assert_equal($map->route('GET', 'admin/products/1/invoices'), array(
+      ':method' => 'GET', ':controller' => 'admin\invoices', ':action' => 'index', ':product_id' => 1, ':format' => null));
+    
+    $this->assert_equal($map->route('GET', 'admin/products/1/invoices/2'), array(
+      ':method' => 'GET', ':controller' => 'admin\invoices', ':action' => 'show', ':product_id' => 1, ':id' => 2, ':format' => null));
+    
+    $this->assert_equal($map->route('PUT', 'admin/products/1/invoices/2/validate'), array(
+      ':method' => 'PUT', ':controller' => 'admin\invoices', ':action' => 'validate', ':product_id' => 1, ':id' => 2, ':format' => null));
+    
+    $this->assert_equal($map->route('GET', 'admin/options/edit.xml'), array(
+      ':method' => 'GET', ':controller' => 'admin\options', ':action' => 'edit', ':format' => 'xml'));
+    
+    $this->assert_equal($map->route('PUT', 'admin/options'), array(
+      ':method' => 'PUT', ':controller' => 'admin\options', ':action' => 'update', ':format' => null));
+    
+    $this->assert_equal($map->route('DELETE', 'admin/options'), array(
+      ':method' => 'DELETE', ':controller' => 'admin\options', ':action' => 'delete', ':format' => null));
+    
+    $this->assert_not_equal($map->route('GET', 'admin/options'), array(
+      ':method' => 'GET', ':controller' => 'admin\options', ':action' => 'index', ':format' => null));
   }
 }
 
