@@ -100,7 +100,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
   }
   
   static function columns() {
-    trigger_error("static method ActiveRecord\Record::columns() must be overwritten by child class.", E_USER_ERROR);
+    trigger_error("Static method Misago\ActiveRecord\Record::columns() must be overwritten by child class.", E_USER_ERROR);
   }
   
   # Checks if a column exists.
@@ -140,7 +140,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     return $this->_attributes;
   }
   
-  # :private:
+  # :nodoc:
   protected function attributes_set($attributes)
   {
     foreach($attributes as $k => $v) {
@@ -148,7 +148,7 @@ abstract class Record extends \Misago\Object implements \ArrayAccess, \IteratorA
     }
   }
   
-  # :private:
+  # :nodoc:
   protected function reset_original_attributes() {
     $this->_original_attributes = $this->_attributes;
   }

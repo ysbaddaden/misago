@@ -214,7 +214,7 @@ abstract class Caching extends Filters
   }
   
   
-  # :private:
+  # :nodoc:
   protected function shall_we_cache_page()
   {
     if (isset(static::$caches_page[get_called_class()][$this->action]))
@@ -238,7 +238,7 @@ abstract class Caching extends Filters
     return false;
   }
   
-  # :private:
+  # :nodoc:
   protected function shall_we_cache_action()
   {
     if (isset(static::$caches_action[get_called_class()][$this->action]))
@@ -262,7 +262,7 @@ abstract class Caching extends Filters
     return false;
   }
   
-  # :private:
+  # :nodoc:
   protected function cache_action()
   {
     $options = array_merge(array('path_only' => false, ':format' => $this->format), $this->params);

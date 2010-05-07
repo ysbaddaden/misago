@@ -202,7 +202,7 @@ class Routes extends ResourceRoutes
   
   # Returns a mapping for a given method+path.
   # 
-  # :private:
+  # :nodoc:
   function & route($method, $uri)
   {
     $uri = trim($uri, '/');
@@ -254,7 +254,7 @@ class Routes extends ResourceRoutes
   # 
   # FIXME: Handle special requirements for keys to select the route.
   # 
-  # :private:
+  # :nodoc:
   function reverse($mapping)
   {
     if (!isset($mapping[':action'])) $mapping[':action'] = 'index';

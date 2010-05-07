@@ -509,7 +509,7 @@ abstract class AbstractAdapter
   # - +commit+   - ends a transaction and commits statements to the database.
   # - +rollback+ - ends a transaction and drops statements (nothing is recorded in the database).
   # 
-  # Note: prefer using <tt>ActiveRecord::transaction()</tt> instead.
+  # Note: prefer using <tt>Misago\ActiveRecord\Base::transaction()</tt> instead.
   function transaction($action)
   {
     switch(strtolower($action))

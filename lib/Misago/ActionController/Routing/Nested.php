@@ -1,6 +1,7 @@
 <?php
 namespace Misago\ActionController\Routing;
 
+# :nodoc:
 class Nested
 {
   private $map;

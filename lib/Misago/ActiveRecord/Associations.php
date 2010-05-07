@@ -308,7 +308,7 @@ use Misago\ActiveSupport\String;
 # FIXME: handle others.build, etc. methods for HABTM relationships.
 # IMPROVE: has_many options: counter_sql, finder_sql
 # IMPROVE: HABTM options: counter_sql, finder_sql, insert_sql, delete_sql
-# TODO: Implement has_many/has_one :throught association.
+# TODO: Implement has_one :through association.
 abstract class Associations extends Record
 {
   private static $_associations;
@@ -738,7 +738,7 @@ abstract class Associations extends Record
   }
   
   # TODO: save_associated() must save HABTM relationships.
-  # :private:
+  # :nodoc:
   protected function save_associated()
   {
     foreach(static::association_names() as $assoc_name)
@@ -766,7 +766,7 @@ abstract class Associations extends Record
     return true;
   }
   
-  # :private:
+  # :nodoc:
   protected function delete_associated()
   {
     $rs = true;

@@ -19,7 +19,6 @@ use Misago\ActiveSupport\String;
 #     }
 #   }
 # 
-# 
 # =Mail
 #
 # See documentation of <tt>\Misago\ActionMailer\Mail</tt> for configuration methods.

@@ -46,8 +46,11 @@ class Connection
   
 	# Returns the connection object for the given configuration.
   # Will create it automatically, if it doesn't exists already.
-  static function get($environment)
+  static function get($environment=null)
   {
+    if ($environment === null) {
+      $environment = $_SERVER['MISAGO_ENV'];
+    }
     if (!isset(self::$adapters[$environment]))
     {
       self::$adapters[$environment] = self::create($environment);

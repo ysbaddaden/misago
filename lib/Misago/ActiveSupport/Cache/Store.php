@@ -3,10 +3,10 @@ namespace Misago\ActiveSupport\Cache;
 
 # Abstract cache storage.
 # 
-# See <tt>Misago\ActiveSupport\MemoryStore</tt>,
-# <tt>Misago\ActiveSupport\MemcacheStore</tt>,
-# <tt>Misago\ActiveSupport\RedisStore</tt> or
-# <tt>Misago\ActiveSupport\FileStore</tt> for actual implementations.
+# See <tt>Misago\ActiveSupport\Cache\MemoryStore</tt>,
+# <tt>Misago\ActiveSupport\Cache\MemcacheStore</tt>,
+# <tt>Misago\ActiveSupport\Cache\RedisStore</tt> or
+# <tt>Misago\ActiveSupport\Cache\FileStore</tt> for actual implementations.
 # You may also build your own one.
 # 
 # Note: <tt>Misago\ActiveSupport\Cache</tt> is meant to store strings. Some

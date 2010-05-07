@@ -8,6 +8,8 @@ is far from implementing all of Rails API, and will surely never (it's not a
 copycat), but the things you rely on daily should be there. If not, patches
 are welcomed.
 
+Please note that misago requires PHP 5.3+.
+
 ==Getting Started
 
 Download and install misago somewhere.
@@ -45,30 +47,29 @@ with anything from your application directly. For instance :
 ==Contents
 
 - +app/+ => contains your application
-- +app/controllers/+ => contains your controllers (<tt>ActionController</tt>)
-- +app/models/+ => contains your models and mailers (<tt>ActiveRecord</tt> & <tt>ActionView</tt>)
-- +app/views/+ => contains your views (<tt>ActionView</tt>)
+- +app/controllers/+ => contains your controllers (<tt>Misago\ActionController</tt>)
+- +app/models/+ => contains your models and mailers (<tt>Misago\ActiveRecord</tt> & <tt>Misago\ActionView</tt>)
+- +app/views/+ => contains your views (<tt>Misago\ActionView</tt>)
 - +app/views/layouts/+ => contains your layouts
 - +config/+ => contains configuration files for your app
 - +config/environments/+ => particular configuration per environment
-- +config/locales/+ => contains your locales (<tt>I18n</tt>)
-- +db/+ => anything related to your database (<tt>ActiveRecord_Migration</tt>)
+- +config/locales/+ => contains your locales (<tt>Misago\I18n</tt>)
+- +db/+ => anything related to your database (<tt>Misago\ActiveRecord\Migration</tt>)
 - +lib/+ => application specific libraries
 - +log/+ => application logs
 - +public/+ => the root of webserver
 - +public/css/+ => stylesheet files
 - +public/js/+ => JavaScript files
 - +scripts/+ => useful command line scripts
-- +scripts/db/+ => database related scripts (eg: running migrations)
 - +test/fixtures/+ => sample data for your tests
-- +test/functional/+ => tests for your controllers (<tt>ActionController_TestCase</tt>)
-- +test/unit/+ => tests for your models, librairies, etc. (<tt>Unit_TestCase</tt>)
+- +test/functional/+ => tests for your controllers (<tt>Misago\ActionController\TestCase</tt>)
+- +test/unit/+ => tests for your models, librairies, etc. (<tt>Misago\Unit\TestCase</tt> & <tt>Test\Unit\TestCase</tt>)
 - +vendor/+ => external libraries, not specific to your project
+- +Pakefile+ => contains tasks for pake [http://github.com/ysbaddaden/pake]
 
 === Autoloading
 
-It's possible to autoload classes. You must use the following syntax if you
-wish to use it (recommended):
-
-- +MyNamespace_SubNamespace_MyClass+ => +my_namespace/sub_namespace/my_class.php+
+It's possible to autoload classes. See 
+http://groups.google.com/group/php-standards/web/psr-0-final-proposal
+for the syntax to use.
 

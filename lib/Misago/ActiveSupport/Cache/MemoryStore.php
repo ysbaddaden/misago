@@ -2,7 +2,7 @@
 namespace Misago\ActiveSupport\Cache;
 
 # A Cache Store implementation which stores data using APC.
-# See <tt>Store</tt> for help.
+# See <tt>Misago\ActiveRecord\Cache\Store</tt> for help.
 class MemoryStore extends Store
 {
   function read($key) {

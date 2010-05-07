@@ -32,7 +32,7 @@ class Table
   # Options: 
   # 
   # - +id+        - true to automatically create the primary key column (default)
-  # - +options+   - addition to table creation (eg: 'engine=myisam')
+  # - +options+   - addition to table creation (eg: +'engine=myisam'+)
   # - +temporary+ - true to create a temporary table
   # - +force+     - true to drop table before create, otherwise creates if not exists
   # 

@@ -48,7 +48,7 @@ class Base extends \Misago\Object
     }
   }
   
-  # :private:
+  # :nodoc:
   protected function _find_helpers(&$helpers, $path)
   {
     $dh = opendir($path);
@@ -202,7 +202,7 @@ class Base extends \Misago\Object
   }
   
   # Copies public vars from controller, not overriding view's own class vars.
-  # :private:
+  # :nodoc:
   protected function copy_controller_vars()
   {
     $this->params =& $this->controller->params;

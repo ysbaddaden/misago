@@ -7,8 +7,8 @@ use Misago\I18n;
 # Ephemeral Record.
 # 
 # This is for tableless records. You get all the joys of an
-# <tt>Misago\ActiveRecord</tt> (record, validation), without the need to
-# store data. 
+# <tt>Misago\ActiveRecord\Base</tt> (record, validation), without the need to
+# store data.
 abstract class Ephemeral extends Validations
 {
   function __set($attribute, $value)

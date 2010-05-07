@@ -2,7 +2,7 @@
 namespace Misago\ActiveSupport\Cache;
 
 # An Cache Store implementation which stores data in files.
-# See <tt>Store</tt> for help.
+# See <tt>Misago\ActiveRecord\Cache\Store</tt> for help.
 class FileStore extends Store
 {
   private $cache_dir;

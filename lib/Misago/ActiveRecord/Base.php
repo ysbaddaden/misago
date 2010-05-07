@@ -7,8 +7,8 @@ use Misago\I18n;
 # Database object abstraction.
 # 
 # Permits to handle database entries like objects. It supports
-# CRUD operations (<tt>create</tt>, read, <tt>update</tt>
-# and <tt>delete</tt>).
+# CRUD operations: <tt>create</tt>, read (<tt>find</tt>), <tt>update</tt>
+# and <tt>delete</tt>.
 # 
 # Extends:
 # 
@@ -529,9 +529,9 @@ abstract class Base extends Calculations
   # 
   #   $count = $post->count_by_sql("select count(*) from posts where created_at > now()");
   # 
-  # Use <tt>count</tt> instead, unless you need special features. Be aware
-  # that custom SQL requests may brake whenever you switch between
-  # connection adapters.
+  # Use <tt>Misago\ActiveRecord\Calculations::count</tt> instead, unless you
+  # need special features. Be aware that custom SQL requests may brake whenever
+  # you switch between connection adapters.
   static function count_by_sql($sql)
   {
     $rows = static::connection()->select_values($sql);
