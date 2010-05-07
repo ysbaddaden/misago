@@ -2,14 +2,40 @@
 
 # Helpful functions to render form fields for a model.
 # 
-#   <\? $search = new Search() ?\>
-#   <\?= form_tag(search_path()) ?\>
-#     <p>
-#       <\?= label($search, 'query') ?\>
-#       <\?= text_field($search, 'query') ?\>
-#       <\?= submit_tag() ?\>
-#     </p>
-#   </form>
+# To send a form with a POST request:
+# 
+#   <\? $f = form_for($account) ?\>
+#   <\?= $f->start(url_for(array(':controller' => 'accounts', ':action' => 'create'))) ?\>
+#   # => <form action="/accounts" method="post">
+# 
+# You may specify another HTTP request method:
+# 
+#   <\? $f = form_for($search) ?\>
+#   <\?= $f->start(url_for(array(':controller' => 'search')), array('method' => 'get')) ?\>
+#   # => <form action="/search" method="get">
+# 
+# = Resource oriented style
+# 
+# You may use the named routes with HTTP methods to create forms:
+# 
+#   <\? $f = form_for($account) ?\>
+#   <\?= $f->start(account_path(), array('method' => 'put')) ?\>
+# 
+# But you'd better rely on the record's state (thanks to +new_record+), and let
+# +form_for()+ decide by itself what to do (either create or update):
+# 
+#   <\? $f = form_for($user) ?\>
+#   <\?= $f->start() ?\>
+# 
+# Let's say +$user+ is a new record, this is equivalent to:
+# 
+#   <\? $f = form_for($user) ?\>
+#   <\?= $f->start(users_path(), array('method' => 'post', 'class' => 'new_user', 'id' => 'new_user') ?\>
+#   
+# Let's now say +$user+ is an existing record, this is then equivalent to:
+# 
+#   <\? $f = form_for(new User(1)) ?\>
+#   <\?= $f->start(users_path(), array('method' => 'put', 'class' => 'edit_user', 'id' => 'edit_user_1') ?\>
 # 
 namespace Misago\ActionView\Helpers\FormHelper;
 use Misago\ActiveSupport\String;
@@ -36,21 +62,43 @@ class FormBuilder
   }
   
   # Starts the HTML form.
-  function start($url, $options=null)
+  # 
+  # Note: all options will be forwarded to
+  # <tt>Misago\ActionView\Helpers\FormTagHelper::form_tag</tt>.
+  # 
+  function start($url=null, $options=null)
   {
+    if (!isset($url))
+    {
+      $name = String::underscore(get_class($this->object));
+      
+      if ($this->object->new_record)
+      {
+        $func = String::pluralize($name).'_path';
+        if (!isset($options['method'])) $options['method'] = 'POST';
+        if (!isset($options['class']))  $options['class']  = "new_$name";
+        if (!isset($options['id']))     $options['id']     = "new_$name";
+      }
+      else
+      {
+        $func = "{$name}_path";
+        if (!isset($options['method'])) $options['method'] = 'PUT';
+        if (!isset($options['class']))  $options['class']  = "edit_$name";
+        if (!isset($options['id']))     $options['id']     = "edit_{$name}_{$this->object->id}";
+      }
+      $url  = $func($this->object);
+    }
     return form_tag($url, $options);
   }
   
   # Ends the HTML form.
-  function end()
-  {
+  function end() {
     return '</form>';
   }
   
   # Displays errors related to a column.
   # Shows only the first error by default.
-  function error_message_on($column, $all=false)
-  {
+  function error_message_on($column, $all=false) {
     return error_message_on($this->object, $column, $all);
   }
   
@@ -69,8 +117,7 @@ class FormBuilder
   }
   
   # DEPRECATED: use <tt>error_messages_for</tt> instead.
-  function errors_on_base()
-  {
+  function errors_on_base() {
     return $this->error_messages_for();
   }
   

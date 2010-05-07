@@ -7,6 +7,38 @@ require_once MISAGO."/lib/Misago/ActionView/Helpers/FormHelper.php";
 
 class Test_ActionView_Helpers_ActiveRecordHelper extends Misago\Unit\TestCase
 {
+  function test_form_for()
+  {
+    $this->assert_instance_of(form_for('Product'), 'Misago\ActionView\Helpers\FormHelper\FormBuilder', "using a camelized string");
+    $this->assert_instance_of(form_for('basket'),  'Misago\ActionView\Helpers\FormHelper\FormBuilder', "using an underscored string");
+
+    $product = new Product();
+    $this->assert_instance_of(form_for($product), 'Misago\ActionView\Helpers\FormHelper\FormBuilder',  "using an ActiveRecord");
+  }
+  
+  function test_start()
+  {
+    $f = form_for('Product');
+    $this->assert_equal($f->start(), '<form action="/products" method="post" class="new_product" id="new_product">');
+    
+    $f = form_for(new Product());
+    $this->assert_equal($f->start(), '<form action="/products" method="post" class="new_product" id="new_product">');
+    
+    $f = form_for(new Product(1));
+    $this->assert_equal($f->start(), '<form action="/products/1" method="post" class="edit_product" id="edit_product_1"><input type="hidden" name="_method" value="put"/>');
+    
+    $f = form_for(new Product(2));
+    $this->assert_equal($f->start(), '<form action="/products/2" method="post" class="edit_product" id="edit_product_2"><input type="hidden" name="_method" value="put"/>');
+    $this->assert_equal($f->start(product_path(2)), '<form action="/products/2" method="get">');
+    $this->assert_equal($f->start(product_path(2), array('method' => 'delete')), '<form action="/products/2" method="post"><input type="hidden" name="_method" value="delete"/>');
+  }
+  
+  function test_end()
+  {
+    $f = form_for('Product');
+    $this->assert_equal($f->end(), '</form>');
+  }
+  
   function test_fields_for()
   {
     $this->assert_instance_of(fields_for('Product'), 'Misago\ActionView\Helpers\FormHelper\FormBuilder', "using a camelized string");

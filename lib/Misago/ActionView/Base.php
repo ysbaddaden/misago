@@ -108,6 +108,7 @@ class Base extends \Misago\Object
   # This will render the partial +posts/_post.html.tpl+, regardless of
   # which controller this is being called from.
   # 
+  # IMPROVE: Partial shortcut when rendering forms: render(array('partial' => $f)).
   function render($options)
   {
     # locals
