@@ -35,12 +35,15 @@ use Misago\ActiveSupport\String;
 #     $event->resources('tickets');
 #     $event->resource('tag');
 #   });
-# 
+#   
 #   # using +path_prefix+ (not recommended):
 #   $map->resources('events');
 #   $map->resources('tickets', array('path_prefix' => 'events/:id'));
 #   $map->resource('tag',      array('path_prefix' => 'events/:id'));
 # 
+# IMPROVE: :path_names option
+# IMPROVE: config.action_controller.resources_path_names
+#
 class ResourceRoutes extends \Misago\Object
 {
   # TODO: Check if named route $plural exists before defining POST!
@@ -52,22 +55,24 @@ class ResourceRoutes extends \Misago\Object
       $closure = $options;
       $options = array();
     }
-
-    $options = array_merge(array('name_prefix' => ''), $options);
+    $options  = array_merge(array('name_prefix' => ''), $options);
+    $plural   = $name;
+    $singular = isset($options['singular']) ? $options['singular'] : String::singularize($name);
     
-    $plural        = $name;
-    $singular      = isset($options['singular'])    ? $options['singular'] : String::singularize($name);
-    $plural_path   = empty($options['path_prefix']) ? $plural   : $options['path_prefix'].'/'.$plural;
-    $singular_path = empty($options['path_prefix']) ? $singular : "{$options['path_prefix']}/$singular";
+    $plural_path = isset($options['as']) ? $options['as'] : $plural;
+    if (isset($options['path_prefix'])) {
+      $plural_path = "{$options['path_prefix']}/$plural_path";
+    }
+    
     $plural_name   = $options['name_prefix'].$plural;
     $singular_name = $options['name_prefix'].$singular;
     $controller    = isset($options['controller'])  ? $options['controller'] : $plural;
-
+    
     # only/except
-    $actions = isset($options['only']) ? $options['only'] :
+    $actions = isset($options['only']) ? array_collection($options['only']) :
       array('index', 'new', 'create', 'show', 'edit', 'update', 'delete');
     if (isset($options['except'])) {
-      $actions = array_diff($actions, $options['except']);
+      $actions = array_diff($actions, array_collection($options['except']));
     }
     
     if (isset($options['collection']))
@@ -238,7 +243,7 @@ class ResourceRoutes extends \Misago\Object
       $closure($obj);
     }
   }
-
+  
   # TODO: Check if named route $singular exists before defining POST/PUT/DELETE!
   function resource($name, $options=array(), $closure=null)
   {
@@ -247,32 +252,35 @@ class ResourceRoutes extends \Misago\Object
       $closure = $options;
       $options = array();
     }
-    $options = array_merge(array('name_prefix' => ''), $options);
+    $options  = array_merge(array('name_prefix' => ''), $options);
+    $singular = $name;
+    $plural   = isset($options['plural']) ? $options['plural'] : String::singularize($name);
     
-    $singular      = $name;
-    $plural        = isset($options['plural'])      ? $options['plural'] : String::singularize($name);
-    $singular_path = empty($options['path_prefix']) ? $singular : "{$options['path_prefix']}/$singular";
-    $plural_path   = empty($options['path_prefix']) ? $plural   : "{$options['path_prefix']}/$plural";
+    $singular_path = isset($options['as']) ? $options['as'] : $singular;
+    if (isset($options['path_prefix'])) {
+      $singular_path = "{$options['path_prefix']}/$singular_path";
+    }
+    
     $singular_name = $options['name_prefix'].$singular;
     $plural_name   = $options['name_prefix'].$plural;
     $controller    = isset($options['controller'])  ? $options['controller'] : $plural;
     
-    $actions = isset($options['only']) ? $options['only'] :
+    $actions = isset($options['only']) ? array_collection($options['only']) :
       array('new', 'create', 'show', 'edit', 'update', 'delete');
     if (isset($options['except'])) {
-      $actions = array_diff($actions, $options['except']);
+      $actions = array_diff($actions, array_collection($options['except']));
     }
     
     if (isset($options['collection']))
     {
       foreach($options['collection'] as $action => $method)
       {
-        $this->named("{$action}_{$plural_name}", "$plural_path/$action", array(
+        $this->named("{$action}_{$singular_name}", "$singular_path/$action", array(
           ':controller' => $controller,
           ':action'     => $action,
           'conditions'  => array('method' => $method)
         ));
-        $this->named("formatted_{$action}_{$plural_name}", "$plural_path/$action.:format", array(
+        $this->named("formatted_{$action}_{$singular_name}", "$singular_path/$action.:format", array(
           ':controller' => $controller,
           ':action'     => $action,
           'conditions'  => array('method' => $method)
@@ -322,12 +330,12 @@ class ResourceRoutes extends \Misago\Object
     {
       foreach($options['member'] as $action => $method)
       {
-        $this->named("{$action}_{$singular_name}", "$plural_path/:id/$action", array(
+        $this->named("{$action}_{$singular_name}", "$singular_path/:id/$action", array(
           ':controller' => $controller,
           ':action'     => $action,
           'conditions'  => array('method' => $method)
         ));
-        $this->named("formatted_{$action}_{$singular_name}", "$plural_path/:id/$action.:format", array(
+        $this->named("formatted_{$action}_{$singular_name}", "$singular_path/:id/$action.:format", array(
           ':controller' => $controller,
           ':action'     => $action,
           'conditions'  => array('method' => $method)

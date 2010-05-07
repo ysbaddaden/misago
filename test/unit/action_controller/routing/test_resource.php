@@ -59,6 +59,21 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     
     $this->assert_not_equal($map->route('PUT', 'events/1/tags.xml'), array(
       ':method' => 'PUT', ':controller' => 'events', ':action' => 'tags', ':id' => 1, ':format' => 'xml'));
+    
+    # as
+    $this->assert_equal($map->route('POST', 'kategorien'), array(
+      ':method' => 'POST', ':controller' => 'categories', ':action' => 'create', ':format' => null));
+    
+    $this->assert_equal($map->route('PUT', 'kategorien/1.json'), array(
+      ':method' => 'PUT', ':controller' => 'categories', ':action' => 'update', ':id' => 1, ':format' => 'json'));
+    
+    # only
+    $this->assert_not_equal($map->route('GET', 'kategorien'), array(
+      ':method' => 'GET', ':controller' => 'categories', ':action' => 'index', ':format' => null));
+    
+    # except
+    $this->assert_not_equal($map->route('DELETE', 'kategorien/2'), array(
+      ':method' => 'DELETE', ':controller' => 'categories', ':action' => 'delete', ':id' => 2, ':format' => null));
   }
 
   function test_map_resource()
@@ -97,6 +112,21 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     
     $this->assert_equal($map->route('GET', 'geocoder/all'), array(
       ':method' => 'GET', ':controller' => 'geocoder', ':action' => 'all', ':format' => null));
+    
+    # as
+    $this->assert_equal($map->route('GET', 'profil'), array(
+      ':method' => 'GET', ':controller' => 'profile', ':action' => 'show', ':format' => null));
+    
+    $this->assert_equal($map->route('PUT', 'profil.xml'), array(
+      ':method' => 'PUT', ':controller' => 'profile', ':action' => 'update', ':format' => 'xml'));
+    
+    # only
+    $this->assert_not_equal($map->route('GET', 'profil/new'), array(
+      ':method' => 'GET', ':controller' => 'profile', ':action' => 'neo', ':format' => null));
+    
+    # except
+    $this->assert_not_equal($map->route('DELETE', 'profil'), array(
+      ':method' => 'DELETE', ':controller' => 'profile', ':action' => 'delete', ':format' => null));
   }
   
   function test_named_routes_for_resources()
@@ -147,7 +177,7 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     $this->assert_equal(formatted_account_url(array(':id' => 73, ':format' => 'xml')),
       new ActionController\Routing\Url('GET', 'accounts/73.xml'));
 
-    # resources name is singular
+    # edge case: resources name is singular
     $this->assert_true(function_exists('wiki_index_path'));
     $this->assert_true(function_exists('formatted_wiki_index_path'));
     
@@ -190,7 +220,7 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     $this->assert_equal(formatted_geocoder_url(array(':id' => 73, ':format' => 'xml')),
       new ActionController\Routing\Url('GET', 'geocoder.xml'));
   }
-
+  
   function test_nested_resources()
   {
     $map = ActionController\Routing\Routes::draw();
@@ -216,10 +246,24 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     $this->assert_equal(edit_discussion_author_path(array(':discussion_id' => 13)),
       new ActionController\Routing\Path('GET', 'discussions/13/author/edit'));
     
-    # closure
-#    $this->assert_equal((string)events_path(), '/events');
-#    $this->assert_equal(event_tickets_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'events/12/tickets'));
-#    $this->assert_equal(event_descriptions_path(array(':event_id' => 12)), new ActionController\Routing\Path('GET', 'events/12/about'));
+    # closure: resources
+    $this->assert_equal((string)events_path(), '/events');
+    $this->assert_equal(event_tickets_path(array(':event_id' => 12)),
+      new ActionController\Routing\Path('GET', 'events/12/tickets'));
+    $this->assert_equal(new_event_ticket_path(array(':event_id' => 12)),
+      new ActionController\Routing\Path('GET', 'events/12/tickets/new'));
+    $this->assert_equal(event_ticket_path(array(':event_id' => 12, ':id' => 5)),
+      new ActionController\Routing\Path('GET', 'events/12/tickets/5'));
+    $this->assert_equal(edit_event_ticket_path(array(':event_id' => 13,':id' => 3)),
+      new ActionController\Routing\Path('GET', 'events/13/tickets/3/edit'));
+    
+    # closure: resource
+    $this->assert_equal(event_description_path(array(':event_id' => 13)),
+      new ActionController\Routing\Path('GET', 'events/13/about'));
+    $this->assert_equal(new_event_description_path(array(':event_id' => 14)),
+      new ActionController\Routing\Path('GET', 'events/14/about/new'));
+    $this->assert_equal(edit_event_description_path(array(':event_id' => 17)),
+      new ActionController\Routing\Path('GET', 'events/17/about/edit'));
   }
 }
 

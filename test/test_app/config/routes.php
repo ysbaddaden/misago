@@ -22,7 +22,10 @@ $map->connect('page/:id.:format', array(':controller' => 'pages', ':action' => '
 
 # named routes
 $map->named('about',    'about', array(':controller' => 'html', ':action' => 'about'));
-$map->named('purchase', 'products/:id/purchase', array(':controller' => 'catalog', ':action' => 'purchase'));
+$map->named('purchase', 'products/:id/purchase', array(
+  ':controller' => 'catalog',
+  ':action'     => 'purchase'
+));
 
 # RESTful resource(s)
 #$map->resources('posts');
@@ -37,7 +40,10 @@ $map->resources('accounts');
 $map->resources('articles');
 
 # nested restful resource(s)
-$map->resources('discussions', array('has_many' => 'messages', 'has_one' => 'author'));
+$map->resources('discussions', array(
+  'has_many' => 'messages',
+  'has_one'  => 'author'
+));
 $map->resources('events', array(
   'member'     => array('publish'  => 'put', 'tags'   => 'get'),
   'collection' => array('archives' => 'get', 'latest' => 'get')),
@@ -47,7 +53,16 @@ $map->resources('events', array(
   $event->resources('tickets');
 });
 
-#$map->resources('categories', array('as' => 'kategorien'));
+$map->resources('categories', array(
+  'only'   => 'create,update,delete',
+  'except' => 'delete',
+  'as'     => 'kategorien'
+));
+$map->resource('profile', array(
+  'only'   => 'show,update,delete',
+  'except' => 'delete',
+  'as'     => 'profil'
+));
 
 # namespaced resource(s)
 #$map->ns('admin', function($admin) {

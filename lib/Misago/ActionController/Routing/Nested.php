@@ -6,14 +6,14 @@ class Nested
   private $map;
   private $name_prefix;
   private $path_prefix;
-  private $ns;
+#  private $ns;
   
-  function __construct($map, $name_prefix, $path_prefix, $ns='')
+  function __construct($map, $name_prefix, $path_prefix/*, $ns=null*/)
   {
     $this->map         = $map;
     $this->name_prefix = $name_prefix;
     $this->path_prefix = $path_prefix;
-    $this->ns          = $ns;
+#    $this->ns          = $ns;
   }
   
   function resources($name, $options=array(), $closure=null) {
@@ -37,11 +37,11 @@ class Nested
     if (!isset($options['path_prefix'])) {
       $options['path_prefix'] = $this->path_prefix;
     }
-    if (!empty($this->ns))
-    {
-      $options['namespace'] = $this->ns.(
-        empty($options['namespace']) ? '' : '\\'.$options['namespace']);
-    }
+#    if (!empty($this->ns))
+#    {
+#      $options['namespace'] = $this->ns.(
+#        empty($options['namespace']) ? '' : '\\'.$options['namespace']);
+#    }
     $this->map->$method($name, $options, $closure);
   }
 }
