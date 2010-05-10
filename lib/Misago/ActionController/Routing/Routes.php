@@ -3,7 +3,7 @@ namespace Misago\ActionController\Routing;
 use Misago\ActiveSupport\String;
 
 # Routing is what connects HTTP requests to your application's controllers,
-# parsing actions an parameters too.
+# parsing actions and parameters too.
 # 
 # You do configure your application's routes in +config/routes.php+.
 # A basic route config file looks like this:
@@ -94,12 +94,18 @@ class Routes extends ResourceRoutes
     return self::$map;
   }
   
-  # IMPROVE: Cache routes in APC.
   # :nodoc:
   static function boot()
   {
-    require ROOT."/config/routes.php";
+    $apc_key = TMP.'/cache/action_controller/routes';
+    
     $map = static::draw();
+    $map->routes = apc_fetch($apc_key, $success);
+    if ($success === false)
+    {
+      require ROOT."/config/routes.php";
+      apc_store($apc_key, $map->routes);
+    }
     $map->build_named_route_helpers();
   }
   
