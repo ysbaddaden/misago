@@ -91,8 +91,8 @@ class Routes extends ResourceRoutes
     if (self::$map === null)
     {
       self::$map = new self();
-      require ROOT.'/config/routes.php';
-      self::$map->build_named_route_helpers();
+#      require ROOT.'/config/routes.php';
+#      self::$map->build_named_route_helpers();
     }
     if ($closure !== null) {
       $closure(self::$map);
