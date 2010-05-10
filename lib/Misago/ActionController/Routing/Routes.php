@@ -67,9 +67,6 @@ use Misago\ActiveSupport\String;
 # transparently handled by view helpers to generate links and forms that will
 # use the correct HTTP method.
 # 
-# IMPROVE: Use a closure for draw().
-# IMPROVE: Cache routes in APC.
-# 
 class Routes extends ResourceRoutes
 {
   private $routes          = array();
@@ -88,16 +85,22 @@ class Routes extends ResourceRoutes
   # Singleton
   static function draw($closure=null)
   {
-    if (self::$map === null)
-    {
+    if (self::$map === null) {
       self::$map = new self();
-#      require ROOT.'/config/routes.php';
-#      self::$map->build_named_route_helpers();
     }
     if ($closure !== null) {
       $closure(self::$map);
     }
     return self::$map;
+  }
+  
+  # IMPROVE: Cache routes in APC.
+  # :nodoc:
+  static function boot()
+  {
+    require ROOT."/config/routes.php";
+    $map = static::draw();
+    $map->build_named_route_helpers();
   }
   
   # Recognizes the route for a request, and returns a controller.

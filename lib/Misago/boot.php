@@ -65,6 +65,7 @@ require 'Misago/ActionController.php';
 require ROOT.'/config/environment.php';
 require ROOT."/config/environments/{$_SERVER['MISAGO_ENV']}.php";
 
+Misago\ActionController\Routing\Routes::boot();
 Misago\I18n::initialize();
 
 ?>
