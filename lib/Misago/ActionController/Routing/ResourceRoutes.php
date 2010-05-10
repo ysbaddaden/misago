@@ -103,19 +103,17 @@ class ResourceRoutes extends \Misago\Object
   # = Options:
   # 
   # * +as+          - use another path for the route. For instance +resource('profile', array('as' => 'benutzerprofil'))+ will generate routes like +"/benutzerprofil/edit"+ using +ProfilesController+.
-  # * +collection+  - additional resources actions in an +{action => pair}+ hash.
+  # * +collection+  - additional resources actions in an +{action => method}+ hash, where method can be one of +get+, +post+, +put+, +delete+ or +any+.
   # * +controller+  - specify the controller to use (may be a namespaced one using +admin\controller+)
   # * +except+      - an array of actions to skip. For instance +{'only' => ['update', 'delete']}+ will skip the +update+ and +delete+ routes.
   # * +has_many+    - 
   # * +has_one+     - 
-  # * +member+      - same as collection, but for a particular resource.
+  # * +member+      - same as collection, but for a particular resource, like +/products/:id/purchase+.
   # * +name_prefix+ - 
   # * +only+        - limits actions to this list. For instance +{'only' => ['index', 'show']}+ will generate the index and show routes only.
   # * +path_prefix+ - 
   # * +plural+      - specify the plural name of the resource
   # 
-  # TODO: Check if named route $plural exists before defining POST!
-  # TODO: Check if named route $singular exists before defining PUT/DELETE!
   function resources($name, $options=array(), $closure=null)
   {
     if (is_object($options))
@@ -134,6 +132,7 @@ class ResourceRoutes extends \Misago\Object
     
     $plural_name   = $options['name_prefix'].$plural;
     $singular_name = $options['name_prefix'].$singular;
+    $index_name    = ($plural == $singular) ? "{$plural_name}_index" : $plural_name;
     
     $controller = isset($options['controller']) ? $options['controller'] : $plural;
     if (isset($options['name_space'])) {
@@ -149,128 +148,55 @@ class ResourceRoutes extends \Misago\Object
     
     if (isset($options['collection']))
     {
-      foreach($options['collection'] as $action => $method)
-      {
-        $this->named("{$action}_{$plural_name}", "$plural_path/$action", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
-        $this->named("formatted_{$action}_{$plural_name}", "$plural_path/$action.:format", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
+      foreach($options['collection'] as $action => $method) {
+        $this->named_resource("{$action}_{$plural_name}", "$plural_path/$action", $method, $controller, $action);
       }
     }
-    if (in_array('index', $actions))
-    {
-      $index_name = ($plural == $singular) ? "{$plural_name}_index" : $plural_name;
-      $this->named($index_name, $plural_path, array(
-        ':controller' => $controller,
-        ':action'     => 'index',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_{$index_name}", "$plural_path.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'index',
-        'conditions'  => array('method' => 'GET')
-      ));
+    if (in_array('index', $actions)) {
+      $this->named_resource($index_name, $plural_path, 'GET', $controller, 'index');
+    }
+    if (in_array('new', $actions)) {
+      $this->named_resource("new_$singular_name", "$plural_path/new", 'GET', $controller, 'neo');
     }
     if (in_array('create', $actions))
     {
-      $this->connect($plural_path, array(
-        ':controller' => $controller,
-        ':action'     => 'create',
-        'conditions'  => array('method' => 'POST')
-      ));
-      $this->connect("$plural_path.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'create',
-        'conditions'  => array('method' => 'POST')
-      ));
-    }
-    if (in_array('new', $actions))
-    {
-      $this->named("new_$singular_name", "$plural_path/new", array(
-        ':controller' => $controller,
-        ':action'     => 'neo',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_new_$singular_name", "$plural_path/new.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'neo',
-        'conditions'  => array('method' => 'GET')
-      ));
+      if ($this->named_route_exists($index_name)) {
+        $this->connect_resource($plural_path, 'POST', $controller, 'create');
+      }
+      else {
+        $this->named_resource($index_name, $plural_path, 'POST', $controller, 'create');
+      }
     }
     
     if (isset($options['member']))
     {
-      foreach($options['member'] as $action => $method)
-      {
-        $this->named("{$action}_{$singular_name}", "$plural_path/:id/$action", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
-        $this->named("formatted_{$action}_{$singular_name}", "$plural_path/:id/$action.:format", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
+      foreach($options['member'] as $action => $method) {
+        $this->named_resource("{$action}_$singular_name", "$plural_path/:id/$action", $method, $controller, $action);
       }
     }
-    if (in_array('edit', $actions))
-    {
-      $this->named("edit_$singular_name", "$plural_path/:id/edit", array(
-        ':controller' => $controller,
-        ':action'     => 'edit',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_edit_$singular_name", "$plural_path/:id/edit.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'edit',
-        'conditions'  => array('method' => 'GET')
-      ));
+    if (in_array('edit', $actions)) {
+      $this->named_resource("edit_$singular_name", "$plural_path/:id/edit", 'GET', $controller, 'edit');
     }
-    if (in_array('show', $actions))
-    {
-      $this->named($singular_name, "$plural_path/:id", array(
-        ':controller' => $controller,
-        ':action'     => 'show',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_$singular_name", "$plural_path/:id.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'show',
-        'conditions'  => array('method' => 'GET')
-      ));
+    if (in_array('show', $actions)) {
+      $this->named_resource($singular_name, "$plural_path/:id", 'GET', $controller, 'show');
     }
     if (in_array('update', $actions))
     {
-      $this->connect("$plural_path/:id", array(
-        ':controller' => $controller,
-        ':action'     => 'update',
-        'conditions'  => array('method' => 'PUT')
-      ));
-      $this->connect("$plural_path/:id.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'update',
-        'conditions'  => array('method' => 'PUT')
-      ));
+      if ($this->named_route_exists($singular_name)) {
+        $this->connect_resource("$plural_path/:id", 'PUT', $controller, 'update');
+      }
+      else {
+        $this->named_resource($singular_name, "$plural_path/:id", 'PUT', $controller, 'update');
+      }
     }
     if (in_array('delete', $actions))
     {
-      $this->connect("$plural_path/:id", array(
-        ':controller' => $controller,
-        ':action'     => 'delete',
-        'conditions'  => array('method' => 'DELETE')
-      ));
-      $this->connect("$plural_path/:id.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'delete',
-        'conditions'  => array('method' => 'DELETE')
-      ));
+      if ($this->named_route_exists($singular_name)) {
+        $this->connect_resource("$plural_path/:id", 'DELETE', $controller, 'delete');
+      }
+      else {
+        $this->named_resource($singular_name, "$plural_path/:id", 'DELETE', $controller, 'delete');
+      }
     }
     
     # nested resource
@@ -369,113 +295,52 @@ class ResourceRoutes extends \Misago\Object
     
     if (isset($options['collection']))
     {
-      foreach($options['collection'] as $action => $method)
-      {
-        $this->named("{$action}_{$singular_name}", "$singular_path/$action", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
-        $this->named("formatted_{$action}_{$singular_name}", "$singular_path/$action.:format", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
+      foreach($options['collection'] as $action => $method) {
+        $this->named_resource("{$action}_{$singular_name}", "$singular_path/$action", $method, $controller, $action);
       }
     }
-    if (in_array('show', $actions))
-    {
-      $this->named($singular_name, $singular_path, array(
-        ':controller' => $controller,
-        ':action'     => 'show',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_$singular_name", "$singular_path.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'show',
-        'conditions'  => array('method' => 'GET')
-      ));
+    if (in_array('show', $actions)) {
+      $this->named_resource($singular_name, $singular_path, 'GET', $controller, 'show');
     }
-    if (in_array('new', $actions))
-    {
-      $this->named("new_$singular_name", "$singular_path/new", array(
-        ':controller' => $controller,
-        ':action'     => 'neo',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_new_$singular_name", "$singular_path/new.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'neo',
-        'conditions'  => array('method' => 'GET')
-      ));
+    if (in_array('new', $actions)) {
+      $this->named_resource("new_$singular_name", "$singular_path/new", 'GET', $controller, 'neo');
     }
     if (in_array('create', $actions))
     {
-      $this->connect($singular_path, array(
-        ':controller' => $controller,
-        ':action'     => 'create',
-        'conditions'  => array('method' => 'POST')
-      ));
-      $this->connect("$singular_path.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'create',
-        'conditions'  => array('method' => 'POST')
-      ));
-    }
-    if (isset($options['member']))
-    {
-      foreach($options['member'] as $action => $method)
-      {
-        $this->named("{$action}_{$singular_name}", "$singular_path/:id/$action", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
-        $this->named("formatted_{$action}_{$singular_name}", "$singular_path/:id/$action.:format", array(
-          ':controller' => $controller,
-          ':action'     => $action,
-          'conditions'  => array('method' => $method)
-        ));
+      if ($this->named_route_exists($singular_name)) {
+        $this->connect_resource($singular_path, 'POST', $controller, 'create');
+      }
+      else {
+        $this->named_resource($singular_name, $singular_path, 'POST', $controller, 'create');
       }
     }
-    if (in_array('edit', $actions))
+    
+    if (isset($options['member']))
     {
-      $this->named("edit_$singular_name", "$singular_path/edit", array(
-        ':controller' => $controller,
-        ':action'     => 'edit',
-        'conditions'  => array('method' => 'GET')
-      ));
-      $this->named("formatted_edit_$singular_name", "$singular_path/edit.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'edit',
-        'conditions'  => array('method' => 'GET')
-      ));
+      foreach($options['member'] as $action => $method) {
+        $this->named_resource("{$action}_{$singular_name}", "$singular_path/$action", $method, $controller, $action);
+      }
+    }
+    if (in_array('edit', $actions)) {
+      $this->named_resource("edit_$singular_name", "$singular_path/edit", 'GET', $controller, 'edit');
     }
     if (in_array('update', $actions))
     {
-      $this->connect($singular_path, array(
-        ':controller' => $controller,
-        ':action'     => 'update',
-        'conditions'  => array('method' => 'PUT')
-      ));
-      $this->connect("$singular_path.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'update',
-        'conditions'  => array('method' => 'PUT')
-      ));
+      if ($this->named_route_exists($singular_name)) {
+        $this->connect_resource($singular_path, 'PUT', $controller, 'update');
+      }
+      else {
+        $this->named_resource($singular_name, $singular_path, 'PUT', $controller, 'update');
+      }
     }
     if (in_array('delete', $actions))
     {
-      $this->connect($singular_path, array(
-        ':controller' => $controller,
-        ':action'     => 'delete',
-        'conditions'  => array('method' => 'DELETE')
-      ));
-      $this->connect("$singular_path.:format", array(
-        ':controller' => $controller,
-        ':action'     => 'delete',
-        'conditions'  => array('method' => 'DELETE')
-      ));
+      if ($this->named_route_exists($singular_name)) {
+        $this->connect_resource($singular_path, 'DELETE', $controller, 'delete');
+      }
+      else {
+        $this->connect_resource($singular_name, $singular_path, 'DELETE', $controller, 'delete');
+      }
     }
     
     # nested resource
@@ -543,6 +408,28 @@ class ResourceRoutes extends \Misago\Object
   {
     $obj = new Nested($this, "{$name}_", $name, $name);
     $closure($obj);
+  }
+
+  private function connect_resource($path, $method, $controller, $action)
+  {
+    $options = array(
+      ':controller' => $controller,
+      ':action'     => $action,
+      'conditions'  => array('method' => $method),
+    );
+    $this->connect($path, $options);
+    $this->connect("$path.:format", $options);
+  }
+  
+  private function named_resource($name, $path, $method, $controller, $action)
+  {
+    $options = array(
+      ':controller' => $controller,
+      ':action'     => $action,
+      'conditions'  => array('method' => $method),
+    );
+    $this->named($name, $path, $options);
+    $this->named("formatted_$name", "$path.:format", $options);
   }
 }
 

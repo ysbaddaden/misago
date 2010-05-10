@@ -109,6 +109,7 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     $this->assert_equal($map->route('DELETE', 'geocoder'), array(
       ':method' => 'DELETE', ':controller' => 'geocoder', ':action' => 'delete', ':format' => null));
     
+    # member
     $this->assert_equal($map->route('GET', 'geocoder/add'), array(
       ':method' => 'GET', ':controller' => 'geocoder', ':action' => 'add', ':format' => null));
     
@@ -117,6 +118,12 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
     
     $this->assert_equal($map->route('GET', 'geocoder/all'), array(
       ':method' => 'GET', ':controller' => 'geocoder', ':action' => 'all', ':format' => null));
+    
+    # member + any
+    $this->assert_equal($map->route('GET', 'geocoder/position'), array(
+      ':method' => 'GET', ':controller' => 'geocoder', ':action' => 'position', ':format' => null));
+    $this->assert_equal($map->route('PUT', 'geocoder/position'), array(
+      ':method' => 'PUT', ':controller' => 'geocoder', ':action' => 'position', ':format' => null));
     
     # as
     $this->assert_equal($map->route('GET', 'profil'), array(
@@ -224,6 +231,24 @@ class Test_ActionController_Routing_Resource extends Misago\Unit\TestCase
       new ActionController\Routing\Path('GET', 'geocoder.html'));
     $this->assert_equal(formatted_geocoder_url(array(':id' => 73, ':format' => 'xml')),
       new ActionController\Routing\Url('GET', 'geocoder.xml'));
+  }
+  
+  function test_named_routes_when_index_and_show_are_missing()
+  {
+    # named route for create when index is disabled
+    $this->assert_true(function_exists('categories_path'));
+    $this->assert_true(function_exists('categories_url'));
+    $this->assert_equal((string)categories_path(), '/kategorien');
+    
+    # named route for update when show is disabled
+    $this->assert_true(function_exists('category_path'));
+    $this->assert_true(function_exists('category_url'));
+    $this->assert_equal((string)category_path(1), '/kategorien/1');
+    
+    # named route for delete when show & update are disabled
+    $this->assert_true(function_exists('tag_path'));
+    $this->assert_true(function_exists('tag_url'));
+    $this->assert_equal((string)tag_path(2), '/tags/2');
   }
   
   function test_nested_resources()

@@ -8,27 +8,23 @@ use Misago\ActiveSupport\String;
 # You do configure your application's routes in +config/routes.php+.
 # A basic route config file looks like this:
 # 
-#   $map = Misago\ActionController\Routing\Routes::draw();
-#   
-#   # basic route: connects /login to AccountsController::login()
-#   $map->connect('login', array(
-#     ':controller' => 'accounts',
-#     ':action'     => 'login'
-#   ));
-#   
-#   # landing page: / => HomeController::index()
-#   $map->root(array(':controller' => 'home'));
-#   
-#   # default routes
-#   $map->connect(':controller/:action/:id');
-#   $map->connect(':controller/:action/:id.:format');
+#   Misago\ActionController\Routing\Routes::draw(function()
+#   {
+#     # basic route: connects /login to AccountsController::login()
+#     $map->connect('login', array(
+#      ':controller' => 'accounts',
+#      ':action'     => 'login'
+#     ));
+#     
+#     # landing page: / => HomeController::index()
+#     $map->root(array(':controller' => 'home'));
+#     
+#     # default routes
+#     $map->connect(':controller/:action/:id');
+#     $map->connect(':controller/:action/:id.:format');
+#   });
 # 
-# You may use different default routes, for instance:
-# 
-#   $map->connect(':controller/:action');
-#   $map->connect(':controller/:action.:format');
-#   $map->connect(':controller/:id/:action');
-#   $map->connect(':controller/:id/:action.:format');
+# You may use different default routes, but it's not recommended.
 # 
 # =Named routes
 # 
@@ -71,7 +67,8 @@ use Misago\ActiveSupport\String;
 # transparently handled by view helpers to generate links and forms that will
 # use the correct HTTP method.
 # 
-# IMPROVE: Cache routes using APC (how do I know when to save it?).
+# IMPROVE: Use a closure for draw().
+# IMPROVE: Cache routes in APC.
 # 
 class Routes extends ResourceRoutes
 {
@@ -89,13 +86,16 @@ class Routes extends ResourceRoutes
   private $built_named_route_helpers = false;
   
   # Singleton
-  static function draw()
+  static function draw($closure=null)
   {
     if (self::$map === null)
     {
       self::$map = new self();
       require ROOT.'/config/routes.php';
       self::$map->build_named_route_helpers();
+    }
+    if ($closure !== null) {
+      $closure(self::$map);
     }
     return self::$map;
   }
@@ -198,6 +198,17 @@ class Routes extends ResourceRoutes
       'default' => empty($mapping),
       'name'    => $name,
     );
+  }
+  
+  protected function named_route_exists($name)
+  {
+    foreach($this->routes as $route)
+    {
+      if ($route['name'] == $name) {
+        return true;
+      }
+    }
+    return false;
   }
   
   # Returns a mapping for a given method+path.
