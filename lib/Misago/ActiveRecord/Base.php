@@ -195,8 +195,9 @@ use Misago\I18n;
 # Remember that only <tt>destroy</tt> has callbacks, <tt>delete</tt> has no such handlers.
 # 
 # 
-# IMPROVE: Check if columns do not conflict with object class attributes.
+# FIXME: ActiveRecord should record dates in UTC!
 # TEST: Test callbacks.
+# IMPROVE: Check if columns do not conflict with object class attributes.
 # 
 abstract class Base extends Calculations
 {

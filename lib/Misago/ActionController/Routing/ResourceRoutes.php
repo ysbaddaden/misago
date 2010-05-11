@@ -262,7 +262,6 @@ class ResourceRoutes extends \Misago\Object
   # * there is no index route;
   # * nesting resource(s) will use the singular name as path prefix.
   # 
-  # TODO: Check if named route $singular exists before defining POST/PUT/DELETE!
   function resource($name, $options=array(), $closure=null)
   {
     if (is_object($options))

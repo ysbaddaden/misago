@@ -1,6 +1,10 @@
 <?php
 namespace Misago\ActiveSupport;
 
+# FIXME: Misago should use UTC dates internally, and return UTC dates with their offset. (ie. Fri, 31 Dec 1999 14:00:00 HST -10:00)
+# TODO: local(): returns the UTC date with the default timezone's offset (ie. Mon, 21 Feb 2005 10:11:12 -0600).
+# TODO: utc(): returns the UTC date with offset +0000 (ie. ).
+# TODO: in_time_zone($tz): returns the UTC date with zone's offset (ie. Mon, 21 Feb 2005 16:11:12 +0100).
 class Datetime extends \DateTime
 {
   protected $_string_format = 'Y-m-d H:i:s';
