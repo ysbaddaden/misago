@@ -79,8 +79,8 @@ function link_to($content, $url=null, $attributes=null)
   else
   {
     # resolves URL
-    if(is_array($url)) {
-      $url = url_for($url);
+    if (is_array($url)) {
+      $url = cfg_get('misago.current_controller')->url_for($url);
     }
     
     # URL is URI+method

@@ -134,19 +134,25 @@ class Test_ActionView_Helpers_UrlHelper extends Misago\Unit\TestCase
   function test_button_to()
   {
     $html = button_to('new', array(':controller' => 'products', ':action' => 'new'));
-    $this->assert_equal($html, '<form action="/products/new" method="post" class="button-to">'.
+    $this->assert_equal($html, '<form action="/products/new" method="get" class="button-to">'.
       '<div><input type="submit" value="new"/></div>'.
       '</form>');
     
-    $html = button_to('new', array(':controller' => 'products', ':action' => 'new', 'field' => 'a', 'param' => 'b'));
-    $this->assert_equal($html, '<form action="/products/new?field=a&amp;param=b" method="post" class="button-to">'.
-      '<div><input type="submit" value="new"/></div>'.
+    $html = button_to('purchase', array(':controller' => 'catalog', ':action' => 'purchase', ':id' => 1, 'field' => 'a', 'param' => 'b'));
+    $this->assert_equal($html, '<form action="/products/1/purchase?field=a&amp;param=b" method="post" class="button-to">'.
+      '<div><input type="submit" value="purchase"/></div>'.
       '</form>');
     
-    $html = button_to('new', array(':controller' => 'products', ':action' => 'delete', ':id' => 2), array('method' => 'delete', 'confirm' => 'Are you sure?'));
+    $html = button_to('publish event', array(':controller' => 'events', ':action' => 'publish', ':id' => 3));
+    $this->assert_equal($html, '<form action="/events/3/publish" method="post" class="button-to">'.
+      '<input type="hidden" name="_method" value="put"/>'.
+      '<div><input type="submit" value="publish event"/></div>'.
+      '</form>');
+    
+    $html = button_to('delete', product_path(2), array('method' => 'delete', 'confirm' => 'Are you sure?'));
     $this->assert_equal($html, '<form action="/products/2" method="post" class="button-to" onsubmit="return confirm(\'Are you sure?\');">'.
       '<input type="hidden" name="_method" value="delete"/>'.
-      '<div><input type="submit" value="new"/></div>'.
+      '<div><input type="submit" value="delete"/></div>'.
       '</form>');
   }
   

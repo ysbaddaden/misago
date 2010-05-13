@@ -220,23 +220,6 @@ class Test_ActionController_Routing_Routes extends Misago\Unit\TestCase
     $this->assert_equal($test->method, 'PUT');
   }
   
-  function test_url_for()
-  {
-    $map = ActionController\Routing\Routes::draw();
-    
-    $options = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
-    $this->assert_equal(url_for($options), '/page/toto.json');
-    
-    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc');
-    $this->assert_equal(url_for($options), '/pages.xml?order=asc');
-    
-    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc', 'path_only' => false);
-    $this->assert_equal(url_for($options), 'http://localhost:3009/pages.xml?order=asc');
-    
-    $this->assert_equal(url_for(array(':controller' => 'admin', 'format' => 'html')), '/admin?format=html',
-      "using query string parameter (string) sharing path parameter (symbol) name");
-  }
-  
   function test_named_routes()
   {
     $map = ActionController\Routing\Routes::draw();
@@ -303,12 +286,6 @@ class Test_ActionController_Routing_Routes extends Misago\Unit\TestCase
     
     $this->assert_equal((string)product_url(new Product(2)), 'http://localhost:3009/products/2');
     $this->assert_equal((string)edit_product_url(new Product(1)), 'http://localhost:3009/products/1/edit');
-  }
-  
-  function test_url_for_activerecord()
-  {
-    $this->assert_equal((string)url_for(new Product(2)), 'http://localhost:3009/products/2');
-    $this->assert_equal((string)url_for(new Product(3)), 'http://localhost:3009/products/3');
   }
   
   function test_named_routes_with_query_string()

@@ -103,13 +103,11 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     return array();
   }
   
-  function path()
-  {
+  function path() {
     return parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
   }
   
-  function url()
-  {
+  function url() {
     return $this->protocol().$this->host().$this->port_string().$_SERVER['REQUEST_URI'];
   }
   
@@ -124,6 +122,10 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     }
     return '';
   }
+  
+#  function base_url() {
+#    return $this->protocol().$this->host().$this->port_string().$this->relative_url_root();
+#  }
   
   function path_parameters($params=null)
   {
@@ -217,12 +219,12 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
   {
     if (is_array($ary))
     {
-	    foreach(array_keys($ary) as $k) {
+      foreach(array_keys($ary) as $k) {
 		    $this->sanitize_magic_quotes($ary[$k]);
 	    }
     }
     else {
-	    $ary = stripslashes($ary);
+      $ary = stripslashes($ary);
     }
   }
 }

@@ -11,11 +11,10 @@ class Url
   function __construct($method, $uri)
   {
     $this->method = $method;
-    $this->uri    = cfg_get('base_url').'/'.$uri;
+    $this->uri    = cfg_get('action_controller.base_url').'/'.$uri;
   }
   
-  function __toString()
-  {
+  function __toString() {
     return $this->uri;
   }
 }

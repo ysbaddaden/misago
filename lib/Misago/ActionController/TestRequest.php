@@ -32,38 +32,31 @@ class TestRequest extends \Misago\Object implements AbstractRequest
     
   }
   
-  function content_type()
-  {
+  function content_type() {
     return $this->data['content_type'];
   }
   
-  function format($force_format=null)
-  {
+  function format($force_format=null) {
     return $this->data[':format'];
   }
   
-  function method()
-  {
+  function method() {
     return strtolower($this->data[':method']);
   }
   
-  function protocol()
-  {
+  function protocol() {
     return $this->data['protocol'];
   }
   
-  function is_ssl()
-  {
+  function is_ssl() {
     return ($this->data['protocol'] == 'https://');
   }
   
-  function host()
-  {
+  function host() {
     return $this->data['host'];
   }
   
-  function port()
-  {
+  function port() {
     return $this->data['port'];
   }
   
@@ -73,8 +66,7 @@ class TestRequest extends \Misago\Object implements AbstractRequest
     return ($port == 80 or $port == 443) ? '' : ":$port";
   }
   
-  function subdomains()
-  {
+  function subdomains() {
     return array();
   }
   
@@ -92,15 +84,13 @@ class TestRequest extends \Misago\Object implements AbstractRequest
     return url_for(array_merge($this->path_parameters(), $this->get));
   }
   
-  function relative_url_root()
-  {
+  function relative_url_root() {
     return '';
   }
   
   function path_parameters($params=null)
   {
     return array_intersect_key($this->data, array(
-#      ':method'     => '',
       ':controller' => '',
       ':action'     => '',
       ':id'         => '',
@@ -114,18 +104,15 @@ class TestRequest extends \Misago\Object implements AbstractRequest
     return $params;
   }
   
-  function raw_body()
-  {
+  function raw_body() {
     return '';
   }
   
-  function is_xml_http_request()
-  {
+  function is_xml_http_request() {
     return (bool)$this->data['xhr'];
   }
   
-  function remote_ip()
-  {
+  function remote_ip() {
     return '127.0.0.1';
   }
 }

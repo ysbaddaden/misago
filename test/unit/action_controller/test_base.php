@@ -141,6 +141,48 @@ class Test_ActionController_Base extends Misago\Unit\TestCase
     $html = $controller->render_to_string(array('template' => 'errors/404', 'layout' => false));
     $this->assert_equal(trim($html), '404 not found');
   }
+  
+  function test_url_for()
+  {
+    $c = new SayController();
+    ob_start(); $c->process(new ActionController\TestRequest(array(':controller' => 'say', ':action' => 'hello'))); ob_get_clean();
+    
+    # uses the current request
+    $options = array(':controller' => 'pages', ':action' => 'show', ':id' => 'toto', ':format' => 'json');
+    $this->assert_equal($c->url_for($options), '/page/toto.json');
+    
+    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc');
+    $this->assert_equal($c->url_for($options), '/pages.xml?order=asc');
+    
+    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc', 'path_only' => false);
+    $this->assert_equal($c->url_for($options), 'http://localhost:3009/pages.xml?order=asc');
+    
+    $this->assert_equal($c->url_for(array(':controller' => 'admin', 'format' => 'html')), '/admin?format=html',
+      "using query string parameter (string) sharing path parameter (symbol) name");
+    
+    # forces protocol, host & port
+    $options = array(':controller' => 'pages', ':format' => 'xml', 'order' => 'asc', 'path_only' => false, 'host' => 'webcomics.fr', 'protocol' => 'https', 'port' => 80);
+    $this->assert_equal($c->url_for($options), 'https://webcomics.fr/pages.xml?order=asc');
+    
+    $options = array(':controller' => 'stories', 'path_only' => false, 'host' => 'www.bd-en-ligne.fr');
+    $this->assert_equal($c->url_for($options), 'http://www.bd-en-ligne.fr:3009/stories');
+    
+    # auto-fills holes in request
+    $this->assert_equal($c->url_for(), '/say/hello');
+    $this->assert_equal($c->url_for(array(':action' => 'blabla')), '/say/blabla');
+    $this->assert_equal($c->url_for(array('page' => '2')), '/say/hello?page=2');
+    $this->assert_equal($c->url_for(array('page' => '2')), '/say/hello?page=2');
+    
+    $c = new SayController();
+    ob_start(); $c->process(new ActionController\TestRequest(array(':controller' => 'say', ':action' => 'hello'))); ob_get_clean();
+    $this->assert_equal($c->url_for(array(':action' => 'index')), '/say');
+  }
+  
+#  function test_url_for_with_activerecords()
+#  {
+#    $this->assert_equal((string)url_for(new Product(2)), 'http://localhost:3009/products/2');
+#    $this->assert_equal((string)url_for(new Product(3)), 'http://localhost:3009/products/3');
+#  }
 }
 
 ?>

@@ -119,7 +119,7 @@ abstract class Base extends RequestForgeryProtection
     return parent::__set($attr, $value);
   }
   
-  # :private:
+  # :nodoc:
   function process($request=null, $response=null)
   {
     \Misago\Session::start(isset($_REQUEST['session_id']) ? $_REQUEST['session_id'] : null);
@@ -128,12 +128,7 @@ abstract class Base extends RequestForgeryProtection
     $this->response = ($response !== null) ? $response : new AbstractResponse();
     $this->flash    = new Flash();
     
-    cfg_set('base_url',
-      $this->request->protocol().
-      $this->request->host().
-      $this->request->port_string().
-      $this->request->relative_url_root()
-    );
+    cfg_set('misago.current_controller', $this);
     
     $this->params = $this->request->parameters();
     $this->action = $this->params[':action'];
@@ -192,7 +187,7 @@ abstract class Base extends RequestForgeryProtection
     }
   }
   
-  # :private:
+  # :nodoc:
   protected function process_action()
   {
     $this->{$this->action}();
@@ -441,21 +436,141 @@ abstract class Base extends RequestForgeryProtection
   
   # Returns IP of current user (REMOTE_ADDR), trying to bypass proxies
   # (HTTP_X_FORWARDED_FOR & HTTP_CLIENT_IP).
-  protected function remote_ip()
-  {
+  protected function remote_ip() {
     return $this->request->remote_ip();
   }
   
   # Checks wether the request is made from AJAX.
-  protected function is_xml_http_request()
-  {
+  protected function is_xml_http_request() {
     return $this->request->is_xml_http_request();
   }
   
   # Shortcut for <tt>is_xml_http_request()</tt>.
-  protected function is_xhr()
-  {
+  protected function is_xhr() {
     return $this->is_xml_http_request();
+  }
+  
+  # Resolves an URL (reverse routing).
+  # 
+  # Options:
+  # 
+  # - +anchor+     - adds an anchor to the URL.
+  # - +path_only+  - false to return an absolute URI, true to return the path only (defaults to true).
+  # - +protocol+   - overwrites the current protocol.
+  # - +host+       - overwrites the current host.
+  # - +port+       - overwrites the current port.
+  # - +user+       - username for HTTP login.
+  # - +password+   - password for HTTP login.
+  # 
+  # Example:
+  # 
+  #   url_for(array(':controller' => 'products', ':action' => 'show', ':id' => '67'))
+  #   # => http://www.domain.com/products/show/67
+  # 
+  # Any unknown option that isn't a symbol is added to the query string:
+  # 
+  #   url_for(array(':controller' => 'products', 'order' => 'asc'))
+  #   # => http://www.domain.com/products?order=asc
+  # 
+  #   url_for(array(':controller' => 'products', ':action' => 'show', ':id' => 13, 'comments' => 'show'))
+  #   # => http://www.domain.com/products/show/13?comments=show
+  # 
+  # You may also add an anchor:
+  # 
+  #   url_for(array(':controller' => 'about', 'anchor' => 'me'))
+  #   # => http://www.domain.com/about#me
+  # 
+  # <tt>url_for</tt> will fill a few missing path parameters for you:
+  # 
+  # * -+:controller+ - will always be filled with the current request controller;
+  # * -+:action+     - will be filled with the current action if the linked controller is the current one.
+  # 
+  # For example, if we are in the +stories+ controller and +feed+ action:
+  # 
+  #   url_for();
+  #   # => "/pages/feed"
+  # 
+  #   url_for(array(':action' => 'index'));
+  #   # => "/pages"
+  # 
+  #   url_for(array(':action' => 'show', ':id' => 2));
+  #   # => "/stories/show/2"
+  # 
+  #   url_for(array(':controller' => 'pages'));
+  #   # => "/pages"
+  # 
+  # Using REST resources, you may pass an <tt>\Misago\ActiveRecord</tt> directly.
+  # For instance:
+  # 
+  #   $product = new Product(43);
+  #   $url = url_for($product);    # => http://www.domain.com/products/3
+  # 
+  function url_for($options=array())
+  {
+    if ($options instanceof \Misago\ActiveRecord\Record)
+    {
+      $named_route = \Misago\ActiveSupport\String::underscore(get_class($options)).'_url';
+      return $named_route($options);
+    }
+    
+    $default_options = array(
+      'anchor'                 => null,
+      'path_only'              => true,
+      'protocol'               => $this->request->protocol(),
+      'host'                   => $this->request->host(),
+      'port'                   => $this->request->port(),
+      'user'                   => null,
+      'password'               => null,
+      'skip_relative_url_root' => false,
+    );
+    
+    $mapping = array_diff_key($options, $default_options);
+    if (!isset($mapping[':controller'])) {
+      $mapping[':controller'] = $this->params[':controller'];
+    }
+    if (!isset($mapping[':action'])
+      and $mapping[':controller'] == $this->params[':controller'])
+    {
+      $mapping[':action'] = $this->params[':action'];
+    }
+    
+    $options = array_merge($default_options, $options);
+    $map     = \Misago\ActionController\Routing\Routes::draw();
+    $keys    = array();
+    $query_string = array();
+    
+    foreach($mapping as $k => $v)
+    {
+      if (is_symbol($k)) {
+        $keys[$k] = $v;
+      }
+      else {
+        $query_string[$k] = $v;
+      }
+    }
+    $path = $map->reverse($keys);
+    
+    if (!empty($query_string))
+    {
+      ksort($query_string);
+      $path .= '?'.http_build_query($query_string);
+    }
+    if (!empty($options['anchor'])) {
+      $path .= '#'.$options['anchor'];
+    }
+    
+    if ($options['path_only']) {
+      return $path;
+    }
+    
+    $url  = strpos($options['protocol'], '://') ? $options['protocol'] : $options['protocol'].'://';
+    $url .= $options['host'];
+    if ($options['port'] != 80 and $options['port'] != 443) {
+      $url .= ':'.$options['port'];
+    }
+    $url .= $this->request->relative_url_root().$path;
+    return $url;
+    #return cfg_get('action_controller.base_url').$path;
   }
 }
 
