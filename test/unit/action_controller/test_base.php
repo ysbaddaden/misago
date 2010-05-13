@@ -176,13 +176,11 @@ class Test_ActionController_Base extends Misago\Unit\TestCase
     $c = new SayController();
     ob_start(); $c->process(new ActionController\TestRequest(array(':controller' => 'say', ':action' => 'hello'))); ob_get_clean();
     $this->assert_equal($c->url_for(array(':action' => 'index')), '/say');
+    
+    # with activerecords:
+    $this->assert_equal((string)$c->url_for(new Product(2)), 'http://localhost:3009/products/2');
+    $this->assert_equal((string)$c->url_for(new Product(3)), 'http://localhost:3009/products/3');
   }
-  
-#  function test_url_for_with_activerecords()
-#  {
-#    $this->assert_equal((string)url_for(new Product(2)), 'http://localhost:3009/products/2');
-#    $this->assert_equal((string)url_for(new Product(3)), 'http://localhost:3009/products/3');
-#  }
 }
 
 ?>

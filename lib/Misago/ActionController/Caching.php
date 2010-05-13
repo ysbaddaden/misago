@@ -292,7 +292,7 @@ abstract class Caching extends Filters
           ':format'     => $this->format,
           ':path_only'  => true,
         ), $options);
-        $path = url_for($options);
+        $path = $this->url_for($options);
       break;
       case 'string': $path = $options; break;
       default:       $path = $this->request->path(); break;
@@ -315,7 +315,7 @@ abstract class Caching extends Filters
           ':path_only'  => true,
         ), $options);
         $suffix = isset($options[':action_suffix']) ? $options[':action_suffix'] : '';
-        return url_for($options).$suffix;
+        return $this->url_for($options).$suffix;
       break;
       
       default: return $options;

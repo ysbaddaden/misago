@@ -73,7 +73,7 @@ class TestRequest extends \Misago\Object implements AbstractRequest
   function path()
   {
     return isset($this->data['path']) ? $this->data['path'] :
-      (string)url_for($this->path_parameters());
+      (string)cfg_get('misago.current_controller')->url_for($this->path_parameters());
   }
   
   function url()
@@ -81,7 +81,7 @@ class TestRequest extends \Misago\Object implements AbstractRequest
     if (isset($this->data['url'])) {
       return $this->data['url'];
     }
-    return url_for(array_merge($this->path_parameters(), $this->get));
+    return cfg_get('misago.current_controller')->url_for(array_merge($this->path_parameters(), $this->get));
   }
   
   function relative_url_root() {

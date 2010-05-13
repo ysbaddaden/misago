@@ -12,7 +12,7 @@
 function form_tag($url, $attributes=null)
 {
   if (is_array($url)) {
-    $url = url_for($url);
+    $url = cfg_get('misago.current_controller')->url_for($url);
   }
   
   if (isset($attributes['method']))

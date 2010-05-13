@@ -419,7 +419,7 @@ abstract class Base extends RequestForgeryProtection
     if (is_array($url))
     {
       $url['path_only'] = false;
-      $url = url_for($url);
+      $url = $this->url_for($url);
     }
     else
     {

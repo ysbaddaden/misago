@@ -26,7 +26,7 @@ function paginate($collection, $options=array())
     if ($page === null) return $label;
     
     $link_options[$param_name] = $page;
-    return link_to($label, url_for($link_options));
+    return link_to($label, cfg_get('misago.current_controller')->url_for($link_options));
   };
   
   # previous page

@@ -26,7 +26,7 @@ function current_page($url)
     and !$url instanceof Misago\ActionController\Routing\Path
     and !is_string($url))
   {
-    $url = url_for($url);
+    $url = cfg_get('misago.current_controller')->url_for($url);
   }
   $url = (string)$url;
   
@@ -174,7 +174,7 @@ function link_to_unless_current($content, $url, $attributes=null)
 function button_to($name, $url, $attributes=null)
 {
   if (is_array($url)) {
-    $url = url_for($url);
+    $url = cfg_get('misago.current_controller')->url_for($url);
   }
   
   $form_attributes = array('class' => 'button-to');

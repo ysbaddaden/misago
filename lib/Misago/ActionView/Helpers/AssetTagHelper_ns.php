@@ -16,7 +16,7 @@ namespace Misago\ActionView\Helpers\AssetTag;
 function linearize_path($base_path, $path)
 {
   if (is_array($path)) {
-    return url_for($path);
+    return cfg_get('misago.current_controller')->url_for($path);
   }
   
   $path = trim($path);
