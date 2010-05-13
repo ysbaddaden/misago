@@ -461,6 +461,7 @@ abstract class Base extends RequestForgeryProtection
   # - +port+       - overwrites the current port.
   # - +user+       - username for HTTP login.
   # - +password+   - password for HTTP login.
+  # - +skip_relative_url_root+ -
   # 
   # Example:
   # 
@@ -568,9 +569,10 @@ abstract class Base extends RequestForgeryProtection
     if ($options['port'] != 80 and $options['port'] != 443) {
       $url .= ':'.$options['port'];
     }
-    $url .= $this->request->relative_url_root().$path;
-    return $url;
-    #return cfg_get('action_controller.base_url').$path;
+    if (!$options['skip_relative_url_root']) {
+      $url .= $this->request->relative_url_root();
+    }
+    return $url.$path;
   }
 }
 
