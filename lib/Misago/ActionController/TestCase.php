@@ -11,34 +11,60 @@ $_SERVER['migrate_debug'] = 0;
 #   
 #   class Test_StoriesController extends Misago\ActionController\TestCase
 #   {
-#     function test_index()
+#     function test_stories_on_index_page()
 #     {
-#       $this->run_action(stories_path());
+#       $this->get(stories_path());
 #       $this->assert_response(200);
 #       $this->assert_select('.stories li', 4);
 #     }
 #   }
 #   ?\>
 # 
-# IMPROVE: Use TestRequest instead of calling a test server.
 abstract class TestCase extends \Misago\Unit\TestCase
 {
   protected $use_transactional_fixtures = false;
   
-  function __construct() {
-    Routing\Routes::draw();
+  # Executes a GET HTTP request on test server.
+  # 
+  #   $this->get('/accounts');
+  #   $this->get(new_account_path());
+  # 
+  function get($uri) {
+    $this->run_action('GET', $uri);
   }
   
-  # Executes an action on test server.
+  # Executes a POST HTTP request on test server.
   # 
-  #   $this->run_action('GET', '/accounts');
-  #   $this->run_action('PUT', '/accounts',
-  #     array('account' => array('user_name' => 'azeroth'));
+  #   $post = array('account' => array('user_name' => 'azeroth'));
+  #   $this->post('/accounts', $post);
+  # 
+  function post($uri, $postfields=array(), $files=array()) {
+    $this->run_action('POST', $uri, $postfields, $files);
+  }
+  
+  # Executes a PUT HTTP request on test server.
+  # 
+  #   $post = array('account' => array('user_name' => 'azeroth'));
+  #   $this->post('/accounts', $post);
   #   
-  #   $this->run_action(new_account_path());
-  #   $this->run_action(delete_account_path());
+  #   $post  = array('account' => array('user_name' => 'azeroth'));
+  #   $files = array('avatar' => '/path/to/avatar.jpg');
+  #   $this->post('/accounts', $post);
   # 
-  function & run_action($method, $uri=null, $postfields=null, $files=null)
+  function put($uri, $postfields=array(), $files=array()) {
+    $this->run_action('PUT', $uri, $postfields, $files);
+  }
+  
+  # Executes a DELETE HTTP request on test server.
+  # 
+  #   $this->delete(account_path());
+  # 
+  function delete($uri) {
+    $this->run_action('DELETE', $uri);
+  }
+  
+  # :nodoc:
+  function run_action($method, $uri=null, $postfields=null, $files=null)
   {
     $args = func_get_args();
     if (is_object($args[0]))
@@ -136,9 +162,9 @@ abstract class TestCase extends \Misago\Unit\TestCase
     return $this->response;
   }
   
-  private function & flatten_postfields(&$postfields)
+  private function flatten_postfields($postfields)
   {
-    $data = array();
+    $data   = array();
     $fields = explode('&', http_build_query($postfields));
     
     foreach($fields as $v)
@@ -151,6 +177,7 @@ abstract class TestCase extends \Misago\Unit\TestCase
     }
     return $data;
   }
+  
   /*
   private function build_multipart_form_data(&$postfields)
   {
