@@ -95,10 +95,6 @@ abstract class TestCase extends \Misago\Unit\TestCase
         curl_setopt($ch, CURLOPT_HTTPGET, true);
       break;
       
-#      case 'PUT':
-#        $method = 'POST';
-#        $postfields['_method'] = 'PUT';
-      
       case 'POST':
         curl_setopt($ch, CURLOPT_POST, true);
         if (!empty($postfields)) {
