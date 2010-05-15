@@ -95,9 +95,9 @@ abstract class TestCase extends \Misago\Unit\TestCase
         curl_setopt($ch, CURLOPT_HTTPGET, true);
       break;
       
-      case 'PUT':
-        $method = 'POST';
-        $postfields['_method'] = 'PUT';
+#      case 'PUT':
+#        $method = 'POST';
+#        $postfields['_method'] = 'PUT';
       
       case 'POST':
         curl_setopt($ch, CURLOPT_POST, true);
@@ -105,18 +105,14 @@ abstract class TestCase extends \Misago\Unit\TestCase
           curl_setopt($ch, CURLOPT_POSTFIELDS, $this->flatten_postfields($postfields));
         }
       break;
-      /*
+      
       case 'PUT':
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
-        if (!empty($postfields))
-        {
-          list($boundary, $data) = $this->build_multipart_form_data($postfields);
-          curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: multipart/form-data; boundary=$boundary"));
-          curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-          print_r($data);
+        if (!empty($postfields)) {
+          curl_setopt($ch, CURLOPT_POSTFIELDS, $this->flatten_postfields($postfields));
         }
       break;
-      */
+      
       case 'DELETE':
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
       break;
@@ -178,32 +174,41 @@ abstract class TestCase extends \Misago\Unit\TestCase
     return $data;
   }
   
-  /*
-  private function build_multipart_form_data(&$postfields)
-  {
-    $data = "";
-    $boundary = "---------------------".substr(md5(rand(0,32000)), 0, 10);
-    
-    foreach($postfields as $k => $v)
-    {
-      if (strpos(ltrim($v), '@') === 0)
-      {
-        $data .= "Content-Disposition: form-data; name=\"{$k}\"; filename=\"{$v}\"\n"; 
-        $data .= "Content-Type: ".mime_content_type($v)."\n"; 
-        $data .= "Content-Transfer-Encoding: binary\n\n"; 
-        $data .= file_get_contents($v)."\n"; 
-        $data .= "--$boundary--\n"; 
-      }
-      else
-      {
-        $data .= "--$boundary\n"; 
-        $data .= "Content-Disposition: form-data; name=\"".$k."\"\n\n".$v."\n"; 
-      }
-    }
-    $data .= "--$boundary\n"; 
-    return array($boundary, $data);
-  }
-  */
+#  private function build_multipart_form_data($postfields)
+#  {
+#    $EOF      = "\r\n";
+#    $boundary = "---------------------------".sha1(rand(0, 32000));
+#    $parts    = array();
+#    $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+#    
+#    $postfields = $this->flatten_postfields($postfields);
+#    foreach($postfields as $name => $value)
+#    {
+#      $part = '';
+#      if (strpos($value, '@') !== 0)
+#      {
+#        $part .= 'Content-Disposition: form-data; name="'.$name.'"'.$EOF.$EOF;
+#        $part .= $value.$EOF;
+#      }
+#      else
+#      {
+#        $value = substr($value, 1);
+#        $part .= 'Content-Disposition: form-data; name="'.$name.'" filename="'.basename($value).'"'.$EOF;
+#        $part .= "Content-Type: ".finfo_file($finfo, $value).$EOF.$EOF;
+#        $part .= file_get_contents($value).$EOF;
+#      }
+#      $parts[] = $part;
+#    }
+#    finfo_close($finfo);
+#    
+#    $data  = "--$boundary$EOF";
+#    $data .= implode("--$boundary$EOF", $parts);
+#    $data .= "--$boundary--$EOF";
+#    
+#    var_dump($data);
+#    
+#    return array($boundary, $data);
+#  }
 }
 
 ?>

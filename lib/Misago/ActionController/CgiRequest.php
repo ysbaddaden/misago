@@ -17,6 +17,7 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
   
   protected $format;
   protected $path_parameters;
+  private   $parsed_multipart = false;
   
   function __construct()
   {
@@ -26,6 +27,13 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
       $this->parse_post_body();
     }
     $_REQUEST = array_merge($_GET, $_POST);
+  }
+  
+  function __destruct()
+  {
+    if ($this->parsed_multipart) {
+      $this->unlink_uploaded_files();
+    }
   }
   
   function accepts()
@@ -123,10 +131,6 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     return '';
   }
   
-#  function base_url() {
-#    return $this->protocol().$this->host().$this->port_string().$this->relative_url_root();
-#  }
-  
   function path_parameters($params=null)
   {
     if ($params !== null) {
@@ -192,17 +196,22 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     }
   }
   
-  # IMPROVE: Parse multipart/form-data, as well as XML post data.
+  # IMPROVE: Parse XML posted data.
   private function parse_post_body()
   {
-    switch($this->content_type())
+    $content_type = $this->content_type();
+    if (($pos = strpos($content_type, ';')) !== false) {
+      $content_type = substr($content_type, 0, $pos);
+    }
+    
+    switch($content_type)
     {
       case 'application/x-www-form-urlencoded':
         parse_str($this->raw_body(), $_POST);
       break;
       
       case 'multipart/form-data':
-        // ...
+        list($_POST, $_FILES) = $this->parse_multipart();
       break;
       
       case 'application/xml': case 'text/xml':
@@ -225,6 +234,209 @@ class CgiRequest extends \Misago\Object implements AbstractRequest
     }
     else {
       $ary = stripslashes($ary);
+    }
+  }
+  
+  # FIXME: Uploaded files may have arrays in their form-names too, like pictures[] => $_FILES['pictures']['name'][].
+  private function parse_multipart()
+  {
+    $EOL = "\r\n";
+    
+    preg_match('/boundary="?([^\";]*)"?/i', $this->content_type(), $match);
+    $boundary = "--{$match[1]}";
+    $post     = array();
+    $files    = array();
+    $buf      = "";
+    $input    = fopen('php://input', 'r');
+    
+    $bufsize = 16384;
+    $boundary_size  = strlen($boundary.$EOL);
+    $content_length = (int)$_SERVER['CONTENT_LENGTH'] - $boundary_size;
+    
+    $upload_tmp_dir = ini_get('upload_tmp_dir');
+    if (!$upload_tmp_dir) $upload_tmp_dir = isset($_SERVER['TMPDIR']) ? $_SERVER['TMPDIR'] : '/tmp';
+    $upload_tmp_dir_ok = (file_exists($upload_tmp_dir) and is_dir($upload_tmp_dir));
+    
+    $upload_max_filesize = $this->byte_string_to_int(ini_get('upload_max_filesize'));
+    
+    $status = fread($input, $boundary_size);
+    if ($status != $boundary.$EOL) {
+      throw new \Misago\Exception("bad content body", 400);
+    }
+    
+    $rx = "/(?:$EOL)?".preg_quote($boundary)."($EOL|--)/";
+    
+    while(true)
+    {
+      $head = null;
+      $body = fopen('php://temp', 'rw');
+      $filename = $content_type = $name = $tmp_name = null;
+      
+      while(!$head or !preg_match($rx, $buf))
+      {
+        if (!$head and ($i = strpos($buf, $EOL.$EOL)) !== false)
+        {
+          $head = substr($buf, 0, $i+2);
+          $buf  = substr($buf, $i+4);
+          
+          if (preg_match('/Content-Disposition:.* filename=(?:"((?:\\.|[^\"])*)"|([^;\s]*))/i', $head, $match)) {
+            $filename = $match[1];
+          }
+          if (preg_match('/Content-Type: (.*)'.$EOL.'/i', $head, $match)) {
+            $content_type = $match[1];
+          }
+          if (preg_match('/Content-Disposition:.*\s+name="?([^\";]*)"?/i', $head, $match)) {
+            $name = $match[1];
+          }
+          elseif (preg_match('/Content-ID:\s*([^'.$EOL.']*)/i', $head, $match)) {
+            $name = $match[1];
+          }
+          continue;
+        }
+        
+        # saves the read body part
+        if ($head and ($boundary_size+4 < strlen($buf))) {
+          fwrite($body, substr($buf, 0, strlen($buf) - ($boundary_size+4)));
+        }
+        
+        # reads more
+        $c = fread($input, $bufsize < $content_length ? $bufsize : $content_length);
+        if (empty($c)) {
+          throw new \Misago\Exception("bad content body", 400);
+        }
+        $buf .= $c;
+        $content_length -= strlen($c);
+      }
+      
+      # saves the rest
+      if (preg_match($rx, $buf, $match))
+      {
+        list($read_body, $buf) = preg_split($rx, $buf, 2);
+        fwrite($body, $read_body);
+        
+        if ($match[1] == '--') {
+          $content_length = -1;
+        }
+      }
+      
+      if ($filename === "") {
+        $files[$name] = multipart_file(UPLOAD_ERR_NO_FILE);
+      }
+      elseif ($filename or $content_type)
+      {
+        if (count($files) > ini_get('max_file_uploads'))
+        {
+          $this->unlink_uploaded_files();
+          throw new \Misago\Exception('too many uploaded files', 500);
+        }
+        
+        $stats = fstat($body);
+        if ($stats['size'] > $upload_max_filesize) {
+          $files[$name] = $this->multipart_file(UPLOAD_ERR_INI_SIZE);
+        }
+        elseif (isset($post['MAX_FILE_SIZE'])
+          and $stats['size'] > $this->byte_string_to_int($post['MAX_FILE_SIZE']))
+        {
+          $files[$name] = $this->multipart_file(UPLOAD_ERR_FORM_SIZE);
+        }
+        elseif (!$upload_tmp_dir_ok) {
+          $files[$name] = $this->multipart_file(UPLOAD_ERR_NO_TMP_DIR);
+        }
+        else
+        {
+          while(true)
+          {
+            do $tmp_name = $upload_tmp_dir.'/php'.mt_rand();
+            while(file_exists($tmp_name));
+            
+            if (($tmp_file = fopen($tmp_name, 'w')) === false)
+            {
+              $files[$name] = $this->multipart_file(UPLOAD_ERR_CANT_WRITE);
+              break;
+            }
+            
+            if (!flock($tmp_file, LOCK_EX))
+            {
+              # race-condition: file is being created by another process!
+              continue;
+            }
+            
+            rewind($body);
+            stream_copy_to_stream($body, $tmp_file);
+            fclose($tmp_file);
+            
+            $files[$name] = $this->multipart_file(UPLOAD_ERR_OK, array(
+              'name'     => $filename ? basename($filename) : null,
+              'type'     => $content_type,
+              'size'     => $stats['size'],
+              'tmp_name' => $tmp_name,
+            ));
+            break;
+          }
+        }
+      }
+      elseif ($body !== null)
+      {
+        rewind($body);
+        $post[$name] = stream_get_contents($body);
+      }
+      fclose($body);
+      
+      if (empty($buf) or $content_length == -1) {
+        break;
+      }
+    }
+    
+    # permits use of arrays in param names
+    parse_str(http_build_query($post), $post);
+    
+    $this->parsed_multipart = true;
+    return array($post, $files);
+  }
+  
+  private function multipart_file($error, $options=array())
+  {
+    return array_merge(array(
+      'name'     => null,
+      'type'     => null,
+      'size'     => null,
+      'tmp_name' => null,
+      'error'    => $error
+    ), $options);
+  }
+
+  private function byte_string_to_int($str)
+  {
+    if (strpos($str, 'K')) {
+      return (int)str_replace('K', '', $str) * 1024;
+    }
+    elseif (strpos($str, 'M')) {
+      return (int)str_replace('M', '', $str) * 1024 * 1024;
+    }
+    elseif (strpos($str, 'G')) {
+      return (int)str_replace('G', '', $str) * 1024 * 1024 * 1024;
+    }
+    elseif (strpos($str, 'T')) {
+      return (int)str_replace('T', '', $str) * 1024 * 1024 * 1024 * 1024;
+    }
+    elseif (strpos($str, 'P')) {
+      return (int)str_replace('P', '', $str) * 1024 * 1024 * 1024 * 1024 * 1024;
+    }
+  }
+  
+  private function unlink_uploaded_files()
+  {
+    foreach($_FILES as $f)
+    {
+      if (is_array($_FILES[$f]['tmp_name']))
+      {
+        foreach($_FILES[$f]['tmp_name'] as $tmp_name) {
+          unlink($tmp_name);
+        }
+      }
+      else {
+        unlink($_FILES[$f]['tmp_name']);
+      }
     }
   }
 }

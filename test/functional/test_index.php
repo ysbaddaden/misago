@@ -6,16 +6,20 @@ class TestIndexController extends Misago\ActionController\TestCase
   function test_query_string_parse()
   {
     $this->get('/index/get?a=b&c=aze%20rty');
-    $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'b', 'c' => 'aze rty'), true)));
+    $this->assert_equal(trim($this->response['body']),
+      trim(print_r(array('a' => 'b', 'c' => 'aze rty'), true)));
     
     $this->post('/index/get?a=abcd&c=aze%20rty', array('a' => 'b', 'c' => 'd'));
-    $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
+    $this->assert_equal(trim($this->response['body']),
+      trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
     
     $this->put('/index/get?a=abcd&c=aze%20rty', array('a' => 'b', 'c' => 'd'));
-    $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
+    $this->assert_equal(trim($this->response['body']),
+      trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
     
-    $this->delete('/index/get?a=abcd&c=aze%20rty', array('a' => 'b', 'c' => 'd'));
-    $this->assert_equal(trim($this->response['body']), trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
+    $this->delete('/index/get?a=abcd&c=aze%20rty');
+    $this->assert_equal(trim($this->response['body']),
+      trim(print_r(array('a' => 'abcd', 'c' => 'aze rty'), true)));
   }
   
   function test_postfields_parse()
@@ -41,10 +45,10 @@ class TestIndexController extends Misago\ActionController\TestCase
   function test_file_upload()
   {
     $this->post('/index/files', array('myfile' => '@'.__FILE__));
-    $this->assert_true((bool)preg_match('/\[name\] => '.basename(__FILE__).'/', $this->response['body']), 'file upload throught POST');
+    $this->assert_match('/\[name\] => '.basename(__FILE__).'/', $this->response['body'], 'file upload throught POST');
     
     $this->put('/index/files', array('myfile' => '@'.__FILE__));
-    $this->assert_true((bool)preg_match('/\[name\] => '.basename(__FILE__).'/', $this->response['body']), 'file upload throught PUT');
+    $this->assert_match('/\[name\] => '.basename(__FILE__).'/', $this->response['body'], 'file upload throught PUT');
   }
   
   function test_head()
